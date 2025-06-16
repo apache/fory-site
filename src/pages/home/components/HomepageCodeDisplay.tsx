@@ -58,18 +58,18 @@ export default function HomepageCodeDisplay() {
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-center md:m-32 m-6 space-y-6 md:space-y-0 md:space-x-8">
-      {/* Left image */}
-      <div className="w-full md:w-1/2 flex justify-center">
+      {/* Pic */}
+      <div className="hidden md:flex w-full md:w-1/2 justify-center">
         <img
           src={programmingImageUrl}
           alt="programming-coding"
-          className="w-full max-w-xs sm:max-w-sm md:max-w-md h-auto"
+          className="w-full max-w-md h-auto"
         />
       </div>
 
-      {/* Code box */}
+      {/* Code Box */}
       <div
-        className="relative text-sm overflow-hidden bg-[#1e1e2f] rounded-lg"
+        className="relative text-sm overflow-hidden bg-[#1e1e2f]rounded-lg"
         style={{
           width: "100%",
           maxWidth: "600px",
@@ -100,7 +100,7 @@ export default function HomepageCodeDisplay() {
           </button>
         </div>
 
-        {/* Code Area with animation and scroll */}
+        {/* 动画切换区域 */}
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedLang}
@@ -124,5 +124,6 @@ export default function HomepageCodeDisplay() {
         </AnimatePresence>
       </div>
     </div>
+
   );
 }
