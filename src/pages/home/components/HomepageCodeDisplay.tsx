@@ -66,7 +66,6 @@ export default function HomepageCodeDisplay() {
           className="w-full max-w-md h-auto"
         />
       </div>
-
       {/* Code Box */}
       <div
         className="relative text-sm overflow-hidden bg-[#1e1e2f]rounded-lg"
@@ -105,15 +104,12 @@ export default function HomepageCodeDisplay() {
             transition={{ duration: 0.4 }}
             className="relative w-full h-full"
           >
-            {/* ✅ Copy 按钮浮动在右上角 */}
             <button
               onClick={copyToClipboard}
               className="absolute top-5 right-5 z-10 text-xs px-2 py-1 rounded border border-gray-500 text-white hover:bg-white/10 transition"
             >
               {copyMessage || "Copy"}
             </button>
-
-            {/* ✅ 代码区域 */}
             <div className="w-full h-full overflow-auto px-4 py-2">
               <SyntaxHighlighter
                 language={selectedLang}
