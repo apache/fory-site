@@ -77,30 +77,25 @@ export default function HomepageCodeDisplay() {
         }}
       >
         {/* Top Bar */}
-        <div className="flex justify-between items-center px-3 py-2 bg-[#1e1e2f]">
+        <div className="flex items-center px-3 py-2 bg-[#1e1e2f]">
           <div className="space-x-3 overflow-auto">
             {langs.map((lang) => (
               <button
                 key={lang}
                 onClick={() => handleLangChange(lang)}
-                className={`px-3 py-1 rounded-full text-sm font-medium duration-200 ${selectedLang === lang
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-600 text-gray-300 hover:bg-gray-500"
+                className={`px-3 py-1 rounded-full text-sm font-medium border border-gray-500 duration-200 ${selectedLang === lang
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-600 text-gray-300 hover:bg-gray-500"
                   }`}
               >
                 {CODE_EXAMPLES[lang].label}
               </button>
             ))}
           </div>
-          <button
-            onClick={copyToClipboard}
-            className="text-xs px-3 py-1 rounded-full font-medium bg-gray-600 text-white hover:bg-gray-500"
-          >
-            {copyMessage || "Copy"}
-          </button>
         </div>
 
-        {/* 动画切换区域 */}
+
+        {/* Code Area with animation and scroll */}
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedLang}
@@ -108,8 +103,17 @@ export default function HomepageCodeDisplay() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.4 }}
-            className="w-full h-full"
+            className="relative w-full h-full"
           >
+            {/* ✅ Copy 按钮浮动在右上角 */}
+            <button
+              onClick={copyToClipboard}
+              className="absolute top-5 right-5 z-10 text-xs px-2 py-1 rounded border border-gray-500 text-white hover:bg-white/10 transition"
+            >
+              {copyMessage || "Copy"}
+            </button>
+
+            {/* ✅ 代码区域 */}
             <div className="w-full h-full overflow-auto px-4 py-2">
               <SyntaxHighlighter
                 language={selectedLang}
@@ -122,6 +126,7 @@ export default function HomepageCodeDisplay() {
             </div>
           </motion.div>
         </AnimatePresence>
+
       </div>
     </div>
 
