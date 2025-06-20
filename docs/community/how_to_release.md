@@ -576,8 +576,22 @@ Thanks,
 ${name}
 ```
 
-After at least 72 hours with at least 3 +1 binding vote (from Incubator PMC member) and no veto, claim the vote result:
+After at least 72 hours with at least 3 +1 binding vote (from Incubator PMC member) and no veto,
+first, reply to the above voting thread to notify that the voting has ended. 
 
+```
+Hi all,
+
+The vote for Release Apache Fory(incubating) v${release_version}-${rc_version} is closed now.
+
+Thanks to everyone for helping checking and voting for the release.
+
+I will close the vote later in another thread.
+
+Best,
+${name}
+```
+Immediately afterward, launch a new voting thread to claim the voting result.
 Title:
 
 ```
