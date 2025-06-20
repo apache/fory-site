@@ -417,7 +417,7 @@ Content:
 Hello, Apache Fory(incubating) Community:
 
 This is a call for vote to release Apache Fory(Incubating)
-version release-0.5.0-rc3.
+version release-${release_version}-${rc_version}.
 
 Apache Fory(incubating) - A blazingly fast multi-language serialization
 framework powered by JIT and zero-copy.
@@ -471,10 +471,26 @@ How to Build and Test, please refer to: https://github.com/apache/fory/blob/main
 
 
 Thanks,
-Chaokun Yang
+${name}
 ```
 
-After at least 3 +1 binding vote (from Fory Podling PMC member and committers) and no veto, claim the vote result:
+After at least 3 +1 binding vote (from Fory Podling PMC member and committers) and no veto,
+first, reply to the above voting thread to notify that the voting has ended.
+
+```
+Hi all,
+
+The vote for Release Apache Fory(incubating) v${release_version}-${rc_version} is closed now.
+
+Thanks to everyone for helping checking and voting for the release.
+
+I will close the vote later in another thread.
+
+Best,
+${name}
+```
+
+Immediately afterward, launch a new voting thread to claim the voting results.
 
 Title:
 
