@@ -399,7 +399,7 @@ These steps ensure all published artifacts are verified and correctly deployed t
 ### build a Pre-release
 
 You need to build a Pre-release before voting, such as:
-https://github.com/apache/fory/releases/tag/v0.11.0-rc2
+https://github.com/apache/fory/releases/tag/v0.11.1-rc1
 
 ### Fory Community Vote
 
@@ -647,7 +647,7 @@ like [#2207](https://github.com/apache/fory/pull/2207).
 ### Github officially released
 
 You need to officially release this version in the Fory project
-Reference implementation: https://github.com/apache/fory/releases/tag/v0.11.0
+Reference implementation: https://github.com/apache/fory/releases/tag/v0.11.1
 
 ### Release Maven artifacts
 

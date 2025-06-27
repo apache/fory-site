@@ -14,13 +14,13 @@ Apache Fory 源码下载请参见 Apache Fory [download](https://github.com/apac
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>0.11.0</version>
+  <version>0.11.1</version>
 </dependency>
 <!-- row/arrow format support -->
 <!-- <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-format</artifactId>
-  <version>0.11.0</version>
+  <version>0.11.1</version>
 </dependency> -->
 ```
 
@@ -32,7 +32,7 @@ Apache Fory 源码下载请参见 Apache Fory [download](https://github.com/apac
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-scala_2.13</artifactId>
-  <version>0.11.0</version>
+  <version>0.11.1</version>
 </dependency>
 ```
 
@@ -42,20 +42,20 @@ Apache Fory 源码下载请参见 Apache Fory [download](https://github.com/apac
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-scala_3</artifactId>
-  <version>0.11.0</version>
+  <version>0.11.1</version>
 </dependency>
 ```
 
 要使用 sbt 添加 scala 2.13 的 Fory scala 依赖，请使用以下配置：
 
 ```sbt
-libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.11.0"
+libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.11.1"
 ```
 
 要使用 sbt 添加 scala 3 的 Fory scala 依赖，请使用以下配置：
 
 ```sbt
-libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.11.0"
+libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.11.1"
 ```
 
 ## Fory Kotlin 安装
@@ -66,6 +66,6 @@ To add a dependency on Fory kotlin with maven, use the following:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-kotlin</artifactId>
-  <version>0.11.0</version>
+  <version>0.11.1</version>
 </dependency>
 ```
