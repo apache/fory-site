@@ -106,8 +106,7 @@ apache-fory-incubating-0.5.0-src.tar.gz: OK
 A quick way to verify above is:
 
 ```bash
-curl -s https://raw.githubusercontent.com/apache/fory/main/ci/release.py | python3 - verify -
-v 0.5.0
+curl -s https://raw.githubusercontent.com/apache/fory/main/ci/release.py | python3 - verify -v 0.5.0
 ```
 
 ## Check the file content of the source package
