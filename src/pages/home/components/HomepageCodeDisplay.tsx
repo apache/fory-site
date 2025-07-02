@@ -75,26 +75,40 @@ export default function HomepageCodeDisplay() {
       {/* Pic */}
       <div className="hidden md:flex w-full md:w-1/2 justify-center">
         <img
+          className="w-full max-w-md h-auto"
           src={programmingImageUrl}
           alt="programming-coding"
-          className="w-full max-w-md h-auto"
         />
       </div>
       {/* Code Box */}
       <div
-        className="relative text-sm overflow-hidden bg-[#1e1e2f]rounded-lg"
+        className="w-full relative text-sm overflow-hidden bg-[#1e1e2f]rounded-lg"
         style={{
           width: "100%",
-          maxWidth: "600px",
-          height: "666px",
+          maxWidth: "666px",
         }}
       >
         <div className="flex items-center justify-between">
-          <div onClick={handleLeftArrowClick}>
-            <img
-              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tbGVmdC1pY29uIGx1Y2lkZS1jaGV2cm9uLWxlZnQiPjxwYXRoIGQ9Im0xNSAxOC02LTYgNi02Ii8+PC9zdmc+"
-              alt="arrow-left"
-            />
+          <div>
+            <button
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-shadow focus:outline-none"
+              onClick={handleLeftArrowClick}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-gray-700"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
           </div>
           <div>
             {/* Top Bar */}
@@ -144,11 +158,26 @@ export default function HomepageCodeDisplay() {
               </motion.div>
             </AnimatePresence>
           </div>
-          <div onClick={handleRightArrowClick}>
-            <img
-              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tcmlnaHQtaWNvbiBsdWNpZGUtY2hldnJvbi1yaWdodCI+PHBhdGggZD0ibTkgMTggNi02LTYtNiIvPjwvc3ZnPg=="
-              alt="arrow-right"
-            />
+          <div>
+            <button
+              className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg hover:shadow-xl transition-shadow focus:outline-none"
+              onClick={handleRightArrowClick}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-gray-700"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
