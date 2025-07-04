@@ -80,6 +80,11 @@
     "imgUrl": "hugegraph.png"
   },
   {
+    "name": "Apache Seata",
+    "link": "https://seata.apache.org/",
+    "imgUrl": "seata.png"
+  },
+  {
     "name": "Adrestus",
     "link": "https://www.adrestus.net/",
     "imgUrl": "adrestus.jpg"
