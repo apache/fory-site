@@ -17,13 +17,13 @@ export default function HomepageHeader() {
       className={clsx("hero hero--primary", styles.heroBanner)}
       data-aos="fade-up"
     >
-      <div className="container">
+      <div className={clsx("container", styles.container)}>
         {/* 页面标题 */}
-        <Heading as="h1" className="hero__title">
+        <Heading as="h1" className={clsx("hero__title", styles.title)}>
           <Translate id="homepage.hero.title">{siteConfig.title}</Translate>
         </Heading>
         {/* 页面副标题 */}
-        <p className="hero__subtitle">
+        <p className={clsx("hero__subtitle", styles.subtitle)}>
           <Translate id="homepage.hero.subtitle">
             {siteConfig.tagline}
           </Translate>
@@ -31,7 +31,10 @@ export default function HomepageHeader() {
         <div className={styles.buttons}>
           {/* GitHub 按钮 */}
           <Link
-            className="button button--secondary button--lg"
+            className={clsx(
+              "button button--secondary button--lg",
+              styles.button
+            )}
             to="https://github.com/apache/fory"
             data-aos="fade-up"
             data-aos-delay="200"
@@ -45,7 +48,11 @@ export default function HomepageHeader() {
           </Link>
           {/* 开始使用按钮 */}
           <Link
-            className="button button--secondary button--lg"
+            className={clsx(
+              "button button--primary button--lg",
+              styles.button,
+              styles.getStartedButton
+            )}
             to="/docs/docs/start/install"
             data-aos="fade-up"
             data-aos-delay="400"
