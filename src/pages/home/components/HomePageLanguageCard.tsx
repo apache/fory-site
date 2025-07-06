@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import "../css/tailwind.css";
 import { imageUrls } from "../../../constants";
+import styles from "../css/HomePageLanguageCard.module.css";
 
 export default function HomePageLanguageCard() {
   const [locale, setLocale] = useState("en-US");
@@ -28,27 +29,33 @@ export default function HomePageLanguageCard() {
   };
 
   return (
-    <div className="text-center">
-      <h2 className="text-2xl font-bold mb-5">Quick Start!</h2>
-      <p className="text-lg mb-5">Choose a language to get started.</p>
-      <div className="w-3/5 mx-auto rounded-md">
-        <div className="grid md:grid-cols-2 sm:grid-cols-1 min-w-0 border-gray-400 rounded-md">
+    <div className="text-center p-8">
+      <h2 className="text-3xl font-bold mb-4 dark:text-white">Quick Start!</h2>
+      <p className="text-lg mb-8 text-gray-600 dark:text-gray-400">
+        Choose a language to get started.
+      </p>
+      <div className="max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 sm:grid-cols-1 gap-6">
           {processedImageUrls.map(({ key, src, label }) => (
             <div
               key={key}
-              className="flex items-center justify-center h-24 text-lg font-bold border border-gray-400 rounded-md cursor-pointer transition-transform duration-300 transform hover:scale-105 active:scale-100 hover:bg-gray-100 hover:border-gray-200"
+              className={styles.languageCard}
               onClick={() =>
-              (window.location.href = getLanguageUrl(
-                key === "java"
-                  ? "java-serialization"
-                  : key === "more"
+                (window.location.href = getLanguageUrl(
+                  key === "java"
+                    ? "java-serialization"
+                    : key === "more"
                     ? "crosslanguage-serialization"
                     : key
-              ))
+                ))
               }
             >
-              <img src={src} className="w-10 h-10 mr-2" alt={`${label} logo`} />
-              <span>{label}</span>
+              <img
+                src={src}
+                className="w-16 h-16 mb-4"
+                alt={`${label} logo`}
+              />
+              <span className="text-xl font-semibold">{label}</span>
             </div>
           ))}
         </div>
