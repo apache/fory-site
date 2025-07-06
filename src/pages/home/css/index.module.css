@@ -55,3 +55,23 @@
 .getStartedButton {
   color: white !important;
 }
+
+[data-theme="dark"] .heroBanner {
+  background: linear-gradient(45deg, #232526, #414345);
+}
+
+[data-theme="dark"] .button--secondary {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .button--secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
+[data-theme="dark"] .title,
+[data-theme="dark"] .subtitle {
+  color: white;
+}
