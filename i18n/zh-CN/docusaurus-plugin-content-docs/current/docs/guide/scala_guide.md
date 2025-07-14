@@ -34,13 +34,13 @@ Fory 支持所有 Scala 对象的序列化：
 如果你使用 sbt 并希望在 Scala 2 项目中引入 Fory Scala 依赖，请添加如下内容：
 
 ```sbt
-libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.11.1"
+libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.11.2"
 ```
 
 如果你使用 sbt 并希望在 Scala 3 项目中引入 Fory Scala 依赖，请添加如下内容：
 
 ```sbt
-libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.11.1"
+libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.11.2"
 ```
 
 ## 快速开始
