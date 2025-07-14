@@ -647,21 +647,21 @@ In general, the following two key areas need to be modified:
 
 1. Update the blog, for example:
    Add a new markdown file under the blog folder:
-2. 
-   ```
-   The Apache Fory team is pleased to announce the [?] release. This is a major release that includes [? PR](https://github.com/apache/fory/compare/v[?]...v[?]-rc1) from ? distinct contributors. See the [Install](https://fory.apache.org/docs/docs/start/install) Page to learn how to get the libraries for your platform.
-   ```
+
+```
+The Apache Fory team is pleased to announce the [?] release. This is a major release that includes [? PR](https://github.com/apache/fory/compare/v[?]...v[?]-rc1) from ? distinct contributors. See the [Install](https://fory.apache.org/docs/docs/start/install) Page to learn how to get the libraries for your platform.
+```
 
 2. Replace versions by upgrading old versions to new ones.
    For example, in `install.md`, update to the latest released version:
    
-3. ```
-   <dependency>
-     <groupId>org.apache.fory</groupId>
-     <artifactId>fory-core</artifactId>
-     <version>0.11.2</version>
-   </dependency>
-   ```
+```
+<dependency>
+ <groupId>org.apache.fory</groupId>
+ <artifactId>fory-core</artifactId>
+ <version>0.11.2</version>
+</dependency>
+  ```
 
 #### Update Fory
 
