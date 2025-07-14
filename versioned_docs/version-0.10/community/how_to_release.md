@@ -4,7 +4,7 @@ sidebar_position: 0
 id: how_to_release
 ---
 
-This document mainly introduces how the release manager releases a new version of Apache fory.
+This document mainly introduces how the release manager releases a new version of Apache Fory.
 
 ## Introduction
 
@@ -183,15 +183,15 @@ Start a discussion about the next release via sending email to: dev@fory.apache.
 Title:
 
 ```
-[DISCUSS] Release Apache fory(incubating) ${release_version}
+[DISCUSS] Release Apache Fory(incubating) ${release_version}
 ```
 
 Content:
 
 ```
-Hello, Apache fory(incubating) Community,
+Hello, Apache Fory(incubating) Community,
 
-This is a call for a discussion to release Apache fory(incubating) version ${release_version}.
+This is a call for a discussion to release Apache Fory(incubating) version ${release_version}.
 
 The change lists about this release:
 
@@ -255,7 +255,7 @@ If some files are unexpected, you need to remove by `svn delete` and repeat the 
 
 ### check version
 
-As an incubating project, fory requires votes from both the fory Community and Incubator Community.
+As an incubating project, Fory requires votes from both the Fory Community and Incubator Community.
 
 - release_version: the version for fory, like 0.5.0.
 - release_candidate_version: the version for voting, like 0.5.0-rc1.
@@ -266,7 +266,7 @@ As an incubating project, fory requires votes from both the fory Community and I
 
 #### Configure Apache Account Passwords
 
-Before publishing fory to Nexus, you need to securely configure your Apache account credentials. This step is critical
+Before publishing Fory to Nexus, you need to securely configure your Apache account credentials. This step is critical
 as passwords must be encrypted.
 
 First, open your Maven global settings file `settings.xml`, typically located at `~/.m2/settings.xml`. Add or modify the
@@ -390,7 +390,7 @@ After completing the publication of all modules, perform the following steps in 
 
 1. Log in to the Apache Nexus repository management interface
 2. Navigate to the "Snapshots" or "Releases" repository (depending on your release type)
-3. Locate the latest fory project version
+3. Locate the latest Fory project version
 4. Execute the "Close" operation to validate all uploaded artifacts
 5. After successful validation, execute the "Release" operation to finalize the deployment
 
@@ -401,25 +401,25 @@ These steps ensure all published artifacts are verified and correctly deployed t
 You need to build a Pre-release before voting, such as:
 https://github.com/apache/fory/releases/tag/v0.10.3-rc2
 
-### fory Community Vote
+### Fory Community Vote
 
-you need send a email to fory Community: dev@fory.apache.org:
+you need send a email to Fory Community: dev@fory.apache.org:
 
 Title:
 
 ```
-[VOTE] Release Apache fory(incubating) v${release_version}-${rc_version}
+[VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
 ```
 
 Content:
 
 ```
-Hello, Apache fory(incubating) Community:
+Hello, Apache Fory(incubating) Community:
 
-This is a call for vote to release Apache fory(Incubating)
+This is a call for vote to release Apache Fory(Incubating)
 version release-0.5.0-rc3.
 
-Apache fory(incubating) - A blazingly fast multi-language serialization
+Apache Fory(incubating) - A blazingly fast multi-language serialization
 framework powered by JIT and zero-copy.
 
 The discussion thread:
@@ -452,11 +452,11 @@ Please vote accordingly:
 [ ] +0 no opinion
 [ ] -1 disapprove with the reason
 
-To learn more about fory, please see https://fory.apache.org/
+To learn more about Fory, please see https://fory.apache.org/
 
 *Valid check is a requirement for a vote. *Checklist for reference:
 
-[ ] Download fory is valid.
+[ ] Download Fory is valid.
 [ ] Checksums and PGP signatures are valid.
 [ ] Source code distributions have correct names matching the current release.
 [ ] LICENSE and NOTICE files are correct.
@@ -474,20 +474,20 @@ Thanks,
 Chaokun Yang
 ```
 
-After at least 3 +1 binding vote (from fory Podling PMC member and committers) and no veto, claim the vote result:
+After at least 3 +1 binding vote (from Fory Podling PMC member and committers) and no veto, claim the vote result:
 
 Title:
 
 ```
-[RESULT][VOTE] Release Apache fory(incubating) v${release_version}-${rc_version}
+[RESULT][VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
 ```
 
 Content:
 
 ```
-Hello, Apache fory(incubating) Community,
+Hello, Apache Fory(incubating) Community,
 
-The vote to release Apache fory(Incubating) v${release_version}-${rc_version} has passed.
+The vote to release Apache Fory(Incubating) v${release_version}-${rc_version} has passed.
 
 The vote PASSED with 3 binding +1 and 0 -1 vote:
 
@@ -511,7 +511,7 @@ Send an email to: general@incubator.apache.org:
 Title:
 
 ```
-[VOTE] Release Apache fory(incubating) v${release_version}-${rc_version}
+[VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
 ```
 
 Content:
@@ -519,16 +519,16 @@ Content:
 ```
 Hello everyone,
 
-This is a call for the vote to release Apache fory(Incubating) v${release_version}-${rc_version}.
+This is a call for the vote to release Apache Fory(Incubating) v${release_version}-${rc_version}.
 
-The Apache fory community has voted and approved the release of Apache
-fory(incubating) v${release_version}-${rc_version}. We now kindly request the IPMC members
+The Apache Fory community has voted and approved the release of Apache
+Fory(incubating) v${release_version}-${rc_version}. We now kindly request the IPMC members
 review and vote for this release.
 
-Apache fory(incubating) - A blazingly fast multi-language serialization
+Apache Fory(incubating) - A blazingly fast multi-language serialization
 framework powered by JIT and zero-copy.
 
-fory community vote thread:
+Fory community vote thread:
 ${community_vote_thread_url}
 
 Vote result thread:
@@ -581,7 +581,7 @@ After at least 72 hours with at least 3 +1 binding vote (from Incubator PMC memb
 Title:
 
 ```
-[RESULT][VOTE] Release Apache fory(incubating) v${release_version}-${rc_version}
+[RESULT][VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
 ```
 
 Content:
@@ -589,7 +589,7 @@ Content:
 ```
 Hi Incubator PMC,
 
-The vote to release Apache fory(incubating) v${release_version}-${rc_version} has passed with
+The vote to release Apache Fory(incubating) v${release_version}-${rc_version} has passed with
 4 +1 binding and 3 +1 non-binding votes, no +0 or -1 votes.
 
 Binding votes：
@@ -637,43 +637,16 @@ leaving only the current version.
 
 ### Update Fory&Fory-Site content
 
-Submit a PR to https://github.com/apache/fory-site to update fory-site.
-Reference implementation: [#283](https://github.com/apache/fory-site/pull/283)
-and [#285](https://github.com/apache/fory-site/pull/285).
-
-#### Update fory-site
-
-In general, the following two key areas need to be modified:
-
-1、Update the blog.
-
-for example:Add a new markdown file under the blog folder:
-
-```
-The Apache Fory team is pleased to announce the [?] release. This is a major release that includes [? PR](https://github.com/apache/fory/compare/v[?]...v[?]-rc1) from ? distinct contributors. See the [Install](https://fory.apache.org/docs/docs/start/install) Page to learn how to get the libraries for your platform.
-```
-
-2、Replace versions by upgrading old versions to new ones.
-
-For example, in install.md, update to the latest released version:
-
-```
-<dependency>
-  <groupId>org.apache.fory</groupId>
-  <artifactId>fory-core</artifactId>
-  <version>0.11.2</version>
-</dependency>
-```
-
-#### Update fory
-
+Submit a PR to https://github.com/apache/fory-site to update Fory-site.
+Reference implementation: [#222](https://github.com/apache/fory-site/pull/222)
+and [#223](https://github.com/apache/fory-site/pull/223).
 
 Submit a PR to https://github.com/apache/fory to update [README](https://github.com/apache/fory/blob/main/README.md),
 like [#2207](https://github.com/apache/fory/pull/2207).
 
 ### Github officially released
 
-You need to officially release this version in the fory project
+You need to officially release this version in the Fory project
 Reference implementation: https://github.com/apache/fory/releases/tag/v0.10.3
 
 ### Release Maven artifacts
@@ -689,7 +662,7 @@ Send the release announcement to dev@fory.apache.org and CC announce@apache.org.
 Title:
 
 ```
-[ANNOUNCE] Release Apache fory(incubating) ${release_version}
+[ANNOUNCE] Release Apache Fory(incubating) ${release_version}
 ```
 
 Content:
@@ -697,10 +670,10 @@ Content:
 ```
 Hi all,
 
-The Apache fory(incubating) community is pleased to announce
-that Apache fory(incubating) {release_version} has been released!
+The Apache Fory(incubating) community is pleased to announce
+that Apache Fory(incubating) {release_version} has been released!
 
-Apache fory(incubating) - A blazingly fast multi-language serialization
+Apache Fory(incubating) - A blazingly fast multi-language serialization
 framework powered by JIT and zero-copy.
 
 The release notes are available here:
@@ -709,17 +682,17 @@ https://github.com/apache/fory/releases/tag/v${release_version}
 For the complete list of changes:
 https://github.com/apache/fory/compare/v0.5.0...v${release_version}
 
-Apache fory website: https://fory.apache.org/
+Apache Fory website: https://fory.apache.org/
 
 Download Links: https://fory.apache.org/download
 
-fory Resources:
-- fory github repo: https://github.com/apache/fory
+Fory Resources:
+- Fory github repo: https://github.com/apache/fory
 - Issue: https://github.com/apache/fory/issues
 - Mailing list: dev@fory.apache.org
 
 We are looking to grow our community and welcome new contributors. If
-you are interested in contributing to fory, please contact us on the
+you are interested in contributing to Fory, please contact us on the
 mailing list or on GitHub. We will be happy to help you get started.
 
 ------------------
@@ -729,4 +702,4 @@ ${your_name}
 
 Remember to use plain text instead of rich text format, or you may be rejected when CC announce@apache.org
 
-After completing the above steps, the fory release process comes to an end.
+After completing the above steps, the Fory release process comes to an end.
