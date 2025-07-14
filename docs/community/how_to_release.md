@@ -677,7 +677,7 @@ The Apache Fory team is pleased to announce the [?] release. This is a major rel
  <artifactId>fory-core</artifactId>
  <version>0.11.2</version>
 </dependency>
-  ```
+ ```
 
 #### Update Fory
 
