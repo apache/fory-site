@@ -399,7 +399,7 @@ These steps ensure all published artifacts are verified and correctly deployed t
 ### build a Pre-release
 
 You need to build a Pre-release before voting, such as:
-https://github.com/apache/fory/releases/tag/v0.10.3-rc2
+https://github.com/apache/fory/releases/tag/v0.11.2-rc1
 
 ### Fory Community Vote
 
@@ -638,32 +638,8 @@ leaving only the current version.
 ### Update Fory&Fory-Site content
 
 Submit a PR to https://github.com/apache/fory-site to update Fory-site.
-Reference implementation: [#283](https://github.com/apache/fory-site/pull/283)
-and [#285](https://github.com/apache/fory-site/pull/285).
-
-#### Update Fory-Site
-
-In general, the following two key areas need to be modified:
-
-1. Update the blog, for example:
-   Add a new markdown file under the blog folder:
-
-```
-The Apache Fory team is pleased to announce the [?] release. This is a major release that includes [? PR](https://github.com/apache/fory/compare/v[?]...v[?]-rc1) from ? distinct contributors. See the [Install](https://fory.apache.org/docs/docs/start/install) Page to learn how to get the libraries for your platform.
-```
-
-2. Replace versions by upgrading old versions to new ones.
-   For example, in `install.md`, update to the latest released version:
-   
-```
-<dependency>
- <groupId>org.apache.fory</groupId>
- <artifactId>fory-core</artifactId>
- <version>0.11.2</version>
-</dependency>
-  ```
-
-#### Update Fory
+Reference implementation: [#222](https://github.com/apache/fory-site/pull/222)
+and [#223](https://github.com/apache/fory-site/pull/223).
 
 Submit a PR to https://github.com/apache/fory to update [README](https://github.com/apache/fory/blob/main/README.md),
 like [#2207](https://github.com/apache/fory/pull/2207).
@@ -671,7 +647,7 @@ like [#2207](https://github.com/apache/fory/pull/2207).
 ### Github officially released
 
 You need to officially release this version in the Fory project
-Reference implementation: https://github.com/apache/fory/releases/tag/v0.10.3
+Reference implementation: https://github.com/apache/fory/releases/tag/v0.11.2
 
 ### Release Maven artifacts
 
