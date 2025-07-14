@@ -670,7 +670,7 @@ The Apache Fory team is pleased to announce the [?] release. This is a major rel
 
 2. Replace versions by upgrading old versions to new ones.
 For example, in `install.md`, update to the latest released version:
-   
+
 ```
 <dependency>
  <groupId>org.apache.fory</groupId>
