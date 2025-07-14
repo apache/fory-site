@@ -669,7 +669,7 @@ The Apache Fory team is pleased to announce the [?] release. This is a major rel
 ```
 
 2. Replace versions by upgrading old versions to new ones.
-   For example, in `install.md`, update to the latest released version:
+For example, in `install.md`, update to the latest released version:
    
 ```
 <dependency>
@@ -681,6 +681,8 @@ The Apache Fory team is pleased to announce the [?] release. This is a major rel
 
 #### Update Fory
 
+Submit a PR to https://github.com/apache/fury to update [README](https://github.com/apache/fury/blob/main/README.md),
+like [#2207](https://github.com/apache/fury/pull/2207).
 
 ### Github officially released
 
