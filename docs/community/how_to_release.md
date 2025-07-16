@@ -669,7 +669,7 @@ The Apache Fory team is pleased to announce the [?] release. This is a major rel
 ```
 
 2. Replace versions by upgrading old versions to new ones.
-For example, in [install](https://fory.apache.org/docs/docs/start/install/#java), update to the latest released version:
+For example, in [install](https://fory.apache.org/docs/docs/start/install/#java) section, it is necessary to update the documentation for both the development branch and the latest release branch::
 
 ```
 <dependency>
