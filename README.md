@@ -1,12 +1,6 @@
-# Apache Fory (incubating) Website
+# Apache Fory Website
 
-The source repository of static website for Apache Fory (incubating): https://github.com/apache/fory.
-
-> [!IMPORTANT]
-> Apache Fory (incubating) is an effort undergoing incubation at the Apache
-> Software Foundation (ASF), sponsored by the Apache Incubator PMC.
->
-> Please read the [DISCLAIMER](DISCLAIMER) and a full explanation of ["incubating"](https://incubator.apache.org/policy/incubation.html).
+The source repository of static website for Apache Fory: https://github.com/apache/fory.
 
 ## Installation
 
