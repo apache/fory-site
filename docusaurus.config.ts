@@ -3,7 +3,7 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'Apache Fory (incubating)',
+  title: 'Apache Fory',
   tagline: 'A blazing-fast cross-language serialization framework powered by just-in-time compilation and zero-copy',
   favicon: 'img/favicon.ico',
 
@@ -246,12 +246,11 @@ const config: Config = {
       ],
       logo: {
         width: 200,
-        src: "/img/apache-incubator.svg",
-        href: "https://incubator.apache.org/",
-        alt: "Apache Incubator logo"
+        src: "/img/asf_logo.svg",
+        href: "https://apache.org/",
+        alt: "ASF Logo"
       },
       copyright: `<div>
-      <p> Apache Fory is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF. </p>
       <p>
         Copyright © ${new Date().getFullYear()} The Apache Software Foundation, Licensed under the Apache License, Version 2.0. <br/>
         Apache, the names of Apache projects, and the feather logo are either registered trademarks or trademarks of the Apache Software Foundation in the United States and/or other countries.
