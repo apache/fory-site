@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fory.apache.org/zh-CN/blog</id>
-    <title>Apache Fory (incubating) Blog</title>
+    <title>Apache Fory Blog</title>
     <updated>2025-07-10T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fory.apache.org/zh-CN/blog"/>
-    <subtitle>Apache Fory (incubating) Blog</subtitle>
+    <subtitle>Apache Fory Blog</subtitle>
     <icon>https://fory.apache.org/zh-CN/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[Fory v0.11.2 Released]]></title>

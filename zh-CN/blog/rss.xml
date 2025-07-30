@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
-        <title>Apache Fory (incubating) Blog</title>
+        <title>Apache Fory Blog</title>
         <link>https://fory.apache.org/zh-CN/blog</link>
-        <description>Apache Fory (incubating) Blog</description>
+        <description>Apache Fory Blog</description>
         <lastBuildDate>Thu, 10 Jul 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
