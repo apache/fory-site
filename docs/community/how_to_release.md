@@ -144,12 +144,12 @@ a [Web of Trust](https://infra.apache.org/release-signing.html#web-of-trust).
 
 #### Add your GPG public key to the project KEYS file
 
-The svn repository of the release branch is: https://dist.apache.org/repos/dist/release/incubator/fory
+The svn repository of the release branch is: https://dist.apache.org/repos/dist/release/fory
 
 Please add the public key to KEYS in the release branch:
 
 ```bash
-svn co https://dist.apache.org/repos/dist/release/incubator/fory fory-dist
+svn co https://dist.apache.org/repos/dist/release/fory fory-dist
 # As this step will copy all the versions, it will take some time. If the network is broken, please use svn cleanup to delete the lock before re-execute it.
 cd fory-dist
 (gpg --list-sigs YOUR_NAME@apache.org && gpg --export --armor YOUR_NAME@apache.org) >> KEYS # Append your key to the KEYS file
@@ -169,7 +169,6 @@ It's recommended but not mandatory to read following documents before making a r
 release:
 
 - Release policy: https://www.apache.org/legal/release-policy.html
-- Incubator release: http://incubator.apache.org/guides/releasemanagement.html
 - TLP release: https://infra.apache.org/release-distribution
 - Release sign: https://infra.apache.org/release-signing.html
 - Release publish: https://infra.apache.org/release-publishing.html
@@ -183,19 +182,19 @@ Start a discussion about the next release via sending email to: dev@fory.apache.
 Title:
 
 ```
-[DISCUSS] Release Apache Fory(incubating) ${release_version}
+[DISCUSS] Release Apache Fory ${release_version}
 ```
 
 Content:
 
 ```
-Hello, Apache Fory(incubating) Community,
+Hello, Apache Fory Community,
 
-This is a call for a discussion to release Apache Fory(incubating) version ${release_version}.
+This is a call for a discussion to release Apache Fory version ${release_version}.
 
 The change lists about this release:
 
-https://github.com/apache/fory/compare/v0.4.1...v0.5.0
+https://github.com/apache/fory/compare/v0.12.0...v0.12.1-rc1
 
 Please leave your comments here about this release plan. We will bump the version in repo and start the release process after the discussion.
 
@@ -210,21 +209,21 @@ If the discussion goes positive, you will need to prepare the release artifiacts
 
 ### Github branch and tag
 
-- Create a new branch named `releases-0.5.0`
+- Create a new branch named `releases-0.12.0`
 - Bump version to `$version` by executing command `python ci/release.py bump_version -l all -version $version`
 - Make a git commit and push the branch to `git@github.com:apache/fory.git`
-- Create a new tag by `git tag v0.5.0-rc1`, then push it to `git@github.com:apache/fory.git`
+- Create a new tag by `git tag v0.12.0-rc1`, then push it to `git@github.com:apache/fory.git`
 
 ### Build and upload artifacts to SVN dist/dev repo
 
 First you need to build source release artifacts by `python ci/release.py build -v $version`.
 
 Then you need to upload it to svn dist repo. The dist repo of the dev branch
-is: https://dist.apache.org/repos/dist/dev/incubator/fory
+is: https://dist.apache.org/repos/dist/dev/fory
 
 ```bash
 # As this step will copy all the versions, it will take some time. If the network is broken, please use svn cleanup to delete the lock before re-execute it.
-svn co https://dist.apache.org/repos/dist/dev/incubator/fory fory-dist-dev
+svn co https://dist.apache.org/repos/dist/dev/fory fory-dist-dev
 ```
 
 Then, upload the artifacts:
@@ -245,7 +244,7 @@ svn status
 svn commit -m "Prepare for fory ${release_version}-${rc_version}"
 ```
 
-Visit https://dist.apache.org/repos/dist/dev/incubator/fory/ to check the artifacts are uploaded correctly.
+Visit https://dist.apache.org/repos/dist/dev/fory/ to check the artifacts are uploaded correctly.
 
 ### What to do if something goes wrong
 
@@ -255,10 +254,10 @@ If some files are unexpected, you need to remove by `svn delete` and repeat the 
 
 ### check version
 
-As an incubating project, Fory requires votes from both the Fory Community and Incubator Community.
+Fory requires votes from the Fory Community.
 
-- release_version: the version for fory, like 0.5.0.
-- release_candidate_version: the version for voting, like 0.5.0-rc1.
+- release_version: the version for fory, like 0.12.0.
+- release_candidate_version: the version for voting, like 0.12.0-rc1.
 - maven_artifact_number: the number for Maven staging artifacts, like 1001. Specifically, the maven_artifact_number can
   be found by searching "fory" on https://repository.apache.org/#stagingRepositories.
 
@@ -317,7 +316,7 @@ Steps to encrypt your password:
 
    ```
 
-2. Encrypt your Apache account password:
+4. Encrypt your Apache account password:
 
    ```sh
 
@@ -399,7 +398,7 @@ These steps ensure all published artifacts are verified and correctly deployed t
 ### build a Pre-release
 
 You need to build a Pre-release before voting, such as:
-https://github.com/apache/fory/releases/tag/v0.11.2-rc1
+https://github.com/apache/fory/releases/tag/v0.12.0-rc1
 
 ### Fory Community Vote
 
@@ -408,41 +407,41 @@ you need send a email to Fory Community: dev@fory.apache.org:
 Title:
 
 ```
-[VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
+[VOTE] Release Apache Fory v${release_version}-${rc_version}
 ```
 
 Content:
 
 ```
-Hello, Apache Fory(incubating) Community:
+Hello, Apache Fory Community:
 
-This is a call for vote to release Apache Fory(Incubating)
+This is a call for vote to release Apache Fory
 version release-${release_version}-${rc_version}.
 
-Apache Fory(incubating) - A blazingly fast multi-language serialization
+Apache Fory - A blazingly fast multi-language serialization
 framework powered by JIT and zero-copy.
 
 The discussion thread:
 https://lists.apache.org/thread/xxr3od301g6v3ndj14zqc05byp9qvclh
 
 The change lists about this release:
-https://github.com/apache/fory/compare/v0.4.1...v0.5.0-rc3
+https://github.com/apache/fory/compare/v0.12.0...v0.12.1-rc1
 
 The release candidates:
-https://dist.apache.org/repos/dist/dev/incubator/fory/0.5.0-rc3/
+https://dist.apache.org/repos/dist/dev/fory/0.5.0-rc3/
 
 The maven staging for this release:
 https://repository.apache.org/content/repositories/orgapachefory-1003
 
 Git tag for the release:
-https://github.com/apache/fory/releases/tag/v0.5.0-rc3
+https://github.com/apache/fory/releases/tag/v0.12.0-rc1
 
 Git commit for the release:
 https://github.com/apache/fory/commit/fae06330edd049bb960536e978a45b97bca66faf
 
 The artifacts signed with PGP key [5E580BA4], corresponding to
 [chaokunyang@apache.org], that can be found in keys file:
-https://downloads.apache.org/incubator/fory/KEYS
+https://downloads.apache.org/fory/KEYS
 
 The vote will be open for at least 72 hours until the necessary number of votes are reached.
 
@@ -464,9 +463,6 @@ To learn more about Fory, please see https://fory.apache.org/
 [ ] No compiled archives bundled in source archive.
 [ ] Can compile from source.
 
-More detail checklist please refer:
-https://cwiki.apache.org/confluence/display/INCUBATOR/Incubator+Release+Checklist
-
 How to Build and Test, please refer to: https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md
 
 
@@ -480,7 +476,7 @@ first, reply to the above voting thread to notify that the voting has ended.
 ```
 Hi all,
 
-The vote for Release Apache Fory(incubating) v${release_version}-${rc_version} is closed now.
+The vote for Release Apache Fory v${release_version}-${rc_version} is closed now.
 
 Thanks to everyone for helping checking and voting for the release.
 
@@ -495,15 +491,15 @@ Immediately afterward, launch a new voting thread to claim the voting results.
 Title:
 
 ```
-[RESULT][VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
+[RESULT][VOTE] Release Apache Fory v${release_version}-${rc_version}
 ```
 
 Content:
 
 ```
-Hello, Apache Fory(incubating) Community,
+Hello, Apache Fory Community,
 
-The vote to release Apache Fory(Incubating) v${release_version}-${rc_version} has passed.
+The vote to release Apache Fory v${release_version}-${rc_version} has passed.
 
 The vote PASSED with 3 binding +1 and 0 -1 vote:
 
@@ -520,111 +516,6 @@ Thanks,
 ${name}
 ```
 
-### Incubator Community Vote
-
-Send an email to: general@incubator.apache.org:
-
-Title:
-
-```
-[VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
-```
-
-Content:
-
-```
-Hello everyone,
-
-This is a call for the vote to release Apache Fory(Incubating) v${release_version}-${rc_version}.
-
-The Apache Fory community has voted and approved the release of Apache
-Fory(incubating) v${release_version}-${rc_version}. We now kindly request the IPMC members
-review and vote for this release.
-
-Apache Fory(incubating) - A blazingly fast multi-language serialization
-framework powered by JIT and zero-copy.
-
-Fory community vote thread:
-${community_vote_thread_url}
-
-Vote result thread:
-${community_vote_result_thread_url}
-
-The release candidate:
-https://dist.apache.org/repos/dist/dev/incubator/fory/${release_version}-${rc_version}/
-
-This release has been signed with a PGP available here:
-https://downloads.apache.org/incubator/fory/KEYS
-
-Git tag for the release:
-https://github.com/apache/fory/releases/tag/v${release_version}-${rc_version}/
-
-Git commit for the release:
-https://github.com/apache/fory/commit/$xxx
-
-Maven staging repo:
-https://repository.apache.org/content/repositories/orgapachefory-${maven_artifact_number}/
-
-How to Build and Test, please refer to:
-https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md
-
-Please download, verify, and test.
-
-The VOTE will pass after 3 binding approve.
-
-[ ] +1 approve
-[ ] +0 no opinion
-[ ] -1 disapprove with the reason
-
-To learn more about apache fory, please see https://fory.apache.org/
-
-Checklist for reference:
-
-[ ] Download links are valid.
-[ ] Checksums and signatures.
-[ ] LICENSE/NOTICE files exist
-[ ] No unexpected binary files
-[ ] All source files have ASF headers
-[ ] Can compile from source
-
-Thanks,
-
-${name}
-```
-
-After at least 72 hours with at least 3 +1 binding vote (from Incubator PMC member) and no veto, claim the vote result:
-
-Title:
-
-```
-[RESULT][VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
-```
-
-Content:
-
-```
-Hi Incubator PMC,
-
-The vote to release Apache Fory(incubating) v${release_version}-${rc_version} has passed with
-4 +1 binding and 3 +1 non-binding votes, no +0 or -1 votes.
-
-Binding votes：
-
-- xxx
-- yyy
-- zzz
-
-Non-Binding votes:
-
-- aaa
-
-Vote thread: ${incubator_vote_thread_url}
-
-Thanks for reviewing and voting for our release candidate.
-
-We will proceed with publishing the approved artifacts and sending out the announcement soon.
-```
-
 ### What if vote fail
 
 If the vote failed, click "Drop" to drop the staging Maven artifacts.
@@ -639,14 +530,14 @@ Address the raised issues, then bump `rc_version` and file a new vote again.
 - release_candidate_version: the version for voting, like 0.5.0-rc1
 
 ```bash
-svn mv https://dist.apache.org/repos/dist/dev/incubator/fory/${release_version}-${rc_version} https://dist.apache.org/repos/dist/release/incubator/fory/${release_version} -m "Release fory ${release_version}"
+svn mv https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_version} https://dist.apache.org/repos/dist/release/fory/${release_version} -m "Release fory ${release_version}"
 ```
 
-In the repository at https://dist.apache.org/repos/dist/dev/incubator/fory/, if any
+In the repository at https://dist.apache.org/repos/dist/dev/fory/, if any
 outdated release_candidate_version are left behind when releasing the release_version,
 please clear them to keep the dev repository tidy.
 
-When `https://archive.apache.org/dist/incubator/fory/0.10.0/${release_version}` is
+When `https://archive.apache.org/dist/fory/0.12.0/${release_version}` is
 accessible (confirming that the release_version has been successfully released
 and archived), we may clean up the previous release version in the release repository,
 leaving only the current version.
@@ -669,7 +560,7 @@ The Apache Fory team is pleased to announce the [?] release. This is a major rel
 ```
 
 2. Replace versions by upgrading old versions to new ones.
-For example, in [install](https://fory.apache.org/docs/docs/start/install/#java) section, it is necessary to update the documentation for both the development branch and the latest release branch::
+   For example, in [install](https://fory.apache.org/docs/docs/start/install/#java) section, it is necessary to update the documentation for both the development branch and the latest release branch::
 
 ```
 <dependency>
@@ -677,7 +568,7 @@ For example, in [install](https://fory.apache.org/docs/docs/start/install/#java)
  <artifactId>fory-core</artifactId>
  <version>0.11.2</version>
 </dependency>
- ```
+```
 
 #### Update Fory
 
@@ -687,7 +578,7 @@ like [#2207](https://github.com/apache/fury/pull/2207).
 ### Github officially released
 
 You need to officially release this version in the Fory project
-Reference implementation: https://github.com/apache/fory/releases/tag/v0.11.2
+Reference implementation: https://github.com/apache/fory/releases/tag/v0.12.0
 
 ### Release Maven artifacts
 
@@ -702,7 +593,7 @@ Send the release announcement to dev@fory.apache.org and CC announce@apache.org.
 Title:
 
 ```
-[ANNOUNCE] Release Apache Fory(incubating) ${release_version}
+[ANNOUNCE] Release Apache Fory ${release_version}
 ```
 
 Content:
@@ -710,17 +601,17 @@ Content:
 ```
 Hi all,
 
-The Apache Fory(incubating) community is pleased to announce
-that Apache Fory(incubating) {release_version} has been released!
+The Apache Fory community is pleased to announce
+that Apache Fory {release_version} has been released!
 
-Apache Fory(incubating) - A blazingly fast multi-language serialization
+Apache Fory - A blazingly fast multi-language serialization
 framework powered by JIT and zero-copy.
 
 The release notes are available here:
 https://github.com/apache/fory/releases/tag/v${release_version}
 
 For the complete list of changes:
-https://github.com/apache/fory/compare/v0.5.0...v${release_version}
+https://github.com/apache/fory/compare/v0.12.0...v${release_version}
 
 Apache Fory website: https://fory.apache.org/
 

@@ -4,7 +4,6 @@ sidebar_position: 0
 id: community
 ---
 
-
 Apache Fory is a volunteer project and it thrives on the contributions of its community.
 We invite you to participate as much or as little as you wish. Here are several ways to contribute:
 
@@ -15,10 +14,10 @@ We invite you to participate as much or as little as you wish. Here are several 
 
 ## Mailing list
 
-| Name                    | Desc                                        | Subscribe                                             | Unsubscribe                                               | Post                               | Archive                                                               |
-|-------------------------|---------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------|------------------------------------|-----------------------------------------------------------------------|
-| dev@fory.apache.org     | Development related discussions             | [Subscribe](mailto:dev-subscribe@fory.apache.org)     | [Unsubscribe](mailto:dev-unsubscribe@fory.apache.org)     | [Post](mailto:dev@fory.apache.org) | [Archive](https://lists.apache.org/list.html?dev@fory.apache.org)     |
-| commits@fory.apache.org | All commits to our repositories             | [Subscribe](mailto:commits-subscribe@fory.apache.org) | [Unsubscribe](mailto:commits-unsubscribe@fory.apache.org) | Read only list                     | [Archive](https://lists.apache.org/list.html?commits@fory.apache.org) |
+| Name                    | Desc                            | Subscribe                                             | Unsubscribe                                               | Post                               | Archive                                                               |
+| ----------------------- | ------------------------------- | ----------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| dev@fory.apache.org     | Development related discussions | [Subscribe](mailto:dev-subscribe@fory.apache.org)     | [Unsubscribe](mailto:dev-unsubscribe@fory.apache.org)     | [Post](mailto:dev@fory.apache.org) | [Archive](https://lists.apache.org/list.html?dev@fory.apache.org)     |
+| commits@fory.apache.org | All commits to our repositories | [Subscribe](mailto:commits-subscribe@fory.apache.org) | [Unsubscribe](mailto:commits-unsubscribe@fory.apache.org) | Read only list                     | [Archive](https://lists.apache.org/list.html?commits@fory.apache.org) |
 
 Please make sure subscribe to any list before attempting to post.
 
