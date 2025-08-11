@@ -266,7 +266,7 @@
 <li>fix(java): Use (long, long, byte) key for MetaStringBytes cache to prevent collisions by @LouisLou2 in <a href="https://github.com/apache/fory/pull/2308" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2308</a></li>
 <li>fix(python): update python benchmark script by @penguin-wwy in <a href="https://github.com/apache/fory/pull/2315" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2315</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="other-improvements">Other Improvements<a href="https://fory.apache.org/zh-CN/blog/fory_0_11_0_release#other-improvements" class="hash-link" aria-label="Other Improvements的直�接链接" title="Other Improvements的直接链接">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="other-improvements">Other Improvements<a href="https://fory.apache.org/zh-CN/blog/fory_0_11_0_release#other-improvements" class="hash-link" aria-label="Other Improvements的直��接链接" title="Other Improvements的直接链接">​</a></h2>
 <ul>
 <li>chore(ci): Migrate the ci from macOS 12 to macOS 13 by @penguin-wwy in <a href="https://github.com/apache/fory/pull/1927" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/1927</a></li>
 <li>chore: bump release version to 0.9.0 by @chaokunyang in <a href="https://github.com/apache/fory/pull/1940" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/1940</a></li>
