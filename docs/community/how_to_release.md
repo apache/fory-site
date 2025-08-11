@@ -194,7 +194,7 @@ This is a call for a discussion to release Apache Fory version ${release_version
 
 The change lists about this release:
 
-https://github.com/apache/fory/compare/v0.11.0...v0.11.1
+https://github.com/apache/fory/compare/v0.12.0...v0.12.1-rc1
 
 Please leave your comments here about this release plan. We will bump the version in repo and start the release process after the discussion.
 
@@ -209,10 +209,10 @@ If the discussion goes positive, you will need to prepare the release artifiacts
 
 ### Github branch and tag
 
-- Create a new branch named `releases-0.5.0`
+- Create a new branch named `releases-0.12.0`
 - Bump version to `$version` by executing command `python ci/release.py bump_version -l all -version $version`
 - Make a git commit and push the branch to `git@github.com:apache/fory.git`
-- Create a new tag by `git tag v0.5.0-rc1`, then push it to `git@github.com:apache/fory.git`
+- Create a new tag by `git tag v0.12.0-rc1`, then push it to `git@github.com:apache/fory.git`
 
 ### Build and upload artifacts to SVN dist/dev repo
 
@@ -256,8 +256,8 @@ If some files are unexpected, you need to remove by `svn delete` and repeat the 
 
 Fory requires votes from the Fory Community.
 
-- release_version: the version for fory, like 0.5.0.
-- release_candidate_version: the version for voting, like 0.5.0-rc1.
+- release_version: the version for fory, like 0.12.0.
+- release_candidate_version: the version for voting, like 0.12.0-rc1.
 - maven_artifact_number: the number for Maven staging artifacts, like 1001. Specifically, the maven_artifact_number can
   be found by searching "fory" on https://repository.apache.org/#stagingRepositories.
 
@@ -398,7 +398,7 @@ These steps ensure all published artifacts are verified and correctly deployed t
 ### build a Pre-release
 
 You need to build a Pre-release before voting, such as:
-https://github.com/apache/fory/releases/tag/v0.11.2-rc1
+https://github.com/apache/fory/releases/tag/v0.12.0-rc1
 
 ### Fory Community Vote
 
@@ -425,7 +425,7 @@ The discussion thread:
 https://lists.apache.org/thread/xxr3od301g6v3ndj14zqc05byp9qvclh
 
 The change lists about this release:
-https://github.com/apache/fory/compare/v0.4.1...v0.5.0-rc3
+https://github.com/apache/fory/compare/v0.12.0...v0.12.1-rc1
 
 The release candidates:
 https://dist.apache.org/repos/dist/dev/fory/0.5.0-rc3/
@@ -434,7 +434,7 @@ The maven staging for this release:
 https://repository.apache.org/content/repositories/orgapachefory-1003
 
 Git tag for the release:
-https://github.com/apache/fory/releases/tag/v0.5.0-rc3
+https://github.com/apache/fory/releases/tag/v0.12.0-rc1
 
 Git commit for the release:
 https://github.com/apache/fory/commit/fae06330edd049bb960536e978a45b97bca66faf
@@ -578,7 +578,7 @@ like [#2207](https://github.com/apache/fury/pull/2207).
 ### Github officially released
 
 You need to officially release this version in the Fory project
-Reference implementation: https://github.com/apache/fory/releases/tag/v0.11.2
+Reference implementation: https://github.com/apache/fory/releases/tag/v0.12.0
 
 ### Release Maven artifacts
 
@@ -611,7 +611,7 @@ The release notes are available here:
 https://github.com/apache/fory/releases/tag/v${release_version}
 
 For the complete list of changes:
-https://github.com/apache/fory/compare/v0.5.0...v${release_version}
+https://github.com/apache/fory/compare/v0.12.0...v${release_version}
 
 Apache Fory website: https://fory.apache.org/
 
