@@ -4,16 +4,13 @@ sidebar_position: 0
 id: how_to_verify
 ---
 
-
-For detailed check list, please refer to the [official check list](https://cwiki.apache.org/confluence/display/INCUBATOR/Incubator+Release+Checklist)
-
 ## Download the candidate version
 
 ```bash
 #If there is svn locally, you can clone to the local
-svn co https://dist.apache.org/repos/dist/dev/incubator/fory/${release_version}-${rc_version}/
+svn co https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_version}/
 # You can download the material file directly
-wget https://dist.apache.org/repos/dist/dev/incubator/fory/${release_version}-${rc_version}/xxx.xxx
+wget https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_version}/xxx.xxx
 ```
 
 ## Verify checksums and signatures
@@ -31,7 +28,7 @@ brew install gnupg
 Then import the Fory release manager's public key:
 
 ```bash
-curl https://downloads.apache.org/incubator/fory/KEYS > KEYS # Download KEYS
+curl https://downloads.apache.org/fory/KEYS > KEYS # Download KEYS
 gpg --import KEYS # Import KEYS to local
 # Then, trust the public key:
 gpg --edit-key <KEY-used-in-this-version> # Edit the key(mentioned in vote email)
@@ -82,7 +79,7 @@ for i in *.tar.gz; do echo $i; gpg --verify $i.asc $i; done
 If something like the following appears, it means the signature is correct:
 
 ```bash
-apache-fory-incubating-0.5.0-src.tar.gz
+apache-fory-0.12.0-src.tar.gz
 gpg: Signature made Wed 17 Apr 2024 11:49:45 PM CST using RSA key ID 5E580BA4
 gpg: checking the trustdb
 gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
@@ -99,8 +96,8 @@ for i in *.tar.gz; do echo $i; sha512sum --check  $i.sha512*; done
 It should output something like:
 
 ```bash
-apache-fory-incubating-0.5.0-src.tar.gz
-apache-fory-incubating-0.5.0-src.tar.gz: OK
+apache-fory-0.12.0-src.tar.gz
+apache-fory-0.12.0-src.tar.gz: OK
 ```
 
 A quick way to verify above is:
