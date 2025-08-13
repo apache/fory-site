@@ -94,6 +94,23 @@ As a Top-Level Project, Fory's roadmap includes:
   - Structured mentorship program for new contributors
   - Production case studies with early adopters
 
+## Acknowledgements
+
+The PMC Members of the Fory project are listed as follows, with big thanks to their significant contributions:
+
+- Shawn Yang (Chair)
+- tison
+- Xuanwo
+- Twice
+- PJ Fanning
+- Pan Li
+- Xin Wang
+- Weipeng Wang
+- liyu
+- eolivelli
+
+Big thanks to all contributors who submitted code, reported issues, and improved documentation. This achievement belongs to the entire Apache Fory community!
+
 ## Get Involved
 
 Experience Fory's performance:
