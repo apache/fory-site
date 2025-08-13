@@ -85,7 +85,8 @@ As a Top-Level Project, Fory's roadmap includes:
 
 - Enhanced Capabilities
   - Improved schema evolution for cross-language compatibility
-  - Producation ready support forRust/C++ serialization
+  - Producation ready support for Rust/C++ serialization
+  - Optimize Pyfory Performance continuously and provide drop-in replacement support for pickle
 - Ecosystem Integration
   - GRPC Integration
   - Protobuf Migration Tool
