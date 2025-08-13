@@ -2,11 +2,122 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fory.apache.org/blog</id>
     <title>Apache Fory Blog</title>
-    <updated>2025-07-10T00:00:00.000Z</updated>
+    <updated>2025-07-18T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fory.apache.org/blog"/>
     <subtitle>Apache Fory Blog</subtitle>
     <icon>https://fory.apache.org/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Apache Fory™ Graduates to Top-Level Apache Project]]></title>
+        <id>https://fory.apache.org/blog/apache-fory-graduated</id>
+        <link href="https://fory.apache.org/blog/apache-fory-graduated"/>
+        <updated>2025-07-18T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Hello, everyone! I'm pleased to announce that Apache Fory™ has graduated from the Apache Incubator to become a Top-Level Project (TLP) of the Apache Software Foundation, signifying its technical maturity and sustainable open-source governance under the Apache Way.]]></summary>
+        <content type="html"><![CDATA[<p><strong>Hello, everyone! I'm pleased to announce that <a href="https://fory.apache.org/" target="_blank" rel="noopener noreferrer">Apache Fory™</a> has graduated from the <a href="https://incubator.apache.org/" target="_blank" rel="noopener noreferrer">Apache Incubator</a> to become a Top-Level Project (TLP) of <a href="https://apache.org/" target="_blank" rel="noopener noreferrer">the Apache Software Foundation</a>, signifying its technical maturity and sustainable open-source governance under the Apache Way.</strong></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-is-apache-fory">What is Apache Fory?<a href="https://fory.apache.org/blog/apache-fory-graduated#what-is-apache-fory" class="hash-link" aria-label="Direct link to What is Apache Fory?" title="Direct link to What is Apache Fory?">​</a></h2>
+<p><strong>Apache Fory</strong> is a blazingly-fast multi-language serialization framework that revolutionizes data exchange between systems and languages. By leveraging <strong>JIT compilation</strong> and <strong>zero-copy techniques</strong>, Fory delivers up to <strong>170x faster performance</strong> compared to other serialization frameworkds while being extremely easy to use.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="key-features">Key Features:<a href="https://fory.apache.org/blog/apache-fory-graduated#key-features" class="hash-link" aria-label="Direct link to Key Features:" title="Direct link to Key Features:">​</a></h3>
+<ul>
+<li>🌐 <strong>Cross-language serialization</strong>: Java, Python, C++, Go, JavaScript, Rust, Scala, Kotlin</li>
+<li>⚡️ <strong>Zero-copy optimization</strong>: Minimizes memory overhead for large datasets</li>
+<li>🔄 <strong>Schema evolution</strong>: Forward/backward compatibility for evolving data structures</li>
+<li>🔒 <strong>Security-first</strong>: Class registration prevents deserialization vulnerabilities</li>
+<li>📦 <strong>Multiple protocols</strong>: Object graph, Row format, and Java-compatible modes</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="quick-start">Quick Start<a href="https://fory.apache.org/blog/apache-fory-graduated#quick-start" class="hash-link" aria-label="Direct link to Quick Start" title="Direct link to Quick Start">​</a></h3>
+<p>Java serialization example:</p>
+<div class="language-java codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-java codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token class-name">Fory</span><span class="token plain"> fory </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token class-name">Fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">builder</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">build</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">register</span><span class="token punctuation" style="color:#393A34">(</span><span class="token class-name">DataModel</span><span class="token punctuation" style="color:#393A34">.</span><span class="token keyword" style="color:#00009f">class</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token class-name">DataModel</span><span class="token plain"> obj </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token keyword" style="color:#00009f">new</span><span class="token plain"> </span><span class="token class-name">DataModel</span><span class="token punctuation" style="color:#393A34">(</span><span class="token comment" style="color:#999988;font-style:italic">/*...*/</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">byte</span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">]</span><span class="token plain"> bytes </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">serialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">obj</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token class-name">DataModel</span><span class="token plain"> restored </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">(</span><span class="token class-name">DataModel</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"> fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">deserialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">bytes</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Python serialization example</p>
+<div class="language-python codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-python codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">from</span><span class="token plain"> dataclasses </span><span class="token keyword" style="color:#00009f">import</span><span class="token plain"> dataclass</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">import</span><span class="token plain"> pyfory</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">class</span><span class="token plain"> </span><span class="token class-name">Foo</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    name</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">str</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    age</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">int</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">pyfory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">register</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">Foo</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token builtin">bytes</span><span class="token plain"> </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> pyfory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">serialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">Foo</span><span class="token punctuation" style="color:#393A34">(</span><span class="token string" style="color:#e3116c">"Shawn"</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">30</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain">  </span><span class="token comment" style="color:#999988;font-style:italic"># Ultra-fast encoding</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">restored </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> pyfory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">deserialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token builtin">bytes</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain">  </span><span class="token comment" style="color:#999988;font-style:italic"># Instant decoding</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-incubation-journey">The Incubation Journey<a href="https://fory.apache.org/blog/apache-fory-graduated#the-incubation-journey" class="hash-link" aria-label="Direct link to The Incubation Journey" title="Direct link to The Incubation Journey">​</a></h2>
+<p>Since entering the Apache Incubator in December 2023, Fory has achieved significant milestones.</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="community-growth">Community Growth<a href="https://fory.apache.org/blog/apache-fory-graduated#community-growth" class="hash-link" aria-label="Direct link to Community Growth" title="Direct link to Community Growth">​</a></h3>
+<ul>
+<li>👥 90+ contributors</li>
+<li>🔧 6 new committers added, with 1 promoted to PPMC</li>
+<li>🤝 Diverse adoption across fintech, e-commerce, and cloud</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="technical-progress">Technical Progress<a href="https://fory.apache.org/blog/apache-fory-graduated#technical-progress" class="hash-link" aria-label="Direct link to Technical Progress" title="Direct link to Technical Progress">​</a></h3>
+<ul>
+<li>🚀 14 ASF-compliant releases (0.5.0 to 0.11.2)</li>
+<li>🔄 4 release managers ensuring sustainable operations</li>
+<li>™ Trademark resolution: Successful rename from Fury → Fory</li>
+<li>✅ Maturity validation: Full compliance with ASF graduation requirements</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="apache-way-adoption">Apache Way Adoption<a href="https://fory.apache.org/blog/apache-fory-graduated#apache-way-adoption" class="hash-link" aria-label="Direct link to Apache Way Adoption" title="Direct link to Apache Way Adoption">​</a></h3>
+<ul>
+<li>📬 100% public discussions on dev@ mailing lists</li>
+<li>🗳️ Consensus-driven decisions through formal voting</li>
+<li>🌐 Complete infrastructure migration to Fory namespace</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-graduation-matters">Why Graduation Matters<a href="https://fory.apache.org/blog/apache-fory-graduated#why-graduation-matters" class="hash-link" aria-label="Direct link to Why Graduation Matters" title="Direct link to Why Graduation Matters">​</a></h2>
+<p>Graduation signifies that Fory has demonstrated:</p>
+<ul>
+<li>Sustainable governance with diverse PMC leadership</li>
+<li>Enterprise-ready stability through rigorous releases</li>
+<li>Community independence with no vendor dominance</li>
+<li>ASF policy compliance including security and licensing</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-next">What's Next<a href="https://fory.apache.org/blog/apache-fory-graduated#whats-next" class="hash-link" aria-label="Direct link to What's Next" title="Direct link to What's Next">​</a></h2>
+<p>As a Top-Level Project, Fory's roadmap includes:</p>
+<ul>
+<li>Enhanced Capabilities<!-- -->
+<ul>
+<li>Improved schema evolution for cross-language compatibility</li>
+<li>Producation ready support for Rust/C++ serialization</li>
+<li>Optimize Pyfory Performance continuously and provide drop-in replacement support for pickle</li>
+</ul>
+</li>
+<li>Ecosystem Integration<!-- -->
+<ul>
+<li>GRPC Integration</li>
+<li>Protobuf Migration Tool</li>
+</ul>
+</li>
+<li>Community Growth<!-- -->
+<ul>
+<li>Comprehensive user documentation</li>
+<li>Structured mentorship program for new contributors</li>
+<li>Production case studies with early adopters</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="get-involved">Get Involved<a href="https://fory.apache.org/blog/apache-fory-graduated#get-involved" class="hash-link" aria-label="Direct link to Get Involved" title="Direct link to Get Involved">​</a></h2>
+<p>Experience Fory's performance:</p>
+<p>Java:</p>
+<div class="language-xml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-xml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">dependency</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">groupId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain">org.apache.fory</span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">groupId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">artifactId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain">fory-core</span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">artifactId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">version</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain">0.11.2</span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">version</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">dependency</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Python:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">pip </span><span class="token function" style="color:#d73a49">install</span><span class="token plain"> pyfory</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Join our community:</p>
+<ul>
+<li>🌐 Website: <a href="https://fory.apache.org/" target="_blank" rel="noopener noreferrer">https://fory.apache.org</a></li>
+<li>💬 Slack: <a href="https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw" target="_blank" rel="noopener noreferrer">fory-project.slack.com</a></li>
+<li>📧 Mailing list: <a href="mailto:dev@fory.apache.org" target="_blank" rel="noopener noreferrer">dev@fory.apache.org</a></li>
+<li>🐙 GitHub: <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="acknowledgements">Acknowledgements<a href="https://fory.apache.org/blog/apache-fory-graduated#acknowledgements" class="hash-link" aria-label="Direct link to Acknowledgements" title="Direct link to Acknowledgements">​</a></h2>
+<p>The PMC Members of the Fory project are listed as follows, with big thanks to their significant contributions:</p>
+<ul>
+<li><a href="https://github.com/chaokunyang" target="_blank" rel="noopener noreferrer">Shawn Yang (Chair)</a></li>
+<li><a href="https://github.com/tisonkun" target="_blank" rel="noopener noreferrer">tison</a></li>
+<li><a href="https://github.com/xuanwo" target="_blank" rel="noopener noreferrer">Xuanwo</a></li>
+<li><a href="https://github.com/pragmatwice" target="_blank" rel="noopener noreferrer">Twice</a></li>
+<li><a href="https://github.com/pjfanning" target="_blank" rel="noopener noreferrer">PJ Fanning</a></li>
+<li><a href="https://github.com/pandalee99" target="_blank" rel="noopener noreferrer">Pan Li</a></li>
+<li>Xin Wang</li>
+<li>Weipeng Wang</li>
+<li>liyu</li>
+<li><a href="https://github.com/eolivelli" target="_blank" rel="noopener noreferrer">eolivelli</a></li>
+</ul>
+<p>Big thanks to all contributors who submitted code, reported issues, and improved documentation. This achievement belongs to the entire Apache Fory community!</p>]]></content>
+        <author>
+            <name>Shawn Yang</name>
+            <uri>https://github.com/chaokunyang</uri>
+        </author>
+        <category label="announcement" term="announcement"/>
+        <category label="serialization" term="serialization"/>
+        <category label="asf" term="asf"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Fory v0.11.2 Released]]></title>
         <id>https://fory.apache.org/blog/fory_0_11_2_release</id>
@@ -1448,76 +1559,6 @@ and implement reference resolution by themselves, as well as writing code to con
 <li>[Scala] fix package object inaccessible from source code by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1181" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1181</a></li>
 </ul>
 <p><strong>Full Changelog</strong>: <a href="https://github.com/alipay/fury/compare/v0.3.1...v0.4.0" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/compare/v0.3.1...v0.4.0</a></p>]]></content>
-        <author>
-            <name>Shawn Yang</name>
-            <uri>https://github.com/chaokunyang</uri>
-        </author>
-        <category label="fury" term="fury"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Fury v0.3.1 released]]></title>
-        <id>https://fory.apache.org/blog/fury_0_3_1_release</id>
-        <link href="https://fory.apache.org/blog/fury_0_3_1_release"/>
-        <updated>2023-11-21T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[This release was made before Fury joined the Apache Incubator and thus it's a non-ASF release.]]></summary>
-        <content type="html"><![CDATA[<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p><strong>This release was made before Fury joined the Apache Incubator and thus it's a non-ASF release.</strong></p></div></div>
-<p>I'm pleased to announce the 0.3.1 release of the Fury. With this release, fury supports python 3.11&amp;3.12, droped python 3.6 support.
-Multiple scala serialization JIT optimization are included, and java serialization compatibility is improved too.</p>
-<p>Author: <a href="https://github.com/chaokunyang" target="_blank" rel="noopener noreferrer">chaokunyang</a></p>
-<p>I'm pleased to announce the 0.3.1 release of the Fury. With this release, fury supports python 3.11&amp;3.12, droped python 3.6 support.
-Multiple scala serialization JIT optimization are included, and java serialization compatibility is improved too.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="highlight">Highlight<a href="https://fory.apache.org/blog/fury_0_3_1_release#highlight" class="hash-link" aria-label="Direct link to Highlight" title="Direct link to Highlight">​</a></h2>
-<ul>
-<li>Support python 3.11 and 3.12, drop python 3.6 support</li>
-<li>Refactor collection serialization framework to support writeReplace JIT</li>
-<li>Integrate scala collection with fury java collection framework</li>
-<li>Support scala collection jit serialization</li>
-<li>Support shim dispatcher to resolve compatibility problems for common used classes</li>
-<li>Use lastest arrow 14 version for row format in Java and Python</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-changed">What's Changed<a href="https://fory.apache.org/blog/fury_0_3_1_release#whats-changed" class="hash-link" aria-label="Direct link to What's Changed" title="Direct link to What's Changed">​</a></h2>
-<ul>
-<li>[Doc] add scala sbt install doc by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1066" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1066</a></li>
-<li>[Doc] Update scala_guide.md by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1067" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1067</a></li>
-<li>[Doc] Add scala 2/3 support doc by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1068" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1068</a></li>
-<li>[Java]  Refactor collection serialization framework to support writeReplace JIT by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1062" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1062</a></li>
-<li>[Java] Refine collection package by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1070" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1070</a></li>
-<li>[Java] merge map/collection into collection package  by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1072" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1072</a></li>
-<li>[Scala] integrate scala collection with fury java collection framework by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1073" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1073</a></li>
-<li>remove unused part of build.sbt by @pjfanning in <a href="https://github.com/alipay/fury/pull/1074" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1074</a></li>
-<li>[Scala] get build to work with Scala 3 by @pjfanning in <a href="https://github.com/alipay/fury/pull/1075" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1075</a></li>
-<li>[Scala] support scala collection jit serialization by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1077" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1077</a></li>
-<li>[Doc] add apache license section to readme by @caicancai in <a href="https://github.com/alipay/fury/pull/1080" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1080</a></li>
-<li>[Java] add option to disable class check warnings by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1084" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1084</a></li>
-<li>[Java] Fix collection serialization NPE when all elements are null by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1086" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1086</a></li>
-<li>[Java] FuryPooledObjectFactory getFury refactor, remove redundant recursive call by @mof-dev-3 in <a href="https://github.com/alipay/fury/pull/1088" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1088</a></li>
-<li>[Rust] add rust-version by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1091" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1091</a></li>
-<li>[DOC] add javascript sample by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1095" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1095</a></li>
-<li>Make sure the c++ standard is set to 17 by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1093" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1093</a></li>
-<li>Fix undefined behavior due to use of uninitialized field in Buffer by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1092" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1092</a></li>
-<li>[Rust] merge derive and make it sample by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1098" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1098</a></li>
-<li>[DOC] add rust sample by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1100" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1100</a></li>
-<li>Simplify endian utility functions and <code>IsOneOf</code> by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1096" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1096</a></li>
-<li>[Java] throw error if nested fury serialize happen in serialization  by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1103" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1103</a></li>
-<li>[C++] remove useless FromXXXEndian by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1105" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1105</a></li>
-<li>[Rust ] Remove the magic numbers by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1107" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1107</a></li>
-<li>[Rust] chore: add rust doc by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1109" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1109</a></li>
-<li>[JavaScript] Fill in readme by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1110" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1110</a></li>
-<li>chore: check xlang flag by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1112" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1112</a></li>
-<li>[Java] Remove guava part1 by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1114" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1114</a></li>
-<li>[Rust] Correct language flag by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1120" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1120</a></li>
-<li>[Java] DateTimeUtils minor refactor, reuse floorDiv to calculate floorMod by @mof-dev-3 in <a href="https://github.com/alipay/fury/pull/1122" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1122</a></li>
-<li>[Python] Support python3.11/12 by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1064" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1064</a></li>
-<li>[java] support shim dispatcher to resolve compatibility problems for common used classes by @xiguashu in <a href="https://github.com/alipay/fury/pull/1123" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1123</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="new-contributors">New Contributors<a href="https://fory.apache.org/blog/fury_0_3_1_release#new-contributors" class="hash-link" aria-label="Direct link to New Contributors" title="Direct link to New Contributors">​</a></h2>
-<ul>
-<li>@pjfanning made their first contribution in <a href="https://github.com/alipay/fury/pull/1074" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1074</a></li>
-<li>@mof-dev-3 made their first contribution in <a href="https://github.com/alipay/fury/pull/1088" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1088</a></li>
-<li>@PragmaTwice made their first contribution in <a href="https://github.com/alipay/fury/pull/1093" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1093</a></li>
-<li>@xiguashu made their first contribution in <a href="https://github.com/alipay/fury/pull/1123" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1123</a></li>
-</ul>
-<p><strong>Full Changelog</strong>: <a href="https://github.com/alipay/fury/compare/v0.3.0...v0.3.1" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/compare/v0.3.0...v0.3.1</a></p>]]></content>
         <author>
             <name>Shawn Yang</name>
             <uri>https://github.com/chaokunyang</uri>
