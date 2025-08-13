@@ -26,7 +26,7 @@ Java serialization example:
 
 ```java
 Fory fory = Fory.builder().build();
-fory.register(DataModel.class); 
+fory.register(DataModel.class);
 
 DataModel obj = new DataModel(/*...*/);
 byte[] bytes = fory.serialize(obj);
@@ -94,23 +94,6 @@ As a Top-Level Project, Fory's roadmap includes:
   - Structured mentorship program for new contributors
   - Production case studies with early adopters
 
-## Acknowledgements
-
-The PMC Members of the Fory project are listed as follows, with big thanks to their significant contributions:
-
-- Shawn Yang (Chair)
-- tison
-- Xuanwo
-- Twice
-- PJ Fanning
-- Pan Li
-- Xin Wang
-- Weipeng Wang
-- liyu
-- eolivelli
-
-Big thanks to all contributors who submitted code, reported issues, and improved documentation. This achievement belongs to the entire Apache Fory community!
-
 ## Get Involved
 
 Experience Fory's performance:
@@ -137,3 +120,20 @@ Join our community:
 - 💬 Slack: [fory-project.slack.com](https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw)
 - 📧 Mailing list: dev@fory.apache.org
 - 🐙 GitHub: https://github.com/apache/fory
+
+## Acknowledgements
+
+The PMC Members of the Fory project are listed as follows, with big thanks to their significant contributions:
+
+- [Shawn Yang (Chair)](https://github.com/chaokunyang)
+- [tison](https://github.com/tisonkun)
+- [Xuanwo](https://github.com/xuanwo)
+- [Twice](https://github.com/pragmatwice)
+- [PJ Fanning](https://github.com/pjfanning)
+- [Pan Li](https://github.com/pandalee99)
+- Xin Wang
+- Weipeng Wang
+- liyu
+- [eolivelli](https://github.com/eolivelli)
+
+Big thanks to all contributors who submitted code, reported issues, and improved documentation. This achievement belongs to the entire Apache Fory community!
