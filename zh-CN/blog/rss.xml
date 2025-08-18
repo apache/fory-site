@@ -4,10 +4,100 @@
         <title>Apache Fory Blog</title>
         <link>https://fory.apache.org/zh-CN/blog</link>
         <description>Apache Fory Blog</description>
-        <lastBuildDate>Fri, 18 Jul 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 18 Aug 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>zh-CN</language>
+        <item>
+            <title><![CDATA[Fory v0.12.0 Released]]></title>
+            <link>https://fory.apache.org/zh-CN/blog/fory_0_12_0_release</link>
+            <guid>https://fory.apache.org/zh-CN/blog/fory_0_12_0_release</guid>
+            <pubDate>Mon, 18 Aug 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[The Apache Fory team is pleased to announce the 0.12.0 release. This is a major release that includes 64 PR from 9 distinct contributors. See the Install Page to learn how to get the libraries for your platform.]]></description>
+            <content:encoded><![CDATA[<p>The Apache Fory team is pleased to announce the 0.12.0 release. This is a major release that includes <a href="https://github.com/apache/fory/compare/v0.11.2...v0.12.0" target="_blank" rel="noopener noreferrer">64 PR</a> from 9 distinct contributors. See the <a href="https://fury.apache.org/docs/docs/start/install" target="_blank" rel="noopener noreferrer">Install</a> Page to learn how to get the libraries for your platform.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="highlights">Highlights<a href="https://fory.apache.org/zh-CN/blog/fory_0_12_0_release#highlights" class="hash-link" aria-label="Highlights的直接链接" title="Highlights的直接链接">​</a></h2>
+<ul>
+<li>[Python] Support Python <code>__getstate__/__setstate__/__reduce__</code> serialization protocol</li>
+<li>[Python] Support serialize python function</li>
+<li>[Java] Use JDK11 for fory-format module</li>
+<li>[Scala]Support default value for scala case/pojo classes when deseralizing</li>
+<li>[Kotlin] Support default value for kotlin data classes when deserializing</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="features">Features<a href="https://fory.apache.org/zh-CN/blog/fory_0_12_0_release#features" class="hash-link" aria-label="Features的直接链接" title="Features的直接链接">​</a></h2>
+<ul>
+<li>refactor(python): replace Black and Flake8 with Ruff by @esafak in <a href="https://github.com/apache/fory/pull/2388" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2388</a></li>
+<li>refactor(python): Unify DataClassSerializer and ComplexObjectSerializer by @esafak in <a href="https://github.com/apache/fory/pull/2389" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2389</a></li>
+<li>refactor(python): Simplify require_pyarrow, remove undefined pytest.mark by @esafak in <a href="https://github.com/apache/fory/pull/2396" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2396</a></li>
+<li>feat(python): Replace usage of ComplexObjectSerializer with DataClassSerializer by @esafak in <a href="https://github.com/apache/fory/pull/2395" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2395</a></li>
+<li>feat(python): Add StatefulSerializer using <strong>getstate</strong>, <strong>setstate</strong> by @esafak in <a href="https://github.com/apache/fory/pull/2400" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2400</a></li>
+<li>feat(python): Implement ReduceSerializer for <strong>reduce</strong> support by @esafak in <a href="https://github.com/apache/fory/pull/2401" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2401</a></li>
+<li>feat(python): Support codegen with XLANG in DataClassSerializer by @esafak in <a href="https://github.com/apache/fory/pull/2405" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2405</a></li>
+<li>perf(Go/python): Type system compatibility upgrade by @pandalee99 in <a href="https://github.com/apache/fory/pull/2339" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2339</a></li>
+<li>feat(python): Add FunctionSerializer for function serialization by @esafak in <a href="https://github.com/apache/fory/pull/2404" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2404</a></li>
+<li>feat: Implement ObjectSerializer for custom objects by @esafak in <a href="https://github.com/apache/fory/pull/2413" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2413</a></li>
+<li>feat(scala): support scala object with default values by @chaokunyang in <a href="https://github.com/apache/fory/pull/2412" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2412</a></li>
+<li>refactor(java): refactor java default value support for scala/kotlin by @chaokunyang in <a href="https://github.com/apache/fory/pull/2415" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2415</a></li>
+<li>feat(kotlin): support default value for kotlin data class by @chaokunyang in <a href="https://github.com/apache/fory/pull/2416" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2416</a></li>
+<li>feat(kotlin): add cache to kotlin default value support by @chaokunyang in <a href="https://github.com/apache/fory/pull/2419" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2419</a></li>
+<li>refactor(ci): Migrate CI runner to Python scripts by @esafak in <a href="https://github.com/apache/fory/pull/2406" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2406</a></li>
+<li>feat(java): use java11 for fory-format module by @chaokunyang in <a href="https://github.com/apache/fory/pull/2448" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2448</a></li>
+<li>feat(python): add register api for python by @chaokunyang in <a href="https://github.com/apache/fory/pull/2451" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2451</a></li>
+<li>feat(java): add graalvm 23 ci by @chaokunyang in <a href="https://github.com/apache/fory/pull/2463" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2463</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="bug-fix">Bug Fix<a href="https://fory.apache.org/zh-CN/blog/fory_0_12_0_release#bug-fix" class="hash-link" aria-label="Bug Fix的直接链接" title="Bug Fix的直接链接">​</a></h2>
+<ul>
+<li>fix: tidy up issues in scala_guide.md by @pjfanning in <a href="https://github.com/apache/fory/pull/2374" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2374</a></li>
+<li>fix(java): ClassDef header calculation error by @LiangliangSui in <a href="https://github.com/apache/fory/pull/2382" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2382</a></li>
+<li>ci(python): Build manylinux_2_28 wheels using auditwheel by @esafak in <a href="https://github.com/apache/fory/pull/2381" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2381</a></li>
+<li>fix: Correct pyarrow installation check and add bazel troubleshooting by @esafak in <a href="https://github.com/apache/fory/pull/2418" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2418</a></li>
+<li>fix(go): fix type writing and reading logic in slice by @lzaeh in <a href="https://github.com/apache/fory/pull/2427" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2427</a></li>
+<li>fix(rust): fix rust lint error by @chaokunyang in <a href="https://github.com/apache/fory/pull/2447" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2447</a></li>
+<li>fix(java): crash when map only contains null value by @LouisLou2 in <a href="https://github.com/apache/fory/pull/2444" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2444</a></li>
+<li>fix(java): MemoryBuffer::readChars by @LouisLou2 in <a href="https://github.com/apache/fory/pull/2438" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2438</a></li>
+<li>fix(java): fix java deploy with different java versions by @chaokunyang in <a href="https://github.com/apache/fory/pull/2449" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2449</a></li>
+<li>fix(java): fix install jdks by @chaokunyang in <a href="https://github.com/apache/fory/pull/2450" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2450</a></li>
+<li>fix(java): fix maven deploy by @chaokunyang in <a href="https://github.com/apache/fory/pull/2452" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2452</a></li>
+<li>fix(java): fix shade janino duplciate entry by @chaokunyang in <a href="https://github.com/apache/fory/pull/2453" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2453</a></li>
+<li>fix(java): fix extension java module conflict by @chaokunyang in <a href="https://github.com/apache/fory/pull/2455" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2455</a></li>
+<li>fix(java): fix extension java module conflict by @chaokunyang in <a href="https://github.com/apache/fory/pull/2456" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2456</a></li>
+<li>fix(java): fix decode classdef for abstract classes by @chaokunyang in <a href="https://github.com/apache/fory/pull/2462" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2462</a></li>
+<li>fix(python): fix pyfory pypi release (#2473) by @chaokunyang in <a href="https://github.com/apache/fory/pull/2474" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2474</a></li>
+<li>fix(python): fix py releases macos13 by @chaokunyang in <a href="https://github.com/apache/fory/pull/2479" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2479</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="other-improvements">Other Improvements<a href="https://fory.apache.org/zh-CN/blog/fory_0_12_0_release#other-improvements" class="hash-link" aria-label="Other Improvements的直接链接" title="Other Improvements的直接链接">​</a></h2>
+<ul>
+<li>chore(Scala): upgrade sbt and plugins by @pjfanning in <a href="https://github.com/apache/fory/pull/2379" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2379</a></li>
+<li>chore(python): add more comprehensive test parameters by @pandalee99 in <a href="https://github.com/apache/fory/pull/2377" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2377</a></li>
+<li>chore(Scala): remove var that can be mutated by @pjfanning in <a href="https://github.com/apache/fory/pull/2385" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2385</a></li>
+<li>chore(Scala): add test for Scala 3 enum by @pjfanning in <a href="https://github.com/apache/fory/pull/2386" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2386</a></li>
+<li>chore(Scala): use setup-sbt CI action by @pjfanning in <a href="https://github.com/apache/fory/pull/2387" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2387</a></li>
+<li>chore(Scala): refactor scala test so it asserts something by @pjfanning in <a href="https://github.com/apache/fory/pull/2390" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2390</a></li>
+<li>chore(Scala): Create DurationTest.scala by @pjfanning in <a href="https://github.com/apache/fory/pull/2394" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2394</a></li>
+<li>chore(Java): handle deserialization scenario that currently throws an IndexOutOfBoundsException by @pjfanning in <a href="https://github.com/apache/fory/pull/2399" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2399</a></li>
+<li>chore: bump release version to 0.11.2 by @pandalee99 in <a href="https://github.com/apache/fory/pull/2403" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2403</a></li>
+<li>chore(deps): bump org.apache.commons<!-- -->:commons-lang3<!-- --> from 3.12.0 to 3.18.0 in /java/fory-test-core by @dependabot[bot] in <a href="https://github.com/apache/fory/pull/2408" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2408</a></li>
+<li>chore(docs): Fix the names of some documents by @pandalee99 in <a href="https://github.com/apache/fory/pull/2411" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2411</a></li>
+<li>chore(cpp): fix duplicate copyright by @co63oc in <a href="https://github.com/apache/fory/pull/2426" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2426</a></li>
+<li>docs: fix ruff command by @co63oc in <a href="https://github.com/apache/fory/pull/2425" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2425</a></li>
+<li>chore: fix typos by @co63oc in <a href="https://github.com/apache/fory/pull/2424" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2424</a></li>
+<li>chore(dart): fix typos by @co63oc in <a href="https://github.com/apache/fory/pull/2428" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2428</a></li>
+<li>chore: fix typos by @co63oc in <a href="https://github.com/apache/fory/pull/2429" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2429</a></li>
+<li>chore: remove incubating by @chaokunyang in <a href="https://github.com/apache/fory/pull/2431" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2431</a></li>
+<li>chore: fix typos by @co63oc in <a href="https://github.com/apache/fory/pull/2433" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2433</a></li>
+<li>chore: fix typos by @co63oc in <a href="https://github.com/apache/fory/pull/2436" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2436</a></li>
+<li>chore: translate comments by @co63oc in <a href="https://github.com/apache/fory/pull/2442" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2442</a></li>
+<li>chore(python): add execute doc for cross langauge tests in python by @chaokunyang in <a href="https://github.com/apache/fory/pull/2420" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2420</a></li>
+<li>chore(java): arrow 18.3.0 by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2458" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2458</a></li>
+<li>chore: prepare commits for releases-0.12 by @chaokunyang in <a href="https://github.com/apache/fory/pull/2470" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2470</a></li>
+<li>chore(python): disable import format warning by @chaokunyang in <a href="https://github.com/apache/fory/pull/2477" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2477</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="new-contributors">New Contributors<a href="https://fory.apache.org/zh-CN/blog/fory_0_12_0_release#new-contributors" class="hash-link" aria-label="New Contributors的直接链接" title="New Contributors的直接链接">​</a></h2>
+<ul>
+<li>@co63oc made their first contribution in <a href="https://github.com/apache/fory/pull/2426" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2426</a></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/apache/fory/compare/v0.11.2...v0.12.0" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/compare/v0.11.2...v0.12.0</a></p>]]></content:encoded>
+            <category>fory</category>
+        </item>
         <item>
             <title><![CDATA[Apache Fory™ Graduates to Top-Level Apache Project]]></title>
             <link>https://fory.apache.org/zh-CN/blog/apache-fory-graduated</link>
@@ -618,7 +708,7 @@
 <li>fix(java): Remove duplicate maven dependency by @Hen1ng in <a href="https://github.com/apache/fury/pull/2044" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2044</a></li>
 <li>fix(java): fix duplicate entry write at max chunk size bound by @chaokunyang in <a href="https://github.com/apache/fury/pull/2040" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2040</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="other-improvements">Other Improvements<a href="https://fory.apache.org/zh-CN/blog/fury_0_10_0_release#other-improvements" class="hash-link" aria-label="Other Improvements的直接链接" title="Other Improvements的直接链接">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="other-improvements">Other Improvements<a href="https://fory.apache.org/zh-CN/blog/fury_0_10_0_release#other-improvements" class="hash-link" aria-label="Other Improvements的直接��链接" title="Other Improvements的直接链接">​</a></h2>
 <ul>
 <li>chore(ci): Migrate the ci from macOS 12 to macOS 13 by @penguin-wwy in <a href="https://github.com/apache/fury/pull/1927" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/1927</a></li>
 <li>chore(Rust): fix lint problems by @theweipeng in <a href="https://github.com/apache/fury/pull/1962" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/1962</a></li>
@@ -1144,7 +1234,7 @@ utf8 encoding uses <code>12</code> bytes for string <code>MediaContent</code>, b
 <li>refactor readVarUint32 algorithm (#1462)</li>
 <li>rewrite readVarUint64 algorithm (#1463)</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="javascript-1">JavaScript<a href="https://fory.apache.org/zh-CN/blog/fury_0_5_0_release#javascript-1" class="hash-link" aria-label="JavaScript的直接链接" title="JavaScript的直接链接">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="javascript-1">JavaScript<a href="https://fory.apache.org/zh-CN/blog/fury_0_5_0_release#javascript-1" class="hash-link" aria-label="JavaScript的直��接链接" title="JavaScript的直接链接">​</a></h3>
 <ul>
 <li>Make PlatformBuffer available if has Buffer polyfill (#1373)</li>
 <li>enhance performance 64bits number (#1320)</li>
@@ -1274,7 +1364,7 @@ fast speed and ease of use:</p>
 </ul>
 </li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="core-serialization-capabilities">Core Serialization Capabilities<a href="https://fory.apache.org/zh-CN/blog/fury_blazing_fast_multiple_language_serialization_framework#core-serialization-capabilities" class="hash-link" aria-label="Core Serialization Capabilities的直接链接" title="Core Serialization Capabilities的直接链接">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="core-serialization-capabilities">Core Serialization Capabilities<a href="https://fory.apache.org/zh-CN/blog/fury_blazing_fast_multiple_language_serialization_framework#core-serialization-capabilities" class="hash-link" aria-label="Core Serialization Capabilities的直接链接" title="Core Serialization Capabilities��的直接链接">​</a></h2>
 <p>Although different scenarios require different serialization protocols, the underlying operations of serialization are
 similar.</p>
 <p>Therefore, Fury defines and implements <strong>a set of basic serialization capabilities</strong>, which can be used for quickly building new multi-language serialization protocols and get speedup by JIT acceleration and other optimizations.</p>
@@ -1426,64 +1516,6 @@ and implement reference resolution by themselves, as well as writing code to con
 <li>@bytemain made their first contribution in <a href="https://github.com/alipay/fury/pull/1211" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1211</a></li>
 </ul>
 <p><strong>Full Changelog</strong>: <a href="https://github.com/alipay/fury/compare/v0.4.0...v0.4.1" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/compare/v0.4.0...v0.4.1</a></p>]]></content:encoded>
-            <category>fury</category>
-        </item>
-        <item>
-            <title><![CDATA[Fury 0.4.0 Released]]></title>
-            <link>https://fory.apache.org/zh-CN/blog/fury_0_4_0_release</link>
-            <guid>https://fory.apache.org/zh-CN/blog/fury_0_4_0_release</guid>
-            <pubDate>Wed, 29 Nov 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[This release was made before Fury joined the Apache Incubator and thus it's a non-ASF release.]]></description>
-            <content:encoded><![CDATA[<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>信息</div><div class="admonitionContent_BuS1"><p><strong>This release was made before Fury joined the Apache Incubator and thus it's a non-ASF release.</strong></p></div></div>
-<p>I'm pleased to announce the 0.4.0 release of the Fury. With this release, <a href="https://www.graalvm.org/latest/reference-manual/native-image/" target="_blank" rel="noopener noreferrer">GraalVM native image</a> and C++ row format automatic encoder based on compile-time reflection are supported. Please try it out and share your feedbacks with us.</p>
-<p>Author: <a href="https://github.com/chaokunyang" target="_blank" rel="noopener noreferrer">chaokunyang</a></p>
-<p>I'm pleased to announce the 0.4.0 release of the Fury. With this release, <a href="https://www.graalvm.org/latest/reference-manual/native-image/" target="_blank" rel="noopener noreferrer">GraalVM native image</a> and C++ row format automatic encoder based on compile-time reflection are supported. Please try it out and share your feedbacks with us.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="highlight">Highlight<a href="https://fory.apache.org/zh-CN/blog/fury_0_4_0_release#highlight" class="hash-link" aria-label="Highlight的直接链接" title="Highlight的直接链接">​</a></h2>
-<ul>
-<li>[Java] Support Graalvm native image. The implementation will generate all serialization code at image build time, the runtime will be extremely fast, see <a href="https://github.com/alipay/fury/blob/main/docs/guide/graalvm_guide.md" target="_blank" rel="noopener noreferrer">fury graalvm usage doc</a></li>
-<li>[Java] Fury vs JDK benchmark on Graalvm native image</li>
-<li>[Scala] Serialization support for package scoped object</li>
-<li>[C++] Reflection support by macro/template programing</li>
-<li>[C++] Automatic row format encoder</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-changed">What's Changed<a href="https://fory.apache.org/zh-CN/blog/fury_0_4_0_release#whats-changed" class="hash-link" aria-label="What's Changed的直接链接" title="What's Changed的直接链接">​</a></h2>
-<ul>
-<li>[Python] fix python release by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1125" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1125</a></li>
-<li>[Java] make unsafe offset compatible with graalvm by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1117" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1117</a></li>
-<li>[Scala] Fix scala package object JIT error by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1130" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1130</a></li>
-<li>[Java] Refine maven pom config by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1126" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1126</a></li>
-<li>[Rust]  add rust building by @caicancai in <a href="https://github.com/alipay/fury/pull/1129" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1129</a></li>
-<li>[C++] Remove useless overload of Writer::WriteString by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1136" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1136</a></li>
-<li>[Rust] fix typo by @caicancai in <a href="https://github.com/alipay/fury/pull/1133" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1133</a></li>
-<li>[Rust]  add mesaage about rust ci by @caicancai in <a href="https://github.com/alipay/fury/pull/1131" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1131</a></li>
-<li>[C++] Add move ctor/assign op to Status by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1134" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1134</a></li>
-<li>[Rust] fix cargo test error by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1135" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1135</a></li>
-<li>[Rust] improve rust ci by @caicancai in <a href="https://github.com/alipay/fury/pull/1138" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1138</a></li>
-<li>[Scala] Fix scala collection serialization nested in pojo by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1140" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1140</a></li>
-<li>[Java] make sting builder serializer codegen eager by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1141" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1141</a></li>
-<li>[Rust] fix rust ci bug by @caicancai in <a href="https://github.com/alipay/fury/pull/1139" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1139</a></li>
-<li>[Java] support add static fields in fury codegen by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1147" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1147</a></li>
-<li>[C++] Add the basic row format serializer for C++ class types via reflection by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1144" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1144</a></li>
-<li>[C++] Add duplicated fields detection in <code>FURY_FIELD_INFO</code> macro by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1151" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1151</a></li>
-<li>[Java] support create serializer when register class by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1154" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1154</a></li>
-<li>[Java] Support graalvm native image by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1143" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1143</a></li>
-<li>[C++] Support string type in RowEncoder by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1158" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1158</a></li>
-<li>[Scala] add graalvm support for scala singleton by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1159" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1159</a></li>
-<li>[Scala] Fix scala singleton map/collection serialization in struct by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1160" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1160</a></li>
-<li>[Java] add read resolve circular test suite by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1161" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1161</a></li>
-<li>[Java] Remove load arrow serializers by default by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1163" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1163</a></li>
-<li>[Java] Support thread safe fury for graalvm native image by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1164" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1164</a></li>
-<li>[Scala] Fix package object serialization in scala App by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1166" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1166</a></li>
-<li>[Java] add graalvm usage doc by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1168" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1168</a></li>
-<li>[C++] Split util.h to bit_util.h and time_util.h by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1171" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1171</a></li>
-<li>[C++] Support cv-qualified types in row encoder by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1172" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1172</a></li>
-<li>[C++] Add support for nested class types in row encoder by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1173" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1173</a></li>
-<li>[Java] Add graalvm benchmark by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1178" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1178</a></li>
-<li>[Java] Fix string key serializer ref tracking by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1174" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1174</a></li>
-<li>[Java] Add graalvm benchmark test results by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1180" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1180</a></li>
-<li>[Scala] fix package object inaccessible from source code by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1181" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1181</a></li>
-</ul>
-<p><strong>Full Changelog</strong>: <a href="https://github.com/alipay/fury/compare/v0.3.1...v0.4.0" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/compare/v0.3.1...v0.4.0</a></p>]]></content:encoded>
             <category>fury</category>
         </item>
     </channel>
