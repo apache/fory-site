@@ -593,7 +593,7 @@ Send the release announcement to dev@fory.apache.org and CC announce@apache.org.
 Title:
 
 ```
-[ANNOUNCE] Release Apache Fory ${release_version}
+[ANNOUNCE] Apache Fory ${release_version} released
 ```
 
 Content:
