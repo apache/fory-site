@@ -70,6 +70,8 @@ public class Example {
     fory = Fory.builder().build();
     // register and generate serializer code.
     fory.register(Record.class, true);
+    // ensure lazy initialized serializers being compiled by fory.
+    fory.ensureSerializersCompiled();
   }
 
   public static void main(String[] args) {
@@ -115,6 +117,8 @@ public class ThreadSafeExample {
       Fory f = Fory.builder().build();
       // register and generate serializer code.
       f.register(Foo.class, true);
+      // ensure lazy initialized serializers being compiled by fory.
+      fory.ensureSerializersCompiled();
       return f;
     });
   }
