@@ -38,10 +38,13 @@ const config: Config = {
       {
         docs: {
           sidebarCollapsible: false,
-          lastVersion: '0.11',
+          lastVersion: '0.12',
           versions: {
             current: {
               label: 'dev',
+            },
+            '0.12': {
+              label: '0.12',
             },
             '0.11': {
               label: '0.11',
