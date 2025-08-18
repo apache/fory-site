@@ -1,5 +1,5 @@
 ---
-title: GraalVM Guide
+title: GraalVM 序列化
 sidebar_position: 6
 id: graalvm_guide
 license: |
@@ -21,33 +21,24 @@ license: |
 
 ## GraalVM Native Image
 
-GraalVM `native image` can compile java code into native code ahead to build faster, smaller, leaner applications.
-The native image doesn't have a JIT compiler to compile bytecode into machine code, and doesn't support
-reflection unless configure reflection file.
+GraalVM 的 `native image` 能将 Java 代码提前编译为本地代码，从而构建更快、更小、更精简的应用。
+Native image 不包含 JIT 编译器，无法在运行时将字节码编译为机器码，也不支持反射，除非配置反射元数据文件。
 
-Fory runs on GraalVM native image pretty well. Fory generates all serializer code for `Fory JIT framework` and `MethodHandle/LambdaMetafactory` at graalvm build time. Then use those generated code for serialization at runtime without
-any extra cost, the performance is great.
+Fory 在 GraalVM native image 下运行良好。Fory 会在 graalvm 构建阶段为 `Fory JIT framework` 和 `MethodHandle/LambdaMetafactory` 生成所有序列化器代码，运行时直接使用这些生成的代码进行序列化，无需额外开销，性能优异。
 
-In order to use Fory on graalvm native image, you must create Fory as an **static** field of a class, and **register** all classes at
-the enclosing class initialize time. Then configure `native-image.properties` under
-`resources/META-INF/native-image/$xxx/native-image.properties` to tell graalvm to init the class at native image
-build time. For example, here we configure `org.apache.fory.graalvm.Example` class be init at build time:
+在 graalvm native image 下使用 Fory 时，必须将 Fory 创建为类的**静态**字段，并在类初始化时**注册**所有类型。然后在 `resources/META-INF/native-image/$xxx/native-image.properties` 下配置 `native-image.properties`，告知 graalvm 在 native image 构建时初始化该类。例如，配置 `org.apache.fory.graalvm.Example` 类在构建时初始化：
 
 ```properties
 Args = --initialize-at-build-time=org.apache.fory.graalvm.Example
 ```
 
-Another benefit using fory is that you don't have to configure [reflection json](https://www.graalvm.org/latest/reference-manual/native-image/metadata/#specifying-reflection-metadata-in-json) and
-[serialization json](https://www.graalvm.org/latest/reference-manual/native-image/metadata/#serialization), which is
-very tedious, cumbersome and inconvenient. When using fory, you just need to invoke
-`org.apache.fory.Fory.register(Class<?>, boolean)` for every type you want to serialize.
+使用 fory 的另一个好处是无需配置繁琐的 [reflection json](https://www.graalvm.org/latest/reference-manual/native-image/metadata/#specifying-reflection-metadata-in-json) 和 [serialization json](https://www.graalvm.org/latest/reference-manual/native-image/metadata/#serialization)。只需对每个需要序列化的类型调用 `org.apache.fory.Fory.register(Class<?>, boolean)` 即可。
 
-Note that Fory `asyncCompilationEnabled` option will be disabled automatically for graalvm native image since graalvm
-native image doesn't support JIT at the image run time.
+注意：Fory 的 `asyncCompilationEnabled` 选项在 graalvm native image 下会自动禁用，因为 native image 运行时不支持 JIT。
 
-## Not thread-safe Fory
+## 非线程安全 Fory
 
-Example:
+示例：
 
 ```java
 import org.apache.fory.Fory;
@@ -68,10 +59,8 @@ public class Example {
 
   static {
     fory = Fory.builder().build();
-    // register and generate serializer code.
+    // 注册并生成序列化器代码。
     fory.register(Record.class, true);
-    // ensure lazy initialized serializers being compiled by fory.
-    fory.ensureSerializersCompiled();
   }
 
   public static void main(String[] args) {
@@ -85,13 +74,13 @@ public class Example {
 }
 ```
 
-Then add `org.apache.fory.graalvm.Example` build time init to `native-image.properties` configuration:
+然后在 `native-image.properties` 配置中添加 `org.apache.fory.graalvm.Example` 的构建时初始化：
 
 ```properties
 Args = --initialize-at-build-time=org.apache.fory.graalvm.Example
 ```
 
-## Thread-safe Fory
+## 线程安全 Fory
 
 ```java
 import org.apache.fory.Fory;
@@ -115,10 +104,8 @@ public class ThreadSafeExample {
   static {
     fory = new ThreadLocalFory(classLoader -> {
       Fory f = Fory.builder().build();
-      // register and generate serializer code.
+      // 注册并生成序列化器代码。
       f.register(Foo.class, true);
-      // ensure lazy initialized serializers being compiled by fory.
-      fory.ensureSerializersCompiled();
       return f;
     });
   }
@@ -136,38 +123,35 @@ public class ThreadSafeExample {
 }
 ```
 
-Then add `org.apache.fory.graalvm.ThreadSafeExample` build time init to `native-image.properties` configuration:
+然后在 `native-image.properties` 配置中添加 `org.apache.fory.graalvm.ThreadSafeExample` 的构建时初始化：
 
 ```properties
 Args = --initialize-at-build-time=org.apache.fory.graalvm.ThreadSafeExample
 ```
 
-## Framework Integration
+## 框架集成
 
-For framework developers, if you want to integrate fory for serialization, you can provided a configuration file to let
-the users to list all the classes they want to serialize, then you can load those classes and invoke
-`org.apache.fory.Fory.register(Class<?>, boolean)` to register those classes in your Fory integration class, and configure that
-class be initialized at graalvm native image build time.
+对于框架开发者，如果希望集成 fory 作为序列化方案，可以提供一个配置文件，让用户列出所有需要序列化的类，然后加载这些类并在 Fory 集成类中调用 `org.apache.fory.Fory.register(Class<?>, boolean)` 进行注册，并配置该类在 graalvm native image 构建时初始化。
 
 ## Benchmark
 
-Here we give two class benchmarks between Fory and Graalvm Serialization.
+这里给出 Fory 与 Graalvm Serialization 的两个类的基准测试。
 
-When Fory compression is disabled:
+Fory 未开启压缩时：
 
-- Struct: Fory is `46x speed, 43% size` compared to JDK.
-- Pojo: Fory is `12x speed, 56% size` compared to JDK.
+- Struct：Fory 为 JDK 的 `46x 速度，43% 大小`
+- Pojo：Fory 为 JDK 的 `12x 速度，56% 大小`
 
-When Fory compression is enabled:
+Fory 开启压缩时：
 
-- Struct: Fory is `24x speed, 31% size` compared to JDK.
-- Pojo: Fory is `12x speed, 48% size` compared to JDK.
+- Struct：Fory 为 JDK 的 `24x 速度，31% 大小`
+- Pojo：Fory 为 JDK 的 `12x 速度，48% 大小`
 
-See [[Benchmark.java](https://github.com/apache/fory/blob/main/integration_tests/graalvm_tests/src/main/java/org/apache/fory/graalvm/Benchmark.java)] for benchmark code.
+基准测试代码见 [[Benchmark.java](https://github.com/apache/fory/blob/main/integration_tests/graalvm_tests/src/main/java/org/apache/fory/graalvm/Benchmark.java)]。
 
-### Struct Benchmark
+### Struct 基准测试
 
-#### Class Fields
+#### 类字段
 
 ```java
 public class Struct implements Serializable {
@@ -186,9 +170,9 @@ public class Struct implements Serializable {
 }
 ```
 
-#### Benchmark Results
+#### Benchmark 结果
 
-No compression:
+未压缩：
 
 ```
 Benchmark repeat number: 400000
@@ -202,7 +186,7 @@ Compare speed: Fory is 45.70x speed of JDK
 Compare size: Fory is 0.43x size of JDK
 ```
 
-Compress number:
+压缩：
 
 ```
 Benchmark repeat number: 400000
@@ -216,9 +200,9 @@ Compare speed: Fory is 24.16x speed of JDK
 Compare size: Fory is 0.31x size of JDK
 ```
 
-### Pojo Benchmark
+### Pojo 基准测试
 
-#### Class Fields
+#### 类字段
 
 ```java
 public class Foo implements Serializable {
@@ -229,9 +213,9 @@ public class Foo implements Serializable {
 }
 ```
 
-#### Benchmark Results
+#### Benchmark 结果
 
-No compression:
+未压缩：
 
 ```
 Benchmark repeat number: 400000
@@ -245,7 +229,7 @@ Compare speed: Fory is 12.19x speed of JDK
 Compare size: Fory is 0.56x size of JDK
 ```
 
-Compress number:
+压缩：
 
 ```
 Benchmark repeat number: 400000
