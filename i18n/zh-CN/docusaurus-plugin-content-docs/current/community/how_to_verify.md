@@ -4,8 +4,6 @@ sidebar_position: 0
 id: how_to_verify
 ---
 
-详细的 Check list，请参阅[Apache 检查清单](https://cwiki.apache.org/confluence/display/INCUBATOR/Incubator+Release+Checklist)
-
 ## 下载 Apache Fory
 
 ```bash
@@ -81,7 +79,7 @@ for i in *.tar.gz; do echo $i; gpg --verify $i.asc $i; done
 如果出现如下内容，则表示签名正确：
 
 ```bash
-apache-fory-incubating-0.5.0-src.tar.gz
+apache-fory-0.5.0-src.tar.gz
 gpg: Signature made Wed 17 Apr 2024 11:49:45 PM CST using RSA key ID 5E580BA4
 gpg: checking the trustdb
 gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
@@ -98,8 +96,8 @@ for i in *.tar.gz; do echo $i; sha512sum --check  $i.sha512; done
 它应该输出如下内容：
 
 ```bash
-apache-fory-incubating-0.5.0-src.tar.gz
-apache-fory-incubating-0.5.0-src.tar.gz: OK
+apache-fory-0.12.0-src.tar.gz
+apache-fory-0.12.0-src.tar.gz: OK
 ```
 
 ## 检查源码包中的文件

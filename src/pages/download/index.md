@@ -1,6 +1,6 @@
 ---
 id: download
-title: Apache Fory(incubating) Download
+title: Apache Fory Download
 ---
 
 The official Apache Fory releases are provided as source artifacts.
@@ -31,19 +31,19 @@ These files are named after the files they relate to but have `.sha512/.asc` ext
 To verify the SHA digests, you need the `.tgz` and its associated `.tgz.sha512` file. An example command:
 
 ```bash
-sha512sum --check apache-fory-incubating-0.12.0-src.tar.gz
+sha512sum --check apache-fory-0.12.0-src.tar.gz
 ```
 
 It should output something like:
 
 ```bash
-apache-fory-incubating-0.12.0-src.tar.gz: OK
+apache-fory-0.12.0-src.tar.gz: OK
 ```
 
 ### Verifying Signatures
 
 To verify the PGP signatures, you will need to download the
-[release KEYS](https://downloads.apache.org/incubator/fory/KEYS) first.
+[release KEYS](https://downloads.apache.org/fory/KEYS) first.
 
 Then import the downloaded `KEYS`:
 
@@ -54,7 +54,7 @@ gpg --import KEYS
 Then you can verify signature:
 
 ```bash
-gpg --verify apache-fory-incubating-0.12.0-src.tar.gz.asc apache-fory-incubating-0.12.0-src.tar.gz
+gpg --verify apache-fory-0.12.0-src.tar.gz.asc apache-fory-0.12.0-src.tar.gz
 ```
 
 If something like the following appears, it means the signature is correct:
