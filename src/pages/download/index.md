@@ -13,11 +13,11 @@ The latest source release is 0.12.0:
 
 | Version | Date       | Source                                                                                                                                                                                                                                                                                                                                             | Release Notes                                                        |
 |---------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| 0.12.0  | 2025-08-18 | [source](https://www.apache.org/dyn/closer.lua/incubator/fory/0.12.0/apache-fory-0.12.0-incubating-src.tar.gz?action=download) [asc](https://downloads.apache.org/incubator/fory/0.12.0/apache-fory-0.12.0-incubating-src.tar.gz.asc) [sha512](https://downloads.apache.org/incubator/fory/0.12.0/apache-fory-0.12.0-incubating-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v0.12.0) |
+| 0.12.0  | 2025-08-18 | [source](https://www.apache.org/dyn/closer.lua/fory/0.12.0/apache-fory-0.12.0-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/0.12.0/apache-fory-0.12.0-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/0.12.0/apache-fory-0.12.0-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v0.12.0) |
 
 ## All archived releases
 
-For older releases, please check the [archive](https://archive.apache.org/dist/incubator/fory).
+For older releases, please check the [archive](https://archive.apache.org/dist/fory).
 
 ## Verify a release
 
