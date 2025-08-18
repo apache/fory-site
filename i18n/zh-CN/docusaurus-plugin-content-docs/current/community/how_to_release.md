@@ -381,7 +381,7 @@ svn mv https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_versi
 标题：
 
 ```
-[ANNOUNCE] Release Apache Fory ${release_version}
+[ANNOUNCE] Apache Fory ${release_version} released
 ```
 
 内容：
