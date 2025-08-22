@@ -162,7 +162,6 @@ svn ci -m "add gpg key for YOUR_NAME" # Later on, if you are asked to enter a us
 建议您在发布之前阅读以下文档，了解有关 Apache 基金会发布软件的更多详细信息，但这不是必须的：
 
 - 发布政策：https://www.apache.org/legal/release-policy.html
-- 孵化器发布：http://incubator.apache.org/guides/releasemanagement.html
 - TLP 版本：https://infra.apache.org/release-distribution
 - 发布标志：https://infra.apache.org/release-signing.html
 - 发布发布：https://infra.apache.org/release-publishing.html
