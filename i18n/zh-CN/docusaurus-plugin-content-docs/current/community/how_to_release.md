@@ -244,7 +244,7 @@ svn commit -m "Prepare for fory ${release_version}-${rc_version}"
 
 ## 投票
 
-作为一个孵化项目，新版本发布需要 Apache Fory 社区和孵化器社区的投票。
+新版本发布需要 Apache Fory 社区的投票。
 
 - release_version：Fory 的版本，如 0.12.0。
 - release_candidate_version：投票的版本，如 0.12.0-rc1。

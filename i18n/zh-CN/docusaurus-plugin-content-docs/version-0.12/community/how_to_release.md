@@ -162,7 +162,6 @@ svn ci -m "add gpg key for YOUR_NAME" # Later on, if you are asked to enter a us
 建议您在发布之前阅读以下文档，了解有关 Apache 基金会发布软件的更多详细信息，但这不是必须的：
 
 - 发布政策：https://www.apache.org/legal/release-policy.html
-- 孵化器发布：http://incubator.apache.org/guides/releasemanagement.html
 - TLP 版本：https://infra.apache.org/release-distribution
 - 发布标志：https://infra.apache.org/release-signing.html
 - 发布发布：https://infra.apache.org/release-publishing.html
@@ -245,7 +244,7 @@ svn commit -m "Prepare for fory ${release_version}-${rc_version}"
 
 ## 投票
 
-作为一个孵化项目，新版本发布需要 Apache Fory 社区和孵化器社区的投票。
+新版本发布需要 Apache Fory 社区的投票。
 
 - release_version：Fory 的版本，如 0.5.0。
 - release_candidate_version：投票的版本，如 0.5.0-rc1。
@@ -349,111 +348,6 @@ Vote thread: ${vote_thread_url}
 Thanks,
 
 ${name}
-```
-
-### 孵化器社区投票
-
-发送电子邮件至：general@incubator.apache.org：
-
-标题：
-
-```
-[VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
-```
-
-内容：
-
-```
-Hello everyone,
-
-This is a call for the vote to release Apache Fory(Incubating) v${release_version}-${rc_version}.
-
-The Apache Fory community has voted and approved the release of Apache
-Fory(incubating) v${release_version}-${rc_version}. We now kindly request the IPMC members
-review and vote for this release.
-
-Apache Fory(incubating) - A blazingly fast multi-language serialization
-framework powered by JIT and zero-copy.
-
-Fory community vote thread:
-${community_vote_thread_url}
-
-Vote result thread:
-${community_vote_result_thread_url}
-
-The release candidate:
-https://dist.apache.org/repos/dist/dev/incubator/fory/${release_version}-${rc_version}/
-
-This release has been signed with a PGP available here:
-https://downloads.apache.org/incubator/fory/KEYS
-
-Git tag for the release:
-https://github.com/apache/fory/releases/tag/v${release_version}-${rc_version}/
-
-Git commit for the release:
-https://github.com/apache/fory/commit/$xxx
-
-Maven staging repo:
-https://repository.apache.org/content/repositories/orgapachefory-${maven_artifact_number}/
-
-How to Build and Test, please refer to:
-https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md
-
-Please download, verify, and test.
-
-The VOTE will pass after 3 binding approve.
-
-[ ] +1 approve
-[ ] +0 no opinion
-[ ] -1 disapprove with the reason
-
-To learn more about apache fory, please see https://fory.apache.org/
-
-Checklist for reference:
-
-[ ] Download links are valid.
-[ ] Checksums and signatures.
-[ ] LICENSE/NOTICE files exist
-[ ] No unexpected binary files
-[ ] All source files have ASF headers
-[ ] Can compile from source
-
-Thanks,
-
-${name}
-```
-
-至少 72 小时后，至少有 3 + 1 具有约束力的投票（来自孵化器 PMC 成员）且没有否决票，发布投票结果：
-
-标题：
-
-```
-[RESULT][VOTE] Release Apache Fory(incubating) v${release_version}-${rc_version}
-```
-
-内容：
-
-```
-Hi Incubator PMC,
-
-The vote to release Apache Fory(incubating) v${release_version}-${rc_version} has passed with
-4 +1 binding and 3 +1 non-binding votes, no +0 or -1 votes.
-
-Binding votes：
-
-- xxx
-- yyy
-- zzz
-
-Non-Binding votes:
-
-- aaa
-
-Vote thread: ${incubator_vote_thread_url}
-
-Thanks for reviewing and voting for our release candidate.
-
-We will proceed with publishing the approved artifacts and sending out the announcement soon.
 ```
 
 ### 如果投票失败怎么办
