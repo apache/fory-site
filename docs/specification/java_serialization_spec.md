@@ -369,7 +369,7 @@ Which encoding to choose:
 
 ### Collection
 
-> All collection serializers must extend `AbstractCollectionSerializer`.
+> All collection serializers must extend `CollectionLikeSerializer`.
 
 Format:
 
@@ -425,7 +425,7 @@ type.
 
 ### Map
 
-> All Map serializers must extend `AbstractMapSerializer`.
+> All Map serializers must extend `MapLikeSerializer`.
 
 Format:
 
