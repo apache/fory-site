@@ -174,14 +174,14 @@ func main() {
 ### JavaScript
 
 ```typescript
-import Fory, { Type } from '@foryjs/fory';
+import Fory, { Type } from '@apache-fory/fory';
 
 /**
- * @foryjs/hps use v8's fast-calls-api that can be called directly by jit, ensure that the version of Node is 20 or above.
+ * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit, ensure that the version of Node is 20 or above.
  * Experimental feature, installation success cannot be guaranteed at this moment
  * If you are unable to install the module, replace it with `const hps = null;`
  **/
-import hps from '@foryjs/hps';
+import hps from '@apache-fory/hps';
 
 // Now we describe data structures using JSON, but in the future, we will use more ways.
 const description = Type.object('example.foo', {
