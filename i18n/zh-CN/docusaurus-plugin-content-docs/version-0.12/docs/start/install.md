@@ -69,3 +69,15 @@ To add a dependency on Fory kotlin with maven, use the following:
   <version>0.12.0</version>
 </dependency>
 ```
+
+
+## Fory Python 安装
+
+```bash
+pip install pyfory
+```
+
+
+## Fory JavaScript 安装
+
+Apache Fory 目前暂未发布到 NPM, 请通过源码安装。

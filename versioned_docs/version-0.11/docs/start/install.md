@@ -71,3 +71,8 @@ To add a dependency on Fory kotlin with maven, use the following:
   <version>0.11.2</version>
 </dependency>
 ```
+
+
+## JavaScript
+
+Apache Fory is NOT yet available on npm, please install from source code now.
