@@ -2,11 +2,47 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fory.apache.org/blog</id>
     <title>Apache Fory Blog</title>
-    <updated>2025-08-18T00:00:00.000Z</updated>
+    <updated>2025-09-01T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fory.apache.org/blog"/>
     <subtitle>Apache Fory Blog</subtitle>
     <icon>https://fory.apache.org/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Fory v0.12.1 Released]]></title>
+        <id>https://fory.apache.org/blog/fory_0_12_1_release</id>
+        <link href="https://fory.apache.org/blog/fory_0_12_1_release"/>
+        <updated>2025-09-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[The Apache Fory team is pleased to announce the 0.12.1 release. This is a major release that includes 24 PR from 5 distinct contributors. See the Install Page to learn how to get the libraries for your platform.]]></summary>
+        <content type="html"><![CDATA[<p>The Apache Fory team is pleased to announce the 0.12.1 release. This is a major release that includes <a href="https://github.com/apache/fory/compare/v0.11.2...v0.12.1" target="_blank" rel="noopener noreferrer">24 PR</a> from 5 distinct contributors. See the <a href="https://fury.apache.org/docs/docs/start/install" target="_blank" rel="noopener noreferrer">Install</a> Page to learn how to get the libraries for your platform.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="features">Features<a href="https://fory.apache.org/blog/fory_0_12_1_release#features" class="hash-link" aria-label="Direct link to Features" title="Direct link to Features">​</a></h2>
+<ul>
+<li>feat(python): set default languge to python for pyfory by @chaokunyang  in <a href="https://github.com/apache/fory/pull/2490" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2490</a></li>
+<li>feat(python): add register api to python by @chaokunyang in <a href="https://github.com/apache/fory/pull/2491" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2491</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="bug-fixes">Bug Fixes<a href="https://fory.apache.org/blog/fory_0_12_1_release#bug-fixes" class="hash-link" aria-label="Direct link to Bug Fixes" title="Direct link to Bug Fixes">​</a></h2>
+<ul>
+<li>Ensure <code>Encoders.mapEncoder</code> loads bean classes correctly by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2494" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2494</a></li>
+<li>fix(java): row format generated bean types handling Optional by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2497" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2497</a></li>
+<li>fix(java): fix addListener not releasing the lock by @open-snail in <a href="https://github.com/apache/fory/pull/2500" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2500</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="improvements">Improvements<a href="https://fory.apache.org/blog/fory_0_12_1_release#improvements" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements">​</a></h2>
+<ul>
+<li>Improve PyPI landing page and add row-format documentation (<a href="https://github.com/apache/fory/pull/2498" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2498</a>, <a href="https://github.com/apache/fory/pull/2499" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2499</a>)</li>
+<li>Refactor python release workflow by @esafak in <a href="https://github.com/apache/fory/pull/2483" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2483</a> <a href="https://github.com/apache/fory/pull/2532" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2532</a></li>
+<li>chore: translate Chinese comments into English by @Asnowww in <a href="https://github.com/apache/fory/pull/2503" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2503</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="new-contributors">New Contributors<a href="https://fory.apache.org/blog/fory_0_12_1_release#new-contributors" class="hash-link" aria-label="Direct link to New Contributors" title="Direct link to New Contributors">​</a></h2>
+<ul>
+<li>@Asnowww made their first contribution in <a href="https://github.com/apache/fory/pull/2503" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2503</a></li>
+<li>@open-snail made their first contribution in <a href="https://github.com/apache/fory/pull/2500" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/pull/2500</a></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/apache/fory/compare/v0.12.0...v0.12.1" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory/compare/v0.12.0...v0.12.1</a></p>]]></content>
+        <author>
+            <name>Shawn Yang</name>
+            <uri>https://github.com/chaokunyang</uri>
+        </author>
+        <category label="fory" term="fory"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Fory v0.12.0 Released]]></title>
         <id>https://fory.apache.org/blog/fory_0_12_0_release</id>
@@ -1544,53 +1580,6 @@ and implement reference resolution by themselves, as well as writing code to con
 <p>The GitHub address of the fury repository is: <a href="https://github.com/apache/fury" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury</a></p>
 <p>Official website: <a href="https://fury.apache.org/" target="_blank" rel="noopener noreferrer">https://fury.apache.org</a></p>
 <p>All issues, PR, and Discussion are welcome.</p>]]></content>
-        <author>
-            <name>Shawn Yang</name>
-            <uri>https://github.com/chaokunyang</uri>
-        </author>
-        <category label="fury" term="fury"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Fury 0.4.1 Released]]></title>
-        <id>https://fory.apache.org/blog/fury_0_4_1_release</id>
-        <link href="https://fory.apache.org/blog/fury_0_4_1_release"/>
-        <updated>2023-12-09T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[This release was made before Fury joined the Apache Incubator and thus it's a non-ASF release.]]></summary>
-        <content type="html"><![CDATA[<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p><strong>This release was made before Fury joined the Apache Incubator and thus it's a non-ASF release.</strong></p></div></div>
-<p>I'm pleased to announce the 0.4.1 release of the Fury: <a href="https://github.com/alipay/fury/releases/tag/v0.4.1" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/releases/tag/v0.4.1</a>. With this release, Fury support rust row format now. C++ row format has been enhanced too, now iterable types can be encoded to fury row format. Please try it out and share your feedbacks with us.</p>
-<p>Author: <a href="https://github.com/chaokunyang" target="_blank" rel="noopener noreferrer">chaokunyang</a></p>
-<p>I'm pleased to announce the 0.4.1 release of the Fury: <a href="https://github.com/alipay/fury/releases/tag/v0.4.1" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/releases/tag/v0.4.1</a>. With this release, Fury support rust row format now. C++ row format has been enhanced too, now iterable types can be encoded to fury row format too.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="highlight">Highlight<a href="https://fory.apache.org/blog/fury_0_4_1_release#highlight" class="hash-link" aria-label="Direct link to Highlight" title="Direct link to Highlight">​</a></h2>
-<ul>
-<li>[Rust] Support row format</li>
-<li>[C++] Support iterable types for RowEncoder</li>
-<li>[JavaScript] Support partial record</li>
-<li>[Java] Fix JIT error in corner case, now Fury can generate serializer for every class</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-changed">What's Changed<a href="https://fory.apache.org/blog/fury_0_4_1_release#whats-changed" class="hash-link" aria-label="Direct link to What's Changed" title="Direct link to What's Changed">​</a></h2>
-<ul>
-<li>[Doc] Refine issue template by a yaml form by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1185" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1185</a></li>
-<li>[C++] Fix ownership problem for children writers by visitor by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1193" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1193</a></li>
-<li>[C++] Remove useless fields and macro in logging by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1195" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1195</a></li>
-<li>[Doc] add docs for java FuryBuilder #1188 by @mof-dev-3 in <a href="https://github.com/alipay/fury/pull/1192" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1192</a></li>
-<li>[Rust] support row format by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1196" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1196</a></li>
-<li>[C++] Add RowEncoder wrapper to RowEncodeTrait by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1200" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1200</a></li>
-<li>[Rust] Row support more types by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1202" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1202</a></li>
-<li>[Rust] Support row map by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1206" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1206</a></li>
-<li>[C++] update bazel version from 4.2 to 6.3.2 by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1204" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1204</a></li>
-<li>[JavaScript] Support partial record by @wangweipeng2 in <a href="https://github.com/alipay/fury/pull/1208" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1208</a></li>
-<li>[Java] fix package access level class accessor jit by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1210" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1210</a></li>
-<li>[JavaScript] Fix register a description twice will get undefined serializer by @bytemain in <a href="https://github.com/alipay/fury/pull/1211" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1211</a></li>
-<li>[C++] Support iterable types in RowEncodeTrait by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1212" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1212</a></li>
-<li>[C++] Support iterable types for RowEncoder by @PragmaTwice in <a href="https://github.com/alipay/fury/pull/1215" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1215</a></li>
-<li>[Python] Refine py register class method by @chaokunyang in <a href="https://github.com/alipay/fury/pull/1218" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1218</a></li>
-<li>[Java] Clear extRegistry.getClassCtx if generate serializer class failed in <a href="https://github.com/alipay/fury/pull/1221" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1221</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="new-contributors">New Contributors<a href="https://fory.apache.org/blog/fury_0_4_1_release#new-contributors" class="hash-link" aria-label="Direct link to New Contributors" title="Direct link to New Contributors">​</a></h2>
-<ul>
-<li>@bytemain made their first contribution in <a href="https://github.com/alipay/fury/pull/1211" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/pull/1211</a></li>
-</ul>
-<p><strong>Full Changelog</strong>: <a href="https://github.com/alipay/fury/compare/v0.4.0...v0.4.1" target="_blank" rel="noopener noreferrer">https://github.com/alipay/fury/compare/v0.4.0...v0.4.1</a></p>]]></content>
         <author>
             <name>Shawn Yang</name>
             <uri>https://github.com/chaokunyang</uri>
