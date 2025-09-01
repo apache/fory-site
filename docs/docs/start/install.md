@@ -16,13 +16,13 @@ To add a dependency on Fory using Maven, use the following:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>0.12.0</version>
+  <version>0.12.1</version>
 </dependency>
 <!-- row/arrow format support -->
 <!-- <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-format</artifactId>
-  <version>0.12.0</version>
+  <version>0.12.1</version>
 </dependency> -->
 ```
 
@@ -34,7 +34,7 @@ To add a dependency on Fory scala for scala 2.13 with maven, use the following:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-scala_2.13</artifactId>
-  <version>0.12.0</version>
+  <version>0.12.1</version>
 </dependency>
 ```
 
@@ -44,20 +44,20 @@ To add a dependency on Fory scala for scala 3 with maven, use the following:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-scala_3</artifactId>
-  <version>0.12.0</version>
+  <version>0.12.1</version>
 </dependency>
 ```
 
 To add a dependency on Fory scala for scala 2.13 with sbt, use the following:
 
 ```sbt
-libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.12.0"
+libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.12.1"
 ```
 
 To add a dependency on Fory scala for scala 3 with sbt, use the following:
 
 ```sbt
-libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.12.0"
+libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.12.1"
 ```
 
 ## Kotlin
@@ -68,14 +68,15 @@ To add a dependency on Fory kotlin with maven, use the following:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-kotlin</artifactId>
-  <version>0.12.0</version>
+  <version>0.12.1</version>
 </dependency>
 ```
 
 ## Python
 
 ```bash
-pip install pyfory
+python -m pip install --upgrade pip
+pip install pyfory==0.12.1
 ```
 
 ## JavaScript
