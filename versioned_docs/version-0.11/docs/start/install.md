@@ -10,7 +10,7 @@ For source download, please see Fory [download](https://fory.apache.org/download
 
 ## Java
 
-To add a dependency on Fory using Maven, use the following:
+To add a dependency on Apache Fory™ using Maven, use the following:
 
 ```xml
 <dependency>
@@ -28,7 +28,7 @@ To add a dependency on Fory using Maven, use the following:
 
 ## Scala
 
-To add a dependency on Fory scala for scala 2.13 with maven, use the following:
+To add a dependency on Apache Fory™scala for scala 2.13 with maven, use the following:
 
 ```xml
 <dependency>
@@ -38,7 +38,7 @@ To add a dependency on Fory scala for scala 2.13 with maven, use the following:
 </dependency>
 ```
 
-To add a dependency on Fory scala for scala 3 with maven, use the following:
+To add a dependency on Apache Fory™scala for scala 3 with maven, use the following:
 
 ```xml
 <dependency>
@@ -48,13 +48,13 @@ To add a dependency on Fory scala for scala 3 with maven, use the following:
 </dependency>
 ```
 
-To add a dependency on Fory scala for scala 2.13 with sbt, use the following:
+To add a dependency on Apache Fory™scala for scala 2.13 with sbt, use the following:
 
 ```sbt
 libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.11.2"
 ```
 
-To add a dependency on Fory scala for scala 3 with sbt, use the following:
+To add a dependency on Apache Fory™scala for scala 3 with sbt, use the following:
 
 ```sbt
 libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.11.2"
@@ -62,7 +62,7 @@ libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.11.2"
 
 ## Kotlin
 
-To add a dependency on Fory kotlin with maven, use the following:
+To add a dependency on Apache Fory™kotlin with maven, use the following:
 
 ```xml
 <dependency>
@@ -74,4 +74,4 @@ To add a dependency on Fory kotlin with maven, use the following:
 
 ## JavaScript
 
-Apache Fory is NOT yet available on npm, please install from source code now.
+Apache Fory™ is NOT yet available on npm, please install from source code now.
