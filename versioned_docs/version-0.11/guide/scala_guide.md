@@ -31,13 +31,13 @@ Scala 2 and 3 are both supported.
 
 ## Install
 
-To add a dependency on Fory scala for scala 2 with sbt, use the following:
+To add a dependency on Apache Fory™scala for scala 2 with sbt, use the following:
 
 ```sbt
 libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.11.2"
 ```
 
-To add a dependency on Fory scala for scala 3 with sbt, use the following:
+To add a dependency on Apache Fory™scala for scala 3 with sbt, use the following:
 
 ```sbt
 libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.11.2"

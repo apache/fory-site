@@ -1,5 +1,5 @@
 ---
-title: How to join Fory
+title: How to join Apache Fory™
 sidebar_position: 0
 id: how_to_join_community
 ---

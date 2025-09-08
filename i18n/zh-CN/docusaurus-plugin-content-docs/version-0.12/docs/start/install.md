@@ -60,7 +60,7 @@ libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.12.2"
 
 ## Fory Kotlin 安装
 
-To add a dependency on Fory kotlin with maven, use the following:
+To add a dependency on Apache Fory™kotlin with maven, use the following:
 
 ```xml
 <dependency>
