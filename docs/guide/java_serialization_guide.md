@@ -135,7 +135,7 @@ public class Example {
 
 ## Advanced Usage
 
-### Apache Fory™ creation
+### Fory creation
 
 Single thread fory:
 
