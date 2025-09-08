@@ -6,7 +6,7 @@ sidebar_position: 0
 
 The official Apache Fory™ releases are provided as source artifacts.
 
-For source download, please see Fory [download](https://fory.apache.org/download) page.
+For source download, please see Apache Fory™ [download](https://fory.apache.org/download) page.
 
 ## Java
 
