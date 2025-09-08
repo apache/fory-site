@@ -1,18 +1,18 @@
-# How to contribute to Fory
+# How to contribute to Apache Fory™
 
 ## Finding good first issues
 
 See [Good First Issues](https://github.com/apache/fory/contribute).
 
-## How to create an issue for Fory
+## How to create an issue for Apache Fory™
 
 Create an issue with [this form](https://github.com/apache/fory/issues/new/choose).
 
-## Fory Website
+## Apache Fory™ Website
 
-Fory's website consists of static pages hosted at https://github.com/apache/fory-site.
+Apache Fory's website consists of static pages hosted at https://github.com/apache/fory-site.
 
-## How to create an issue for Fory Website
+## How to create an issue for Apache Fory™ Website
 
 Create an issue with [this form](https://github.com/apache/fory-site/issues/new/choose).
 

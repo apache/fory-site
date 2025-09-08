@@ -3,7 +3,7 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'Apache Fory',
+  title: 'Apache Fory™',
   tagline: 'A blazing-fast cross-language serialization framework powered by just-in-time compilation and zero-copy',
   favicon: 'img/favicon.ico',
 
@@ -101,7 +101,7 @@ const config: Config = {
     navbar: {
       title: '',
       logo: {
-        alt: 'Fory Logo',
+        alt: 'Apache Fory™ Logo',
         src: 'img/navbar-logo.png',
       },
       items: [
@@ -237,7 +237,7 @@ const config: Config = {
           title: 'Repositories',
           items: [
             {
-              label: 'Fory',
+              label: 'Apache Fory™',
               href: 'https://github.com/apache/fory',
             },
             {

@@ -46,7 +46,7 @@ git remote add upstream https://github.com/apache/fury.git
 
 ### Step3：创建分支
 
-- 好了，现在可以开始贡献我们的代码了。fury 默认分支为 main  分支。无论是功能开发、bug 修复、文档编写，都请新建立一个分支，再合并到 main 分支上。使用以下代码创建分支：
+- 好了，现在可以开始贡献我们的代码了。fury 默认分支为 main 分支。无论是功能开发、bug 修复、文档编写，都请新建立一个分支，再合并到 main 分支上。使用以下代码创建分支：
 
 ```shell
 // 创建功能开发分支

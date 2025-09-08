@@ -1,14 +1,14 @@
 ---
 id: install
-title: 安装 Apache Fory
+title: 安装 Apache Fory™
 sidebar_position: 0
 ---
 
-Apache Fory 源码下载请参见 Apache Fory [download](https://github.com/apache/fory/releases)页面。
+Apache Fory™ 源码下载请参见 Apache Fory™ [download](https://github.com/apache/fory/releases)页面。
 
-### Fory Java 安装
+### Apache Fory™ Java 安装
 
-要使用 Maven 添加对 Apache Fory 的依赖，请使用以下配置：
+要使用 Maven 添加对 Apache Fory™ 的依赖，请使用以下配置：
 
 ```xml
 <dependency>
@@ -24,7 +24,7 @@ Apache Fory 源码下载请参见 Apache Fory [download](https://github.com/apac
 </dependency> -->
 ```
 
-### Fory Scala 安装
+### Apache Fory™ Scala 安装
 
 要使用 Maven 添加 scala 2.13 的 Fory scala 依赖，请使用以下配置：
 
@@ -58,7 +58,7 @@ libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.12.2"
 libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.12.2"
 ```
 
-## Fory Kotlin 安装
+## Apache Fory™ Kotlin 安装
 
 To add a dependency on Fory kotlin with maven, use the following:
 

@@ -59,7 +59,7 @@ git checkout -b fix/xxxx
 git checkout -b docs/add-java-demo
 ```
 
-Suppose we have created the documentation modification branch `docs/add-java-demo` and  we have added some code and submitted it to the code repository.
+Suppose we have created the documentation modification branch `docs/add-java-demo` and we have added some code and submitted it to the code repository.
 
 - `git add .`
 - `git commit -a -m "docs: add java demo and related docs"`

@@ -127,7 +127,7 @@ println(fury.deserialize(fury.serialize(opt1)))
 
 ## 性能
 
- `pojo/bean/case/object` Scala 对 Apache Fury JIT 的支持很好，性能与 Apache Fury Java 一样优异。
+`pojo/bean/case/object` Scala 对 Apache Fury JIT 的支持很好，性能与 Apache Fury Java 一样优异。
 
 Scala 集合和泛型不遵循 Java 集合框架，并且未与当前发行版中的 Apache Fury JIT 完全集成。性能不会像 Java 的 Fury collections 序列化那么好。
 

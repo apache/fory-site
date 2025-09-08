@@ -25,7 +25,7 @@ GraalVM `native image` can compile java code into native code ahead to build fas
 The native image doesn't have a JIT compiler to compile bytecode into machine code, and doesn't support
 reflection unless configure reflection file.
 
-Fory runs on GraalVM native image pretty well. Fory generates all serializer code for `Fory JIT framework` and `MethodHandle/LambdaMetafactory` at graalvm build time. Then use those generated code for serialization at runtime without
+Apache Fory™ runs on GraalVM native image pretty well. Fory generates all serializer code for `Fory JIT framework` and `MethodHandle/LambdaMetafactory` at graalvm build time. Then use those generated code for serialization at runtime without
 any extra cost, the performance is great.
 
 In order to use Fory on graalvm native image, you must create Fory as an **static** field of a class, and **register** all classes at

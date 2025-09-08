@@ -1,6 +1,6 @@
 ---
 slug: fury_meta_string_37_5_percent_space_efficient_encoding_than_utf8
-title: 'Meta String: A 37.5% space efficient string encoding than UTF-8 in Fury serialization'
+title: "Meta String: A 37.5% space efficient string encoding than UTF-8 in Fury serialization"
 authors: [chaokunyang]
 tags: [fury]
 ---
@@ -12,7 +12,7 @@ In rpc/serialization systems, we often need to send **`namespace/path/filename/f
 Those strings are mostly ascii strings. In order to transfer between processes, we encode such strings using utf-8 encodings. Such encoding
 will take one byte for every char, which is not space efficient actually.
 
-If we take a deeper look, we will found that most chars are **lowercase chars,  `.`, `$` and `_`**, which can be expressed in a much
+If we take a deeper look, we will found that most chars are **lowercase chars, `.`, `$` and `_`**, which can be expressed in a much
 smaller range **`0~32`**. But one byte can represent range `0~255`, the significant bits are wasted, and this cost is not ignorable. In a dynamic serialization
 framework, such meta will take considerable cost compared to actual data.
 
@@ -32,11 +32,11 @@ More details about meta string spec can be found in [Fury xlang serialization sp
 
 String binary encoding algorithm:
 
-| Algorithm                 | Pattern       | Description                                                                                                                                                                                                                                                                              |
-|---------------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| LOWER_SPECIAL             | `a-z._$\|`    | every char is written using 5 bits, `a-z`: `0b00000~0b11001`, `._$\|`: `0b11010~0b11101`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char)                                                        |
-| LOWER_UPPER_DIGIT_SPECIAL | `a-zA-Z0~9._` | every char is written using 6 bits, `a-z`: `0b00000~0b11001`, `A-Z`: `0b11010~0b110011`, `0~9`: `0b110100~0b111101`, `._`: `0b111110~0b111111`,  prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char) |
-| UTF-8                     | any chars     | UTF-8 encoding                                                                                                                                                                                                                                                                           |
+| Algorithm                 | Pattern       | Description                                                                                                                                                                                                                                                                             |
+| ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LOWER_SPECIAL             | `a-z._$\|`    | every char is written using 5 bits, `a-z`: `0b00000~0b11001`, `._$\|`: `0b11010~0b11101`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char)                                                       |
+| LOWER_UPPER_DIGIT_SPECIAL | `a-zA-Z0~9._` | every char is written using 6 bits, `a-z`: `0b00000~0b11001`, `A-Z`: `0b11010~0b110011`, `0~9`: `0b110100~0b111101`, `._`: `0b111110~0b111111`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char) |
+| UTF-8                     | any chars     | UTF-8 encoding                                                                                                                                                                                                                                                                          |
 
 If we use `LOWER_SPECIAL/LOWER_UPPER_DIGIT_SPECIAL`, we must add a strip last char flag in encoded data. This is because every char will be encoded using `5/6` bits, and the last char may have `1~7` bits which are unused by encoding, such bits may cause an extra char to be read, which we must strip off.
 
@@ -148,7 +148,7 @@ For most lowercase characters, meta string will use `5` bits to encode every cha
 Here is the common encoding selection strategy:
 
 | Encoding Flag             | Pattern                                                  | Encoding Algorithm                                                                                                                                          |
-|---------------------------|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LOWER_SPECIAL             | every char is in `a-z._\|`                               | `LOWER_SPECIAL`                                                                                                                                             |
 | FIRST_TO_LOWER_SPECIAL    | every char is in `a-z._` except first char is upper case | replace first upper case char to lower case, then use `LOWER_SPECIAL`                                                                                       |
 | ALL_TO_LOWER_SPECIAL      | every char is in `a-zA-Z._`                              | replace every upper case char by `\|` + `lower case`, then use `LOWER_SPECIAL`, use this encoding if it's smaller than Encoding `LOWER_UPPER_DIGIT_SPECIAL` |

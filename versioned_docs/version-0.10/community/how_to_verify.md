@@ -4,7 +4,6 @@ sidebar_position: 0
 id: how_to_verify
 ---
 
-
 For detailed check list, please refer to the [official check list](https://cwiki.apache.org/confluence/display/INCUBATOR/Incubator+Release+Checklist)
 
 ## Download the candidate version

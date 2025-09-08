@@ -1,14 +1,14 @@
 ---
 id: introduction
-title: Apache Fory 介绍
+title: Apache Fory™ 介绍
 sidebar_position: 1
 ---
 
-Fory 是一个由 JIT（即时编译）和零拷贝提供支持的高性能多语言序列化框架。
+Apache Fory™ 是一个由 JIT（即时编译）和零拷贝提供支持的高性能多语言序列化框架。
 
 ## 协议
 
-不同的场景有不同的序列化要求。Apache Fory 为这些需求设计并实现了多个二进制协议：
+不同的场景有不同的序列化要求。Apache Fory™ 为这些需求设计并实现了多个二进制协议：
 
 - 跨语言对象图协议：
   - 跨语言自动序列化任何对象，无需 IDL 定义、Schema编译和对象协议转换；

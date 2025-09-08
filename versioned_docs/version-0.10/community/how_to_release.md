@@ -317,7 +317,7 @@ Steps to encrypt your password:
 
    ```
 
-2. Encrypt your Apache account password:
+4. Encrypt your Apache account password:
 
    ```sh
 
