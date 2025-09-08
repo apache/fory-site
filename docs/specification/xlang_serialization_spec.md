@@ -1,5 +1,5 @@
 ---
-title: Fory Xlang Serialization Format
+title: Xlang Serialization Format
 sidebar_position: 0
 id: fory_xlang_serialization_spec
 license: |

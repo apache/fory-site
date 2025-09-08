@@ -1,5 +1,5 @@
 ---
-title: Fory Java Serialization Format
+title: Java Serialization Format
 sidebar_position: 1
 id: fory_java_serialization_spec
 license: |

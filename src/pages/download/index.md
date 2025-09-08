@@ -5,7 +5,7 @@ title: Apache Fory™ Download
 
 The official Apache Fory™ releases are provided as source artifacts.
 
-For binary install, please see Fory [install](/docs/docs/start/install/) document.
+For binary install, please see Apache Fory™ [install](/docs/docs/start/install/) document.
 
 ## The latest release
 
