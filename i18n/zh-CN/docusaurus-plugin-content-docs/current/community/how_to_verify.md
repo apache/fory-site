@@ -1,10 +1,10 @@
 ---
-title: 如何验证 Apache Fory
+title: 如何验证 Apache Fory™
 sidebar_position: 0
 id: how_to_verify
 ---
 
-## 下载 Apache Fory
+## 下载 Apache Fory™
 
 ```bash
 # If there is svn locally, you can clone to the local
@@ -110,7 +110,7 @@ apache-fory-0.12.0-src.tar.gz: OK
 
 ## 检查 fory-java 的 Maven artifacts
 
-下载 Apache Fory：https://repository.apache.org/content/repositories/orgapachefory-${maven_artifact_number}/.
+下载 Apache Fory™：https://repository.apache.org/content/repositories/orgapachefory-${maven_artifact_number}/.
 
 您可以检查以下内容：
 

@@ -1,12 +1,12 @@
 ---
-title: 如何验证 Apache Fory
+title: 如何验证 Apache Fory™
 sidebar_position: 0
 id: how_to_verify
 ---
 
 详细的 Check list，请参阅[Apache 检查清单](https://cwiki.apache.org/confluence/display/INCUBATOR/Incubator+Release+Checklist)
 
-## 下载 Apache Fory
+## 下载 Apache Fory™
 
 ```bash
 # If there is svn locally, you can clone to the local
@@ -27,7 +27,7 @@ yum install gnupg
 brew install gnupg
 ```
 
-之后，导入 Apache Fory release manager 的公钥：
+之后，导入 Apache Fory™ release manager 的公钥：
 
 ```bash
 curl https://downloads.apache.org/incubator/fory/KEYS > KEYS # Download KEYS

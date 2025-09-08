@@ -4,10 +4,10 @@ sidebar_position: 0
 id: community
 ---
 
-Apache Fory 是一个由社区驱动的开源项目，项目的蓬勃发展得益于社区贡献。
+Apache Fory™ 是一个由社区驱动的开源项目，项目的蓬勃发展得益于社区贡献。
 我们邀请您根据自己的意愿尽可能地参与项目。以下是几种贡献方式：
 
-- 使用 Apache Fory 并分享使用体验和反馈问题；
+- 使用 Apache Fory™ 并分享使用体验和反馈问题；
 - 为项目提供最佳实践示例；
 - 报告错误并修复；
 - 贡献代码和参与文档建设。
@@ -67,11 +67,11 @@ Apache Fory 是一个由社区驱动的开源项目，项目的蓬勃发展得�
 - 验证该 Bug 确实存在；
 - 搜索 [Issue List](https://github.com/apache/fory/issues) 以确保不存在相关 Bug。
 - 在 Issue List 中创建 [bug 报告](https://github.com/apache/fory/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml)。
-- 如果可能的话，深入研究 Apache Fory 的源代码，并针对您报告的 Bug 提交补丁，这有助于快速修复 Bug。
+- 如果可能的话，深入研究 Apache Fory™ 的源代码，并针对您报告的 Bug 提交补丁，这有助于快速修复 Bug。
 
 ### 报告安全漏洞
 
-Apache Fory 是 [Apache 软件基金会](https://apache.org/) 的一个项目，遵循 [ASF 漏洞处理流程](https://apache.org/security/#vulnerability-handling)。
+Apache Fory™ 是 [Apache 软件基金会](https://apache.org/) 的一个项目，遵循 [ASF 漏洞处理流程](https://apache.org/security/#vulnerability-handling)。
 
 要报告您发现的新的安全漏洞，请遵循 [ASF 漏洞报告流程](https://apache.org/security/#reporting-a-vulnerability)，该流程解释了如何私下向社区维护者发送详细的漏洞信息。
 

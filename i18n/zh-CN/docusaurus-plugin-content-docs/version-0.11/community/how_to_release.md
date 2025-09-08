@@ -4,7 +4,7 @@ sidebar_position: 0
 id: how_to_release
 ---
 
-本文主要介绍如何发布新版本的 Apache Fory。
+本文主要介绍如何发布新版本的 Apache Fory™。
 
 ## 介绍
 

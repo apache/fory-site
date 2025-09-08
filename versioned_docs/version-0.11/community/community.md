@@ -4,7 +4,7 @@ sidebar_position: 0
 id: community
 ---
 
-Apache Fory is a volunteer project and it thrives on the contributions of its community.
+Apache Fory™ is a volunteer project and it thrives on the contributions of its community.
 We invite you to participate as much or as little as you wish. Here are several ways to contribute:
 
 - Use our project and share feedback.
@@ -75,7 +75,7 @@ To report a bug:
 
 ### Reporting a Vulnerability
 
-Apache Fory is a project of the [Apache Software Foundation](https://apache.org/) and follows the [ASF vulnerability handling process](https://apache.org/security/#vulnerability-handling).
+Apache Fory™ is a project of the [Apache Software Foundation](https://apache.org/) and follows the [ASF vulnerability handling process](https://apache.org/security/#vulnerability-handling).
 
 To report a new vulnerability you have discovered please follow the [ASF vulnerability reporting process](https://apache.org/security/#reporting-a-vulnerability), which explains how to send us details privately.
 

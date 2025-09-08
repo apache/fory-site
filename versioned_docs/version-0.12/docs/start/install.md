@@ -4,7 +4,7 @@ title: Install
 sidebar_position: 0
 ---
 
-The official Apache Fory releases are provided as source artifacts.
+The official Apache Fory™ releases are provided as source artifacts.
 
 For source download, please see Fory [download](https://fory.apache.org/download) page.
 
@@ -81,4 +81,4 @@ pip install pyfory==0.12.2
 
 ## JavaScript
 
-Apache Fory is NOT yet available on npm, please install from source code now.
+Apache Fory™ is NOT yet available on npm, please install from source code now.
