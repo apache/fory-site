@@ -96,7 +96,7 @@ The entry-level issues of Fory can be viewed through the [issue list](https://gi
 
 If you currently **have the time and willingness** to participate in community contributions, you can take a look at **good first issue** in the issues and select one that interests you and is suitable for you to claim.
 
-## Embrace the Apache Fory Community
+## Embrace the Apache Fory™ Community
 
 While you contribute code to Fory, we encourage you to participate in other things that make the community more prosperous, such as:
 

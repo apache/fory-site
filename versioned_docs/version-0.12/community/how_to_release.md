@@ -4,7 +4,7 @@ sidebar_position: 0
 id: how_to_release
 ---
 
-This document mainly introduces how the release manager releases a new version of Apache Fory.
+This document mainly introduces how the release manager releases a new version of Apache Fory™.
 
 ## Introduction
 
@@ -613,7 +613,7 @@ https://github.com/apache/fory/releases/tag/v${release_version}
 For the complete list of changes:
 https://github.com/apache/fory/compare/v0.12.0...v${release_version}
 
-Apache Fory website: https://fory.apache.org/
+Apache Fory™ website: https://fory.apache.org/
 
 Download Links: https://fory.apache.org/download
 

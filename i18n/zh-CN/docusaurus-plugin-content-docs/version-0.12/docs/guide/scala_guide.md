@@ -171,12 +171,12 @@ println(fory.deserialize(fory.serialize(opt1)))
 
 ## 性能
 
-`pojo/bean/case/object` Scala 对 Apache Fory JIT 的支持很好，性能与 Apache Fory Java 一样优异。
+`pojo/bean/case/object` Scala 对 Apache Fory™ JIT 的支持很好，性能与 Apache Fory™ Java 一样优异。
 
-Scala 集合和泛型不遵循 Java 集合框架，并且未与当前发行版中的 Apache Fory JIT 完全集成。性能不会像 Java 的 Fory collections 序列化那么好。
+Scala 集合和泛型不遵循 Java 集合框架，并且未与当前发行版中的 Apache Fory™ JIT 完全集成。性能不会像 Java 的 Fory collections 序列化那么好。
 
 scala 集合的执行将调用 Java 序列化 API `writeObject/readObject/writeReplace/readResolve/readObjectNoData/Externalizable` 和 Fory `ObjectStream` 实现。虽然 `org.apache.fory.serializer.ObjectStreamSerializer` 比 JDK `ObjectOutputStream/ObjectInputStream` 快很多，但它仍然不知道如何使用 Scala 集合泛型。
 
 未来我们计划为 Scala 类型提供更多优化，敬请期待，更多信息请参看 [#682](https://github.com/apache/fory/issues/682)！
 
-Scala 集合序列化已在 [#1073](https://github.com/apache/fory/pull/1073) 完成 ，如果您想获得更好的性能，请使用 Apache Fory snapshot 版本。
+Scala 集合序列化已在 [#1073](https://github.com/apache/fory/pull/1073) 完成 ，如果您想获得更好的性能，请使用 Apache Fory™ snapshot 版本。

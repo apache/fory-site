@@ -1,16 +1,16 @@
 ---
-title: 如何加入 Fory 社区
+title: 如何加入 Apache Fory™ 社区
 sidebar_position: 0
 id: how_to_join_community
 ---
 
-首先为你选择加入开源贡献行列的行为点赞 👍🏻。再者，十分感谢你选择参与到 Fory 社区，为这个开源项目做出贡献。
+首先为你选择加入开源贡献行列的行为点赞 👍🏻。再者，十分感谢你选择参与到 Apache Fory™ 社区，为这个开源项目做出贡献。
 
-## Fory 贡献指南
+## Apache Fory™ 贡献指南
 
-Fory 团队通常在 github 上进行开发和 issue 维护，请打开 [Github 网站](https://github.com/)，点击右上角 `Sign up` 按钮，注册一个自己的账号，开启你开源之旅的第一步。
+Apache Fory™ 团队通常在 github 上进行开发和 issue 维护，请打开 [Github 网站](https://github.com/)，点击右上角 `Sign up` 按钮，注册一个自己的账号，开启你开源之旅的第一步。
 
-在 [Fory仓库](https://github.com/apache/fory)中，我们有一份面向所有开源贡献者的[指南](https://fory.apache.org/zh-CN/docs/community/)，介绍了有关版本管理、分支管理等内容，**请花几分钟时间阅读了解一下**。
+在 [Apache Fory™ 仓库](https://github.com/apache/fory)中，我们有一份面向所有开源贡献者的[指南](https://fory.apache.org/zh-CN/docs/community/)，介绍了有关版本管理、分支管理等内容，**请花几分钟时间阅读了解一下**。
 
 ## 你的第一个 Pull Request
 
@@ -25,7 +25,7 @@ Git 是一种版本控制系统，用于跟踪和管理软件开发项目中的�
 
 ### Step1：Fork 项目
 
-- 首先需要 fork 这个项目，进入[Fory项目页面](https://github.com/apache/fory)，点击右上角的 Fork 按钮
+- 首先需要 fork 这个项目，进入[Apache Fory™ 项目页面](https://github.com/apache/fory)，点击右上角的 Fork 按钮
 - 你的 github 帐号中会出现 xxxx(你的 github 用户名)/fory 这个项目
 - 在本地电脑上使用以下命令: 得到一个 fory 文件夹
 
@@ -91,18 +91,18 @@ git push origin docs/add-java-demo
 
 相关信息填写完成后，点击 Create pull request 提交。
 
-## **轻松步入 Fory 开源贡献之旅**
+## **轻松步入 Apache Fory™ 开源贡献之旅**
 
 "**good first issue**" 是一个在开源社区常见的标签，这个标签的目的是帮助新贡献者找到适合入门的问题。
 
-Fory 的入门问题，你可以通过 [issue 列表](https://github.com/apache/fory/issues)查看。
+Apache Fory™ 的入门问题，你可以通过 [issue 列表](https://github.com/apache/fory/issues)查看。
 
 如果你当前**有时间和意愿**参与到社区贡献，可以在 issue 里看一看 **good first issue**，选择一个感兴趣、适合自己的认领。
 
-## 拥抱 Apache Fory 社区
+## 拥抱 Apache Fory™ 社区
 
-在你为 Fory 贡献代码之余，我们鼓励你参与其他让社区更加繁荣的事情，比如：
+在你为 Apache Fory™ 贡献代码之余，我们鼓励你参与其他让社区更加繁荣的事情，比如：
 
 - 为项目的发展、功能规划 等提建议。
-- 创作文章、视频，开办讲座来宣传 Fory。
+- 创作文章、视频，开办讲座来宣传 Apache Fory™
 - 撰写推广计划，同团队一同执行。

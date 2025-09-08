@@ -1,9 +1,9 @@
 ---
 id: download
-title: Apache Fory Download
+title: Apache Fory™ Download
 ---
 
-The official Apache Fory releases are provided as source artifacts.
+The official Apache Fory™ releases are provided as source artifacts.
 
 For binary install, please see Fory [install](/docs/docs/start/install/) document.
 

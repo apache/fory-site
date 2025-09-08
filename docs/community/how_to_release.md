@@ -4,7 +4,7 @@ sidebar_position: 0
 id: how_to_release
 ---
 
-This document mainly introduces how the release manager releases a new version of Apache Fory.
+This document mainly introduces how the release manager releases a new version of Apache Fory™.
 
 ## Introduction
 
