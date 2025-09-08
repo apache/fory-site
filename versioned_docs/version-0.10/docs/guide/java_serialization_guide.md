@@ -211,7 +211,7 @@ sophisticated compression techniques to minimize overhead, there is still some a
 class metadata.
 
 To further reduce metadata costs, Fury introduces a class metadata sharing mechanism, which allows the metadata to be
-sent to the deserialization process only once. For more details, please refer to the [Meta Sharing](#MetaSharing)
+sent to the deserialization process only once. For more details, please refer to the [Meta Sharing](#meta-sharing)
 section.
 
 ### Smaller size
@@ -467,9 +467,7 @@ Fury support mapping object from one type to another type.
 > Notes:
 >
 > 1. This mapping will execute a deep copy, all mapped fields are serialized into binary and
-
-     deserialized from that binary to map into another type.
-
+>    deserialized from that binary to map into another type.
 > 2. All struct types must be registered with same ID, otherwise Fury can not mapping to correct struct type.
 >    Be careful when you use `Fury#register(Class)`, because fury will allocate an auto-grown ID which might be
 >    inconsistent if you register classes with different order between Fury instance.
