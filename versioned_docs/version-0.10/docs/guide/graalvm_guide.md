@@ -29,7 +29,7 @@ Fury runs on GraalVM native image pretty well. Fury generates all serializer cod
 any extra cost, the performance is great.
 
 In order to use Fury on graalvm native image, you must create Fury as an **static** field of a class, and **register** all classes at
- the enclosing class initialize time. Then configure `native-image.properties` under
+the enclosing class initialize time. Then configure `native-image.properties` under
 `resources/META-INF/native-image/$xxx/native-image.propertie` to tell graalvm to init the class at native image
 build time. For example, here we configure `org.apache.fury.graalvm.Example` class be init at build time:
 

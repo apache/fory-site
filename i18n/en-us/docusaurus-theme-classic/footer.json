@@ -36,7 +36,7 @@
     "description": "The label of footer link with label=Benchmark linking to /docs/docs/introduction/benchmark"
   },
   "link.item.label.Fory": {
-    "message": "Fory",
+    "message": "Apache Fory™",
     "description": "The label of footer link with label=Fory linking to https://github.com/apache/fory"
   },
   "link.item.label.Website": {

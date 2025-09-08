@@ -1,17 +1,15 @@
 {
-    "projectBaseUrl": "",
-    "ignorePatterns": [
-        {
-            "pattern": "^(https?://)?(127.0.0.1|localhost|192.168.33.1|repository.apache|git-scm|somehost\\.com)"
-        }
-    ],
-    "replacementPatterns": [
-        {
-            "pattern": "^/",
-            "replacement": "https://fory.apache.org/"
-        }
-    ],
-    "aliveStatusCodes": [
-        200
-    ]
+  "projectBaseUrl": "",
+  "ignorePatterns": [
+    {
+      "pattern": "^(https?://)?(127.0.0.1|localhost|192.168.33.1|repository.apache|git-scm|somehost\\.com)"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "https://fory.apache.org/"
+    }
+  ],
+  "aliveStatusCodes": [200]
 }

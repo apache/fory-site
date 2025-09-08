@@ -14,10 +14,10 @@ Apache Fory 是一个由社区驱动的开源项目，项目的蓬勃发展得�
 
 ## 邮件列表
 
-| 邮件列表                    | 描述                                        | 订阅                                             | 取消订阅                                               | 发送邮件                               | 活动                                                               |
-|-------------------------|---------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------|------------------------------------|-----------------------------------------------------------------------|
-| dev@fory.apache.org     | 开发相关讨论             | [订阅](mailto:dev-subscribe@fory.apache.org)     | [取消订阅](mailto:dev-unsubscribe@fory.apache.org)     | [发送邮件](mailto:dev@fory.apache.org) | [邮件列表活动](https://lists.apache.org/list.html?dev@fory.apache.org)     |
-| commits@fory.apache.org | 仓库的所有 commits            | [订阅](mailto:commits-subscribe@fory.apache.org) | [取消订阅](mailto:commits-unsubscribe@fory.apache.org) | 只读的邮件列表                     | [邮件列表活动](https://lists.apache.org/list.html?commits@fory.apache.org) |
+| 邮件列表                | 描述               | 订阅                                             | 取消订阅                                               | 发送邮件                               | 活动                                                                       |
+| ----------------------- | ------------------ | ------------------------------------------------ | ------------------------------------------------------ | -------------------------------------- | -------------------------------------------------------------------------- |
+| dev@fory.apache.org     | 开发相关讨论       | [订阅](mailto:dev-subscribe@fory.apache.org)     | [取消订阅](mailto:dev-unsubscribe@fory.apache.org)     | [发送邮件](mailto:dev@fory.apache.org) | [邮件列表活动](https://lists.apache.org/list.html?dev@fory.apache.org)     |
+| commits@fory.apache.org | 仓库的所有 commits | [订阅](mailto:commits-subscribe@fory.apache.org) | [取消订阅](mailto:commits-unsubscribe@fory.apache.org) | 只读的邮件列表                         | [邮件列表活动](https://lists.apache.org/list.html?commits@fory.apache.org) |
 
 在尝试发送邮件之前，请确保订阅上述的邮件列表。
 

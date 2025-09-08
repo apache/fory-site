@@ -4,7 +4,6 @@ sidebar_position: 0
 id: community
 ---
 
-
 Apache Fury is a volunteer project and it thrives on the contributions of its community.
 We invite you to participate as much or as little as you wish. Here are several ways to contribute:
 
@@ -15,10 +14,10 @@ We invite you to participate as much or as little as you wish. Here are several 
 
 ## Mailing list
 
-| Name                    | Desc                                        | Subscribe                                             | Unsubscribe                                               | Post                               | Archive                                                               |
-|-------------------------|---------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------|------------------------------------|-----------------------------------------------------------------------|
-| dev@fury.apache.org     | Development related discussions             | [Subscribe](mailto:dev-subscribe@fury.apache.org)     | [Unsubscribe](mailto:dev-unsubscribe@fury.apache.org)     | [Post](mailto:dev@fury.apache.org) | [Archive](https://lists.apache.org/list.html?dev@fury.apache.org)     |
-| commits@fury.apache.org | All commits to our repositories             | [Subscribe](mailto:commits-subscribe@fury.apache.org) | [Unsubscribe](mailto:commits-unsubscribe@fury.apache.org) | Read only list                     | [Archive](https://lists.apache.org/list.html?commits@fury.apache.org) |
+| Name                    | Desc                            | Subscribe                                             | Unsubscribe                                               | Post                               | Archive                                                               |
+| ----------------------- | ------------------------------- | ----------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| dev@fury.apache.org     | Development related discussions | [Subscribe](mailto:dev-subscribe@fury.apache.org)     | [Unsubscribe](mailto:dev-unsubscribe@fury.apache.org)     | [Post](mailto:dev@fury.apache.org) | [Archive](https://lists.apache.org/list.html?dev@fury.apache.org)     |
+| commits@fury.apache.org | All commits to our repositories | [Subscribe](mailto:commits-subscribe@fury.apache.org) | [Unsubscribe](mailto:commits-unsubscribe@fury.apache.org) | Read only list                     | [Archive](https://lists.apache.org/list.html?commits@fury.apache.org) |
 
 Please make sure subscribe to any list before attempting to post.
 

@@ -191,7 +191,7 @@ corresponding flags and maintaining internal state.
 Reference flags:
 
 | Flag                | Byte Value | Description                                                                                                                                             |
-|---------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | NULL FLAG           | `-3`       | This flag indicates the object is a null value. We don't use another byte to indicate REF, so that we can save one byte.                                |
 | REF FLAG            | `-2`       | This flag indicates the object is already serialized previously, and fury will write a ref id with unsigned varint format instead of serialize it again |
 | NOT_NULL VALUE FLAG | `-1`       | This flag indicates the object is a non-null value and fury doesn't track ref for this type of object.                                                  |
@@ -243,7 +243,7 @@ differently.
 - If schema evolution mode is enabled globally when creating fury, and current class is configured to use schema
   consistent mode like `struct` vs `table` in flatbuffers:
   - Type meta will be add to `captured_type_defs`: `captured_type_defs[type def stub] = map size` ahead when
-      registering type.
+    registering type.
   - Get index of the meta in `captured_type_defs`, write that index as `| unsigned varint: index |`.
 
 ### Struct Schema evolution
@@ -253,7 +253,7 @@ using one of the following mode. Which mode to use is configured when creating f
 
 - Normal mode(meta share not enabled):
   - If type meta hasn't been written before, add `type def`
-      to `captured_type_defs`: `captured_type_defs[type def] = map size`.
+    to `captured_type_defs`: `captured_type_defs[type def] = map size`.
   - Get index of the meta in `captured_type_defs`, write that index as `| unsigned varint: index |`.
   - After finished the serialization of the object graph, fury will start to write `captured_type_defs`:
     - Firstly, set current to `meta start offset` of fury header
@@ -270,31 +270,32 @@ using one of the following mode. Which mode to use is configured when creating f
 - Meta share mode: the writing steps are same as the normal mode, but `captured_type_defs` will be shared across
   multiple serializations of different objects. For example, suppose we have a batch to serialize:
 
-    ```python
-    captured_type_defs = {}
-    stream = ...
-    # add `Type1` to `captured_type_defs` and write `Type1`
-    fury.serialize(stream, [Type1()])
-    # add `Type2` to `captured_type_defs` and write `Type2`, `Type1` is written before.
-    fury.serialize(stream, [Type1(), Type2()])
-    # `Type1` and `Type2` are written before, no need to write meta.
-    fury.serialize(stream, [Type1(), Type2()])
-    ```
+  ```python
+  captured_type_defs = {}
+  stream = ...
+  # add `Type1` to `captured_type_defs` and write `Type1`
+  fury.serialize(stream, [Type1()])
+  # add `Type2` to `captured_type_defs` and write `Type2`, `Type1` is written before.
+  fury.serialize(stream, [Type1(), Type2()])
+  # `Type1` and `Type2` are written before, no need to write meta.
+  fury.serialize(stream, [Type1(), Type2()])
+  ```
 
 - Streaming mode(streaming mode doesn't support meta share):
   - If type meta hasn't been written before, the data will be written as:
 
-      ```
-      | unsigned varint: 0b11111111 | type def |
-      ```
+    ```
+    | unsigned varint: 0b11111111 | type def |
+    ```
 
   - If type meta has been written before, the data will be written as:
 
-      ```
-      | unsigned varint: written index << 1 |
-      ```
+    ```
+    | unsigned varint: written index << 1 |
+    ```
 
-      `written index` is the id in `captured_type_defs`.
+    `written index` is the id in `captured_type_defs`.
+
   - With this mode, `meta start offset` can be omitted.
 
 > The normal mode and meta share mode will forbid streaming writing since it needs to look back for update the start
@@ -365,8 +366,8 @@ Detailed spec:
   - encoding: `UTF8/ALL_TO_LOWER_SPECIAL/LOWER_UPPER_DIGIT_SPECIAL/TAG_ID`
   - If tag id is used, field name will be written by an unsigned varint tag id, and 2 bits encoding will be `11`.
 - size of field name:
-  - The `4 bits size: 0~14`  will be used to indicate length `1~15`, the value `15` indicates to read more bytes,
-          the encoding will encode `size - 15` as a varint next.
+  - The `4 bits size: 0~14` will be used to indicate length `1~15`, the value `15` indicates to read more bytes,
+    the encoding will encode `size - 15` as a varint next.
   - If encoding is `TAG_ID`, then num_bytes of field name will be used to store tag id.
 - ref tracking: when set to 1, ref tracking will be enabled for this field.
 - nullability: when set to 1, this field can be null.
@@ -411,7 +412,7 @@ List/Set/Map nested type spec:
 
 ###### Field Name
 
-If tag id is set, tag id will be used instead. Otherwise meta string of field name will  be written instead.
+If tag id is set, tag id will be used instead. Otherwise meta string of field name will be written instead.
 
 ###### Field order
 
@@ -468,16 +469,16 @@ Meta string is mainly used to encode meta strings such as field names.
 
 String binary encoding algorithm:
 
-| Algorithm                 | Pattern       | Description                                                                                                                                                                                                                                                                              |
-|---------------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| LOWER_SPECIAL             | `a-z._$\|`    | every char is written using 5 bits, `a-z`: `0b00000~0b11001`, `._$\|`: `0b11010~0b11101`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char)                                                        |
-| LOWER_UPPER_DIGIT_SPECIAL | `a-zA-Z0~9._` | every char is written using 6 bits, `a-z`: `0b00000~0b11001`, `A-Z`: `0b11010~0b110011`, `0~9`: `0b110100~0b111101`, `._`: `0b111110~0b111111`,  prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char) |
-| UTF-8                     | any chars     | UTF-8 encoding                                                                                                                                                                                                                                                                           |
+| Algorithm                 | Pattern       | Description                                                                                                                                                                                                                                                                             |
+| ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LOWER_SPECIAL             | `a-z._$\|`    | every char is written using 5 bits, `a-z`: `0b00000~0b11001`, `._$\|`: `0b11010~0b11101`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char)                                                       |
+| LOWER_UPPER_DIGIT_SPECIAL | `a-zA-Z0~9._` | every char is written using 6 bits, `a-z`: `0b00000~0b11001`, `A-Z`: `0b11010~0b110011`, `0~9`: `0b110100~0b111101`, `._`: `0b111110~0b111111`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char) |
+| UTF-8                     | any chars     | UTF-8 encoding                                                                                                                                                                                                                                                                          |
 
 Encoding flags:
 
 | Encoding Flag             | Pattern                                                  | Encoding Algorithm                                                                                                                                          |
-|---------------------------|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LOWER_SPECIAL             | every char is in `a-z._\|`                               | `LOWER_SPECIAL`                                                                                                                                             |
 | FIRST_TO_LOWER_SPECIAL    | every char is in `a-z._` except first char is upper case | replace first upper case char to lower case, then use `LOWER_SPECIAL`                                                                                       |
 | ALL_TO_LOWER_SPECIAL      | every char is in `a-zA-Z._`                              | replace every upper case char by `\|` + `lower case`, then use `LOWER_SPECIAL`, use this encoding if it's smaller than Encoding `LOWER_UPPER_DIGIT_SPECIAL` |
@@ -546,7 +547,7 @@ Notes:
   - Otherwise write as 9 bytes: `| 0b1 | little-endian 8 bytes long |`
 - Fury PVL(Progressive Variable-length Long) Encoding:
   - positive long format: first bit in every byte indicates whether to have the next byte. If first bit is set
-      i.e. `b & 0x80 == 0x80`, then the next byte should be read until the first bit is unset.
+    i.e. `b & 0x80 == 0x80`, then the next byte should be read until the first bit is unset.
 
 #### signed int64
 
@@ -561,7 +562,7 @@ Notes:
   - Otherwise write as 9 bytes: `| 0b1 | little-endian 8 bytes long |`
 - Fury PVL(Progressive Variable-length Long) Encoding:
   - First convert the number into positive unsigned long by `(v << 1) ^ (v >> 63)` ZigZag algorithm to reduce cost of
-      small negative numbers, then encoding it as an unsigned long.
+    small negative numbers, then encoding it as an unsigned long.
 
 #### float32
 

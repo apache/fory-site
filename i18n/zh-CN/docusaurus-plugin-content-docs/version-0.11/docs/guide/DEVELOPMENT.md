@@ -4,11 +4,11 @@ sidebar_position: 7
 id: development
 ---
 
-## 本地构建 Apache Fory
+## 本地构建 Apache Fory™
 
 从 [Github 代码库](https://github.com/apache/fory) 拉取最新代码。
 
-### 构建 Apache Fory Java
+### 构建 Apache Fory™ Java
 
 ```bash
 cd java
@@ -20,7 +20,7 @@ mvn clean compile -DskipTests
 - java 1.8+
 - maven 3.6.3+
 
-### 构建 Apache Fory Python
+### 构建 Apache Fory™ Python
 
 ```bash
 cd python
@@ -32,7 +32,7 @@ pip install -v -e .
 
 - python 3.6+
 
-### 构建 Apache Fory C++
+### 构建 Apache Fory™ C++
 
 Build fory row format：
 
@@ -53,7 +53,7 @@ bazel build //cpp/fory/encoder:fory_encoder
 - compilers with C++17 support
 - bazel 6.3.2
 
-### 构建 Apache Fory GoLang
+### 构建 Apache Fory™ GoLang
 
 ```bash
 cd go/fory
@@ -67,7 +67,7 @@ go test -v fory_xlang_test.go
 
 - go 1.13+
 
-### 构建 Apache Fory Rust
+### 构建 Apache Fory™ Rust
 
 ```bash
 cd rust
@@ -83,7 +83,7 @@ cargo test
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-### 构建 Apache Fory JavaScript
+### 构建 Apache Fory™ JavaScript
 
 ```bash
 cd javascript

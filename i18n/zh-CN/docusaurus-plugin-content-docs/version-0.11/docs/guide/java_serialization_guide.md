@@ -129,7 +129,7 @@ public class Example {
 
 ## 高级用法
 
-### Fory 创建
+### Apache Fory™ 创建
 
 单线程 Fory 示例：
 
@@ -773,7 +773,7 @@ if (JavaSerializer.serializedByJDK(bytes)) {
 }
 ```
 
-### Fory 版本升级
+### Apache Fory™ 版本升级
 
 目前仅保证小版本间的二进制兼容性。例如，fory `v0.11.1` 升级到 `v0.11.2` 可直接兼容，升级到 `v0.12.0` 则不保证兼容。大多数场景无需频繁升级主版本，当前版本已足够高效紧凑，老版本也会持续维护 bugfix。
 

@@ -28,7 +28,7 @@ Note:
 ## Type Mapping
 
 | Fury Type               | Fury Type ID | Java            | Python                            | Javascript      | C++                            | Golang           | Rust             |
-|-------------------------|--------------|-----------------|-----------------------------------|-----------------|--------------------------------|------------------|------------------|
+| ----------------------- | ------------ | --------------- | --------------------------------- | --------------- | ------------------------------ | ---------------- | ---------------- |
 | bool                    | 1            | bool/Boolean    | bool                              | Boolean         | bool                           | bool             | bool             |
 | int8                    | 2            | byte/Byte       | int/pyfury.Int8                   | Type.int8()     | int8_t                         | int8             | i8               |
 | int16                   | 3            | short/Short     | int/pyfury.Int16                  | Type.int16()    | int16_t                        | int16            | i6               |
@@ -58,7 +58,7 @@ Note:
 | decimal                 | 27           | BigDecimal      | Decimal                           | bigint          | /                              | /                | /                |
 | binary                  | 28           | byte[]          | bytes                             | /               | `uint8_t[n]/vector<T>`         | `[n]uint8/[]T`   | `Vec<uint8_t>`   |
 | array                   | 29           | array           | np.ndarray                        | /               | /                              | array/slice      | Vec              |
-| bool_array              | 30           | bool[]          | ndarray(np.bool_)                 | /               | `bool[n]`                      | `[n]bool/[]T`    | `Vec<bool>`      |
+| bool_array              | 30           | bool[]          | ndarray(np.bool\_)                | /               | `bool[n]`                      | `[n]bool/[]T`    | `Vec<bool>`      |
 | int8_array              | 31           | byte[]          | ndarray(int8)                     | /               | `int8_t[n]/vector<T>`          | `[n]int8/[]T`    | `Vec<i18>`       |
 | int16_array             | 32           | short[]         | ndarray(int16)                    | /               | `int16_t[n]/vector<T>`         | `[n]int16/[]T`   | `Vec<i16>`       |
 | int32_array             | 33           | int[]           | ndarray(int32)                    | /               | `int32_t[n]/vector<T>`         | `[n]int32/[]T`   | `Vec<i32>`       |
@@ -92,21 +92,21 @@ Here is en example:
 
 - Java:
 
-    ```java
-    class Foo {
-      @Int32Type(varint = true)
-      int f1;
-      List<@Int32Type(varint = true) Integer> f2;
-    }
-    ```
+  ```java
+  class Foo {
+    @Int32Type(varint = true)
+    int f1;
+    List<@Int32Type(varint = true) Integer> f2;
+  }
+  ```
 
 - Python:
 
-    ```python
-    class Foo:
-        f1: Int32Type(varint=True)
-        f2: List[Int32Type(varint=True)]
-    ```
+  ```python
+  class Foo:
+      f1: Int32Type(varint=True)
+      f2: List[Int32Type(varint=True)]
+  ```
 
 ## Type wrapper
 

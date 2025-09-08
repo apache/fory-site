@@ -108,10 +108,10 @@ public class Example {
 }
 ```
 
-## FuryBuilder  options
+## FuryBuilder options
 
 | Option Name                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Default Value                                                  |
-|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | `timeRefIgnored`                    | Whether to ignore reference tracking of all time types registered in `TimeSerializers` and subclasses of those types when ref tracking is enabled. If ignored, ref tracking of every time type can be enabled by invoking `Fury#registerSerializer(Class, Serializer)`. For example, `fury.registerSerializer(Date.class, new DateSerializer(fury, true))`. Note that enabling ref tracking should happen before serializer codegen of any types which contain time fields. Otherwise, those fields will still skip ref tracking. | `true`                                                         |
 | `compressInt`                       | Enables or disables int compression for smaller size.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | `true`                                                         |
 | `compressLong`                      | Enables or disables long compression for smaller size.                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `true`                                                         |
@@ -234,9 +234,9 @@ For long compression, fury support two encoding:
   - Otherwise write as 9 bytes: `| 0b1 | little-endian 8bytes long |`
 - Fury PVL(Progressive Variable-length Long) Encoding:
   - First bit in every byte indicate whether has next byte. if first bit is set, then next byte will be read util
-      first bit of next byte is unset.
+    first bit of next byte is unset.
   - Negative number will be converted to positive number by `(v << 1) ^ (v >> 63)` to reduce cost of small negative
-      numbers.
+    numbers.
 
 If a number are `long` type, it can't be represented by smaller bytes mostly, the compression won't get good enough
 result,
@@ -463,13 +463,16 @@ returned.
 ### Coping/Mapping object from one type to another type
 
 Fury support mapping object from one type to another type.
+
 > Notes:
 >
 > 1. This mapping will execute a deep copy, all mapped fields are serialized into binary and
+
      deserialized from that binary to map into another type.
+
 > 2. All struct types must be registered with same ID, otherwise Fury can not mapping to correct struct type.
-     > Be careful when you use `Fury#register(Class)`, because fury will allocate an auto-grown ID which might be
-     > inconsistent if you register classes with different order between Fury instance.
+>    Be careful when you use `Fury#register(Class)`, because fury will allocate an auto-grown ID which might be
+>    inconsistent if you register classes with different order between Fury instance.
 
 ```java
 public class StructMappingExample {

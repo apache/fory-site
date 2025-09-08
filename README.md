@@ -1,6 +1,6 @@
-# Apache Fory Website
+# Apache Fory™ Website
 
-The source repository of static website for Apache Fory: https://github.com/apache/fory.
+The source repository of static website for Apache Fory™: https://github.com/apache/fory.
 
 ## Installation
 

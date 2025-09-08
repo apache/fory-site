@@ -66,7 +66,7 @@ corresponding flags and maintaining internal state.
 Reference flags:
 
 | Flag                | Byte Value | Description                                                                                                                                             |
-|---------------------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | NULL FLAG           | `-3`       | This flag indicates the object is a null value. We don't use another byte to indicate REF, so that we can save one byte.                                |
 | REF FLAG            | `-2`       | This flag indicates the object is already serialized previously, and fury will write a ref id with unsigned varint format instead of serialize it again |
 | NOT_NULL VALUE FLAG | `-1`       | This flag indicates the object is a non-null value and fury doesn't track ref for this type of object.                                                  |
@@ -92,15 +92,15 @@ If schema consistent mode is enabled globally or enabled for current class, clas
 - If class is not registered:
   - If class is not an array, fury will write one byte `0bxxxxxxx1` first, then write class name.
     - The first little bit is `1`, which is different from first bit `0` of
-          encoded class id. Fury can use this information to determine whether to read class by class id for
-          deserialization.
+      encoded class id. Fury can use this information to determine whether to read class by class id for
+      deserialization.
   - If class is not registered and class is an array, fury will write one byte `dimensions << 1 | 1` first, then write
-      component
-      class subsequently. This can reduce array class name cost if component class is or will be serialized.
+    component
+    class subsequently. This can reduce array class name cost if component class is or will be serialized.
   - Class will be written as two enumerated fury unsigned by default: `package name` and `class name`. If meta share
-      mode is
-      enabled,
-      class will be written as an unsigned varint which points to index in `MetaContext`.
+    mode is
+    enabled,
+    class will be written as an unsigned varint which points to index in `MetaContext`.
 
 ### Schema evolution
 
@@ -162,45 +162,45 @@ Meta header is a 64 bits number value encoded in little endian order.
 
 - num fields: encode `num fields << 1 | register flag(1 when class registered)` as unsigned varint.
   - If class is registered, then an unsigned varint class id will be written next, package and class name will be
-      omitted.
+    omitted.
   - If current class is schema consistent, then num field will be `0` to flag it.
   - If current class isn't schema consistent, then num field will be the number of compatible fields. For example,
-      users
-      can use tag id to mark some field as compatible field in schema consistent context. In such cases, schema
-      consistent
-      fields will be serialized first, then compatible fields will be serialized next. At deserialization, Fury will use
-      fields info of those fields which aren't annotated by tag id for deserializing schema consistent fields, then use
-      fields info in meta for deserializing compatible fields.
+    users
+    can use tag id to mark some field as compatible field in schema consistent context. In such cases, schema
+    consistent
+    fields will be serialized first, then compatible fields will be serialized next. At deserialization, Fury will use
+    fields info of those fields which aren't annotated by tag id for deserializing schema consistent fields, then use
+    fields info in meta for deserializing compatible fields.
 - Package name encoding(omitted when class is registered):
   - encoding algorithm: `UTF8/ALL_TO_LOWER_SPECIAL/LOWER_UPPER_DIGIT_SPECIAL`
-  - Header: `6 bits size | 2 bits encoding flags`. The `6 bits size: 0~63`  will be used to indicate size `0~63`,
-      the value `63` the size need more byte to read, the encoding will encode `size - 63` as a varint next.
+  - Header: `6 bits size | 2 bits encoding flags`. The `6 bits size: 0~63` will be used to indicate size `0~63`,
+    the value `63` the size need more byte to read, the encoding will encode `size - 63` as a varint next.
 - Class name encoding(omitted when class is registered):
   - encoding algorithm: `UTF8/LOWER_UPPER_DIGIT_SPECIAL/FIRST_TO_LOWER_SPECIAL/ALL_TO_LOWER_SPECIAL`
-  - header: `6 bits size | 2 bits encoding flags`. The `6 bits size: 0~63`  will be used to indicate size `0~63`,
-      the value `63` the size need more byte to read, the encoding will encode `size - 63` as a varint next.
+  - header: `6 bits size | 2 bits encoding flags`. The `6 bits size: 0~63` will be used to indicate size `0~63`,
+    the value `63` the size need more byte to read, the encoding will encode `size - 63` as a varint next.
 - Field info:
   - header(8
-      bits): `3 bits size + 2 bits field name encoding + polymorphism flag + nullability flag + ref tracking flag`.
-      Users can use annotation to provide those info.
+    bits): `3 bits size + 2 bits field name encoding + polymorphism flag + nullability flag + ref tracking flag`.
+    Users can use annotation to provide those info.
     - 2 bits field name encoding:
       - encoding: `UTF8/ALL_TO_LOWER_SPECIAL/LOWER_UPPER_DIGIT_SPECIAL/TAG_ID`
       - If tag id is used, i.e. field name is written by an unsigned varint tag id. 2 bits encoding will be `11`.
     - size of field name:
-      - The `3 bits size: 0~7`  will be used to indicate length `1~7`, the value `6` the size read more bytes,
-              the encoding will encode `size - 7` as a varint next.
+      - The `3 bits size: 0~7` will be used to indicate length `1~7`, the value `6` the size read more bytes,
+        the encoding will encode `size - 7` as a varint next.
       - If encoding is `TAG_ID`, then num_bytes of field name will be used to store tag id.
     - ref tracking: when set to 1, ref tracking will be enabled for this field.
     - nullability: when set to 1, this field can be null.
     - polymorphism: when set to 1, the actual type of field will be the declared field type even the type if
-          not `final`.
+      not `final`.
   - type id:
     - For registered type-consistent classes, it will be the registered class id.
     - Otherwise it will be encoded as `OBJECT_ID` if it isn't `final` and `FINAL_OBJECT_ID` if it's `final`. The
-          meta for such types is written separately instead of inlining here is to reduce meta space cost if object of
-          this type is serialized in current object graph multiple times, and the field value may be null too.
+      meta for such types is written separately instead of inlining here is to reduce meta space cost if object of
+      this type is serialized in current object graph multiple times, and the field value may be null too.
   - Field name: If type id is set, type id will be used instead. Otherwise meta string encoding length and data will
-      be written instead.
+    be written instead.
 
 Field order are left as implementation details, which is not exposed to specification, the deserialization need to
 resort fields based on Fury field comparator. In this way, fury can compute statistics for field names or types and
@@ -215,9 +215,9 @@ Same encoding algorithm as the previous layer except:
     - If package name has been written before: `varint index + sharing flag(set)` will be written
     - If package name hasn't been written before:
       - If meta string encoding is `LOWER_SPECIAL` and the length of encoded string `<=` 64, then header will be
-              `6 bits size + encoding flag(set) + sharing flag(unset)`.
+        `6 bits size + encoding flag(set) + sharing flag(unset)`.
       - Otherwise, header will
-              be `3 bits unset + 3 bits encoding flags + encoding flag(unset) + sharing flag(unset)`
+        be `3 bits unset + 3 bits encoding flags + encoding flag(unset) + sharing flag(unset)`
 
 ## Meta String
 
@@ -227,16 +227,16 @@ Meta string is mainly used to encode meta strings such as class name and field n
 
 String binary encoding algorithm:
 
-| Algorithm                 | Pattern       | Description                                                                                                                                                                                                                                                                              |
-|---------------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| LOWER_SPECIAL             | `a-z._$\|`    | every char is written using 5 bits, `a-z`: `0b00000~0b11001`, `._$\|`: `0b11010~0b11101`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char)                                                        |
-| LOWER_UPPER_DIGIT_SPECIAL | `a-zA-Z0~9._` | every char is written using 6 bits, `a-z`: `0b00000~0b11001`, `A-Z`: `0b11010~0b110011`, `0~9`: `0b110100~0b111101`, `._`: `0b111110~0b111111`,  prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char) |
-| UTF-8                     | any chars     | UTF-8 encoding                                                                                                                                                                                                                                                                           |
+| Algorithm                 | Pattern       | Description                                                                                                                                                                                                                                                                             |
+| ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LOWER_SPECIAL             | `a-z._$\|`    | every char is written using 5 bits, `a-z`: `0b00000~0b11001`, `._$\|`: `0b11010~0b11101`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char)                                                       |
+| LOWER_UPPER_DIGIT_SPECIAL | `a-zA-Z0~9._` | every char is written using 6 bits, `a-z`: `0b00000~0b11001`, `A-Z`: `0b11010~0b110011`, `0~9`: `0b110100~0b111101`, `._`: `0b111110~0b111111`, prepend one bit at the start to indicate whether strip last char since last byte may have 7 redundant bits(1 indicates strip last char) |
+| UTF-8                     | any chars     | UTF-8 encoding                                                                                                                                                                                                                                                                          |
 
 Encoding flags:
 
 | Encoding Flag             | Pattern                                                       | Encoding Algorithm                                                                                                                                          |
-|---------------------------|---------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LOWER_SPECIAL             | every char is in `a-z._$\|`                                   | `LOWER_SPECIAL`                                                                                                                                             |
 | FIRST_TO_LOWER_SPECIAL    | every char is in `a-z[c1,c2]` except first char is upper case | replace first upper case char to lower case, then use `LOWER_SPECIAL`                                                                                       |
 | ALL_TO_LOWER_SPECIAL      | every char is in `a-zA-Z[c1,c2]`                              | replace every upper case char by `\|` + `lower case`, then use `LOWER_SPECIAL`, use this encoding if it's smaller than Encoding `LOWER_UPPER_DIGIT_SPECIAL` |
@@ -324,7 +324,7 @@ If string has been written before, the data will be written as follows:
 - size: 1~9 byte
 - Fury PVL(Progressive Variable-length Long) Encoding:
   - positive long format: first bit in every byte indicates whether to have the next byte. If first bit is set
-      i.e. `b & 0x80 == 0x80`, then the next byte should be read until the first bit is unset.
+    i.e. `b & 0x80 == 0x80`, then the next byte should be read until the first bit is unset.
 
 #### Signed long
 
@@ -334,7 +334,7 @@ If string has been written before, the data will be written as follows:
   - Otherwise write as 9 bytes: `| 0b1 | little-endian 8 bytes long |`
 - Fury PVL(Progressive Variable-length Long) Encoding:
   - First convert the number into positive unsigned long by `(v << 1) ^ (v >> 63)` ZigZag algorithm to reduce cost of
-      small negative numbers, then encoding it as an unsigned long.
+    small negative numbers, then encoding it as an unsigned long.
 
 #### Float
 
