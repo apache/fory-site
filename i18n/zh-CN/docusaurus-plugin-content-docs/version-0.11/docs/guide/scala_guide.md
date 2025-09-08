@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Fory 支持所有 Scala 对象的序列化：
+Apache Fory™ 支持所有 Scala 对象的序列化：
 
 - 支持 `case` class 序列化
 - 支持 `pojo/bean` class 序列化

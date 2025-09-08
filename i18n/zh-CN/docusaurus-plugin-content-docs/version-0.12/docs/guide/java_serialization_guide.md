@@ -190,7 +190,7 @@ byte[] bytes = fory.serialize(object);
 System.out.println(fory.deserialize(bytes));
 ```
 
-兼容模式下，类元数据会写入序列化结果。Fory 采用高效压缩算法降低元数据开销，但仍会有一定体积增加。为进一步降低元数据成本，Fory 支持元数据共享机制，详情见[Meta Sharing](https://fory.apache.org/docs/specification/fory_java_serialization_spec#meta-share)。
+兼容模式下，类元数据会写入序列化结果。Apache Fory™ 采用高效压缩算法降低元数据开销，但仍会有一定体积增加。为进一步降低元数据成本，Apache Fory™ 支持元数据共享机制，详情见[Meta Sharing](https://fory.apache.org/docs/specification/fory_java_serialization_spec#meta-share)。
 
 ### 压缩
 
@@ -637,7 +637,7 @@ fory.register(Foo.class, "demo", "Foo");
 
 ### 零拷贝序列化
 
-Fory 支持零拷贝序列化，可高效处理大对象或直接内存缓冲区。示例：
+Apache Fory™ 支持零拷贝序列化，可高效处理大对象或直接内存缓冲区。示例：
 
 ```java
 import org.apache.fory.*;
@@ -668,7 +668,7 @@ public class ZeroCopyExample {
 
 ### 元数据共享（Meta Sharing）
 
-Fory 支持在同一上下文（如 TCP 连接）内共享类型元数据（类名、字段名、最终字段类型等）。首次序列化时元数据会发送到对端，对端可基于元数据重建反序列化器，后续序列化无需重复传输元数据，从而减少网络流量并自动支持类型前向/后向兼容。
+Apache Fory™ 支持在同一上下文（如 TCP 连接）内共享类型元数据（类名、字段名、最终字段类型等）。首次序列化时元数据会发送到对端，对端可基于元数据重建反序列化器，后续序列化无需重复传输元数据，从而减少网络流量并自动支持类型前向/后向兼容。
 
 ```java
 // Fory.builder()
@@ -705,13 +705,13 @@ Object newObj = fory.execute(
 
 ### 反序列化不存在的类
 
-Fory 支持反序列化不存在的类。通过 `ForyBuilder#deserializeNonexistentClass(true)` 启用。当启用且元数据共享开启时，Fory 会将该类型的数据存储为 Map 的惰性子类，避免反序列化时填充 Map 的重排开销，提升性能。如果数据被发送到另一个进程且该类存在，则可无损还原为原类型对象。
+Apache Fory™ 支持反序列化不存在的类。通过 `ForyBuilder#deserializeNonexistentClass(true)` 启用。当启用且元数据共享开启时，Fory 会将该类型的数据存储为 Map 的惰性子类，避免反序列化时填充 Map 的重排开销，提升性能。如果数据被发送到另一个进程且该类存在，则可无损还原为原类型对象。
 
 若未启用元数据共享，则新类数据会被跳过，返回 `NonexistentSkipClass` 占位对象。
 
 ### 类型映射（跨类型深拷贝/映射）
 
-Fory 支持将一个类型的对象深拷贝/映射为另一个类型。注意事项：
+Apache Fory™ 支持将一个类型的对象深拷贝/映射为另一个类型。注意事项：
 
 1. 该映射会执行深拷贝，所有映射字段会先序列化为二进制，再反序列化为目标类型。
 2. 所有结构体类型必须用相同 ID 注册，否则无法正确映射。务必保证序列化和反序列化端注册顺序一致。
@@ -789,7 +789,7 @@ if (JavaSerializer.serializedByJDK(bytes)) {
 
 ### POJO 跨类型反序列化
 
-Fory 支持将一个 POJO 序列化后反序列化为不同结构的 POJO。此时需将 `CompatibleMode` 设为 `org.apache.fory.config.CompatibleMode.COMPATIBLE`。
+Apache Fory™ 支持将一个 POJO 序列化后反序列化为不同结构的 POJO。此时需将 `CompatibleMode` 设为 `org.apache.fory.config.CompatibleMode.COMPATIBLE`。
 
 ```java
 public class DeserializeIntoType {

@@ -1,6 +1,6 @@
 ---
 id: usage
-title: Apache Fory 使用
+title: Apache Fory™ 使用
 sidebar_position: 1
 ---
 
