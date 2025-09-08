@@ -24,7 +24,7 @@ license: |
 GraalVM 的 `native image` 能将 Java 代码提前编译为本地代码，从而构建更快、更小、更精简的应用。
 Native image 不包含 JIT 编译器，无法在运行时将字节码编译为机器码，也不支持反射，除非配置反射元数据文件。
 
-Fory 在 GraalVM native image 下运行良好。Fory 会在 graalvm 构建阶段为 `Fory JIT framework` 和 `MethodHandle/LambdaMetafactory` 生成所有序列化器代码，运行时直接使用这些生成的代码进行序列化，无需额外开销，性能优异。
+Apache Fory™ 在GraalVM native image 下运行良好。Fory 会在 graalvm 构建阶段为 `Fory JIT framework` 和 `MethodHandle/LambdaMetafactory` 生成所有序列化器代码，运行时直接使用这些生成的代码进行序列化，无需额外开销，性能优异。
 
 在 graalvm native image 下使用 Fory 时，必须将 Fory 创建为类的**静态**字段，并在类初始化时**注册**所有类型。然后在 `resources/META-INF/native-image/$xxx/native-image.properties` 下配置 `native-image.properties`，告知 graalvm 在 native image 构建时初始化该类。例如，配置 `org.apache.fory.graalvm.Example` 类在构建时初始化：
 

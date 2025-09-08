@@ -4,7 +4,7 @@ title: 安装 Apache Fory
 sidebar_position: 0
 ---
 
-Apache Fory 源码下载请参见 Apache Fory [download](https://github.com/apache/fory/releases)页面。
+Apache Fory™ 源码下载请参见 Apache Fory [download](https://github.com/apache/fory/releases)页面。
 
 ### Apache Fory™ Java 安装
 
