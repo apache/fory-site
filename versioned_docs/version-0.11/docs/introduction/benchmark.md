@@ -9,8 +9,8 @@ Different serialization frameworks are suitable for different scenarios, and ben
 If you need to benchmark for your specific scenario, make sure all serialization frameworks are appropriately configured for that scenario.
 
 Dynamic serialization frameworks supports polymorphism and reference, which has more cost compared
-to static serialization frameworks, unless it uses the jit techniques as fory did.
-Since fory will generate code at runtime, please warm up before collecting benchmark statistics.
+to static serialization frameworks, unless it uses the jit techniques as Apache Fory™ did.
+Since Apache Fory™ will generate code at runtime, please warm up before collecting benchmark statistics.
 
 ### Java Serialization
 
