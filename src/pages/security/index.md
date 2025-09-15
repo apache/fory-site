@@ -15,7 +15,7 @@ Severity: Mederate
 
 Vendor: The Apache Software Foundation
 
-Versions affected: 0.5.0 to 0.12.1
+Versions affected: 0.5.0 through 0.12.1
 
 Description: A vulnerability in Apache Fory allows a remote attacker to cause a Denial of Service (DoS). The issue stems from the insecure deserialization of untrusted data. An attacker can supply a large, specially crafted data payload that, when processed, consumes an excessive amount of CPU resources during the deserialization process. This leads to CPU exhaustion, rendering the application or system using the Apache Fory library unresponsive and unavailable to legitimate users.
 
