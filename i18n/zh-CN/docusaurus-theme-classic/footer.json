@@ -44,7 +44,7 @@
     "description": "The label of footer link with label=Website linking to https://github.com/apache/fory-site"
   },
   "copyright": {
-    "message": "<div>\n      <p> 版权所有 © 2025 The Apache Software Foundation，许可证：Apache License, Version 2.0。 <br/>\n        Apache、Apache 项目的名称以及羽毛标志是 Apache 软件基金会在美国和/或其他国家的注册商标或商标。\n      </p>\n      </div>",
+    "message": "<div>\n      <p> 版权所有 © 2025 The Apache Software Foundation，许可证：Apache License, Version 2.0。 <br/>\n        Apache Fory、Fory、Apache、Apache Logo、Apache Fory Logo 是 Apache 软件基金会在美国和/或其他国家的注册商标或商标。\n      </p>\n      </div>",
     "description": "The footer copyright"
   },
   "logo.alt": {
