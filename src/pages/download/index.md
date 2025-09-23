@@ -9,11 +9,11 @@ For binary install, please see Apache Fory™ [install](/docs/docs/start/install
 
 ## The latest release
 
-The latest source release is 0.12.2:
+The latest source release is 0.12.3:
 
 | Version | Date       | Source                                                                                                                                                                                                                                                                              | Release Notes                                                        |
 | ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| 0.12.2  | 2025-09-01 | [source](https://www.apache.org/dyn/closer.lua/fory/0.12.2/apache-fory-0.12.2-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/0.12.2/apache-fory-0.12.2-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/0.12.2/apache-fory-0.12.2-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v0.12.2) |
+| 0.12.3  | 2025-09-01 | [source](https://www.apache.org/dyn/closer.lua/fory/0.12.3/apache-fory-0.12.3-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/0.12.3/apache-fory-0.12.3-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/0.12.3/apache-fory-0.12.3-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v0.12.3) |
 
 ## All archived releases
 
@@ -31,13 +31,13 @@ These files are named after the files they relate to but have `.sha512/.asc` ext
 To verify the SHA digests, you need the `.tgz` and its associated `.tgz.sha512` file. An example command:
 
 ```bash
-sha512sum --check apache-fory-0.12.2-src.tar.gz
+sha512sum --check apache-fory-0.12.3-src.tar.gz
 ```
 
 It should output something like:
 
 ```bash
-apache-fory-0.12.2-src.tar.gz: OK
+apache-fory-0.12.3-src.tar.gz: OK
 ```
 
 ### Verifying Signatures
@@ -54,7 +54,7 @@ gpg --import KEYS
 Then you can verify signature:
 
 ```bash
-gpg --verify apache-fory-0.12.2-src.tar.gz.asc apache-fory-0.12.2-src.tar.gz
+gpg --verify apache-fory-0.12.3-src.tar.gz.asc apache-fory-0.12.3-src.tar.gz
 ```
 
 If something like the following appears, it means the signature is correct:
