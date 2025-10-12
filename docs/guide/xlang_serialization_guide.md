@@ -1,6 +1,6 @@
 ---
 title: Xlang Serialization Guide
-sidebar_position: 2
+sidebar_position: 4
 id: xlang_object_graph_guide
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
