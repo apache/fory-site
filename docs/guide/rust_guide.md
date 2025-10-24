@@ -58,7 +58,7 @@ fory = "0.13"
 ### Basic Example
 
 ```rust
-use fory::{Fory, Error};
+use fory::{Fory, Error, Reader};
 use fory::ForyObject;
 
 #[derive(ForyObject, Debug, PartialEq)]
@@ -70,7 +70,7 @@ struct User {
 
 fn main() -> Result<(), Error> {
     let mut fory = Fory::default();
-    fory.register::<User>(1);
+    fory.register::<User>(1)?;
 
     let user = User {
         name: "Alice".to_string(),
@@ -79,12 +79,18 @@ fn main() -> Result<(), Error> {
     };
 
     // Serialize
-    let bytes = fory.serialize(&user);
-
+    let bytes = fory.serialize(&user)?;
     // Deserialize
     let decoded: User = fory.deserialize(&bytes)?;
     assert_eq!(user, decoded);
 
+    // Serialize to specified buffer
+    let mut buf: Vec<u8> = vec![];
+    fory.serialize_to(&user, &mut buf)?;
+    // Deserialize from specified buffer
+    let mut reader = Reader::new(&buf);
+    let decoded: User = fory.deserialize_from(&mut reader)?;
+    assert_eq!(user, decoded);
     Ok(())
 }
 ```
