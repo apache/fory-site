@@ -1,5 +1,5 @@
 ---
-title: 多语言序列化
+title: Xlang Serialization Guide
 sidebar_position: 4
 id: xlang_object_graph_guide
 license: |
@@ -19,11 +19,9 @@ license: |
   limitations under the License.
 ---
 
-## 跨语言对象图序列化
+## Serialize built-in types
 
-### 序列化内置类型
-
-Apache Fory™ 可以自动序列化编程语言的常见数据类型：primitive numeric types, string, binary, array, list, map 等。
+Common types can be serialized automatically: primitive numeric types, string, binary, array, list, map and so on.
 
 **Java**
 
@@ -140,9 +138,9 @@ fn run() {
 }
 ```
 
-### 序列化自定义类型
+## Serialize custom types
 
-序列化用户定义的类型需要使用注册 API 注册自定义类型，以便在不同语言中建立类型之间的映射关系。
+Serializing user-defined types needs registering the custom type using the register API to establish the mapping relationship between the type in different languages.
 
 **Java**
 
@@ -240,8 +238,8 @@ class SomeClass2:
 
 if __name__ == "__main__":
     f = pyfory.Fory()
-    f.register_class(SomeClass1, type_tag="example.SomeClass1")
-    f.register_class(SomeClass2, type_tag="example.SomeClass2")
+    f.register_type(SomeClass1, typename="example.SomeClass1")
+    f.register_type(SomeClass2, typename="example.SomeClass2")
     obj1 = SomeClass1(f1=True, f2={-1: 2})
     obj = SomeClass2(
         f1=obj1,
@@ -291,10 +289,10 @@ func main() {
   F2 map[int8]int32
  }
  fory := forygo.NewFory()
- if err := fory.RegisterTagType("example.SomeClass1", SomeClass1{}); err != nil {
+ if err := fory.RegisterNamedType(SomeClass1{}, "example.SomeClass1"); err != nil {
   panic(err)
  }
- if err := fory.RegisterTagType("example.SomeClass2", SomeClass2{}); err != nil {
+ if err := fory.RegisterNamedType(SomeClass2{}, "example.SomeClass2"); err != nil {
   panic(err)
  }
  obj1 := &SomeClass1{}
@@ -409,9 +407,9 @@ fn complex_struct() {
 }
 ```
 
-### 序列化共享引用和循环引用
+## Serialize Shared Reference and Circular Reference
 
-共享引用和循环引用可以被自动序列化，不会产生重复数据或递归错误。
+Shared reference and circular reference can be serialized automatically, no duplicate data or recursion error.
 
 **Java**
 
@@ -483,7 +481,7 @@ func main() {
   F3 map[string]string
  }
  fory := forygo.NewFory(true)
- if err := fory.RegisterTagType("example.SomeClass", SomeClass{}); err != nil {
+ if err := fory.Register(SomeClass{}, 65); err != nil {
   panic(err)
  }
  value := &SomeClass{F2: map[string]string{"k1": "v1", "k2": "v2"}}
@@ -491,7 +489,6 @@ func main() {
  value.F1 = value
  bytes, err := fory.Marshal(value)
  if err != nil {
-  panic(err)
  }
  var newValue interface{}
  // bytes can be data serialized by other languages.
@@ -505,23 +502,23 @@ func main() {
 **JavaScript**
 
 ```javascript
-import Fory, { Type } from "@apache-fory/fory";
+import Fory, { Type } from '@apache-fory/fory';
 /**
  * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit, ensure that the version of Node is 20 or above.
  * Experimental feature, installation success cannot be guaranteed at this moment
  * If you are unable to install the module, replace it with `const hps = null;`
  **/
-import hps from "@apache-fory/hps";
+import hps from '@apache-fory/hps';
 
-const description = Type.object("example.foo", {
+const description = Type.object('example.foo', {
   foo: Type.string(),
-  bar: Type.object("example.foo"),
+  bar: Type.object('example.foo'),
 });
 
 const fory = new Fory({ hps });
 const { serialize, deserialize } = fory.registerSerializer(description);
-const data = {
-  foo: "hello fory",
+const data: any = {
+  foo: 'hello fory',
 };
 data.bar = data;
 const input = serialize(data);
@@ -529,18 +526,17 @@ const result = deserialize(input);
 console.log(result.bar.foo === result.foo);
 ```
 
-**Rust**
+**JavaScript**
+Reference cannot be implemented because of rust ownership restrictions
 
-由于 Rust 所有权限制，暂不支持引用类型的序列化
-
-### Zero-Copy Serialization
+## Zero-Copy Serialization
 
 **Java**
 
 ```java
 import org.apache.fory.*;
 import org.apache.fory.config.*;
-import org.apache.fory.serializers.BufferObject;
+import org.apache.fory.serializer.BufferObject;
 import org.apache.fory.memory.MemoryBuffer;
 
 import java.util.*;
