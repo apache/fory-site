@@ -76,6 +76,53 @@ object ScalaExample {
 }`,
 
   },
+  rust: {
+    label: "Rust",
+    code: `use fory::{Fory, Error};
+use fory::ForyObject;
+
+#[derive(ForyObject, Debug, PartialEq)]
+struct User {
+	name: String,
+	age: i32,
+	email: String,
+}
+
+fn main() -> Result<(), Error> {
+	let mut fory = Fory::default();
+	fory.register::<User>(1)?;
+
+	let user = User { name: "Alice".into(), age: 30, email: "alice@example.com".into() };
+	let bytes = fory.serialize(&user)?;
+	let decoded: User = fory.deserialize(&bytes)?;
+	assert_eq!(user, decoded);
+	Ok(())
+}`,
+
+  },
+
+  python: {
+    label: "Python",
+    code: `import pyfory
+from dataclasses import dataclass
+from typing import List, Dict
+
+@dataclass
+class Person:
+    name: str
+    age: int
+    scores: List[int]
+    metadata: Dict[str, str]
+
+# Python mode - supports all Python types including dataclasses
+fory = pyfory.Fory(xlang=False, ref=True)
+fory.register(Person)
+person = Person("Bob", 25, [88, 92, 85], {"team": "engineering"})
+data = fory.serialize(person)
+result = fory.deserialize(data)
+print(result)  # Person(name='Bob', age=25, ...)`,
+  },
+
 };
 
 export const imageUrls = [
