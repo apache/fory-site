@@ -12,6 +12,8 @@ Dynamic serialization frameworks supports polymorphism and reference, which has 
 to static serialization frameworks, unless it uses the jit techniques as Apache Fory™ did.
 Since Apache Fory™ will generate code at runtime, please warm up before collecting benchmark statistics.
 
+## Java Benchmark
+
 ### Java Serialization
 
 <img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
@@ -28,7 +30,17 @@ Since Apache Fory™ will generate code at runtime, please warm up before collec
 
 See [benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks) for more benchmarks about type forward/backward compatibility, off-heap support, zero-copy serialization.
 
-### JavaScript
+## Rust Benchmark
+
+<img src="/img/benchmarks/rust/company.png" width="90%"/>
+
+<img src="/img/benchmarks/rust/ecommerce_data.png" width="90%"/>
+
+<img src="/img/benchmarks/rust/system_data.png" width="90%"/>
+
+Note: Results depend on hardware, dataset, and implementation versions. See the Rust guide for how to run benchmarks yourself: https://github.com/apache/fory/blob/main/rust/benches/README.md
+
+## JavaScript Benchmark
 
 <img width="33%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
 
