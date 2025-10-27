@@ -1,5 +1,5 @@
 ---
-title: 行存格式
+title: Row Format Guide
 sidebar_position: 5
 id: row_format_guide
 license: |
@@ -47,21 +47,21 @@ for (int i = 0; i < 1000000; i++) {
   bars.add(bar);
 }
 foo.f4 = bars;
-// 可被 python 零拷贝读取
+// Can be zero-copy read by python
 BinaryRow binaryRow = encoder.toRow(foo);
-// 也可以是 python 生成的数据
+// can be data from python
 Foo newFoo = encoder.fromRow(binaryRow);
-// 零拷贝读取 List<Integer> f2
+// zero-copy read List<Integer> f2
 BinaryArray binaryArray2 = binaryRow.getArray(1);
-// 零拷贝读取 List<Bar> f4
+// zero-copy read List<Bar> f4
 BinaryArray binaryArray4 = binaryRow.getArray(3);
-// 零拷贝读取 `readList<Bar> f4` 的第 11 个元素
+// zero-copy read 11th element of `readList<Bar> f4`
 BinaryRow barStruct = binaryArray4.getStruct(10);
 
-// 零拷贝读取 `readList<Bar> f4` 第 11 个元素的 f2 的第 6 个元素
+// zero-copy read 6th of f2 of 11th element of `readList<Bar> f4`
 barStruct.getArray(1).getInt64(5);
 RowEncoder<Bar> barEncoder = Encoders.bean(Bar.class);
-// 只反序列化部分数据
+// deserialize part of data.
 Bar newBar = barEncoder.fromRow(barStruct);
 Bar newBar2 = barEncoder.fromRow(binaryArray4.getStruct(20));
 ```
@@ -97,11 +97,11 @@ print(new_foo.f2[100000], new_foo.f4[100000].f1, new_foo.f4[200000].f2[5])
 print(f"pickle end: {datetime.datetime.now()}")
 ```
 
-### Apache Arrow 支持
+### Apache Arrow Support
 
-Fory Format 也支持与 Arrow Table/RecordBatch 的自动转换。
+Apache Fory™ Row Format also supports automatic conversion from/to Arrow Table/RecordBatch.
 
-Java 示例：
+Java:
 
 ```java
 Schema schema = TypeInference.inferSchema(BeanA.class);
@@ -114,13 +114,13 @@ for (int i = 0; i < 10; i++) {
 return arrowWriter.finishAsRecordBatch();
 ```
 
-## 支持接口与继承类型
+## Support for Interface and Extension Types
 
-Fury 现已支持 Java `interface` 类型和子类（`extends`）类型的行格式映射，带来更动态和灵活的数据 schema。
+Fory now supports row format mapping for Java `interface` types and subclassed (`extends`) types, enabling more dynamic and flexible data schemas.
 
-相关增强见 [#2243](https://github.com/apache/fury/pull/2243)、[#2250](https://github.com/apache/fury/pull/2250)、[#2256](https://github.com/apache/fury/pull/2256)。
+These enhancements were introduced in [#2243](https://github.com/apache/fory/pull/2243), [#2250](https://github.com/apache/fory/pull/2250), and [#2256](https://github.com/apache/fory/pull/2256).
 
-### 示例：接口类型的 RowEncoder 映射
+### Example: Interface Mapping with RowEncoder
 
 ```java
 public interface Animal {
@@ -136,7 +136,7 @@ public class Dog implements Animal {
   }
 }
 
-// 使用 RowEncoder 以接口类型编码和解码
+// Encode and decode using RowEncoder with interface type
 RowEncoder<Animal> encoder = Encoders.bean(Animal.class);
 Dog dog = new Dog();
 dog.name = "Bingo";
@@ -146,7 +146,7 @@ System.out.println(decoded.speak()); // Woof
 
 ```
 
-### 示例：继承类型的 RowEncoder 映射
+### Example: Extension Type with RowEncoder
 
 ```java
 public class Parent {
@@ -157,7 +157,7 @@ public class Child extends Parent {
     public String childField;
 }
 
-// 使用 RowEncoder 以父类类型编码和解码
+// Encode and decode using RowEncoder with parent class type
 RowEncoder<Parent> encoder = Encoders.bean(Parent.class);
 Child child = new Child();
 child.parentField = "Hello";
@@ -167,7 +167,7 @@ Parent decoded = encoder.fromRow(row);
 
 ```
 
-Python 示例：
+Python:
 
 ```python
 import pyfory
@@ -176,7 +176,7 @@ encoder.to_arrow_record_batch([foo] * 10000)
 encoder.to_arrow_table([foo] * 10000)
 ```
 
-C++ 示例：
+C++
 
 ```c++
 std::shared_ptr<ArrowWriter> arrow_writer;

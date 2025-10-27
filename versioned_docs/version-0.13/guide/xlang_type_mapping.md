@@ -1,5 +1,5 @@
 ---
-title: 跨语言类型映射
+title: Type Mapping of Xlang Serialization
 sidebar_position: 7
 id: xlang_type_mapping
 license: |
@@ -19,13 +19,13 @@ license: |
   limitations under the License.
 ---
 
-注意：
+Note:
 
-- 类型定义请参见 [规范中的类型系统](/specification/xlang_serialization_spec.md#type-systems)
-- `int16_t[n]/vector<T>` 表示 `int16_t[n]/vector<int16_t>`
-- 跨语言序列化功能尚不稳定，请勿在生产环境中使用。
+- For type definition, see [Type Systems in Spec](../specification/xlang_serialization_spec.md#type-systems)
+- `int16_t[n]/vector<T>` indicates `int16_t[n]/vector<int16_t>`
+- The cross-language serialization is not stable, do not use it in your production environment.
 
-## 类型映射
+## Type Mapping
 
 | Fory Type               | Fory Type ID | Java            | Python                            | Javascript      | C++                            | Golang           | Rust             |
 | ----------------------- | ------------ | --------------- | --------------------------------- | --------------- | ------------------------------ | ---------------- | ---------------- |
@@ -69,24 +69,26 @@ license: |
 | arrow record batch      | 38           | /               | /                                 | /               | /                              | /                | /                |
 | arrow table             | 39           | /               | /                                 | /               | /                              | /                | /                |
 
-## 类型信息（当前未实现）
+## Type info(not implemented currently)
 
-由于各语言的类型系统存在差异，某些类型无法做到一一映射。
+Due to differences between type systems of languages, those types can't be mapped one-to-one between languages.
 
-如果用户发现某一语言的类型在 Fory 类型系统中对应多个类型，例如 Java 中的 `long` 对应 `int64/varint64/sliint64`，这意味着该语言缺少某些类型，用户在使用 Fory 时需要额外提供类型信息。
+If the user notices that one type on a language corresponds to multiple types in Fory type systems, for example, `long`
+in java has type `int64/varint64/sliint64`, it means the language lacks some types, and the user must provide extra type
+info when using Fory.
 
-## 类型注解
+## Type annotation
 
-如果类型是另一个类的字段，用户可以为类型的字段或整个类型提供元信息提示。
-这些信息在其他语言中也可以提供：
+If the type is a field of another class, users can provide meta hints for fields of a type, or for the whole type.
+Such information can be provided in other languages too:
 
-- Java：使用 annotation。
-- C++：使用宏和模板。
-- Golang：使用 struct tag。
-- Python：使用 typehint。
-- Rust：使用宏。
+- java: use annotation.
+- cpp: use macro and template.
+- golang: use struct tag.
+- python: use typehint.
+- rust: use macro.
 
-示例：
+Here is en example:
 
 - Java:
 
@@ -106,8 +108,9 @@ license: |
       f2: List[Int32Type(varint=True)]
   ```
 
-## 类型包装器
+## Type wrapper
 
-如果类型不是类的字段，用户必须用 Fory 类型包装该类型以传递额外的类型信息。
+If the type is not a field of a class, the user must wrap this type with a Fory type to pass the extra type info.
 
-例如，假设 Fory Java 提供了 `VarInt64` 类型，当用户调用 `fory.serialize(long_value)` 时，需要这样调用：`fory.serialize(new VarInt64(long_value))`。
+For example, suppose Fory Java provide a `VarInt64` type, when a user invoke `fory.serialize(long_value)`, he need to
+invoke like `fory.serialize(new VarInt64(long_value))`.
