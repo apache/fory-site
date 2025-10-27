@@ -149,10 +149,6 @@ Such information can be provided in other languages too:
 All internal data types are expressed using an ID in range `0~64`. Users can use `0~4096` for representing their
 types.
 
-### Type mapping
-
-See [Type mapping](../guide/xlang_type_mapping.md)
-
 ## Spec overview
 
 Here is the overall format:
