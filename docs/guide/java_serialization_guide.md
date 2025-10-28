@@ -286,7 +286,7 @@ For Maven:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-simd</artifactId>
-  <version>0.13.0-SNAPSHOT</version>
+  <version>0.13.0</version>
 </dependency>
 ```
 
