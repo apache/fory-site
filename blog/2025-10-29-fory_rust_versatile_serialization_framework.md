@@ -439,14 +439,33 @@ We're actively seeking contributors for:
 
 ### Thread Safety
 
-`Fory` instances are **thread-safe**:
+`Fory` becomes fully thread-safe after registration is complete. Once every type is registered (which requires `&mut Fory`), wrap the instance in an `Arc` and freely share it across worker threads for concurrent serialization and deserialization.
 
 ```rust
+use fory::Fory;
+use std::{sync::Arc, thread};
+
 let mut fory = Fory::default();
-fory.register::<Item>(1000)?;
-let fory = Arc::new(fory);
-fory.serialize(&item);
-fory.deserialize(&bytes);
+fory.register::<Item>(1)?;
+let fory = Arc::new(fory); // `Fory` is Send + Sync once registration is done
+
+let item = Item::default();
+let handles: Vec<_> = (0..4)
+    .map(|_| {
+        let fory = Arc::clone(&fory);
+        let input = item.clone();
+        thread::spawn(move || {
+            let bytes = fory.serialize(&input);
+            let decoded: Item = fory.deserialize(&bytes).expect("valid data");
+            (bytes, decoded)
+        })
+    })
+    .collect();
+
+for handle in handles {
+    let (bytes, decoded) = handle.join().expect("thread finished");
+    // work with `bytes` / `decoded`
+}
 ```
 
 ### Error Handling
