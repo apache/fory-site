@@ -1,6 +1,6 @@
 # Introducing Apache Fory™ Rust: A Versatile Serialization Framework for the Modern Age
 
-**TL;DR**: Apache Fory Rust is now available—a blazingly-fast, cross-language serialization framework that delivers ultra-fast serialization performance while automatically handling circular references, trait objects, and schema evolution. Built with Rust's safety guarantees and zero-copy techniques, it's designed for developers who refuse to compromise between performance and developer experience.
+**TL;DR**: Apache Fory Rust is a blazingly-fast, cross-language serialization framework that delivers **ultra-fast serialization performance** while **automatically handling circular references, trait objects, and schema evolution**. Built with Rust's safety guarantees and zero-copy techniques, it's designed for developers who refuse to compromise between performance and developer experience.
 
 ---
 
@@ -9,7 +9,7 @@
 Every backend engineer has faced this moment: your application needs to serialize complex data structures such as nested objects, circular references, polymorphic types, and you're forced to choose between three bad options:
 
 1. **Fast but fragile**: Hand-rolled binary formats that break with schema changes
-2. **Flexible but slow**: JSON/Protocol Buffers with 10-100x performance overhead
+2. **Flexible but slow**: JSON/Protocol with 10x performance overhead
 3. **Complex and limiting**: Existing solutions that don't support your language's advanced features
 
 Apache Fory Rust eliminates this false choice. It's a serialization framework that delivers exceptional performance while automatically handling the complexities of modern applications—no IDL files, no manual schema management, no compromises.
@@ -33,33 +33,9 @@ let bytes = fory.serialize(&user);
 user = fory.deserialize(bytes)  # Just works!
 ```
 
-This isn't just convenient—it's transformative for microservices architectures where different teams use different languages.
+This isn't just convenient — it changes how we develop microservices architectures where different teams use different languages.
 
-### 2. **Zero-Copy Performance**
-
-Traditional serialization frameworks allocate memory for every object during deserialization. Apache Fory's **row format** enables zero-copy field access, reading data directly from the binary buffer:
-
-```rust
-use fory::{to_row, from_row};
-
-// Serialize to row format
-let row_data = to_row(&large_dataset);
-
-// Access fields WITHOUT full deserialization
-let row = from_row::<Dataset>(&row_data);
-let id = row.id();        // Direct memory read, zero allocation
-let name = row.name();    // Still zero allocation
-```
-
-**Performance characteristics**:
-
-- **Full deserialization**: Traditional → N allocations | Row format → 0 allocations
-- **Single field access**: Traditional → O(n) time | Row format → O(1) time
-- **Memory footprint**: Traditional → Full graph | Row format → Only accessed fields
-
-This makes Apache Fory ideal for analytics workloads, memory-mapped files, and high-throughput data pipelines.
-
-### 3. **Automatic Shared/Circular Reference Handling**
+### 2. **Automatic Shared/Circular Reference Handling**
 
 Most serialization frameworks panic when encountering circular references. Apache Fory tracks and preserves reference identity automatically:
 
@@ -120,7 +96,7 @@ assert!(Rc::ptr_eq(&decoded, &decoded.borrow().children[0].borrow().parent.upgra
 
 This isn't just a feature—it's essential for graph databases, object-relational mappers, and domain models.
 
-### 4. **Trait Object Serialization**
+### 3. **Trait Object Serialization**
 
 Rust's trait system enables powerful abstractions, but serializing `Box<dyn Trait>` is notoriously difficult. Apache Fory makes it trivial:
 
@@ -181,7 +157,7 @@ assert_eq!(unwrapped.name, "Rex");
 
 This unlocks plugin systems, heterogeneous collections, and extensible architectures that were previously impossible to serialize.
 
-### 5. **Schema Evolution Without Breaking Changes**
+### 4. **Schema Evolution Without Breaking Changes**
 
 Microservices evolve independently. Apache Fory's **Compatible mode** allows schema changes without coordination:
 
@@ -415,29 +391,6 @@ Register types with **consistent IDs or names** across all languages:
 
 - **By ID** (`fory.register::<User>(1)`): Faster serialization, more compact encoding, but requires coordination to avoid ID conflicts
 - **By name** (`fory.register_by_name::<User>("example.User")`): More flexible, less prone to conflicts, easier to manage across teams, but slightly larger encoding
-
-### Row Format for Analytics
-
-```rust
-use fory::{to_row, from_row, ForyRow};
-
-#[derive(ForyRow)]
-struct LogEntry {
-    timestamp: i64,
-    user_id: i64,
-    event_type: String,
-    metadata: HashMap<String, String>,
-}
-
-// Serialize to row format
-let row_data = to_row(&log);
-
-// Zero-copy field access
-let row = from_row::<LogEntry>(&row_data);
-if row.event_type() == "error" {
-    process_error(row.user_id(), row.metadata());
-}
-```
 
 ## Supported Types
 
