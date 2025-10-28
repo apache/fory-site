@@ -1,4 +1,9 @@
-# Introducing Apache Fory™ Rust: A Versatile Serialization Framework for the Modern Age
+---
+slug: fory_rust_versatile_serialization_framework
+title: Introducing Apache Fory™ Rust: A Versatile Serialization Framework for the Modern Age
+authors: [chaokunyang]
+tags: [fory, rust]
+---
 
 **TL;DR**: Apache Fory Rust is a blazingly-fast, cross-language serialization framework that delivers **ultra-fast serialization performance** while **automatically handling circular references, trait objects, and schema evolution**. Built with Rust's safety guarantees and zero-copy techniques, it's designed for developers who refuse to compromise between performance and developer experience.
 
