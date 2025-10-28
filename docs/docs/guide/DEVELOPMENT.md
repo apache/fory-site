@@ -147,3 +147,5 @@ prettier --write "**/*.md"
 ## Contributing
 
 For more information, please refer to [How to contribute to Apache Fory™](https://github.com/apache/fory/blob/main/CONTRIBUTING.md).
+
+See [AGENTS](https://github.com/apache/fory/blob/main/AGENTS.md) for detailed guidelines and best practices for AI coding agents working on the Apache Fory codebase.
