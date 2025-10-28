@@ -321,7 +321,7 @@ This modular design ensures clean separation of concerns and makes the codebase 
    - Rich object graphs with shared references
 
 4. **Real-time systems**
-   - Low-latency requirements (<1ms serialization)
+   - Low-latency requirements (`<1ms` serialization)
    - Memory-mapped file access
    - Zero-copy deserialization critical
 
