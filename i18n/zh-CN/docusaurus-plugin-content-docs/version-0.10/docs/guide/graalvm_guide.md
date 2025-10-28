@@ -1,7 +1,7 @@
 ---
 title: GraalVM 指南
 sidebar_position: 6
-id: graalvm_guide
+id: graalvm_serialization
 ---
 
 ## GraalVM Native Image 介绍

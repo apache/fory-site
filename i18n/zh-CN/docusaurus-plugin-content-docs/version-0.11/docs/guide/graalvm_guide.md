@@ -1,7 +1,7 @@
 ---
 title: GraalVM 序列化
 sidebar_position: 6
-id: graalvm_guide
+id: graalvm_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

@@ -1,7 +1,7 @@
 ---
 title: Java 序列化指南
 sidebar_position: 0
-id: java_object_graph_guide
+id: java_serialization
 ---
 
 ## Java 对象图序列化

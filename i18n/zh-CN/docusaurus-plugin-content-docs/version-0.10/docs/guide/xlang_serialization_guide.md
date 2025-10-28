@@ -1,7 +1,7 @@
 ---
 title: 多语言序列化指南
 sidebar_position: 2
-id: xlang_object_graph_guide
+id: xlang_serialization
 ---
 
 ## 跨语言对象图序列化

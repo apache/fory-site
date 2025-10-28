@@ -1,6 +1,6 @@
 {
   "version.label": {
-    "message": "dev版本",
+    "message": "dev",
     "description": "The label for version current"
   },
   "sidebar.docsSidebar.category.Introduction": {
