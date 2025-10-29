@@ -104,7 +104,7 @@ Enterprise-grade security and compatibility:
 
 ## Rust Features
 
-## 🚀 Why Apache Fory™ Rust?
+### 🚀 Why Apache Fory™ Rust?
 
 - **🔥 Blazingly Fast**: Zero-copy deserialization and optimized binary protocols
 - **🌍 Cross-Language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
@@ -171,3 +171,61 @@ High-performance **row format** for zero-copy deserialization. Unlike traditiona
 - **Memory-mapped files**: Work with data larger than RAM
 - **Cache-friendly**: Sequential memory layout for better CPU cache utilization
 - **Lazy evaluation**: Defer expensive operations until field access
+
+## Scala Features
+
+### Supported Types
+
+Apache Fory™ supports all scala object serialization:
+
+- `case` class serialization supported
+- `pojo/bean` class serialization supported
+- `object` singleton serialization supported
+- `collection` serialization supported
+- other types such as `tuple/either` and basic types are all supported too.
+
+Scala 2 and 3 are both supported.
+
+### Scala Class Default Values Support
+
+Fory supports Scala class default values during deserialization when using compatible mode. This feature enables forward/backward compatibility when case classes or regular Scala classes have default parameters.
+
+When a Scala class has default parameters, the Scala compiler generates methods in the companion object (for case classes) or in the class itself (for regular Scala classes) like `apply$default$1`, `apply$default$2`, etc. that return the default values. Fory can detect these methods and use them when deserializing objects where certain fields are missing from the serialized data.
+
+## Kotlin Features
+
+### Supported Types:
+
+- primitives: `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double`, `UByte`, `UShort`, `UInt`, `ULong`.
+- `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double` works out of the box with the default fory java implementation.
+- stdlib `collection`: `ArrayDeque`, `ArrayList`, `HashMap`,`HashSet`, `LinkedHashSet`, `LinkedHashMap`.
+- `ArrayList`, `HashMap`,`HashSet`, `LinkedHashSet`, `LinkedHashMap` works out of the box with the default fory java implementation.
+- `String` works out of the box with the default fory java implementation.
+- arrays: `Array`, `BooleanArray`, `ByteArray`, `CharArray`, `DoubleArray`, `FloatArray`, `IntArray`, `LongArray`, `ShortArray`
+- all standard array types work out of the box with the default fory java implementation.
+- unsigned arrays: `UByteArray`, `UShortArray`, `UIntArray`, `ULongArray`
+- from stdlib: `Pair`, `Triple`, `Result`
+- kotlin.random: `Random`
+- kotlin.ranges: `CharRange`, `CharProgression`, `IntRange`, `IntProgression`, `LongRange`, `LongProgression`, `UintRange`, `UintProgression`, `ULongRange`, `ULongProgression`
+- kotlin.text: `Regex`
+- kotlin.time: `Duration`
+- kotlin.uuid: `Uuid`
+
+Additional support is added for the following classes in kotlin:
+
+- Unsigned primitives: `UByte`, `UShort`, `UInt`, `ULong`
+- Unsigned array types: `UByteArray`, `UShortArray`, `UIntArray`, `ULongArray`
+- Empty collections: `emptyList`, `emptyMap`, `emptySet`
+- Collections: `ArrayDeque`
+- kotlin.time: `Duration`
+- kotlin.uuid: `Uuid`
+
+### Data Class Default Value Support
+
+Apache Fory™ Kotlin provides support for Kotlin data class default values during serialization and deserialization. This feature allows for backward and forward compatibility when data class schemas evolve.
+
+When a Kotlin data class has parameters with default values, Apache Fory™ can:
+
+1. **Detect default values** using Kotlin reflection
+2. **Apply default values** during deserialization when fields are missing from serialized data
+3. **Support schema evolution** by allowing new fields with defaults to be added without breaking existing serialized data
