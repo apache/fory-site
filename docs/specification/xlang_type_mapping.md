@@ -1,5 +1,5 @@
 ---
-title: Type Mapping of Xlang Serialization
+title: Xlang Type Mapping
 sidebar_position: 7
 id: xlang_type_mapping
 license: |
