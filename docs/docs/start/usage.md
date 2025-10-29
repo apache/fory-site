@@ -4,11 +4,13 @@ title: Usage
 sidebar_position: 1
 ---
 
-This section provides quick examples for getting started with Apache Fory™. For comprehensive guides, see the [Guide](../guide/).
+This section provides quick examples for getting started with Apache Fory™.
 
 ## Native Serialization
 
-**Always use native mode when working with a single language.** Native mode delivers optimal performance by avoiding the type metadata overhead required for cross-language compatibility. Xlang mode introduces additional metadata encoding costs and restricts serialization to types that are common across all supported languages. Language-specific types will be rejected during serialization in xlang-mode.
+**Always use native mode when working with a single language.** Native mode delivers optimal performance by avoiding the type metadata overhead required for cross-language compatibility.
+
+Xlang mode introduces additional metadata encoding costs and restricts serialization to types that are common across all supported languages. Language-specific types will be rejected during serialization in xlang-mode.
 
 ### Java Serialization
 
@@ -44,7 +46,7 @@ public class Example {
 }
 ```
 
-For detailed Java usage including compatibility modes, compression, and advanced features, see [Java Serialization Guide](docs/guide/java_serialization_guide.md) and [java/README.md](java/README.md).
+For detailed Java usage including compatibility modes, compression, and advanced features, see [Java Serialization Guide](docs/guide/java_serialization_guide.md).
 
 ### Python Serialization
 
@@ -129,7 +131,7 @@ fun main() {
 }
 ```
 
-For detailed Kotlin usage including null safety and default value support, see [kotlin/README.md](kotlin/README.md).
+For detailed Kotlin usage including null safety and default value support, see [kotlin/README.md](https://github.com/apache/fory/blob/main/kotlin/README.md).
 
 ## Cross-Language Serialization
 

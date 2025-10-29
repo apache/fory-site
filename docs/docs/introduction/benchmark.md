@@ -13,7 +13,7 @@ The following benchmarks compare Fory against popular Java serialization framewo
 
 **Test Classes**:
 
-- `Struct`: Class with [100 primitive fields](docs/benchmarks#Struct)
+- `Struct`: Class with [100 primitive fields](https://github.com/apache/fory/tree/main/docs/benchmarks#Struct)
 - `MediaContent`: Class from [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java)
 - `Sample`: Class from [Kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/master/benchmarks/src/main/java/com/esotericsoftware/kryo/benchmarks/data/Sample.java)
 
