@@ -134,9 +134,7 @@ Automatically tracks and preserves reference identity for shared objects using `
 
 ### Trait Object Serialization
 
-Polymorphic serialization through trait objects, enabling dynamic dispatch and type flexibility. This is essential for plugin systems, heterogeneous collections, and extensible architectures.
-
-**Supported trait object types:**
+Polymorphic serialization through trait objects, enabling dynamic dispatch and type flexibility. This is essential for plugin systems, heterogeneous collections, and extensible architectures. Supported trait object types:
 
 - `Box<dyn Trait>` - Owned trait objects
 - `Rc<dyn Trait>` - Reference-counted trait objects
@@ -194,7 +192,7 @@ When a Scala class has default parameters, the Scala compiler generates methods 
 
 ## Kotlin Features
 
-### Supported Types:
+### Supported Types
 
 - primitives: `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double`, `UByte`, `UShort`, `UInt`, `ULong`.
 - `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double` works out of the box with the default fory java implementation.
