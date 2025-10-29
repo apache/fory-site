@@ -1,5 +1,5 @@
 ---
-title: Java Serialization Guide
+title: Java Serialization
 sidebar_position: 0
 id: java_serialization
 license: |
