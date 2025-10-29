@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-# Apache Fory™ Python
+## Apache Fory™ Python
 
 **Apache Fory™** 是一个极速的多语言序列化框架，基于 **JIT 编译**和**零拷贝**技术，在保持易用性和安全性的同时提供**超高性能**。
 
