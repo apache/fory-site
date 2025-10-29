@@ -4,23 +4,9 @@ title: Introduction
 sidebar_position: 1
 ---
 
-<div align="center">
-  <img width="65%" alt="Apache Fory logo" src="docs/images/logo/fory-horizontal.png"><br>
-</div>
-
-[![Build Status](https://img.shields.io/github/actions/workflow/status/apache/fory/ci.yml?branch=main&style=for-the-badge&label=GITHUB%20ACTIONS&logo=github)](https://github.com/apache/fory/actions/workflows/ci.yml)
-[![Slack Channel](https://img.shields.io/badge/slack-join-3f0e40?logo=slack&style=for-the-badge)](https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw)
-[![X](https://img.shields.io/badge/@ApacheFory-follow-blue?logo=x&style=for-the-badge)](https://x.com/ApacheFory)
-[![Maven Version](https://img.shields.io/maven-central/v/org.apache.fory/fory-core?style=for-the-badge)](https://search.maven.org/#search|gav|1|g:"org.apache.fory"%20AND%20a:"fory-core")
-[![Crates.io](https://img.shields.io/crates/v/fory.svg?style=for-the-badge)](https://crates.io/crates/fory)
-[![PyPI](https://img.shields.io/pypi/v/pyfory.svg?logo=PyPI&style=for-the-badge)](https://pypi.org/project/pyfory/)
+<img width="65%" alt="Apache Fory logo" src="/img/navbar-logo.png"/>
 
 **Apache Fory™** is a blazingly-fast multi-language serialization framework powered by **JIT compilation**, **zero-copy** techniques, and **advanced code generation**, achieving up to **170x performance improvement** while maintaining simplicity and ease of use.
-
-<https://fory.apache.org>
-
-> [!IMPORTANT]
-> **Apache Fory™ was previously named as Apache Fury. For versions before 0.11, please use "fury" instead of "fory" in package names, imports, and dependencies, see [Fury Docs](https://fory.apache.org/docs/0.10/docs/introduction/) for how to use Fury in older versions**.
 
 ## Key Features
 
@@ -162,7 +148,3 @@ We welcome contributions! Please read our [Contributing Guide](https://github.co
 - 📊 Share benchmarks
 
 See [Development Guide](../guide/DEVELOPMENT.md) for build instructions and development workflow.
-
-## License
-
-Apache Fory™ is licensed under the [Apache License 2.0](LICENSE).

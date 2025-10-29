@@ -1,10 +1,10 @@
 ---
 id: features
 title: Features
-sidebar_position: 3
+sidebar_position: 2
 ---
 
-## Key Features
+## Core Capabilities
 
 ### 🚀 High-Performance Serialization
 
@@ -114,11 +114,9 @@ Enterprise-grade security and compatibility:
 - **📦 Schema Evolution**: Compatible mode for independent schema changes
 - **⚡ Two Modes**: Object graph serialization and zero-copy row-based format
 
-### 1. Object Graph Serialization
+### Object Graph Serialization
 
-Apache Fory™ provides automatic serialization of complex object graphs, preserving the structure and relationships between objects. The `#[derive(ForyObject)]` macro generates efficient serialization code at compile time, eliminating runtime overhead.
-
-**Key capabilities:**
+Automatic serialization of complex object graphs, preserving the structure and relationships between objects. The `#[derive(ForyObject)]` macro generates efficient serialization code at compile time, eliminating runtime overhead:
 
 - Nested struct serialization with arbitrary depth
 - Collection types (Vec, HashMap, HashSet, BTreeMap)
@@ -126,17 +124,17 @@ Apache Fory™ provides automatic serialization of complex object graphs, preser
 - Automatic handling of primitive types and strings
 - Efficient binary encoding with variable-length integers
 
-### 2. Shared and Circular References
+### Shared and Circular References
 
-Apache Fory™ automatically tracks and preserves reference identity for shared objects using `Rc<T>` and `Arc<T>`. When the same object is referenced multiple times, Fory serializes it only once and uses reference IDs for subsequent occurrences. This ensures:
+Automatically tracks and preserves reference identity for shared objects using `Rc<T>` and `Arc<T>`. When the same object is referenced multiple times, Fory serializes it only once and uses reference IDs for subsequent occurrences. This ensures:
 
 - **Space efficiency**: No data duplication in serialized output
 - **Reference identity preservation**: Deserialized objects maintain the same sharing relationships
 - **Circular reference support**: Use `RcWeak<T>` and `ArcWeak<T>` to break cycles
 
-### 3. Trait Object Serialization
+### Trait Object Serialization
 
-Apache Fory™ supports polymorphic serialization through trait objects, enabling dynamic dispatch and type flexibility. This is essential for plugin systems, heterogeneous collections, and extensible architectures.
+Polymorphic serialization through trait objects, enabling dynamic dispatch and type flexibility. This is essential for plugin systems, heterogeneous collections, and extensible architectures.
 
 **Supported trait object types:**
 
@@ -145,11 +143,9 @@ Apache Fory™ supports polymorphic serialization through trait objects, enablin
 - `Arc<dyn Trait>` - Thread-safe reference-counted trait objects
 - `Vec<Box<dyn Trait>>`, `HashMap<K, Box<dyn Trait>>` - Collections of trait objects
 
-### 4. Schema Evolution
+### Schema Evolution
 
-Apache Fory™ supports schema evolution in **Compatible mode**, allowing serialization and deserialization peers to have different type definitions. This enables independent evolution of services in distributed systems without breaking compatibility.
-
-**Features:**
+Schema evolution in **Compatible mode**, allowing serialization and deserialization peers to have different type definitions. This enables independent evolution of services in distributed systems without breaking compatibility:
 
 - Add new fields with default values
 - Remove obsolete fields (skipped during deserialization)
@@ -157,24 +153,7 @@ Apache Fory™ supports schema evolution in **Compatible mode**, allowing serial
 - Reorder fields (matched by name, not position)
 - Type-safe fallback to default values for missing fields
 
-**Compatibility rules:**
-
-- Field names must match (case-sensitive)
-- Type changes are not supported (except nullable/non-nullable)
-- Nested struct types must be registered on both sides
-
-### 5. Enum Support
-
-Apache Fory™ supports enums without data payloads (C-style enums). Each variant is assigned an ordinal value (0, 1, 2, ...) during serialization.
-
-**Features:**
-
-- Efficient varint encoding for ordinals
-- Schema evolution support in Compatible mode
-- Type-safe variant matching
-- Default variant support with `#[default]`
-
-### 6. Custom Serializers
+### Custom Serializers
 
 For types that don't support `#[derive(ForyObject)]`, implement the `Serializer` trait manually. This is useful for:
 
@@ -183,11 +162,9 @@ For types that don't support `#[derive(ForyObject)]`, implement the `Serializer`
 - Legacy data format compatibility
 - Performance-critical custom encoding
 
-### 7. Row-Based Serialization
+### Row-Based Serialization
 
-Apache Fory™ provides a high-performance **row format** for zero-copy deserialization. Unlike traditional object serialization that reconstructs entire objects in memory, row format enables **random access** to fields directly from binary data without full deserialization.
-
-**Key benefits:**
+High-performance **row format** for zero-copy deserialization. Unlike traditional object serialization that reconstructs entire objects in memory, row format enables **random access** to fields directly from binary data without full deserialization.
 
 - **Zero-copy access**: Read fields without allocating or copying data
 - **Partial deserialization**: Access only the fields you need
