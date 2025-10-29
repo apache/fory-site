@@ -97,7 +97,13 @@ const config: Config = {
   themeConfig: {
     metadata: [
       { 'http-equiv': 'Content-Security-Policy', content: "frame-src 'self' https://ghbtns.com/;" },
+      { property: 'og:image', content: 'https://fory.apache.org/img/logo.png' },
+      { property: 'og:image:width', content: '1500' },
+      { property: 'og:image:height', content: '1500' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:image', content: 'https://fory.apache.org/img/logo.png' },
     ],
+    image: 'img/logo.png',
     navbar: {
       title: '',
       logo: {
@@ -269,5 +275,4 @@ const config: Config = {
 };
 
 export default config;
-
 
