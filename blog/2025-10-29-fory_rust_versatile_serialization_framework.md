@@ -7,8 +7,10 @@ tags: [fory, rust]
 
 **TL;DR**: Apache Fory Rust is a blazingly-fast, cross-language serialization framework that delivers **ultra-fast serialization performance** while **automatically handling circular references, trait objects, and schema evolution**. Built with Rust's safety guarantees and zero-copy techniques, it's designed for developers who refuse to compromise between performance and developer experience.
 
-- Github Repo: https://github.com/apache/fory
-- Crate: https://crates.io/crates/fory
+- 🐙 GitHub: https://github.com/apache/fory
+- 📦 Crate: https://crates.io/crates/fory
+
+![Apache Fory Logo](https://fory.apache.org/img/navbar-logo.png)
 
 ---
 
