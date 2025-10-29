@@ -1,5 +1,5 @@
 ---
-title: Xlang Serialization Guide
+title: Xlang Serialization
 sidebar_position: 4
 id: xlang_serialization
 license: |

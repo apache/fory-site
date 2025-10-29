@@ -1,5 +1,5 @@
 ---
-title: GraalVM Guide
+title: GraalVM Serialization
 sidebar_position: 6
 id: graalvm_serialization
 license: |
