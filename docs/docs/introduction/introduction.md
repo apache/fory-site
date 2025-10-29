@@ -4,59 +4,165 @@ title: Introduction
 sidebar_position: 1
 ---
 
-Apache Fory™ is a blazing fast multi-language serialization framework powered by jit(just-in-time compilation) and zero-copy.
+<div align="center">
+  <img width="65%" alt="Apache Fory logo" src="docs/images/logo/fory-horizontal.png"><br>
+</div>
+
+[![Build Status](https://img.shields.io/github/actions/workflow/status/apache/fory/ci.yml?branch=main&style=for-the-badge&label=GITHUB%20ACTIONS&logo=github)](https://github.com/apache/fory/actions/workflows/ci.yml)
+[![Slack Channel](https://img.shields.io/badge/slack-join-3f0e40?logo=slack&style=for-the-badge)](https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw)
+[![X](https://img.shields.io/badge/@ApacheFory-follow-blue?logo=x&style=for-the-badge)](https://x.com/ApacheFory)
+[![Maven Version](https://img.shields.io/maven-central/v/org.apache.fory/fory-core?style=for-the-badge)](https://search.maven.org/#search|gav|1|g:"org.apache.fory"%20AND%20a:"fory-core")
+[![Crates.io](https://img.shields.io/crates/v/fory.svg?style=for-the-badge)](https://crates.io/crates/fory)
+[![PyPI](https://img.shields.io/pypi/v/pyfory.svg?logo=PyPI&style=for-the-badge)](https://pypi.org/project/pyfory/)
+
+**Apache Fory™** is a blazingly-fast multi-language serialization framework powered by **JIT compilation**, **zero-copy** techniques, and **advanced code generation**, achieving up to **170x performance improvement** while maintaining simplicity and ease of use.
+
+<https://fory.apache.org>
+
+> [!IMPORTANT]
+> **Apache Fory™ was previously named as Apache Fury. For versions before 0.11, please use "fury" instead of "fory" in package names, imports, and dependencies, see [Fury Docs](https://fory.apache.org/docs/0.10/docs/introduction/) for how to use Fury in older versions**.
+
+## Key Features
+
+### 🚀 High-Performance Serialization
+
+Apache Fory™ delivers exceptional performance through advanced optimization techniques:
+
+- **JIT Compilation**: Runtime code generation for Java eliminates virtual method calls and inlines hot paths
+- **Static Code Generation**: Compile-time code generation for Rust, C++, and Go delivers peak performance without runtime overhead
+- **Zero-Copy Operations**: Direct memory access without intermediate buffer copies; row format enables random access and partial serialization
+- **Intelligent Encoding**: Variable-length compression for integers and strings; SIMD acceleration for arrays (Java 16+)
+- **Meta Sharing**: Class metadata packing reduces redundant type information across serializations
+
+### 🌍 Cross-Language Serialization
+
+The **[xlang serialization format](docs/specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
+
+- **Automatic Type Mapping**: Intelligent conversion between language-specific types ([type mapping](docs/specification/xlang_type_mapping.md))
+- **Reference Preservation**: Shared and circular references work correctly across languages
+- **Polymorphism**: Objects serialize/deserialize with their actual runtime types
+- **Schema Evolution**: Optional forward/backward compatibility for evolving schemas
+- **Automatic Serialization**: No IDL or schema definitions required; serialize any object directly without code generation
+
+### 📊 Row Format
+
+A cache-friendly **[row format](docs/specification/row_format_spec.md)** optimized for analytics workloads:
+
+- **Zero-Copy Random Access**: Read individual fields without deserializing entire objects
+- **Partial Operations**: Selective field serialization and deserialization for efficiency
+- **Apache Arrow Integration**: Seamless conversion to columnar format for analytics pipelines
+- **Multi-Language**: Available in Java, Python, Rust and C++
+
+### 🔒 Security & Production-Readiness
+
+Enterprise-grade security and compatibility:
+
+- **Class Registration**: Whitelist-based deserialization control (enabled by default)
+- **Depth Limiting**: Protection against recursive object graph attacks
+- **Configurable Policies**: Custom class checkers and deserialization policies
+- **Platform Support**: Java 8-24, GraalVM native image, multiple OS platforms
 
 ## Protocols
 
-Different scenarios have different serialization requirements. Apache Fory™ designed and implemented
-multiple binary protocols for those requirements:
+Apache Fory™ implements multiple binary protocols optimized for different scenarios:
 
-- Cross-language object graph protocol:
-  - Cross-language serialize any object automatically, no need for IDL definition, schema compilation and object to/from protocol
-    conversion.
-  - Support shared reference and circular reference, no duplicate data or recursion error.
-  - Support object polymorphism.
-- Native java/python object graph protocol: highly-optimized based on type system of the language.
-- Row format protocol: a cache-friendly binary random access format, supports skipping serialization and partial serialization,
-  and can convert to column-format automatically.
+| Protocol                                                                  | Use Case                       | Key Features                                           |
+| ------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
+| **[Xlang Serialization](docs/specification/xlang_serialization_spec.md)** | Cross-language object exchange | Automatic serialization, references, polymorphism      |
+| **[Java Serialization](docs/specification/java_serialization_spec.md)**   | High-performance Java-only     | Drop-in JDK serialization replacement, 100x faster     |
+| **[Row Format](docs/specification/row_format_spec.md)**                   | Analytics and data processing  | Zero-copy random access, Arrow compatibility           |
+| **Python Native**                                                         | Python-specific serialization  | Pickle/cloudpickle replacement with better performance |
 
-New protocols can be added easily based on fory existing buffer, encoding, meta, codegen and other capabilities. All of those share same codebase, and the optimization for one protocol
-can be reused by another protocol.
+All protocols share the same optimized codebase, allowing improvements in one protocol to benefit others.
+
+## Documentation
+
+### User Guides
+
+| Guide                            | Description                                | Source                                                                  | Website                                                                             |
+| -------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Java Serialization**           | Comprehensive guide for Java serialization | [java_serialization_guide.md](docs/guide/java_serialization_guide.md)   | [📖 View](https://fory.apache.org/docs/docs/guide/java_serialization)               |
+| **Cross-Language Serialization** | Multi-language object exchange             | [xlang_serialization_guide.md](docs/guide/xlang_serialization_guide.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| **Row Format**                   | Zero-copy random access format             | [row_format_guide.md](docs/guide/row_format_guide.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
+| **Python**                       | Python-specific features and usage         | [python_guide.md](docs/guide/python_guide.md)                           | [📖 View](https://fory.apache.org/docs/docs/guide/python_serialization)             |
+| **Rust**                         | Rust implementation and patterns           | [rust_guide.md](docs/guide/rust_guide.md)                               | [📖 View](https://fory.apache.org/docs/docs/guide/rust_serialization)               |
+| **Scala**                        | Scala integration and best practices       | [scala_guide.md](docs/guide/scala_guide.md)                             | [📖 View](https://fory.apache.org/docs/docs/guide/scala_serialization)              |
+| **GraalVM**                      | Native image support and AOT compilation   | [graalvm_guide.md](docs/guide/graalvm_guide.md)                         | [📖 View](https://fory.apache.org/docs/docs/guide/graalvm_serialization)            |
+| **Development**                  | Building and contributing to Fory          | [DEVELOPMENT.md](docs/guide/DEVELOPMENT.md)                             | [📖 View](https://fory.apache.org/docs/docs/guide/development)                      |
+
+### Protocol Specifications
+
+| Specification           | Description                    | Source                                                                        | Website                                                                             |
+| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Xlang Serialization** | Cross-language binary protocol | [xlang_serialization_spec.md](docs/specification/xlang_serialization_spec.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| **Java Serialization**  | Java-optimized protocol        | [java_serialization_spec.md](docs/specification/java_serialization_spec.md)   | [📖 View](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
+| **Row Format**          | Row-based binary format        | [row_format_spec.md](docs/specification/row_format_spec.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
+| **Type Mapping**        | Cross-language type conversion | [xlang_type_mapping.md](docs/specification/xlang_type_mapping.md)             | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
 
 ## Compatibility
 
 ### Schema Compatibility
 
-Apache Fory™ java object graph serialization support class schema forward/backward compatibility. The serialization peer and deserialization peer can add/delete fields independently.
+Apache Fory™ supports class schema forward/backward compatibility across **Java, Python, Rust, and Golang**, enabling seamless schema evolution in production systems without requiring coordinated upgrades across all services. Fory provides two schema compatibility modes:
 
-We plan to add support cross-language serialization after [meta compression](https://github.com/apache/fory/issues/203) are finished.
+1. **Schema Consistent Mode (Default)**: Assumes identical class schemas between serialization and deserialization peers. This mode offers minimal serialization overhead, smallest data size, and fastest performance: ideal for stable schemas or controlled environments.
+
+2. **Compatible Mode**: Supports independent schema evolution with forward and backward compatibility. This mode enables field addition/deletion, limited type evolution, and graceful handling of schema mismatches. Enable using `withCompatibleMode(CompatibleMode.COMPATIBLE)` in Java, `compatible=True` in Python, `compatible_mode(true)` in Rust, or `NewFory(true)` in Go.
 
 ### Binary Compatibility
 
-We are still improving our protocols, binary compatibility are not ensured between fory releases for now. Please `shade` fory if you will upgrade fory in the future.
+**Current Status**: Binary compatibility is **not guaranteed** between Fory major releases as the protocol continues to evolve. However, compatibility **is guaranteed** between minor versions (e.g., 0.13.x).
 
-Binary compatibility will be ensured before fory 1.0.
+**Recommendations**:
+
+- Version your serialized data by Fory major version
+- Plan migration strategies when upgrading major versions
+- See [upgrade guide](docs/guide/java_serialization_guide.md#upgrade-fory) for details
+
+**Future**: Binary compatibility will be guaranteed starting from Fory 1.0 release.
 
 ## Security
 
-Static serialization such as row format are secure by nature. But dynamic object graph serialization supports deserialize unregistered types, which can introduce security risks.
+### Overview
 
-For example, the deserialization may invoke `init` constructor or `equals`/`hashCode` method, if the method body contains malicious code, the system will be at risks.
+Serialization security varies by protocol:
 
-Apache Fory™ provides a class registration mode option and enabled by default for this protocol, which allows deserializing trusted registered types or built-in types only for security.
+- **Row Format**: Secure with predefined schemas
+- **Object Graph Serialization** (Java/Python native): More flexible but requires careful security configuration
 
-Apache Fory™ provides a class registration option and enabled by default for such protocols, which allows only deserializing trusted registered types or built-in types. **Do not disable class registration or class registration checks unless you can ensure your environment is indeed secure**. We are not responsible for security if you disabled the class registration option.
+Dynamic serialization can deserialize arbitrary types, which may introduces risks. For example, the deserialization may invoke `init` constructor or `equals/hashCode` method, if the method body contains malicious code, the system will be at risk.
 
-## RoadMap
+Fory enables class registration **by default** for dynamic protocols, allowing only trusted registered types.
+**Do not disable class registration unless you can ensure your environment is secure**.
 
-- Meta compression, auto meta sharing and cross-language schema compatibility.
-- AOT Framework for c++/golang to generate code statically.
-- C++/Rust object graph serialization support
-- Golang/Rust/NodeJS row format support
-- ProtoBuffer compatibility support
-- Protocols for features and knowledge graph serialization
-- Continuously improve our serialization infrastructure for any new protocols
+If this option is disabled, you are responsible for serialization security. You should implement and configure a customized `ClassChecker` or `DeserializationPolicy` for fine-grained security control
 
-## How to Contribute
+To report security vulnerabilities in Apache Fory™, please follow the [ASF vulnerability reporting process](https://apache.org/security/#reporting-a-vulnerability).
 
-Please read the [CONTRIBUTING](https://github.com/apache/fory/blob/main/CONTRIBUTING.md) guide for instructions on how to contribute.
+## Community and Support
+
+### Getting Help
+
+- **Slack**: Join our [Slack workspace](https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw) for community discussions
+- **Twitter/X**: Follow [@ApacheFory](https://x.com/ApacheFory) for updates and announcements
+- **GitHub Issues**: Report bugs and request features at [apache/fory](https://github.com/apache/fory/issues)
+- **Mailing Lists**: Subscribe to Apache Fory mailing lists for development discussions
+
+### Contributing
+
+We welcome contributions! Please read our [Contributing Guide](https://github.com/apache/fory/blob/main/CONTRIBUTING.md) to get started.
+
+**Ways to Contribute**:
+
+- 🐛 Report bugs and issues
+- 💡 Propose new features
+- 📝 Improve documentation
+- 🔧 Submit pull requests
+- 🧪 Add test cases
+- 📊 Share benchmarks
+
+See [Development Guide](../guide/DEVELOPMENT.md) for build instructions and development workflow.
+
+## License
+
+Apache Fory™ is licensed under the [Apache License 2.0](LICENSE).
