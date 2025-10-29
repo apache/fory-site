@@ -1,11 +1,16 @@
 ---
 slug: fory_rust_versatile_serialization_framework
-title: Introducing Apache Fory™ Rust: A Versatile Serialization Framework for the Modern Age
+title: "Introducing Apache Fory™ Rust: A Versatile Serialization Framework for the Modern Age"
 authors: [chaokunyang]
 tags: [fory, rust]
 ---
 
 **TL;DR**: Apache Fory Rust is a blazingly-fast, cross-language serialization framework that delivers **ultra-fast serialization performance** while **automatically handling circular references, trait objects, and schema evolution**. Built with Rust's safety guarantees and zero-copy techniques, it's designed for developers who refuse to compromise between performance and developer experience.
+
+- 🐙 GitHub: https://github.com/apache/fory
+- 📦 Crate: https://crates.io/crates/fory
+
+![Apache Fory Logo](https://fory.apache.org/img/navbar-logo.png)
 
 ---
 
@@ -487,6 +492,12 @@ match fory.deserialize::<User>(&bytes) {
     Err(e) => log::error!("Deserialization failed: {}", e),
 }
 ```
+
+## Documentation
+
+- Apache Fory Rust Guide: [📖 View](https://fory.apache.org/docs/docs/guide/rust_serialization)
+- Apache Fory Rust API Doc: [📖 View](https://docs.rs/fory/latest/fory/)
+- Apache Fory Xlang Serialization Spec: [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec/)
 
 ## Community and Contribution
 
