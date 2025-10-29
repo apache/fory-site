@@ -1,18 +1,21 @@
 ---
 id: benchmark
 title: Benchmark
-sidebar_position: 2
+sidebar_position: 3
 ---
 
-Different serialization frameworks are suitable for different scenarios, and benchmark results here are for reference only.
-
-If you need to benchmark for your specific scenario, make sure all serialization frameworks are appropriately configured for that scenario.
-
-Dynamic serialization frameworks supports polymorphism and reference, which has more cost compared
-to static serialization frameworks, unless it uses the jit techniques as Apache Fory™ did.
-Since Apache Fory™ will generate code at runtime, please warm up before collecting benchmark statistics.
+> **Note**: Different serialization frameworks excel in different scenarios. Benchmark results are for reference only.
+> For your specific use case, conduct benchmarks with appropriate configurations and workloads.
 
 ## Java Benchmark
+
+The following benchmarks compare Fory against popular Java serialization frameworks. Charts labeled **"compatible"** show schema evolution mode with forward/backward compatibility enabled, while others show schema consistent mode where class schemas must match.
+
+**Test Classes**:
+
+- `Struct`: Class with [100 primitive fields](https://github.com/apache/fory/tree/main/docs/benchmarks#Struct)
+- `MediaContent`: Class from [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java)
+- `Sample`: Class from [Kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/master/benchmarks/src/main/java/com/esotericsoftware/kryo/benchmarks/data/Sample.java)
 
 ### Java Serialization
 
@@ -28,9 +31,13 @@ Since Apache Fory™ will generate code at runtime, please warm up before collec
 <img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
 <img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
 
-See [benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks) for more benchmarks about type forward/backward compatibility, off-heap support, zero-copy serialization.
+**Important**: Fory's runtime code generation requires proper warm-up for performance measurement:
+
+For additional benchmarks covering type forward/backward compatibility, off-heap support, and zero-copy serialization, see [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks).
 
 ## Rust Benchmark
+
+Fory Rust demonstrates competitive performance compared to other Rust serialization frameworks.
 
 <img src="/img/benchmarks/rust/company.png" width="90%"/>
 
