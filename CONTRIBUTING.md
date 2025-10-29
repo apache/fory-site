@@ -22,6 +22,16 @@ All updates about docs for [guide](https://github.com/apache/fory/tree/main/docs
 
 If you want to update those pages, please submit a PR to https://github.com/apache/fory.
 
+## How to lint doc
+
+```bash
+npm install -g markdownlint-cli2
+npm install -g prettier
+prettier --write "**/*.md"
+markdownlint-cli2 "**/*.md" "#node_modules" --fix
+markdownlint '**/*.md' --ignore node_modules
+```
+
 ## Write a blog
 
 If you want write a blog, or update other contents about the website, please submit PR to [this site repo](https://github.com/apache/fory-site).

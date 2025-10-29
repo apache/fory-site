@@ -18,7 +18,8 @@ license: |
   See the License for the specific language governing permissions and
   limitations under the License.
 ---
-# Apache Fory™ Rust
+
+## Apache Fory™ Rust
 
 [![Crates.io](https://img.shields.io/crates/v/fory.svg)](https://crates.io/crates/fory)
 [![Documentation](https://docs.rs/fory/badge.svg)](https://docs.rs/fory)

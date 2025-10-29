@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-# Apache Fory™ Python
+## Apache Fory™ Python
 
 **Apache Fory™** is a blazing fast multi-language serialization framework powered by **JIT compilation** and **zero-copy** techniques, providing up to **ultra-fast performance** while maintaining ease of use and safety.
 

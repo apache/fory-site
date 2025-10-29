@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-# Apache Fory™ Rust
+## Apache Fory™ Rust
 
 **Apache Fory™** 是一个极速的多语言序列化框架，由 **JIT 编译**和**零拷贝**技术驱动，在保持易用性和安全性的同时提供**超高性能**。
 
