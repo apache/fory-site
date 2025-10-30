@@ -1,5 +1,5 @@
 ---
-title: Row Format
+title: Row Format Guide
 sidebar_position: 5
 id: row_format
 license: |

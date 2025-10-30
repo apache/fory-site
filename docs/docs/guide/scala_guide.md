@@ -1,5 +1,5 @@
 ---
-title: Scala Serialization
+title: Scala Serialization Guide
 sidebar_position: 3
 id: scala_serialization
 license: |
