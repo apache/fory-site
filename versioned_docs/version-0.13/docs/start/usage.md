@@ -139,7 +139,7 @@ For detailed Kotlin usage including null safety and default value support, see [
 
 The following examples demonstrate serializing a `Person` object across Java and Rust. For other languages (Python, Go, JavaScript, etc.), simply set the language mode to `XLANG` and follow the same pattern.
 
-**Java**
+### Java
 
 ```java
 import org.apache.fory.*;
@@ -166,7 +166,7 @@ public class XlangExample {
 }
 ```
 
-**Rust**
+### Rust
 
 ```rust
 use fory::{Fory, ForyObject};
@@ -192,7 +192,46 @@ fn main() -> Result<(), Error> {
 }
 ```
 
-**Key Points for Cross-Language Serialization**:
+### Go
+
+```go
+type Person struct {
+  name: string
+  age: i32
+}
+fory := fory.NewFory(true)
+fory.Register(Person{}, 1)
+person := Person{"chaokunyang", 28}
+bytes, err := fory.Marshal(person)
+var p Person
+err = fory.Unmarshal(bytes, &p)
+```
+
+### JavaScript
+
+```javascript
+import Fory, { Type } from "@apache-fory/fory";
+
+/**
+ * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit, ensure that the version of Node is 20 or above.
+ * Experimental feature, installation success cannot be guaranteed at this moment
+ * If you are unable to install the module, replace it with `const hps = null;`
+ **/
+import hps from "@apache-fory/hps";
+
+// Now we describe data structures using JSON, but in the future, we will use more ways.
+const description = Type.object("example.Person", {
+  name: Type.string(),
+  age: Type.int32(),
+});
+const fory = new Fory({ hps });
+const { serialize, deserialize } = fory.registerSerializer(description);
+const input = serialize({ name: "chaokunyang", age: 28 });
+const result = deserialize(input);
+console.log(result);
+```
+
+### Key Points
 
 - Use `Language.XLANG` mode in all languages
 - Register types with **consistent IDs or names** across all languages:
