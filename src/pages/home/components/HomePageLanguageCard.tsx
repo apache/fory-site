@@ -45,7 +45,7 @@ export default function HomePageLanguageCard() {
                   key === "java"
                     ? "java-serialization"
                     : key === "more"
-                    ? "crosslanguage-serialization"
+                    ? "cross-language-serialization"
                     : key
                 ))
               }
