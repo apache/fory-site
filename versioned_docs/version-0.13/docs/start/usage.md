@@ -192,7 +192,7 @@ fn main() -> Result<(), Error> {
 }
 ```
 
-### Go
+### Golang
 
 ```go
 type Person struct {

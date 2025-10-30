@@ -120,6 +120,7 @@ Automatic serialization of complex object graphs, preserving the structure and r
 
 - Nested struct serialization with arbitrary depth
 - Collection types (Vec, HashMap, HashSet, BTreeMap)
+- Enum type support
 - Optional fields with `Option<T>`
 - Automatic handling of primitive types and strings
 - Efficient binary encoding with variable-length integers
