@@ -579,35 +579,91 @@ assert_eq!(person_v2.phone, None);
 
 ### 5. Enum Support
 
-Apache Fory™ supports enums without data payloads (C-style enums). Each variant is assigned an ordinal value (0, 1, 2, ...) during serialization.
+Apache Fory™ supports three types of enum variants with full schema evolution in Compatible mode:
+
+**Variant Types:**
+
+- **Unit**: C-style enums (`Status::Active`)
+- **Unnamed**: Tuple-like variants (`Message::Pair(String, i32)`)
+- **Named**: Struct-like variants (`Event::Click { x: i32, y: i32 }`)
 
 **Features:**
 
-- Efficient varint encoding for ordinals
-- Schema evolution support in Compatible mode
-- Type-safe variant matching
+- Efficient varint encoding for variant ordinals
+- Schema evolution support (add/remove variants, add/remove fields)
 - Default variant support with `#[default]`
+- Automatic type mismatch handling
 
 ```rust
-use fory::ForyObject;
+use fory::{Fory, ForyObject};
 
 #[derive(Default, ForyObject, Debug, PartialEq)]
-enum Status {
+enum Value {
     #[default]
-    Pending,
-    Active,
-    Inactive,
-    Deleted,
+    Null,
+    Bool(bool),
+    Number(f64),
+    Text(String),
+    Object { name: String, value: i32 },
 }
 
 let mut fory = Fory::default();
-fory.register::<Status>(1);
+fory.register::<Value>(1)?;
 
-let status = Status::Active;
-let bytes = fory.serialize(&status);
-let decoded: Status = fory.deserialize(&bytes)?;
-assert_eq!(status, decoded);
+let value = Value::Object { name: "score".to_string(), value: 100 };
+let bytes = fory.serialize(&value)?;
+let decoded: Value = fory.deserialize(&bytes)?;
+assert_eq!(value, decoded);
 ```
+
+#### Schema Evolution
+
+Compatible mode enables robust schema evolution with variant type encoding (2 bits):
+
+- `0b0` = Unit, `0b1` = Unnamed, `0b10` = Named
+
+```rust
+use fory::{Fory, ForyObject};
+
+// Old version
+#[derive(ForyObject)]
+enum OldEvent {
+    Click { x: i32, y: i32 },
+    Scroll { delta: f64 },
+}
+
+// New version - added field and variant
+#[derive(Default, ForyObject)]
+enum NewEvent {
+    #[default]
+    Unknown,
+    Click { x: i32, y: i32, timestamp: u64 },  // Added field
+    Scroll { delta: f64 },
+    KeyPress(String),  // New variant
+}
+
+let mut fory = Fory::builder().compatible().build();
+
+// Serialize with old schema
+let old_bytes = fory.serialize(&OldEvent::Click { x: 100, y: 200 })?;
+
+// Deserialize with new schema - timestamp gets default value (0)
+let new_event: NewEvent = fory.deserialize(&old_bytes)?;
+assert!(matches!(new_event, NewEvent::Click { x: 100, y: 200, timestamp: 0 }));
+```
+
+**Evolution capabilities:**
+
+- **Unknown variants** → Falls back to default variant
+- **Named variant fields** → Add/remove fields (missing fields use defaults)
+- **Unnamed variant elements** → Add/remove elements (extras skipped, missing use defaults)
+- **Variant type mismatches** → Automatically uses default value for current variant
+
+**Best practices:**
+
+- Always mark a default variant with `#[default]`
+- Named variants provide better evolution than unnamed
+- Use compatible mode for cross-version communication
 
 ### 6. Tuple Support
 
