@@ -188,20 +188,7 @@ assert!(Rc::ptr_eq(&decoded[0], &decoded[1]));
 assert!(Rc::ptr_eq(&decoded[1], &decoded[2]));
 ```
 
-For thread-safe shared references, use `Arc<T>`:
-
-```rust
-use std::sync::Arc;
-
-let shared = Arc::new(String::from("shared_value"));
-let data = vec![shared.clone(), shared.clone(), shared.clone()];
-
-let bytes = fory.serialize(&data);
-let decoded: Vec<Arc<String>> = fory.deserialize(&bytes)?;
-
-// Reference identity is preserved with Arc too
-assert!(Arc::ptr_eq(&decoded[0], &decoded[1]));
-```
+For thread-safe shared references, use `Arc<T>`.
 
 #### Circular References with Weak Pointers
 
