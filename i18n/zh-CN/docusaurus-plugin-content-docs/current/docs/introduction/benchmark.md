@@ -37,7 +37,7 @@ sidebar_position: 2
 
 <img src="/img/benchmarks/rust/system_data.png" width="90%"/>
 
-注意：结果取决于硬件、数据集和实现版本。有关如何自行运行性能测试的信息，请参阅 Fory Rust Benchmark 指南：https://github.com/apache/fory/blob/main/rust/benches/README.md
+注意：结果取决于硬件、数据集和实现版本。有关如何自行运行性能测试的信息，请参阅 Fory Rust Benchmark 指南：https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
 
 ## JavaScript 性能测试
 
