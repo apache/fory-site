@@ -45,7 +45,7 @@ Fory Rust demonstrates competitive performance compared to other Rust serializat
 
 <img src="/img/benchmarks/rust/system_data.png" width="90%"/>
 
-Note: Results depend on hardware, dataset, and implementation versions. See the Rust guide for how to run benchmarks yourself: https://github.com/apache/fory/blob/main/rust/benches/README.md
+Note: Results depend on hardware, dataset, and implementation versions. See the Rust guide for how to run benchmarks yourself: https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
 
 ## JavaScript Benchmark
 
