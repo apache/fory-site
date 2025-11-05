@@ -959,8 +959,8 @@ Apache Fory™ Rust is designed for maximum performance:
 Run benchmarks:
 
 ```bash
-cd rust
-cargo bench --package fory-benchmarks
+cd benchmarks/rust_benchmark
+cargo bench
 ```
 
 ## 📖 Documentation
