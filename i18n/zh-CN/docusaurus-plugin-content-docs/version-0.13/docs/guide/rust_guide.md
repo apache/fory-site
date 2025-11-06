@@ -185,20 +185,11 @@ assert!(Rc::ptr_eq(&decoded[0], &decoded[1]));
 assert!(Rc::ptr_eq(&decoded[1], &decoded[2]));
 ```
 
-对于线程安全的共享引用，使用 `Arc<T>`：
+对于线程安全的共享引用，使用 `Arc<T>`。
 
-```rust
-use std::sync::Arc;
+#### 使用弱指针的循环引用
 
-let shared = Arc::new(String::from("shared_value"));
-let data = vec![shared.clone(), shared.clone(), shared.clone()];
-
-let bytes = fory.serialize(&data);
-let decoded: Vec<Arc<String>> = fory.deserialize(&bytes)?;
-
-// Arc 也保留引用标识
-assert!(Arc::ptr_eq(&decoded[0], &decoded[1]));
-```
+````
 
 #### 使用弱指针的循环引用
 
@@ -260,7 +251,7 @@ for child in &decoded.borrow().children {
     let upgraded_parent = child.borrow().parent.upgrade().unwrap();
     assert!(Rc::ptr_eq(&decoded, &upgraded_parent));
 }
-```
+````
 
 **使用 Arc 的线程安全循环图：**
 
@@ -576,37 +567,126 @@ assert_eq!(person_v2.phone, None);
 
 ### 5. 枚举支持
 
-Apache Fory™ 支持无数据载荷的枚举（C 风格枚举）。每个变体在序列化期间被分配一个序数值（0、1、2、...）。
+Apache Fory™ 支持三种枚举变体类型，并在兼容模式下完全支持 schema 演进：
+
+**变体类型：**
+
+- **Unit**：C 风格枚举（`Status::Active`）
+- **Unnamed**：类元组变体（`Message::Pair(String, i32)`）
+- **Named**：类结构体变体（`Event::Click { x: i32, y: i32 }`）
 
 **特性：**
 
-- 高效的 varint 编码序数
-- 兼容模式下的 schema 演进支持
-- 类型安全的变体匹配
+- 高效的 varint 编码变体序数
+- Schema 演进支持（添加/删除变体，添加/删除字段）
 - 使用 `#[default]` 的默认变体支持
+- 自动类型不匹配处理
 
 ```rust
-use fory::ForyObject;
+use fory::{Fory, ForyObject};
 
 #[derive(Default, ForyObject, Debug, PartialEq)]
-enum Status {
+enum Value {
     #[default]
-    Pending,
-    Active,
-    Inactive,
-    Deleted,
+    Null,
+    Bool(bool),
+    Number(f64),
+    Text(String),
+    Object { name: String, value: i32 },
 }
 
 let mut fory = Fory::default();
-fory.register::<Status>(1);
+fory.register::<Value>(1)?;
 
-let status = Status::Active;
-let bytes = fory.serialize(&status);
-let decoded: Status = fory.deserialize(&bytes)?;
-assert_eq!(status, decoded);
+let value = Value::Object { name: "score".to_string(), value: 100 };
+let bytes = fory.serialize(&value)?;
+let decoded: Value = fory.deserialize(&bytes)?;
+assert_eq!(value, decoded);
 ```
 
-### 6. 自定义序列化器
+#### Schema 演进
+
+兼容模式启用强大的 schema 演进，并使用变体类型编码（2 位）：
+
+- `0b0` = Unit，`0b1` = Unnamed，`0b10` = Named
+
+```rust
+use fory::{Fory, ForyObject};
+
+// 旧版本
+#[derive(ForyObject)]
+enum OldEvent {
+    Click { x: i32, y: i32 },
+    Scroll { delta: f64 },
+}
+
+// 新版本 - 添加了字段和变体
+#[derive(Default, ForyObject)]
+enum NewEvent {
+    #[default]
+    Unknown,
+    Click { x: i32, y: i32, timestamp: u64 },  // 添加了字段
+    Scroll { delta: f64 },
+    KeyPress(String),  // 新变体
+}
+
+let mut fory = Fory::builder().compatible().build();
+
+// 使用旧 schema 序列化
+let old_bytes = fory.serialize(&OldEvent::Click { x: 100, y: 200 })?;
+
+// 使用新 schema 反序列化 - timestamp 获得默认值 (0)
+let new_event: NewEvent = fory.deserialize(&old_bytes)?;
+assert!(matches!(new_event, NewEvent::Click { x: 100, y: 200, timestamp: 0 }));
+```
+
+**演进能力：**
+
+- **未知变体** → 回退到默认变体
+- **命名变体字段** → 添加/删除字段（缺失字段使用默认值）
+- **未命名变体元素** → 添加/删除元素（多余的被跳过，缺失的使用默认值）
+- **变体类型不匹配** → 自动使用当前变体的默认值
+
+**最佳实践：**
+
+- 始终使用 `#[default]` 标记默认变体
+- 命名变体比未命名变体提供更好的演进能力
+- 跨版本通信时使用兼容模式
+
+### 6. 元组支持
+
+Apache Fory™ 原生支持最多 22 个元素的元组，在兼容和非兼容模式下都能高效序列化。
+
+**特性：**
+
+- 自动序列化 1 到 22 个元素的元组
+- 异构类型支持（每个元素可以是不同类型）
+- 兼容模式下的 schema 演进（处理缺失/额外元素）
+
+**序列化模式：**
+
+1. **非兼容模式**：顺序序列化元素，无集合头，以实现最小开销
+2. **兼容模式**：使用带类型元数据的集合协议以支持 schema 演进
+
+```rust
+use fory::{Fory, Error};
+
+let mut fory = Fory::default();
+
+// 异构类型的元组
+let data: (i32, String, bool, Vec<i32>) = (
+    42,
+    "hello".to_string(),
+    true,
+    vec![1, 2, 3],
+);
+
+let bytes = fory.serialize(&data)?;
+let decoded: (i32, String, bool, Vec<i32>) = fory.deserialize(&bytes)?;
+assert_eq!(data, decoded);
+```
+
+### 7. 自定义序列化器
 
 对于不能使用 `#[derive(ForyObject)]` 的类型，手动实现 `Serializer` trait。这在以下情况下很有用：
 
@@ -865,7 +945,7 @@ fory.register::<MyStruct>(100);
 fory.register_by_namespace::<MyStruct>("com.example", "MyStruct");
 ```
 
-参见 [xlang_type_mapping.md](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) 了解跨语言的类型映射。
+参见 [xlang_type_mapping.md](https://fory.apache.org/docs/specification/xlang_type_mapping) 了解跨语言的类型映射。
 
 ## ⚡ 性能
 
@@ -880,8 +960,8 @@ Apache Fory™ Rust 设计追求最大性能：
 运行基准测试：
 
 ```bash
-cd rust
-cargo bench --package fory-benchmarks
+cd benchmarks/rust_benchmark
+cargo bench
 ```
 
 ## 📖 文档
