@@ -13,7 +13,7 @@ The latest source release is 0.13.1:
 
 | Version | Date       | Source                                                                                                                                                                                                                                                                                 | Release Notes                                                        |
 | ------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| 0.13.1  | 2025-09-23 | [source](https://www.apache.org/dyn/closer.lua/fory/0.13.1/apache-fory-0.13.1-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/0.13.1/apache-fory-0.13.1-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/0.13.1/apache-fory-0.13.1-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/0.13.1) |
+| 0.13.1  | 2025-09-23 | [source](https://www.apache.org/dyn/closer.lua/fory/0.13.1/apache-fory-0.13.1-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/0.13.1/apache-fory-0.13.1-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/0.13.1/apache-fory-0.13.1-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v0.13.1) |
 
 ## All archived releases
 
