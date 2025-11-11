@@ -1,7 +1,7 @@
 ---
-title: Java Serialization
+title: Java Serialization Guide
 sidebar_position: 0
-id: java_serialization
+id: java_object_graph_guide
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -286,7 +286,7 @@ For Maven:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-simd</artifactId>
-  <version>0.13.1-SNAPSHOT</version>
+  <version>0.13.0-SNAPSHOT</version>
 </dependency>
 ```
 
