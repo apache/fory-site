@@ -18,12 +18,22 @@ To add a dependency on Apache Fory™ using Maven, use the following:
   <artifactId>fory-core</artifactId>
   <version>0.13.2</version>
 </dependency>
-<!-- row/arrow format support -->
-<!-- <dependency>
+<!-- Optional row format support -->
+<!--
+<dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-format</artifactId>
-  <version>0.13.2</version>
-</dependency> -->
+  <version>0.13.1</version>
+</dependency>
+-->
+<!-- SIMD acceleration for array compression (Java 16+) -->
+<!--
+<dependency>
+  <groupId>org.apache.fory</groupId>
+  <artifactId>fory-simd</artifactId>
+  <version>0.13.1</version>
+</dependency>
+-->
 ```
 
 ## Scala
