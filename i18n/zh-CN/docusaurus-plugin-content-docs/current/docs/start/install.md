@@ -16,12 +16,22 @@ Apache Fory™ 源码下载请参见 Apache Fory™ [download](https://github.co
   <artifactId>fory-core</artifactId>
   <version>0.13.2</version>
 </dependency>
-<!-- row/arrow format support -->
-<!-- <dependency>
+<!-- Optional row format support -->
+<!--
+<dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-format</artifactId>
-  <version>0.13.2</version>
-</dependency> -->
+  <version>0.13.1</version>
+</dependency>
+-->
+<!-- SIMD acceleration for array compression (Java 16+) -->
+<!--
+<dependency>
+  <groupId>org.apache.fory</groupId>
+  <artifactId>fory-simd</artifactId>
+  <version>0.13.1</version>
+</dependency>
+-->
 ```
 
 ## 安装 Apache Fory™ Scala
