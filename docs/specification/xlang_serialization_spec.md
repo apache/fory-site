@@ -60,7 +60,7 @@ This specification defines the Fory xlang binary format. The format is dynamic r
 - named_ext: an `ext` type whose type mapping will be encoded as a name.
 - list: a sequence of objects.
 - set: an unordered set of unique elements.
-- map: a map of key-value pairs. Mutable types such as `list/map/set/array/tensor` are not allowed as key of map.
+- map: a map of key-value pairs. Mutable types such as `list/map/set/array` are not allowed as key of map.
 - duration: an absolute length of time, independent of any calendar/timezone, as a count of nanoseconds.
 - timestamp: a point in time, independent of any calendar/timezone, as a count of nanoseconds. The count is relative
   to an epoch at UTC midnight on January 1, 1970.
@@ -77,7 +77,8 @@ This specification defines the Fory xlang binary format. The format is dynamic r
   - float16_array: one dimensional half_float_16 array.
   - float32_array: one dimensional float32 array.
   - float64_array: one dimensional float64 array.
-- tensor: multidimensional array which every sub-array have same size and type.
+- union: a tagged union type that can hold one of several alternative types. The active alternative is identified by an index.
+- none: represents an empty/unit value with no data (e.g., for empty union alternatives).
 
 Note:
 
@@ -186,7 +187,8 @@ custom types (struct/ext/enum). User type IDs are in a separate namespace and co
 | 35      | FLOAT16_ARRAY           | 1D float16 array                                    |
 | 36      | FLOAT32_ARRAY           | 1D float32 array                                    |
 | 37      | FLOAT64_ARRAY           | 1D float64 array                                    |
-| 38      | TENSOR                  | Multi-dimensional array                             |
+| 38      | UNION                   | Tagged union type (one of several alternatives)     |
+| 39      | NONE                    | Empty/unit type (no data)                           |
 
 #### Type ID Encoding for User Types
 
