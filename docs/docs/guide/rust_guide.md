@@ -252,55 +252,6 @@ for child in &decoded.borrow().children {
 }
 ```
 
-**Thread-Safe Circular Graphs with Arc:**
-
-```rust
-use fory::{Fory, Error};
-use fory::ForyObject;
-use fory::ArcWeak;
-use std::sync::{Arc, Mutex};
-
-#[derive(ForyObject)]
-struct Node {
-    val: i32,
-    parent: ArcWeak<Mutex<Node>>,
-    children: Vec<Arc<Mutex<Node>>>,
-}
-
-let mut fory = Fory::default();
-fory.register::<Node>(6000);
-
-let parent = Arc::new(Mutex::new(Node {
-    val: 10,
-    parent: ArcWeak::new(),
-    children: vec![],
-}));
-
-let child1 = Arc::new(Mutex::new(Node {
-    val: 20,
-    parent: ArcWeak::from(&parent),
-    children: vec![],
-}));
-
-let child2 = Arc::new(Mutex::new(Node {
-    val: 30,
-    parent: ArcWeak::from(&parent),
-    children: vec![],
-}));
-
-parent.lock().unwrap().children.push(child1.clone());
-parent.lock().unwrap().children.push(child2.clone());
-
-let bytes = fory.serialize(&parent);
-let decoded: Arc<Mutex<Node>> = fory.deserialize(&bytes)?;
-
-assert_eq!(decoded.lock().unwrap().children.len(), 2);
-for child in &decoded.lock().unwrap().children {
-    let upgraded_parent = child.lock().unwrap().parent.upgrade().unwrap();
-    assert!(Arc::ptr_eq(&decoded, &upgraded_parent));
-}
-```
-
 ### 3. Trait Object Serialization
 
 Apache Fory™ supports polymorphic serialization through trait objects, enabling dynamic dispatch and type flexibility. This is essential for plugin systems, heterogeneous collections, and extensible architectures.
@@ -310,9 +261,10 @@ Apache Fory™ supports polymorphic serialization through trait objects, enablin
 - `Box<dyn Trait>` - Owned trait objects
 - `Rc<dyn Trait>` - Reference-counted trait objects
 - `Arc<dyn Trait>` - Thread-safe reference-counted trait objects
+- `Box<dyn Any>`/`Rc<dyn Any>`/`Arc<dyn Any>` - Any trait type objects
 - `Vec<Box<dyn Trait>>`, `HashMap<K, Box<dyn Trait>>` - Collections of trait objects
 
-#### Basic Trait Object Serialization
+**Basic Trait Object Serialization Example:**
 
 ```rust
 use fory::{Fory, register_trait_type};
@@ -365,141 +317,6 @@ let decoded: Zoo = fory.deserialize(&bytes)?;
 
 assert_eq!(decoded.star_animal.name(), "Buddy");
 assert_eq!(decoded.star_animal.speak(), "Woof!");
-```
-
-#### Serializing `dyn Any` Trait Objects
-
-Apache Fory™ supports serializing `Rc<dyn Any>` and `Arc<dyn Any>` for runtime type dispatch. This is useful when you need maximum flexibility and don't want to define a custom trait.
-
-**Key points:**
-
-- Works with any type that implements `Serializer`
-- Requires downcasting after deserialization to access the concrete type
-- Type information is preserved during serialization
-- Useful for plugin systems and dynamic type handling
-
-```rust
-use std::rc::Rc;
-use std::any::Any;
-
-let dog_rc: Rc<dyn Animal> = Rc::new(Dog {
-    name: "Rex".to_string(),
-    breed: "Golden".to_string()
-});
-
-// Convert to Rc<dyn Any> for serialization
-let dog_any: Rc<dyn Any> = dog_rc.clone();
-
-// Serialize the Any wrapper
-let bytes = fory.serialize(&dog_any);
-let decoded: Rc<dyn Any> = fory.deserialize(&bytes)?;
-
-// Downcast back to the concrete type
-let unwrapped = decoded.downcast_ref::<Dog>().unwrap();
-assert_eq!(unwrapped.name, "Rex");
-```
-
-For thread-safe scenarios, use `Arc<dyn Any>`:
-
-```rust
-use std::sync::Arc;
-use std::any::Any;
-
-let dog_arc: Arc<dyn Animal> = Arc::new(Dog {
-    name: "Buddy".to_string(),
-    breed: "Labrador".to_string()
-});
-
-// Convert to Arc<dyn Any>
-let dog_any: Arc<dyn Any> = dog_arc.clone();
-
-let bytes = fory.serialize(&dog_any);
-let decoded: Arc<dyn Any> = fory.deserialize(&bytes)?;
-
-// Downcast to concrete type
-let unwrapped = decoded.downcast_ref::<Dog>().unwrap();
-assert_eq!(unwrapped.name, "Buddy");
-```
-
-#### Rc/Arc-Based Trait Objects in Structs
-
-For fields with `Rc<dyn Trait>` or `Arc<dyn Trait>`, Fory automatically handles the conversion:
-
-```rust
-use std::sync::Arc;
-use std::rc::Rc;
-use std::collections::HashMap;
-
-#[derive(ForyObject)]
-struct AnimalShelter {
-    animals_rc: Vec<Rc<dyn Animal>>,
-    animals_arc: Vec<Arc<dyn Animal>>,
-    registry: HashMap<String, Arc<dyn Animal>>,
-}
-
-let mut fory = Fory::default().compatible(true);
-fory.register::<Dog>(100);
-fory.register::<Cat>(101);
-fory.register::<AnimalShelter>(102);
-
-let shelter = AnimalShelter {
-    animals_rc: vec![
-        Rc::new(Dog { name: "Rex".to_string(), breed: "Golden".to_string() }),
-        Rc::new(Cat { name: "Mittens".to_string(), color: "Gray".to_string() }),
-    ],
-    animals_arc: vec![
-        Arc::new(Dog { name: "Buddy".to_string(), breed: "Labrador".to_string() }),
-    ],
-    registry: HashMap::from([
-        ("pet1".to_string(), Arc::new(Dog {
-            name: "Max".to_string(),
-            breed: "Shepherd".to_string()
-        }) as Arc<dyn Animal>),
-    ]),
-};
-
-let bytes = fory.serialize(&shelter);
-let decoded: AnimalShelter = fory.deserialize(&bytes)?;
-
-assert_eq!(decoded.animals_rc[0].name(), "Rex");
-assert_eq!(decoded.animals_arc[0].speak(), "Woof!");
-```
-
-#### Standalone Trait Object Serialization
-
-Due to Rust's orphan rule, `Rc<dyn Trait>` and `Arc<dyn Trait>` cannot implement `Serializer` directly. For standalone serialization (not inside struct fields), the `register_trait_type!` macro generates wrapper types.
-
-**Note:** If you don't want to use wrapper types, you can serialize as `Rc<dyn Any>` or `Arc<dyn Any>` instead (see the `dyn Any` section above).
-
-The `register_trait_type!` macro generates `AnimalRc` and `AnimalArc` wrapper types:
-
-```rust
-// For Rc<dyn Trait>
-let dog_rc: Rc<dyn Animal> = Rc::new(Dog {
-    name: "Rex".to_string(),
-    breed: "Golden".to_string()
-});
-let wrapper = AnimalRc::from(dog_rc);
-
-let bytes = fory.serialize(&wrapper);
-let decoded: AnimalRc = fory.deserialize(&bytes)?;
-
-// Unwrap back to Rc<dyn Animal>
-let unwrapped: Rc<dyn Animal> = decoded.unwrap();
-assert_eq!(unwrapped.name(), "Rex");
-
-// For Arc<dyn Trait>
-let dog_arc: Arc<dyn Animal> = Arc::new(Dog {
-    name: "Buddy".to_string(),
-    breed: "Labrador".to_string()
-});
-let wrapper = AnimalArc::from(dog_arc);
-
-let bytes = fory.serialize(&wrapper);
-let decoded: AnimalArc = fory.deserialize(&bytes)?;
-
-let unwrapped: Arc<dyn Animal> = decoded.unwrap();
-assert_eq!(unwrapped.name(), "Buddy");
 ```
 
 ### 4. Schema Evolution
@@ -601,42 +418,6 @@ let value = Value::Object { name: "score".to_string(), value: 100 };
 let bytes = fory.serialize(&value)?;
 let decoded: Value = fory.deserialize(&bytes)?;
 assert_eq!(value, decoded);
-```
-
-#### Schema Evolution
-
-Compatible mode enables robust schema evolution with variant type encoding (2 bits):
-
-- `0b0` = Unit, `0b1` = Unnamed, `0b10` = Named
-
-```rust
-use fory::{Fory, ForyObject};
-
-// Old version
-#[derive(ForyObject)]
-enum OldEvent {
-    Click { x: i32, y: i32 },
-    Scroll { delta: f64 },
-}
-
-// New version - added field and variant
-#[derive(Default, ForyObject)]
-enum NewEvent {
-    #[default]
-    Unknown,
-    Click { x: i32, y: i32, timestamp: u64 },  // Added field
-    Scroll { delta: f64 },
-    KeyPress(String),  // New variant
-}
-
-let mut fory = Fory::builder().compatible().build();
-
-// Serialize with old schema
-let old_bytes = fory.serialize(&OldEvent::Click { x: 100, y: 200 })?;
-
-// Deserialize with new schema - timestamp gets default value (0)
-let new_event: NewEvent = fory.deserialize(&old_bytes)?;
-assert!(matches!(new_event, NewEvent::Click { x: 100, y: 200, timestamp: 0 }));
 ```
 
 **Evolution capabilities:**
@@ -832,99 +613,6 @@ assert_eq!(prefs.values().get(0), "en");
 | Memory usage         | Full object graph in memory   | Only accessed fields in memory  |
 | Suitable for         | Small objects, full access    | Large objects, selective access |
 
-### 8. Thread-Safe Serialization
-
-Apache Fory™ Rust is fully thread-safe: `Fory` implements both `Send` and `Sync`, so one configured instance can be shared across threads for concurrent work. The internal read/write context pools are lazily initialized with thread-safe primitives, letting worker threads reuse buffers without coordination.
-
-```rust
-use fory::{Fory, Error};
-use fory::ForyObject;
-use std::sync::Arc;
-use std::thread;
-
-#[derive(ForyObject, Clone, Copy, Debug, PartialEq)]
-struct Item {
-    value: i32,
-}
-
-fn main() -> Result<(), Error> {
-    let mut fory = Fory::default();
-    fory.register::<Item>(1000)?;
-
-    let fory = Arc::new(fory);
-    let handles: Vec<_> = (0..8)
-        .map(|i| {
-            let shared = Arc::clone(&fory);
-            thread::spawn(move || {
-                let item = Item { value: i };
-                shared.serialize(&item)
-            })
-        })
-        .collect();
-
-    for handle in handles {
-        let bytes = handle.join().unwrap()?;
-        let item: Item = fory.deserialize(&bytes)?;
-        assert!(item.value >= 0);
-    }
-
-    Ok(())
-}
-```
-
-**Tip:** Perform registrations (such as `fory.register::<T>(id)`) before spawning threads so every worker sees the same metadata. Once configured, wrapping the instance in `Arc` is enough to fan out serialization and deserialization tasks safely.
-
-## 🔧 Supported Types
-
-### Primitive Types
-
-| Rust Type                 | Description     |
-| ------------------------- | --------------- |
-| `bool`                    | Boolean         |
-| `i8`, `i16`, `i32`, `i64` | Signed integers |
-| `f32`, `f64`              | Floating point  |
-| `String`                  | UTF-8 string    |
-
-### Collections
-
-| Rust Type        | Description        |
-| ---------------- | ------------------ |
-| `Vec<T>`         | Dynamic array      |
-| `VecDeque<T>`    | Double-ended queue |
-| `LinkedList<T>`  | Doubly-linked list |
-| `HashMap<K, V>`  | Hash map           |
-| `BTreeMap<K, V>` | Ordered map        |
-| `HashSet<T>`     | Hash set           |
-| `BTreeSet<T>`    | Ordered set        |
-| `BinaryHeap<T>`  | Binary heap        |
-| `Option<T>`      | Optional value     |
-
-### Smart Pointers
-
-| Rust Type    | Description                                          |
-| ------------ | ---------------------------------------------------- |
-| `Box<T>`     | Heap allocation                                      |
-| `Rc<T>`      | Reference counting (shared refs tracked)             |
-| `Arc<T>`     | Thread-safe reference counting (shared refs tracked) |
-| `RcWeak<T>`  | Weak reference to `Rc<T>` (breaks circular refs)     |
-| `ArcWeak<T>` | Weak reference to `Arc<T>` (breaks circular refs)    |
-| `RefCell<T>` | Interior mutability (runtime borrow checking)        |
-| `Mutex<T>`   | Thread-safe interior mutability                      |
-
-### Date and Time
-
-| Rust Type               | Description                |
-| ----------------------- | -------------------------- |
-| `chrono::NaiveDate`     | Date without timezone      |
-| `chrono::NaiveDateTime` | Timestamp without timezone |
-
-### Custom Types
-
-| Macro                   | Description                |
-| ----------------------- | -------------------------- |
-| `#[derive(ForyObject)]` | Object graph serialization |
-| `#[derive(ForyRow)]`    | Row-based serialization    |
-
 ## 🌍 Cross-Language Serialization
 
 Apache Fory™ supports seamless data exchange across multiple languages:
@@ -965,9 +653,11 @@ cargo bench
 
 ## 📖 Documentation
 
+- **[User Guide](https://fory.apache.org/docs/next/docs/guide/rust)** - Comprehensive User documents
 - **[API Documentation](https://docs.rs/fory)** - Complete API reference
 - **[Protocol Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec)** - Serialization protocol details
-- **[Type Mapping](https://fory.apache.org/docs/docs/guide/xlang_type_mapping)** - Cross-language type mappings
+- **[Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping)** - Cross-language type mappings
+- **[Source](https://github.com/apache/fory/tree/main/docs/guide/rust)** - Source code for doc
 
 ## 🎯 Use Cases
 
@@ -986,92 +676,6 @@ cargo bench
 - Memory-constrained environments
 - Real-time data streaming applications
 - Zero-copy scenarios
-
-## 🏗️ Architecture
-
-The Rust implementation consists of three main crates:
-
-```
-fory/                   # High-level API
-├── src/lib.rs         # Public API exports
-
-fory-core/             # Core serialization engine
-├── src/
-│   ├── fory.rs       # Main serialization entry point
-│   ├── buffer.rs     # Binary buffer management
-│   ├── serializer/   # Type-specific serializers
-│   ├── resolver/     # Type resolution and metadata
-│   ├── meta/         # Meta string compression
-│   ├── row/          # Row format implementation
-│   └── types.rs      # Type definitions
-
-fory-derive/           # Procedural macros
-├── src/
-│   ├── object/       # ForyObject macro
-│   └── fory_row.rs  # ForyRow macro
-```
-
-## 🔄 Serialization Modes
-
-Apache Fory™ supports two serialization modes:
-
-### SchemaConsistent Mode (Default)
-
-Type declarations must match exactly between peers:
-
-```rust
-let fory = Fory::default(); // SchemaConsistent by default
-```
-
-### Compatible Mode
-
-Allows independent schema evolution:
-
-```rust
-let fory = Fory::default().compatible(true);
-```
-
-## ⚙️ Configuration
-
-### Maximum Dynamic Object Nesting Depth
-
-Apache Fory™ provides protection against stack overflow from deeply nested dynamic objects during deserialization. By default, the maximum nesting depth is set to 5 levels for trait objects and containers.
-
-**Default configuration:**
-
-```rust
-let fory = Fory::default(); // max_dyn_depth = 5
-```
-
-**Custom depth limit:**
-
-```rust
-let fory = Fory::default().max_dyn_depth(10); // Allow up to 10 levels
-```
-
-**When to adjust:**
-
-- **Increase**: For legitimate deeply nested data structures
-- **Decrease**: For stricter security requirements or shallow data structures
-
-**Protected types:**
-
-- `Box<dyn Any>`, `Rc<dyn Any>`, `Arc<dyn Any>`
-- `Box<dyn Trait>`, `Rc<dyn Trait>`, `Arc<dyn Trait>` (trait objects)
-- `RcWeak<T>`, `ArcWeak<T>`
-- Collection types (Vec, HashMap, HashSet)
-- Nested struct types in Compatible mode
-
-Note: Static data types (non-dynamic types) are secure by nature and not subject to depth limits, as their structure is known at compile time.
-
-## 🧪 Troubleshooting
-
-- **Type registry errors**: An error like `TypeId ... not found in type_info registry` means the type was never registered with the current `Fory` instance. Confirm that every serializable struct or trait implementation calls `fory.register::<T>(type_id)` before serialization and that the same IDs are reused on the deserialize side.
-- **Quick error lookup**: Prefer the static constructors on `fory_core::error::Error` (`Error::type_mismatch`, `Error::invalid_data`, `Error::unknown`, etc.) rather than instantiating variants manually. This keeps diagnostics consistent and makes opt-in panics work.
-- **Panic on error for backtraces**: Toggle `FORY_PANIC_ON_ERROR=1` (or `true`) alongside `RUST_BACKTRACE=1` when running tests or binaries to panic at the exact site an error is constructed. Reset the variable afterwards to avoid aborting user-facing code paths.
-- **Struct field tracing**: Add the `#[fory(debug)]` attribute (or `#[fory(debug = true)]`) alongside `#[derive(ForyObject)]` to tell the macro to emit hook invocations for that type. Once compiled with debug hooks, call `set_before_write_field_func`, `set_after_write_field_func`, `set_before_read_field_func`, or `set_after_read_field_func` (from `fory-core/src/serializer/struct_.rs`) to plug in custom callbacks, and use `reset_struct_debug_hooks()` when you want the defaults back.
-- **Lightweight logging**: Without custom hooks, enable `ENABLE_FORY_DEBUG_OUTPUT=1` to print field-level read/write events emitted by the default hook functions. This is especially useful when investigating alignment or cursor mismatches.
-- **Test-time hygiene**: Some integration tests expect `FORY_PANIC_ON_ERROR` to remain unset. Export it only for focused debugging sessions, and prefer `cargo test --features tests -p tests --test <case>` when isolating failing scenarios.
 
 ## 🛠️ Development
 
@@ -1104,21 +708,6 @@ cargo fmt --check
 # Run linter
 cargo clippy --all-targets --all-features -- -D warnings
 ```
-
-## 🗺️ Roadmap
-
-- [x] Static codegen based on rust macro
-- [x] Row format serialization
-- [x] Cross-language object graph serialization
-- [x] Shared and circular reference tracking
-- [x] Weak pointer support
-- [x] Trait object serialization with polymorphism
-- [x] Schema evolution in compatible mode
-- [x] SIMD optimizations for string encoding
-- [ ] Cross-language support for shared and circular reference tracking
-- [ ] Cross-language support for trait objects
-- [ ] Performance optimizations
-- [ ] More comprehensive benchmarks
 
 ## 📄 License
 
