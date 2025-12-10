@@ -1,5 +1,5 @@
 ---
-title: Scala Serialization
+title: Kotlin Serialization
 sidebar_position: 0
 id: scala_serialization_index
 license: |
