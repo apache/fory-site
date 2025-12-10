@@ -67,14 +67,14 @@ All protocols share the same optimized codebase, allowing improvements in one pr
 
 | Guide                            | Description                                | Source                                                                  | Website                                                                             |
 | -------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **Java Serialization**           | Comprehensive guide for Java serialization | [java_serialization_guide.md](docs/guide/java_serialization_guide.md)   | [📖 View](https://fory.apache.org/docs/docs/guide/java_serialization)               |
-| **Cross-Language Serialization** | Multi-language object exchange             | [xlang_serialization_guide.md](docs/guide/xlang_serialization_guide.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
-| **Row Format**                   | Zero-copy random access format             | [row_format_guide.md](docs/guide/row_format_guide.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
-| **Python**                       | Python-specific features and usage         | [python_guide.md](docs/guide/python_guide.md)                           | [📖 View](https://fory.apache.org/docs/docs/guide/python_serialization)             |
-| **Rust**                         | Rust implementation and patterns           | [rust_guide.md](docs/guide/rust_guide.md)                               | [📖 View](https://fory.apache.org/docs/docs/guide/rust_serialization)               |
-| **Scala**                        | Scala integration and best practices       | [scala_guide.md](docs/guide/scala_guide.md)                             | [📖 View](https://fory.apache.org/docs/docs/guide/scala_serialization)              |
-| **GraalVM**                      | Native image support and AOT compilation   | [graalvm_guide.md](docs/guide/graalvm_guide.md)                         | [📖 View](https://fory.apache.org/docs/docs/guide/graalvm_serialization)            |
-| **Development**                  | Building and contributing to Fory          | [DEVELOPMENT.md](docs/guide/DEVELOPMENT.md)                             | [📖 View](https://fory.apache.org/docs/docs/guide/development)                      |
+| **Java Serialization**           | Comprehensive guide for Java serialization | [Java Guide](../guide/java/index.md)   | [📖 View](https://fory.apache.org/docs/docs/guide/java)               |
+| **Cross-Language Serialization** | Multi-language object exchange             | [Xlang Guide](../guide/xlang/index.md) | [📖 View](https://fory.apache.org/docs/docs/guide/xlang) |
+| **Row Format**                   | Zero-copy random access format             | [Java Row Format](../guide/java/row-format.md)                   | [📖 View](https://fory.apache.org/docs/docs/guide/java/row-format)          |
+| **Python**                       | Python-specific features and usage         | [Python Guide](../guide/python/index.md)                           | [📖 View](https://fory.apache.org/docs/docs/guide/python)             |
+| **Rust**                         | Rust implementation and patterns           | [Rust Guide](../guide/rust/index.md)                               | [📖 View](https://fory.apache.org/docs/docs/guide/rust)               |
+| **Scala**                        | Scala integration and best practices       | [Scala Guide](../guide/scala/index.md)                             | [📖 View](https://fory.apache.org/docs/docs/guide/scala)              |
+| **GraalVM**                      | Native image support and AOT compilation   | [GraalVM Guide](../guide/graalvm_guide.md)                         | [📖 View](https://fory.apache.org/docs/docs/guide/graalvm_guide)            |
+| **Development**                  | Building and contributing to Fory          | [Development](../guide/DEVELOPMENT.md)                             | [📖 View](https://fory.apache.org/docs/docs/guide/DEVELOPMENT)                      |
 
 ### Protocol Specifications
 
@@ -103,7 +103,7 @@ Apache Fory™ supports class schema forward/backward compatibility across **Jav
 
 - Version your serialized data by Fory major version
 - Plan migration strategies when upgrading major versions
-- See [upgrade guide](docs/guide/java_serialization_guide.md#upgrade-fory) for details
+- See [upgrade guide](../guide/java/migration.md) for details
 
 **Future**: Binary compatibility will be guaranteed starting from Fory 1.0 release.
 

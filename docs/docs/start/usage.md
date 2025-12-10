@@ -46,7 +46,7 @@ public class Example {
 }
 ```
 
-For detailed Java usage including compatibility modes, compression, and advanced features, see [Java Serialization Guide](docs/guide/java_serialization_guide.md).
+For detailed Java usage including compatibility modes, compression, and advanced features, see [Java Serialization Guide](../guide/java/index.md).
 
 ### Python Serialization
 
@@ -71,7 +71,7 @@ result = fory.deserialize(data)
 print(result.name, result.age)  # Output: chaokunyang 28
 ```
 
-For detailed Python usage including type hints, compatibility modes, and advanced features, see [Python Guide](docs/guide/python_guide.md).
+For detailed Python usage including type hints, compatibility modes, and advanced features, see [Python Guide](../guide/python/index.md).
 
 ### Scala Serialization
 
@@ -102,7 +102,7 @@ object Example {
 }
 ```
 
-For detailed Scala usage including collection serialization and integration patterns, see [Scala Guide](docs/guide/scala_guide.md).
+For detailed Scala usage including collection serialization and integration patterns, see [Scala Guide](../guide/scala/index.md).
 
 ### Kotlin Serialization
 
@@ -242,9 +242,9 @@ console.log(result);
 
 For examples with **circular references**, **shared references**, and **polymorphism** across languages, see:
 
-- [Cross-Language Serialization Guide](docs/guide/xlang_serialization_guide.md)
-- [Java Serialization Guide - Cross Language](docs/guide/java_serialization_guide.md#cross-language-serialization)
-- [Python Guide - Cross Language](docs/guide/python_guide.md#cross-language-serialization)
+- [Cross-Language Serialization Guide](../guide/xlang/index.md)
+- [Java Serialization Guide - Cross Language](../guide/java/cross-language.md)
+- [Python Guide - Cross Language](../guide/python/cross-language.md)
 
 ## Row Format Encoding
 
@@ -340,4 +340,4 @@ print(foo_row.f4[100000].f1)        # Access nested field
 print(foo_row.f4[200000].f2[5])     # Access deeply nested field
 ```
 
-For more details on row format, see [Row Format Guide](docs/guide/row_format_guide.md).
+For more details on row format, see [Java Row Format Guide](../guide/java/row-format.md) or [Python Row Format Guide](../guide/python/row-format.md).
