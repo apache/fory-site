@@ -1441,7 +1441,7 @@ should have same registration order.
 ```java
 Fory fory = xxx;
 fory.register(SomeClass.class);
-fory.register(SomeClass1.class, 200);
+fory.register(SomeClass1.class, 1);
 ```
 
 If you invoke `ForyBuilder#requireClassRegistration(false)` to disable class registration check,
