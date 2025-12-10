@@ -1,6 +1,6 @@
 ---
 title: Development
-sidebar_position: 8
+sidebar_position: 11
 id: development
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
