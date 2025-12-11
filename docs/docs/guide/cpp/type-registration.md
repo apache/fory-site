@@ -74,14 +74,14 @@ fory.register_struct<Order>(2);
 
 ## Registering Enums
 
-For simple enums with continuous values starting from 0, no macro is needed:
+Use `register_enum<T>(type_id)` to register an enum type. For simple enums with continuous values starting from 0, no macro is needed:
 
 ```cpp
 // Simple continuous enum - no FORY_ENUM needed
 enum class Color { RED, GREEN, BLUE };  // Values: 0, 1, 2
 
-// Just register directly
-fory.register_struct<Color>(0);
+// Register with register_enum
+fory.register_enum<Color>(0);
 ```
 
 For enums with non-continuous values, use the `FORY_ENUM` macro to map values to ordinals:
@@ -96,8 +96,8 @@ enum LegacyStatus { UNKNOWN = -1, OK = 0, ERROR = 1 };
 FORY_ENUM(::LegacyStatus, UNKNOWN, OK, ERROR);
 
 // Register after FORY_ENUM
-fory.register_struct<Priority>(1);
-fory.register_struct<LegacyStatus>(2);
+fory.register_enum<Priority>(1);
+fory.register_enum<LegacyStatus>(2);
 ```
 
 **When to use `FORY_ENUM`:**

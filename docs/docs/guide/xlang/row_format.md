@@ -1,5 +1,5 @@
 ---
-title: Row Format Guide
+title: Row Format
 sidebar_position: 5
 id: row_format
 license: |
@@ -18,6 +18,15 @@ license: |
   See the License for the specific language governing permissions and
   limitations under the License.
 ---
+
+Fory Row Format is a cache-friendly binary format designed for efficient random access and partial serialization. Unlike object graph serialization, row format allows you to read individual fields without deserializing the entire object.
+
+## Features
+
+- **Zero-Copy Random Access**: Read specific fields directly from binary data
+- **Partial Serialization**: Skip unnecessary fields during serialization
+- **Cross-Language Compatible**: Row format data can be shared between Java, Python, and C++
+- **Apache Arrow Integration**: Convert row format to/from Arrow RecordBatch for analytics (Java/Python)
 
 ## Java
 
@@ -47,21 +56,21 @@ for (int i = 0; i < 1000000; i++) {
   bars.add(bar);
 }
 foo.f4 = bars;
-// Can be zero-copy read by python
+// Can be zero-copy read by Python
 BinaryRow binaryRow = encoder.toRow(foo);
-// can be data from python
+// Can be data from Python
 Foo newFoo = encoder.fromRow(binaryRow);
-// zero-copy read List<Integer> f2
+// Zero-copy read List<Integer> f2
 BinaryArray binaryArray2 = binaryRow.getArray(1);
-// zero-copy read List<Bar> f4
+// Zero-copy read List<Bar> f4
 BinaryArray binaryArray4 = binaryRow.getArray(3);
-// zero-copy read 11th element of `readList<Bar> f4`
+// Zero-copy read 11th element of List<Bar> f4
 BinaryRow barStruct = binaryArray4.getStruct(10);
 
-// zero-copy read 6th of f2 of 11th element of `readList<Bar> f4`
+// Zero-copy read 6th element of f2 of 11th element of List<Bar> f4
 barStruct.getArray(1).getInt64(5);
 RowEncoder<Bar> barEncoder = Encoders.bean(Bar.class);
-// deserialize part of data.
+// Deserialize part of data
 Bar newBar = barEncoder.fromRow(barStruct);
 Bar newBar2 = barEncoder.fromRow(binaryArray4.getStruct(20));
 ```
@@ -97,11 +106,11 @@ print(new_foo.f2[100000], new_foo.f4[100000].f1, new_foo.f4[200000].f2[5])
 print(f"pickle end: {datetime.datetime.now()}")
 ```
 
-### Apache Arrow Support
+## Apache Arrow Support
 
-Apache Fory™ Row Format also supports automatic conversion from/to Arrow Table/RecordBatch.
+Fory Row Format supports automatic conversion from/to Arrow Table/RecordBatch for analytics workloads.
 
-Java:
+### Java
 
 ```java
 Schema schema = TypeInference.inferSchema(BeanA.class);
@@ -114,9 +123,18 @@ for (int i = 0; i < 10; i++) {
 return arrowWriter.finishAsRecordBatch();
 ```
 
+### Python
+
+```python
+import pyfory
+encoder = pyfory.encoder(Foo)
+encoder.to_arrow_record_batch([foo] * 10000)
+encoder.to_arrow_table([foo] * 10000)
+```
+
 ## Support for Interface and Extension Types
 
-Fory now supports row format mapping for Java `interface` types and subclassed (`extends`) types, enabling more dynamic and flexible data schemas.
+Fory supports row format mapping for Java `interface` types and subclassed (`extends`) types, enabling more dynamic and flexible data schemas.
 
 These enhancements were introduced in [#2243](https://github.com/apache/fory/pull/2243), [#2250](https://github.com/apache/fory/pull/2250), and [#2256](https://github.com/apache/fory/pull/2256).
 
@@ -143,7 +161,6 @@ dog.name = "Bingo";
 BinaryRow row = encoder.toRow(dog);
 Animal decoded = encoder.fromRow(row);
 System.out.println(decoded.speak()); // Woof
-
 ```
 
 ### Example: Extension Type with RowEncoder
@@ -164,42 +181,10 @@ child.parentField = "Hello";
 child.childField = "World";
 BinaryRow row = encoder.toRow(child);
 Parent decoded = encoder.fromRow(row);
-
 ```
 
-Python:
+## See Also
 
-```python
-import pyfory
-encoder = pyfory.encoder(Foo)
-encoder.to_arrow_record_batch([foo] * 10000)
-encoder.to_arrow_table([foo] * 10000)
-```
-
-C++
-
-```c++
-std::shared_ptr<ArrowWriter> arrow_writer;
-EXPECT_TRUE(
-    ArrowWriter::Make(schema, ::arrow::default_memory_pool(), &arrow_writer)
-        .ok());
-for (auto &row : rows) {
-  EXPECT_TRUE(arrow_writer->Write(row).ok());
-}
-std::shared_ptr<::arrow::RecordBatch> record_batch;
-EXPECT_TRUE(arrow_writer->Finish(&record_batch).ok());
-EXPECT_TRUE(record_batch->Validate().ok());
-EXPECT_EQ(record_batch->num_columns(), schema->num_fields());
-EXPECT_EQ(record_batch->num_rows(), row_nums);
-```
-
-```java
-Schema schema = TypeInference.inferSchema(BeanA.class);
-ArrowWriter arrowWriter = ArrowUtils.createArrowWriter(schema);
-Encoder<BeanA> encoder = Encoders.rowEncoder(BeanA.class);
-for (int i = 0; i < 10; i++) {
-  BeanA beanA = BeanA.createBeanA(2);
-  arrowWriter.write(encoder.toRow(beanA));
-}
-return arrowWriter.finishAsRecordBatch();
-```
+- [Row Format Specification](https://fory.apache.org/docs/next/specification/fory_row_format_spec) - Binary format details
+- [Java Row Format Guide](../java/row-format.md) - Java-specific row format documentation
+- [Python Row Format Guide](../python/row-format.md) - Python-specific row format documentation
