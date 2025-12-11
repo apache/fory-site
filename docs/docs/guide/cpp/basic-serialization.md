@@ -114,7 +114,7 @@ if (result.ok()) {
 ```cpp
 // Serialize to existing Buffer (fastest path)
 Buffer buffer;
-auto result = fory.serialize_to(obj, buffer);
+auto result = fory.serialize_to(buffer, obj);
 if (result.ok()) {
   size_t bytes_written = result.value();
   // buffer now contains serialized data
@@ -122,7 +122,7 @@ if (result.ok()) {
 
 // Serialize to existing vector (zero-copy)
 std::vector<uint8_t> output;
-auto result = fory.serialize_to(obj, output);
+auto result = fory.serialize_to(output, obj);
 if (result.ok()) {
   size_t bytes_written = result.value();
   // output now contains serialized data
@@ -225,7 +225,7 @@ fory.register_struct<Outer>(2);
 
 ## Performance Tips
 
-- **Buffer Reuse**: Use `serialize_to(obj, buffer)` with pre-allocated buffers
+- **Buffer Reuse**: Use `serialize_to(buffer, obj)` with pre-allocated buffers
 - **Pre-registration**: Register all types before serialization starts
 - **Single-Threaded**: Use `build()` instead of `build_thread_safe()` when possible
 - **Disable Tracking**: Use `track_ref(false)` when references aren't needed

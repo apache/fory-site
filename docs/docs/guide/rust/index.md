@@ -81,7 +81,7 @@ fn main() -> Result<(), Error> {
 
     // Serialize to specified buffer
     let mut buf: Vec<u8> = vec![];
-    fory.serialize_to(&user, &mut buf)?;
+    fory.serialize_to(&mut buf, &user)?;
     // Deserialize from specified buffer
     let mut reader = Reader::new(&buf);
     let decoded: User = fory.deserialize_from(&mut reader)?;

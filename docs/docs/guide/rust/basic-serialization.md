@@ -144,7 +144,7 @@ let decoded: MyStruct = fory.deserialize(&bytes)?;
 
 // Serialize to existing buffer
 let mut buf: Vec<u8> = vec![];
-fory.serialize_to(&obj, &mut buf)?;
+fory.serialize_to(&mut buf, &obj)?;
 
 // Deserialize from reader
 let mut reader = Reader::new(&buf);
