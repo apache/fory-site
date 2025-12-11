@@ -21,6 +21,34 @@ license: |
 
 Apache Fory™ provides blazingly fast Java object serialization with JIT compilation and zero-copy techniques. When only Java object serialization is needed, this mode delivers better performance compared to cross-language object graph serialization.
 
+## Features
+
+### High Performance
+
+- **JIT Code Generation**: Highly-extensible JIT framework generates serializer code at runtime using async multi-threaded compilation, delivering 20-170x speedup through:
+  - Inlining variables to reduce memory access
+  - Inlining method calls to eliminate virtual dispatch overhead
+  - Minimizing conditional branching
+  - Eliminating hash lookups
+- **Zero-Copy**: Direct memory access without intermediate buffer copies; row format supports random access and partial serialization
+- **Variable-Length Encoding**: Optimized compression for integers, longs
+- **Meta Sharing**: Cached class metadata reduces redundant type information
+- **SIMD Acceleration**: Java Vector API support for array operations (Java 16+)
+
+### Drop-in Replacement
+
+- **100% JDK Serialization Compatible**: Supports `writeObject`/`readObject`/`writeReplace`/`readResolve`/`readObjectNoData`/`Externalizable`
+- **Java 8-24 Support**: Works across all modern Java versions including Java 17+ records
+- **GraalVM Native Image**: AOT compilation support without reflection configuration
+
+### Advanced Features
+
+- **Reference Tracking**: Automatic handling of shared and circular references
+- **Schema Evolution**: Forward/backward compatibility for class schema changes
+- **Polymorphism**: Full support for inheritance hierarchies and interfaces
+- **Deep Copy**: Efficient deep cloning of complex object graphs with reference preservation
+- **Security**: Class registration and configurable deserialization policies
+
 ## Quick Start
 
 Note that Fory creation is not cheap, the **Fory instances should be reused between serializations** instead of creating it every time. You should keep Fory as a static global variable, or instance variable of some singleton object or limited objects.

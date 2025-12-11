@@ -30,7 +30,7 @@ The C++ implementation provides high-performance serialization with compile-time
 - **🎯 Type-Safe**: Compile-time type checking with macro-based struct registration
 - **🔄 Reference Tracking**: Automatic tracking of shared and circular references
 - **📦 Schema Evolution**: Compatible mode for independent schema changes
-- **⚡ Two Modes**: Object graph serialization and zero-copy row-based format
+- **⚡ Two Formats**: Object graph serialization and zero-copy row-based format
 - **🧵 Thread Safety**: Both single-threaded (fastest) and thread-safe variants
 
 ## Installation
