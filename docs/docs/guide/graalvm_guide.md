@@ -1,6 +1,6 @@
 ---
 title: GraalVM Guide
-sidebar_position: 6
+sidebar_position: 19
 id: graalvm_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
