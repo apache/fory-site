@@ -91,7 +91,7 @@ pip install pyfory==0.13.2
 
 ```toml
 [dependencies]
-fory = "0.13"
+fory = "0.14"
 ```
 
 或者直接执行以下命令：

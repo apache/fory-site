@@ -57,7 +57,7 @@ go get github.com/apache/fory/go/fory
 
 ```toml
 [dependencies]
-fory = "0.13"
+fory = "0.14"
 ```
 
 ### JavaScript
