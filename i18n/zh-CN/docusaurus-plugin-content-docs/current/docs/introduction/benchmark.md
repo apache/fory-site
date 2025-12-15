@@ -19,6 +19,10 @@ sidebar_position: 2
 <img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
 <img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
 <img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
 
 ### Java 反序列化
 
@@ -41,10 +45,11 @@ sidebar_position: 2
 
 ## C++ 性能测试
 
-<img src="public/benchmarks/cpp/throughput.png" width="90%"/>
+<img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
 
 ## JavaScript 性能测试
 
+<img width="50%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
 <img width="50%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
 
 此柱状图使用的数据包含一个具有多种字段类型的复杂对象，JSON 数据大小为 3KB。
