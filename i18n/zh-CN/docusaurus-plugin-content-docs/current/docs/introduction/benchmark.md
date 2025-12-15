@@ -41,7 +41,7 @@ sidebar_position: 2
 
 ## C++ 性能测试
 
-<img src="public/benchmarks/cpp/throughput.png" width="90%"/>
+<img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
 
 ## JavaScript 性能测试
 

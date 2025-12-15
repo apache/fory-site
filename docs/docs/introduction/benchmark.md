@@ -51,7 +51,7 @@ Note: Results depend on hardware, dataset, and implementation versions. See the 
 
 Fory C++ demonstrates competitive performance compared to Protobuf C++ serialization framework.
 
-<img src="public/benchmarks/cpp/throughput.png" width="90%"/>
+<img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
 
 ## JavaScript Benchmark
 
