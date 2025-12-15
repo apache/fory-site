@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[2138],{4386:a=>{a.exports=JSON.parse('{"label":"java","permalink":"/zh-CN/blog/tags/java","allTagsPath":"/zh-CN/blog/tags","count":1,"unlisted":false}')}}]);
