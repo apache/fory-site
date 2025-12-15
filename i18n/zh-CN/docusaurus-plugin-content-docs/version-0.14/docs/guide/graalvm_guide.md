@@ -103,12 +103,12 @@ Args = --initialize-at-build-time=com.example.Example \
 
 ### ForyGraalVMFeature 处理的内容
 
-| 场景                   | 不使用 Feature               | 使用 Feature     |
-| ---------------------- | ---------------------------- | ---------------- |
-| 具有无参构造函数的公共类 | ✅ 可工作                    | ✅ 可工作        |
-| 私有构造函数           | ❌ 需要 reflect-config.json | ✅ 自动注册      |
-| 私有内部记录           | ❌ 需要 reflect-config.json | ✅ 自动注册      |
-| 动态代理               | ❌ 需要手动配置              | ✅ 自动注册      |
+| 场景                     | 不使用 Feature              | 使用 Feature |
+| ------------------------ | --------------------------- | ------------ |
+| 具有无参构造函数的公共类 | ✅ 可工作                   | ✅ 可工作    |
+| 私有构造函数             | ❌ 需要 reflect-config.json | ✅ 自动注册  |
+| 私有内部记录             | ❌ 需要 reflect-config.json | ✅ 自动注册  |
+| 动态代理                 | ❌ 需要手动配置             | ✅ 自动注册  |
 
 ### 私有记录示例
 
@@ -214,12 +214,12 @@ fory.ensureSerializersCompiled();
 
 Fory 与 GraalVM JDK 序列化的性能比较：
 
-| 类型   | 压缩 | 速度       | 大小 |
-| ------ | ---- | ---------- | ---- |
-| Struct | 关闭 | 46 倍更快  | 43%  |
-| Struct | 开启 | 24 倍更快  | 31%  |
-| Pojo   | 关闭 | 12 倍更快  | 56%  |
-| Pojo   | 开启 | 12 倍更快  | 48%  |
+| 类型   | 压缩 | 速度      | 大小 |
+| ------ | ---- | --------- | ---- |
+| Struct | 关闭 | 46 倍更快 | 43%  |
+| Struct | 开启 | 24 倍更快 | 31%  |
+| Pojo   | 关闭 | 12 倍更快 | 56%  |
+| Pojo   | 开启 | 12 倍更快 | 48%  |
 
 查看 [Benchmark.java](https://github.com/apache/fory/blob/main/integration_tests/graalvm_tests/src/main/java/org/apache/fory/graalvm/Benchmark.java) 获取基准测试代码。
 

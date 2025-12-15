@@ -133,16 +133,16 @@ person = fory.deserialize(bytes_from_rust)
 
 ### 常见类型映射
 
-| Rust           | Java         | Python        |
-| -------------- | ------------ | ------------- |
-| `i32`          | `int`        | `int32`       |
-| `i64`          | `long`       | `int64`       |
-| `f32`          | `float`      | `float32`     |
-| `f64`          | `double`     | `float64`     |
-| `String`       | `String`     | `str`         |
-| `Vec<T>`       | `List<T>`    | `List[T]`     |
-| `HashMap<K,V>` | `Map<K,V>`   | `Dict[K,V]`   |
-| `Option<T>`    | 可空 `T`     | `Optional[T]` |
+| Rust           | Java       | Python        |
+| -------------- | ---------- | ------------- |
+| `i32`          | `int`      | `int32`       |
+| `i64`          | `long`     | `int64`       |
+| `f32`          | `float`    | `float32`     |
+| `f64`          | `double`   | `float64`     |
+| `String`       | `String`   | `str`         |
+| `Vec<T>`       | `List<T>`  | `List[T]`     |
+| `HashMap<K,V>` | `Map<K,V>` | `Dict[K,V]`   |
+| `Option<T>`    | 可空 `T`   | `Optional[T]` |
 
 ## 最佳实践
 

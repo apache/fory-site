@@ -192,14 +192,14 @@ public class DeserializeIntoType {
 
 ## 配置选项
 
-| 选项                              | 描述                             | 默认值                            |
-| --------------------------------- | -------------------------------- | --------------------------------- |
-| `compatibleMode`                  | `SCHEMA_CONSISTENT` 或 `COMPATIBLE` | `SCHEMA_CONSISTENT`               |
-| `checkClassVersion`               | 检查类 schema 一致性             | `false`                           |
-| `metaShareEnabled`                | 启用元数据共享                   | 如果是兼容模式则为 `true`         |
-| `scopedMetaShareEnabled`          | 每次序列化的作用域元数据共享     | 如果是兼容模式则为 `true`         |
-| `deserializeNonexistentClass`     | 处理不存在的类                   | 如果是兼容模式则为 `true`         |
-| `metaCompressor`                  | 元数据压缩的压缩器               | `DeflaterMetaCompressor`          |
+| 选项                          | 描述                                | 默认值                    |
+| ----------------------------- | ----------------------------------- | ------------------------- |
+| `compatibleMode`              | `SCHEMA_CONSISTENT` 或 `COMPATIBLE` | `SCHEMA_CONSISTENT`       |
+| `checkClassVersion`           | 检查类 schema 一致性                | `false`                   |
+| `metaShareEnabled`            | 启用元数据共享                      | 如果是兼容模式则为 `true` |
+| `scopedMetaShareEnabled`      | 每次序列化的作用域元数据共享        | 如果是兼容模式则为 `true` |
+| `deserializeNonexistentClass` | 处理不存在的类                      | 如果是兼容模式则为 `true` |
+| `metaCompressor`              | 元数据压缩的压缩器                  | `DeflaterMetaCompressor`  |
 
 ## 最佳实践
 

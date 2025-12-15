@@ -25,22 +25,22 @@ license: |
 
 所有 C++ 基本类型都支持高效的二进制编码：
 
-| 类型       | 大小   | Fory TypeId | 说明          |
-| ---------- | ------ | ----------- | ------------- |
-| `bool`     | 1 字节 | BOOL        | True/false    |
-| `int8_t`   | 1 字节 | INT8        | 有符号字节    |
-| `uint8_t`  | 1 字节 | INT8        | 无符号字节    |
-| `int16_t`  | 2 字节 | INT16       | 有符号短整型  |
-| `uint16_t` | 2 字节 | INT16       | 无符号短整型  |
-| `int32_t`  | 4 字节 | INT32       | 有符号整型    |
-| `uint32_t` | 4 字节 | INT32       | 无符号整型    |
-| `int64_t`  | 8 字节 | INT64       | 有符号长整型  |
-| `uint64_t` | 8 字节 | INT64       | 无符号长整型  |
-| `float`    | 4 字节 | FLOAT32     | IEEE 754 单精度 |
-| `double`   | 8 字节 | FLOAT64     | IEEE 754 双精度 |
-| `char`     | 1 字节 | INT8        | 字符（作为有符号）|
-| `char16_t` | 2 字节 | INT16       | 16 位字符     |
-| `char32_t` | 4 字节 | INT32       | 32 位字符     |
+| 类型       | 大小   | Fory TypeId | 说明               |
+| ---------- | ------ | ----------- | ------------------ |
+| `bool`     | 1 字节 | BOOL        | True/false         |
+| `int8_t`   | 1 字节 | INT8        | 有符号字节         |
+| `uint8_t`  | 1 字节 | INT8        | 无符号字节         |
+| `int16_t`  | 2 字节 | INT16       | 有符号短整型       |
+| `uint16_t` | 2 字节 | INT16       | 无符号短整型       |
+| `int32_t`  | 4 字节 | INT32       | 有符号整型         |
+| `uint32_t` | 4 字节 | INT32       | 无符号整型         |
+| `int64_t`  | 8 字节 | INT64       | 有符号长整型       |
+| `uint64_t` | 8 字节 | INT64       | 无符号长整型       |
+| `float`    | 4 字节 | FLOAT32     | IEEE 754 单精度    |
+| `double`   | 8 字节 | FLOAT64     | IEEE 754 双精度    |
+| `char`     | 1 字节 | INT8        | 字符（作为有符号） |
+| `char16_t` | 2 字节 | INT16       | 16 位字符          |
+| `char32_t` | 4 字节 | INT32       | 32 位字符          |
 
 ```cpp
 int32_t value = 42;
@@ -51,12 +51,12 @@ assert(value == decoded);
 
 ## 字符串类型
 
-| 类型               | Fory TypeId | 说明                   |
-| ------------------ | ----------- | ---------------------- |
-| `std::string`      | STRING      | UTF-8 编码             |
-| `std::string_view` | STRING      | 零拷贝视图（读取）     |
-| `std::u16string`   | STRING      | UTF-16（转换）         |
-| `binary`           | BINARY      | 无长度的原始字节       |
+| 类型               | Fory TypeId | 说明               |
+| ------------------ | ----------- | ------------------ |
+| `std::string`      | STRING      | UTF-8 编码         |
+| `std::string_view` | STRING      | 零拷贝视图（读取） |
+| `std::u16string`   | STRING      | UTF-16（转换）     |
+| `binary`           | BINARY      | 无长度的原始字节   |
 
 ```cpp
 std::string text = "Hello, World!";

@@ -35,11 +35,11 @@ Rust 实现提供多功能的高性能序列化，具有自动内存管理和编
 
 ## Crate 列表
 
-| Crate                                                                       | 描述                    | 版本                                                                                                  |
-| --------------------------------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| Crate                                                                       | 描述                         | 版本                                                                                                  |
+| --------------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
 | [`fory`](https://github.com/apache/fory/blob/main/rust/fory)                | 带有 derive macro 的高级 API | [![crates.io](https://img.shields.io/crates/v/fory.svg)](https://crates.io/crates/fory)               |
-| [`fory-core`](https://github.com/apache/fory/blob/main/rust/fory-core/)     | 核心序列化引擎          | [![crates.io](https://img.shields.io/crates/v/fory-core.svg)](https://crates.io/crates/fory-core)     |
-| [`fory-derive`](https://github.com/apache/fory/blob/main/rust/fory-derive/) | 过程宏                  | [![crates.io](https://img.shields.io/crates/v/fory-derive.svg)](https://crates.io/crates/fory-derive) |
+| [`fory-core`](https://github.com/apache/fory/blob/main/rust/fory-core/)     | 核心序列化引擎               | [![crates.io](https://img.shields.io/crates/v/fory-core.svg)](https://crates.io/crates/fory-core)     |
+| [`fory-derive`](https://github.com/apache/fory/blob/main/rust/fory-derive/) | 过程宏                       | [![crates.io](https://img.shields.io/crates/v/fory-derive.svg)](https://crates.io/crates/fory-derive) |
 
 ## 快速开始
 

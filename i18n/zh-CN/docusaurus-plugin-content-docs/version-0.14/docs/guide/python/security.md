@@ -122,15 +122,15 @@ result = fory.deserialize(data)  # 将调用策略钩子
 
 ## 可用的策略钩子
 
-| 钩子                                         | 描述                           |
-| -------------------------------------------- | ------------------------------ |
-| `validate_class(cls, is_local)`              | 在反序列化期间验证/阻止类类型  |
-| `validate_module(module, is_local)`          | 验证/阻止模块导入              |
-| `validate_function(func, is_local)`          | 验证/阻止函数引用              |
-| `intercept_reduce_call(callable_obj, args)`  | 拦截 `__reduce__` 调用         |
+| 钩子                                         | 描述                                  |
+| -------------------------------------------- | ------------------------------------- |
+| `validate_class(cls, is_local)`              | 在反序列化期间验证/阻止类类型         |
+| `validate_module(module, is_local)`          | 验证/阻止模块导入                     |
+| `validate_function(func, is_local)`          | 验证/阻止函数引用                     |
+| `intercept_reduce_call(callable_obj, args)`  | 拦截 `__reduce__` 调用                |
 | `inspect_reduced_object(obj)`                | 检查/替换通过 `__reduce__` 创建的对象 |
-| `intercept_setstate(obj, state)`             | 在 `__setstate__` 之前清理状态 |
-| `authorize_instantiation(cls, args, kwargs)` | 控制类实例化                   |
+| `intercept_setstate(obj, state)`             | 在 `__setstate__` 之前清理状态        |
+| `authorize_instantiation(cls, args, kwargs)` | 控制类实例化                          |
 
 **另请参阅：** `pyfory/policy.py` 包含每个钩子的详细文档和示例。
 

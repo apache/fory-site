@@ -101,14 +101,14 @@ print(f"{person.name}, {person.age}")  # Alice, 30
 
 ## 文档
 
-| 主题                                                                              | 描述                         |
-| --------------------------------------------------------------------------------- | ---------------------------- |
-| [入门指南](getting-started.md)                                                    | 所有语言的安装和基本设置     |
-| [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping)         | 跨语言类型映射参考           |
-| [序列化](serialization.md)                                                        | 内置类型、自定义类型、引用处理 |
-| [零拷贝](zero-copy.md)                                                            | 大型数据的带外序列化         |
-| [行格式](row_format.md)                                                           | 具有随机访问的缓存友好二进制格式 |
-| [故障排查](troubleshooting.md)                                                    | 常见问题及解决方案           |
+| 主题                                                                      | 描述                             |
+| ------------------------------------------------------------------------- | -------------------------------- |
+| [入门指南](getting-started.md)                                            | 所有语言的安装和基本设置         |
+| [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping) | 跨语言类型映射参考               |
+| [序列化](serialization.md)                                                | 内置类型、自定义类型、引用处理   |
+| [零拷贝](zero-copy.md)                                                    | 大型数据的带外序列化             |
+| [行格式](row_format.md)                                                   | 具有随机访问的缓存友好二进制格式 |
+| [故障排查](troubleshooting.md)                                            | 常见问题及解决方案               |
 
 ## 特定语言指南
 

@@ -94,13 +94,13 @@ CompressedArraySerializers.registerSerializers(fory);
 
 ## 配置摘要
 
-| 选项                | 描述                                  | 默认值  |
-| ------------------- | ------------------------------------- | ------- |
-| `compressInt`       | 启用 int 压缩                         | `true`  |
-| `compressLong`      | 启用 long 压缩                        | `true`  |
-| `compressIntArray`  | 启用 SIMD int 数组压缩（Java 16+）    | `true`  |
-| `compressLongArray` | 启用 SIMD long 数组压缩（Java 16+）   | `true`  |
-| `compressString`    | 启用字符串压缩                        | `false` |
+| 选项                | 描述                                | 默认值  |
+| ------------------- | ----------------------------------- | ------- |
+| `compressInt`       | 启用 int 压缩                       | `true`  |
+| `compressLong`      | 启用 long 压缩                      | `true`  |
+| `compressIntArray`  | 启用 SIMD int 数组压缩（Java 16+）  | `true`  |
+| `compressLongArray` | 启用 SIMD long 数组压缩（Java 16+） | `true`  |
+| `compressString`    | 启用字符串压缩                      | `false` |
 
 ## 性能考虑
 

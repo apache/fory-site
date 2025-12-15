@@ -151,11 +151,11 @@ cargo test --features tests
 
 ## 快速参考
 
-| 环境变量                     | 目的                       |
-| ---------------------------- | -------------------------- |
-| `RUST_BACKTRACE=1`           | 启用堆栈跟踪               |
-| `FORY_PANIC_ON_ERROR=1`      | 在错误位置 panic 以调试    |
-| `ENABLE_FORY_DEBUG_OUTPUT=1` | 打印字段级读/写事件        |
+| 环境变量                     | 目的                    |
+| ---------------------------- | ----------------------- |
+| `RUST_BACKTRACE=1`           | 启用堆栈跟踪            |
+| `FORY_PANIC_ON_ERROR=1`      | 在错误位置 panic 以调试 |
+| `ENABLE_FORY_DEBUG_OUTPUT=1` | 打印字段级读/写事件     |
 
 ## 相关主题
 
