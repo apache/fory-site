@@ -68,3 +68,18 @@
 .footer__links {
   text-align: center;
 }
+
+.themed-logo-light {
+  display: block;
+}
+.themed-logo-dark {
+  display: none;
+}
+
+[data-theme='dark'] .themed-logo-light {
+  display: none;
+}
+
+[data-theme='dark'] .themed-logo-dark {
+  display: block;
+}
