@@ -1,7 +1,7 @@
 ---
 id: benchmark
 title: Benchmark
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 > **Note**: Different serialization frameworks excel in different scenarios. Benchmark results are for reference only.
