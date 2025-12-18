@@ -15,17 +15,21 @@ sidebar_position: 2
 
 ### Java 序列化
 
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
 
 ### Java 反序列化
 
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
+<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
 
 更多关于类型前向/后向兼容性、堆外支持、零拷贝序列化的性能测试，请参见 [benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks)。
 
@@ -39,9 +43,14 @@ sidebar_position: 2
 
 注意：结果取决于硬件、数据集和实现版本。有关如何自行运行性能测试的信息，请参阅 Fory Rust Benchmark 指南：https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
 
+## C++ 性能测试
+
+<img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
+
 ## JavaScript 性能测试
 
-<img width="33%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
+<img width="50%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
+<img width="50%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
 
 此柱状图使用的数据包含一个具有多种字段类型的复杂对象，JSON 数据大小为 3KB。
 
