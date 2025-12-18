@@ -7,6 +7,7 @@ sidebar_position: 2
 ## In simple terms
 
 **Apache Fory** is a **fast and efficient way to convert data and objects into bytes and back**, so they can be:
+
 - sent over the network
 - stored on disk
 - shared between different programming languages
@@ -18,17 +19,20 @@ This process is commonly called **serialization**.
 ## Why does Fory exist?
 
 Most applications need to move data:
+
 - between services
 - between machines
 - between different programming languages
 
 While many serialization tools exist, they often have trade-offs:
+
 - slow performance
 - large data size
 - limited cross-language support
 - complex schemas or IDLs
 
 **Fory focuses on solving these problems** by being:
+
 - **High-performance**
 - **Cross-language**
 - **Easy to use**
@@ -39,13 +43,15 @@ While many serialization tools exist, they often have trade-offs:
 ## What problem does Fory solve?
 
 Imagine you have:
+
 - a Java service
 - a Python service
-- a Rust service  
+- a Rust service
 
 All of them need to exchange complex objects.
 
 With Fory:
+
 - you don’t need to define schemas
 - you don’t need to generate code
 - you don’t need to worry about language differences
@@ -92,7 +98,7 @@ User user = new User("Alice", 20);
 byte[] bytes = fory.serialize(user);
 ```
 
-At this point, the `User` object is converted into a binary format that can be stored, sent over the network, or shared with applications written in other languages.
+At this point, the `User` object is converted into the Fory binary format, which follows the Fory serialization protocol. This protocol defines how data, types, and references are encoded so that objects can be safely stored, transmitted, and deserialized across different programming languages.
 
 ### Step 3: Deserialize the object (Python)
 
