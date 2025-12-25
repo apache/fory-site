@@ -1,6 +1,6 @@
 ---
 title: Supported Types
-sidebar_position: 5
+sidebar_position: 6
 id: cpp_supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
