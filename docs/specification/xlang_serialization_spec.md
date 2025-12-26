@@ -414,6 +414,8 @@ identification.
 Struct is a special type, depending whether schema compatibility is enabled, Fory will write struct meta
 differently.
 
+Only ext/enum/struct can be registered using namespaced type.
+
 ### Struct Schema consistent
 
 - If schema consistent mode is enabled globally when creating fory, type meta will be written as a fory unsigned varint

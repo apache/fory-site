@@ -52,7 +52,9 @@ project(my_project LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+if(MSVC)
+    add_compile_options(/Zc:preprocessor)
+endif()
 include(FetchContent)
 FetchContent_Declare(
     fory
@@ -240,6 +242,7 @@ std::thread t2([&]() {
 - [Basic Serialization](basic-serialization.md) - Object graph serialization
 - [Schema Evolution](schema-evolution.md) - Compatible mode and schema changes
 - [Type Registration](type-registration.md) - Registering types
+- [Field Configuration](field-configuration.md) - Field-level metadata (nullable, ref tracking)
 - [Supported Types](supported-types.md) - All supported types
 - [Cross-Language](cross-language.md) - XLANG mode
 - [Row Format](row-format.md) - Zero-copy row-based format

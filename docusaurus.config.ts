@@ -111,7 +111,8 @@ const config: Config = {
       title: '',
       logo: {
         alt: 'Apache Fory™ Logo',
-        src: 'img/navbar-logo.png',
+        src: 'img/fory-logo-light.png',
+        srcDark: 'img/fory-logo-dark.png',
       },
       items: [
         // {
