@@ -1,6 +1,6 @@
 ---
 title: Serialization
-sidebar_position: 3
+sidebar_position: 30
 id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
