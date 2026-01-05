@@ -31,14 +31,14 @@ license: |
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>0.14.0</version>
+  <version>0.14.1</version>
 </dependency>
 ```
 
 **Gradle：**
 
 ```gradle
-implementation 'org.apache.fory:fory-core:0.14.0'
+implementation 'org.apache.fory:fory-core:0.14.1'
 ```
 
 ### Python
