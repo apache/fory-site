@@ -443,10 +443,12 @@ If schema evolution mode is enabled globally when creating fory, and enabled for
 using one of the following mode. Which mode to use is configured when creating fory.
 
 - Normal mode(meta share not enabled):
+
   - If type meta hasn't been written before, add `type def`
     to `captured_type_defs`: `captured_type_defs[type def] = map size`.
   - Get index of the meta in `captured_type_defs`, write that index as `| unsigned varint: index |`.
   - After finished the serialization of the object graph, fory will start to write `captured_type_defs`:
+
     - Firstly, set current to `meta start offset` of fory header
     - Then write `captured_type_defs` one by one:
 
@@ -473,6 +475,7 @@ using one of the following mode. Which mode to use is configured when creating f
   ```
 
 - Streaming mode(streaming mode doesn't support meta share):
+
   - If type meta hasn't been written before, the data will be written as:
 
     ```
@@ -1349,6 +1352,9 @@ Field will be ordered as following, every group of fields will have its own orde
 
 If two fields have same type, then sort by snake_case styled field name.
 
+⚠️ Note: This field ordering is an internal implementation detail and may change.
+Users should not rely on this order for application-level logic.
+
 #### schema consistent
 
 Object will be written as:
@@ -1505,6 +1511,7 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
 ### Phase 1: Core Infrastructure
 
 1. **Buffer Implementation**
+
    - [ ] Create a byte buffer with read/write cursor tracking
    - [ ] Implement little-endian byte order for all multi-byte writes
    - [ ] Implement `write_int8`, `write_int16`, `write_int32`, `write_int64`
@@ -1513,6 +1520,7 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
    - [ ] Implement buffer growth strategy (e.g., doubling)
 
 2. **Varint Encoding**
+
    - [ ] Implement `write_varuint32` / `read_varuint32`
    - [ ] Implement `write_varint32` / `read_varint32` (with ZigZag)
    - [ ] Implement `write_varuint64` / `read_varuint64`
@@ -1529,16 +1537,19 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
 ### Phase 2: Basic Type Serializers
 
 4. **Primitive Types**
+
    - [ ] bool (1 byte: 0 or 1)
    - [ ] int8, int16, int32, int64 (little endian)
    - [ ] float32, float64 (IEEE 754, little endian)
 
 5. **String Serialization**
+
    - [ ] Implement string header: `(byte_length << 2) | encoding`
    - [ ] Support UTF-8 encoding (required for xlang)
    - [ ] Optionally support LATIN1 and UTF-16
 
 6. **Temporal Types**
+
    - [ ] Duration (seconds + nanoseconds)
    - [ ] Timestamp (nanoseconds since epoch)
    - [ ] LocalDate (days since epoch)
@@ -1552,12 +1563,14 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
 ### Phase 3: Collection Types
 
 8. **List/Array Serialization**
+
    - [ ] Write length as varuint32
    - [ ] Write elements header byte
    - [ ] Handle homogeneous vs heterogeneous elements
    - [ ] Handle null elements
 
 9. **Map Serialization**
+
    - [ ] Write total size as varuint32
    - [ ] Implement chunk-based format (max 255 pairs per chunk)
    - [ ] Write KV header byte per chunk
@@ -1587,18 +1600,21 @@ Meta strings are required for enum and struct serialization (encoding field name
 ### Phase 6: Struct Serialization
 
 13. **Type Registration**
+
     - [ ] Support registration by numeric ID
     - [ ] Support registration by namespace + type name
     - [ ] Maintain type → serializer mapping
     - [ ] Generate type IDs: `(user_id << 8) | internal_type_id`
 
 14. **Field Ordering**
+
     - [ ] Implement Fory field ordering algorithm
     - [ ] Sort primitives by size (larger first), then type ID, then name
     - [ ] Handle nullable vs non-nullable fields
     - [ ] Convert field names to snake_case for sorting
 
 15. **Schema Consistent Mode**
+
     - [ ] Compute type hash (MurmurHash3 of field info string)
     - [ ] Write 4-byte type hash before fields
     - [ ] Serialize fields in Fory order
