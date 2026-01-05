@@ -50,14 +50,14 @@ Fory Kotlin 继承了 Fory Java 的所有特性，并增加了 Kotlin 特定的�
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-kotlin</artifactId>
-  <version>0.14.0</version>
+  <version>0.14.1</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation("org.apache.fory:fory-kotlin:0.14.0")
+implementation("org.apache.fory:fory-kotlin:0.14.1")
 ```
 
 ## 快速开始
