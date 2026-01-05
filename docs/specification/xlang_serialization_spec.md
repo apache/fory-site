@@ -40,10 +40,10 @@ This specification defines the Fory xlang binary format. The format is dynamic r
 - int8: a 8-bit signed integer.
 - int16: a 16-bit signed integer.
 - int32: a 32-bit signed integer.
-- var_int32: a 32-bit signed integer which use fory var_int32 encoding.
+- var32: a 32-bit signed integer which use fory variable-length encoding.
 - int64: a 64-bit signed integer.
-- var_int64: a 64-bit signed integer which use fory PVL encoding.
-- sli_int64: a 64-bit signed integer which use fory SLI encoding.
+- var64: a 64-bit signed integer which use fory PVL encoding.
+- h64: a 64-bit signed integer which use fory Hybrid encoding.
 - float16: a 16-bit floating point number.
 - float32: a 32-bit floating point number.
 - float64: a 64-bit floating point number including NaN and Infinity.
@@ -154,41 +154,52 @@ custom types (struct/ext/enum). User type IDs are in a separate namespace and co
 | 2       | INT8                    | 8-bit signed integer                                |
 | 3       | INT16                   | 16-bit signed integer                               |
 | 4       | INT32                   | 32-bit signed integer                               |
-| 5       | VAR_INT32               | Variable-length encoded 32-bit signed integer       |
+| 5       | VAR32                   | Variable-length encoded 32-bit signed integer       |
 | 6       | INT64                   | 64-bit signed integer                               |
-| 7       | VAR_INT64               | Variable-length encoded 64-bit signed integer       |
-| 8       | SLI_INT64               | Small Long as Int encoded 64-bit signed integer     |
-| 9       | FLOAT16                 | 16-bit floating point (half precision)              |
-| 10      | FLOAT32                 | 32-bit floating point (single precision)            |
-| 11      | FLOAT64                 | 64-bit floating point (double precision)            |
-| 12      | STRING                  | UTF-8/UTF-16/Latin1 encoded string                  |
-| 13      | ENUM                    | Enum registered by numeric ID                       |
-| 14      | NAMED_ENUM              | Enum registered by namespace + type name            |
-| 15      | STRUCT                  | Struct registered by numeric ID (schema consistent) |
-| 16      | COMPATIBLE_STRUCT       | Struct with schema evolution support (by ID)        |
-| 17      | NAMED_STRUCT            | Struct registered by namespace + type name          |
-| 18      | NAMED_COMPATIBLE_STRUCT | Struct with schema evolution (by name)              |
-| 19      | EXT                     | Extension type registered by numeric ID             |
-| 20      | NAMED_EXT               | Extension type registered by namespace + type name  |
-| 21      | LIST                    | Ordered collection (List, Array, Vector)            |
-| 22      | SET                     | Unordered collection of unique elements             |
-| 23      | MAP                     | Key-value mapping                                   |
-| 24      | DURATION                | Time duration (seconds + nanoseconds)               |
-| 25      | TIMESTAMP               | Point in time (nanoseconds since epoch)             |
-| 26      | LOCAL_DATE              | Date without timezone (days since epoch)            |
-| 27      | DECIMAL                 | Arbitrary precision decimal                         |
-| 28      | BINARY                  | Raw binary data                                     |
-| 29      | ARRAY                   | Generic array type                                  |
-| 30      | BOOL_ARRAY              | 1D boolean array                                    |
-| 31      | INT8_ARRAY              | 1D int8 array                                       |
-| 32      | INT16_ARRAY             | 1D int16 array                                      |
-| 33      | INT32_ARRAY             | 1D int32 array                                      |
-| 34      | INT64_ARRAY             | 1D int64 array                                      |
-| 35      | FLOAT16_ARRAY           | 1D float16 array                                    |
-| 36      | FLOAT32_ARRAY           | 1D float32 array                                    |
-| 37      | FLOAT64_ARRAY           | 1D float64 array                                    |
-| 38      | UNION                   | Tagged union type (one of several alternatives)     |
-| 39      | NONE                    | Empty/unit type (no data)                           |
+| 7       | VAR64                   | Variable-length encoded 64-bit signed integer       |
+| 8       | H64                     | Hybrid encoded 64-bit signed integer                |
+| 9       | UINT8                   | 8-bit unsigned integer                              |
+| 10      | UINT16                  | 16-bit unsigned integer                             |
+| 11      | UINT32                  | 32-bit unsigned integer                             |
+| 12      | VARU32                  | Variable-length encoded 32-bit unsigned integer     |
+| 13      | UINT64                  | 64-bit unsigned integer                             |
+| 14      | VARU64                  | Variable-length encoded 64-bit unsigned integer     |
+| 15      | HU64                    | Hybrid encoded 64-bit unsigned integer              |
+| 16      | FLOAT16                 | 16-bit floating point (half precision)              |
+| 17      | FLOAT32                 | 32-bit floating point (single precision)            |
+| 18      | FLOAT64                 | 64-bit floating point (double precision)            |
+| 19      | STRING                  | UTF-8/UTF-16/Latin1 encoded string                  |
+| 20      | LIST                    | Ordered collection (List, Array, Vector)            |
+| 21      | SET                     | Unordered collection of unique elements             |
+| 22      | MAP                     | Key-value mapping                                   |
+| 23      | ENUM                    | Enum registered by numeric ID                       |
+| 24      | NAMED_ENUM              | Enum registered by namespace + type name            |
+| 25      | STRUCT                  | Struct registered by numeric ID (schema consistent) |
+| 26      | COMPATIBLE_STRUCT       | Struct with schema evolution support (by ID)        |
+| 27      | NAMED_STRUCT            | Struct registered by namespace + type name          |
+| 28      | NAMED_COMPATIBLE_STRUCT | Struct with schema evolution (by name)              |
+| 29      | EXT                     | Extension type registered by numeric ID             |
+| 30      | NAMED_EXT               | Extension type registered by namespace + type name  |
+| 31      | UNION                   | Tagged union type (one of several alternatives)     |
+| 32      | NONE                    | Empty/unit type (no data)                           |
+| 33      | DURATION                | Time duration (seconds + nanoseconds)               |
+| 34      | TIMESTAMP               | Point in time (nanoseconds since epoch)             |
+| 35      | LOCAL_DATE              | Date without timezone (days since epoch)            |
+| 36      | DECIMAL                 | Arbitrary precision decimal                         |
+| 37      | BINARY                  | Raw binary data                                     |
+| 38      | ARRAY                   | Generic array type                                  |
+| 39      | BOOL_ARRAY              | 1D boolean array                                    |
+| 40      | INT8_ARRAY              | 1D int8 array                                       |
+| 41      | INT16_ARRAY             | 1D int16 array                                      |
+| 42      | INT32_ARRAY             | 1D int32 array                                      |
+| 43      | INT64_ARRAY             | 1D int64 array                                      |
+| 44      | UINT8_ARRAY             | 1D uint8 array                                      |
+| 45      | UINT16_ARRAY            | 1D uint16 array                                     |
+| 46      | UINT32_ARRAY            | 1D uint32 array                                     |
+| 47      | UINT64_ARRAY            | 1D uint64 array                                     |
+| 48      | FLOAT16_ARRAY           | 1D float16 array                                    |
+| 49      | FLOAT32_ARRAY           | 1D float32 array                                    |
+| 50      | FLOAT64_ARRAY           | 1D float64 array                                    |
 
 #### Type ID Encoding for User Types
 
@@ -202,11 +213,11 @@ Full Type ID = (user_type_id << 8) | internal_type_id
 
 | User ID | Type              | Internal ID | Full Type ID     | Decimal |
 | ------- | ----------------- | ----------- | ---------------- | ------- |
-| 0       | STRUCT            | 15          | `(0 << 8) \| 15` | 15      |
-| 0       | ENUM              | 13          | `(0 << 8) \| 13` | 13      |
-| 1       | STRUCT            | 15          | `(1 << 8) \| 15` | 271     |
-| 1       | COMPATIBLE_STRUCT | 16          | `(1 << 8) \| 16` | 272     |
-| 2       | NAMED_STRUCT      | 17          | `(2 << 8) \| 17` | 529     |
+| 0       | STRUCT            | 25          | `(0 << 8) \| 25` | 25      |
+| 0       | ENUM              | 23          | `(0 << 8) \| 23` | 23      |
+| 1       | STRUCT            | 25          | `(1 << 8) \| 25` | 281     |
+| 1       | COMPATIBLE_STRUCT | 26          | `(1 << 8) \| 26` | 282     |
+| 2       | NAMED_STRUCT      | 27          | `(2 << 8) \| 27` | 539     |
 
 When reading type IDs:
 
@@ -904,33 +915,7 @@ have small encoded values:
 
 - size: 1~9 bytes
 
-Fory supports two encoding schemes for 64-bit integers:
-
-**Fory SLI (Small Long as Int) Encoding:**
-
-Optimized for values that fit in 31 bits (common case for IDs, timestamps, etc.):
-
-```
-if value in [0, 2147483647]:  // fits in 31 bits
-    write 4 bytes: ((int32) value) << 1  // bit 0 is 0, indicating 4-byte encoding
-else:
-    write 1 byte:  0x01                  // bit 0 is 1, indicating 9-byte encoding
-    write 8 bytes: value as little-endian int64
-```
-
-Reading:
-
-```
-first_int32 = read_int32_le()
-if (first_int32 & 1) == 0:
-    return first_int32 >> 1  // 4-byte encoding
-else:
-    return read_int64_le()   // read remaining 8 bytes
-```
-
-**Fory PVL (Progressive Variable-Length) Encoding:**
-
-Standard varint encoding extended to 64 bits:
+Uses PVL (Progressive Variable-Length) encoding:
 
 ```
 function write_varuint64(value):
@@ -946,6 +931,32 @@ function write_varuint64(value):
 | 128 ~ 16383   | 2     |
 | ...           | ...   |
 | 2^56 ~ 2^63-1 | 9     |
+
+#### unsigned hybrid int64 (HU64)
+
+- size: 4 or 9 bytes
+
+Optimized for unsigned values that fit in 31 bits (common case for IDs, sizes, counts, etc.):
+
+```
+if value in [0, 2147483647]:  // fits in 31 bits (2^31 - 1), full unsigned range
+    write 4 bytes: ((int32) value) << 1  // bit 0 is 0, indicating 4-byte encoding
+else:
+    write 1 byte:  0x01                  // bit 0 is 1, indicating 9-byte encoding
+    write 8 bytes: value as little-endian uint64
+```
+
+Reading:
+
+```
+first_int32 = read_int32_le()
+if (first_int32 & 1) == 0:
+    return (uint64)(first_int32 >> 1)  // 4-byte encoding, unsigned
+else:
+    return read_uint64_le()            // read remaining 8 bytes
+```
+
+Note: HU64 uses the full 31 bits for positive values [0, 2^31-1], compared to H64 which splits the range for signed values [-2^30, 2^30-1].
 
 #### VarUint36Small
 
@@ -972,21 +983,7 @@ This encoding is optimized for the common case where string length fits in 7 bit
 
 - size: 1~9 bytes
 
-**Fory SLI (Small Long as Int) Encoding for signed:**
-
-Optimized for small signed values:
-
-```
-if value in [-1073741824, 1073741823]:  // fits in 31 bits signed
-    write 4 bytes: ((int32) value) << 1  // bit 0 is 0
-else:
-    write 1 byte:  0x01                  // bit 0 is 1
-    write 8 bytes: value as little-endian int64
-```
-
-**Fory PVL (Progressive Variable-Length) Encoding for signed:**
-
-Uses ZigZag encoding first, then varint:
+Uses ZigZag encoding first, then PVL varint:
 
 ```
 // Encode
@@ -997,6 +994,32 @@ write_varuint64(zigzag_value)
 zigzag_value = read_varuint64()
 value = (zigzag_value >> 1) ^ (-(zigzag_value & 1))
 ```
+
+#### signed hybrid int64 (H64)
+
+- size: 4 or 9 bytes
+
+Optimized for small signed values:
+
+```
+if value in [-1073741824, 1073741823]:  // fits in 30 bits + sign ([-2^30, 2^30-1])
+    write 4 bytes: ((int32) value) << 1  // bit 0 is 0, indicating 4-byte encoding
+else:
+    write 1 byte:  0x01                  // bit 0 is 1, indicating 9-byte encoding
+    write 8 bytes: value as little-endian int64
+```
+
+Reading:
+
+```
+first_int32 = read_int32_le()
+if (first_int32 & 1) == 0:
+    return (int64)(first_int32 >> 1)  // 4-byte encoding, sign-extended
+else:
+    return read_int64_le()            // read remaining 8 bytes
+```
+
+Note: H64 uses 30 bits + sign for values [-2^30, 2^30-1], while HU64 uses full 31 bits for unsigned values [0, 2^31-1].
 
 #### float32
 
@@ -1316,7 +1339,7 @@ Field will be ordered as following, every group of fields will have its own orde
   - larger size type first, smaller later, variable size type last.
   - when same size, sort by type id
   - when same size and type id, sort by snake case field name
-  - types: bool/int8/int16/int32/varint32/int64/varint64/sliint64/float16/float32/float64
+  - types: bool/int8/int16/int32/var32/int64/var64/h64/float16/float32/float64
 - nullable primitive fields: same order as primitive fields
 - other internal type fields: sort by type id then snake case field name
 - list fields: sort by snake case field name
@@ -1495,7 +1518,7 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
    - [ ] Implement `write_varuint64` / `read_varuint64`
    - [ ] Implement `write_varint64` / `read_varint64` (with ZigZag)
    - [ ] Implement `write_varuint36_small` / `read_varuint36_small` (for strings)
-   - [ ] Optionally implement SLI encoding for int64
+   - [ ] Optionally implement Hybrid encoding (H64/HU64) for int64
 
 3. **Header Handling**
    - [ ] Write magic number `0x62d4`
