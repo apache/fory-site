@@ -43,7 +43,14 @@ This specification defines the Fory xlang binary format. The format is dynamic r
 - var32: a 32-bit signed integer which use fory variable-length encoding.
 - int64: a 64-bit signed integer.
 - var64: a 64-bit signed integer which use fory PVL encoding.
-- h64: a 64-bit signed integer which use fory Hybrid encoding.
+- hybrid64: a 64-bit signed integer which use fory Hybrid encoding.
+- uint8: an 8-bit unsigned integer.
+- uint16: a 16-bit unsigned integer.
+- uint32: a 32-bit unsigned integer.
+- varu32: a 32-bit unsigned integer which use fory variable-length encoding.
+- uint64: a 64-bit unsigned integer.
+- varu64: a 64-bit unsigned integer which use fory PVL encoding.
+- hybridu64: a 64-bit unsigned integer which use fory Hybrid encoding.
 - float16: a 16-bit floating point number.
 - float32: a 32-bit floating point number.
 - float64: a 64-bit floating point number including NaN and Infinity.
@@ -82,7 +89,7 @@ This specification defines the Fory xlang binary format. The format is dynamic r
 
 Note:
 
-- Unsigned int/long are not added here, since not every language support those types.
+- Unsigned integer types use the same byte sizes as their signed counterparts; the difference is in value interpretation. See [Type mapping](xlang_type_mapping.md) for language-specific type mappings.
 
 ### Polymorphisms
 
@@ -154,17 +161,17 @@ custom types (struct/ext/enum). User type IDs are in a separate namespace and co
 | 2       | INT8                    | 8-bit signed integer                                |
 | 3       | INT16                   | 16-bit signed integer                               |
 | 4       | INT32                   | 32-bit signed integer                               |
-| 5       | VAR32                   | Variable-length encoded 32-bit signed integer       |
+| 5       | VARINT32                | Variable-length encoded 32-bit signed integer       |
 | 6       | INT64                   | 64-bit signed integer                               |
-| 7       | VAR64                   | Variable-length encoded 64-bit signed integer       |
-| 8       | H64                     | Hybrid encoded 64-bit signed integer                |
+| 7       | VARINT64                | Variable-length encoded 64-bit signed integer       |
+| 8       | TAGGED_INT64            | Hybrid encoded 64-bit signed integer                |
 | 9       | UINT8                   | 8-bit unsigned integer                              |
 | 10      | UINT16                  | 16-bit unsigned integer                             |
 | 11      | UINT32                  | 32-bit unsigned integer                             |
-| 12      | VARU32                  | Variable-length encoded 32-bit unsigned integer     |
+| 12      | VAR_UINT32              | Variable-length encoded 32-bit unsigned integer     |
 | 13      | UINT64                  | 64-bit unsigned integer                             |
-| 14      | VARU64                  | Variable-length encoded 64-bit unsigned integer     |
-| 15      | HU64                    | Hybrid encoded 64-bit unsigned integer              |
+| 14      | VAR_UINT64              | Variable-length encoded 64-bit unsigned integer     |
+| 15      | TAGGED_UINT64           | Hybrid encoded 64-bit unsigned integer              |
 | 16      | FLOAT16                 | 16-bit floating point (half precision)              |
 | 17      | FLOAT32                 | 32-bit floating point (single precision)            |
 | 18      | FLOAT64                 | 64-bit floating point (double precision)            |
@@ -932,7 +939,7 @@ function write_varuint64(value):
 | ...           | ...   |
 | 2^56 ~ 2^63-1 | 9     |
 
-#### unsigned hybrid int64 (HU64)
+#### unsigned hybrid int64 (TAGGED_UINT64)
 
 - size: 4 or 9 bytes
 
@@ -956,7 +963,7 @@ else:
     return read_uint64_le()            // read remaining 8 bytes
 ```
 
-Note: HU64 uses the full 31 bits for positive values [0, 2^31-1], compared to H64 which splits the range for signed values [-2^30, 2^30-1].
+Note: TAGGED_UINT64 uses the full 31 bits for positive values [0, 2^31-1], compared to TAGGED_INT64 which splits the range for signed values [-2^30, 2^30-1].
 
 #### VarUint36Small
 
@@ -995,7 +1002,7 @@ zigzag_value = read_varuint64()
 value = (zigzag_value >> 1) ^ (-(zigzag_value & 1))
 ```
 
-#### signed hybrid int64 (H64)
+#### signed hybrid int64 (TAGGED_INT64)
 
 - size: 4 or 9 bytes
 
@@ -1019,7 +1026,7 @@ else:
     return read_int64_le()            // read remaining 8 bytes
 ```
 
-Note: H64 uses 30 bits + sign for values [-2^30, 2^30-1], while HU64 uses full 31 bits for unsigned values [0, 2^31-1].
+Note: TAGGED_INT64 uses 30 bits + sign for values [-2^30, 2^30-1], while TAGGED_UINT64 uses full 31 bits for unsigned values [0, 2^31-1].
 
 #### float32
 
@@ -1518,7 +1525,7 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
    - [ ] Implement `write_varuint64` / `read_varuint64`
    - [ ] Implement `write_varint64` / `read_varint64` (with ZigZag)
    - [ ] Implement `write_varuint36_small` / `read_varuint36_small` (for strings)
-   - [ ] Optionally implement Hybrid encoding (H64/HU64) for int64
+   - [ ] Optionally implement Hybrid encoding (TAGGED_INT64/TAGGED_UINT64) for int64
 
 3. **Header Handling**
    - [ ] Write magic number `0x62d4`
