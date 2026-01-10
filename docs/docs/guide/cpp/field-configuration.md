@@ -284,8 +284,221 @@ FORY_FIELD_TAGS(Document,
 | **Header dependencies** | Required everywhere      | Isolated to config      |
 | **Migration effort**    | High (change all fields) | Low (add one macro)     |
 
+## FORY_FIELD_CONFIG Macro
+
+The `FORY_FIELD_CONFIG` macro is the most powerful and flexible way to configure field-level serialization. It provides:
+
+- **Builder pattern API**: Fluent, chainable configuration with `F(id).option1().option2()`
+- **Encoding control**: Specify how unsigned integers are encoded (varint, fixed, tagged)
+- **Compile-time verification**: Field names are verified against member pointers
+- **Cross-language compatibility**: Configure encoding to match other languages (Java, Rust, etc.)
+
+### Basic Syntax
+
+```cpp
+FORY_FIELD_CONFIG(StructType,
+    (field1, fory::F(0)),                           // Simple: just ID
+    (field2, fory::F(1).nullable()),                // With nullable
+    (field3, fory::F(2).varint()),                  // With encoding
+    (field4, fory::F(3).nullable().ref()),          // Multiple options
+    (field5, 4)                                     // Backward compatible: integer ID
+);
+```
+
+### The F() Builder
+
+The `fory::F(id)` factory creates a `FieldMeta` object that supports method chaining:
+
+```cpp
+fory::F(0)                    // Create with field ID 0
+    .nullable()               // Mark as nullable
+    .ref()                    // Enable reference tracking
+    .varint()                 // Use variable-length encoding
+    .fixed()                  // Use fixed-size encoding
+    .tagged()                 // Use tagged encoding
+    .monomorphic()            // Mark as monomorphic type
+    .compress(false)          // Disable compression
+```
+
+**Tip:** To use `F()` without the `fory::` prefix, add a using declaration:
+
+```cpp
+using fory::F;
+
+FORY_FIELD_CONFIG(MyStruct,
+    (field1, F(0).varint()),      // No prefix needed
+    (field2, F(1).nullable())
+);
+```
+
+### Encoding Options for Unsigned Integers
+
+For `uint32_t` and `uint64_t` fields, you can specify the wire encoding:
+
+| Method      | Type ID       | Description                                    | Use Case                              |
+| ----------- | ------------- | ---------------------------------------------- | ------------------------------------- |
+| `.varint()` | VAR_UINT32/64 | Variable-length encoding (1-5 or 1-10 bytes)   | Values typically small                |
+| `.fixed()`  | UINT32/64     | Fixed-size encoding (always 4 or 8 bytes)      | Values uniformly distributed          |
+| `.tagged()` | TAGGED_UINT64 | Tagged hybrid encoding with size hint (uint64) | Mixed small and large values (uint64) |
+
+**Note:** `uint8_t` and `uint16_t` always use fixed encoding (UINT8, UINT16).
+
+### Complete Example
+
+```cpp
+#include "fory/serialization/fory.h"
+
+using namespace fory::serialization;
+
+// Define struct with unsigned integer fields
+struct MetricsData {
+  // Counters - often small values, use varint for space efficiency
+  uint32_t requestCount;
+  uint64_t bytesSent;
+
+  // IDs - uniformly distributed, use fixed for consistent performance
+  uint32_t userId;
+  uint64_t sessionId;
+
+  // Timestamps - use tagged encoding for mixed value ranges
+  uint64_t createdAt;
+
+  // Nullable fields
+  std::optional<uint32_t> errorCount;
+  std::optional<uint64_t> lastAccessTime;
+};
+
+FORY_STRUCT(MetricsData, requestCount, bytesSent, userId, sessionId,
+            createdAt, errorCount, lastAccessTime);
+
+// Configure field encoding
+FORY_FIELD_CONFIG(MetricsData,
+    // Small counters - varint saves space
+    (requestCount, fory::F(0).varint()),
+    (bytesSent, fory::F(1).varint()),
+
+    // IDs - fixed for consistent performance
+    (userId, fory::F(2).fixed()),
+    (sessionId, fory::F(3).fixed()),
+
+    // Timestamp - tagged encoding
+    (createdAt, fory::F(4).tagged()),
+
+    // Nullable fields
+    (errorCount, fory::F(5).nullable().varint()),
+    (lastAccessTime, fory::F(6).nullable().tagged())
+);
+
+int main() {
+  auto fory = Fory::builder().xlang(true).build();
+  fory.register_struct<MetricsData>(100);
+
+  MetricsData data{
+      .requestCount = 42,
+      .bytesSent = 1024,
+      .userId = 12345678,
+      .sessionId = 9876543210,
+      .createdAt = 1704067200000000000ULL, // 2024-01-01 in nanoseconds
+      .errorCount = 3,
+      .lastAccessTime = std::nullopt
+  };
+
+  auto bytes = fory.serialize(data).value();
+  auto decoded = fory.deserialize<MetricsData>(bytes).value();
+}
+```
+
+### Cross-Language Compatibility
+
+When serializing data to be read by other languages, use `FORY_FIELD_CONFIG` to match their encoding expectations:
+
+**Java Compatibility:**
+
+```cpp
+// Java uses these type IDs for unsigned integers:
+// - Byte (u8): UINT8 (fixed)
+// - Short (u16): UINT16 (fixed)
+// - Integer (u32): VAR_UINT32 (varint) or UINT32 (fixed)
+// - Long (u64): VAR_UINT64 (varint), UINT64 (fixed), or TAGGED_UINT64
+
+struct JavaCompatible {
+  uint8_t byteField;      // Maps to Java Byte
+  uint16_t shortField;    // Maps to Java Short
+  uint32_t intVarField;   // Maps to Java Integer with varint
+  uint32_t intFixedField; // Maps to Java Integer with fixed
+  uint64_t longVarField;  // Maps to Java Long with varint
+  uint64_t longTagged;    // Maps to Java Long with tagged
+};
+
+FORY_STRUCT(JavaCompatible, byteField, shortField, intVarField,
+            intFixedField, longVarField, longTagged);
+
+FORY_FIELD_CONFIG(JavaCompatible,
+    (byteField, fory::F(0)),                    // UINT8 (auto)
+    (shortField, fory::F(1)),                   // UINT16 (auto)
+    (intVarField, fory::F(2).varint()),         // VAR_UINT32
+    (intFixedField, fory::F(3).fixed()),        // UINT32
+    (longVarField, fory::F(4).varint()),        // VAR_UINT64
+    (longTagged, fory::F(5).tagged())           // TAGGED_UINT64
+);
+```
+
+### Schema Evolution with FORY_FIELD_CONFIG
+
+In compatible mode, fields can have different nullability between sender and receiver:
+
+```cpp
+// Version 1: All fields non-nullable
+struct DataV1 {
+  uint32_t id;
+  uint64_t timestamp;
+};
+FORY_STRUCT(DataV1, id, timestamp);
+FORY_FIELD_CONFIG(DataV1,
+    (id, fory::F(0).varint()),
+    (timestamp, fory::F(1).tagged())
+);
+
+// Version 2: Added nullable fields
+struct DataV2 {
+  uint32_t id;
+  uint64_t timestamp;
+  std::optional<uint32_t> version;  // New nullable field
+};
+FORY_STRUCT(DataV2, id, timestamp, version);
+FORY_FIELD_CONFIG(DataV2,
+    (id, fory::F(0).varint()),
+    (timestamp, fory::F(1).tagged()),
+    (version, fory::F(2).nullable().varint())  // New field with nullable
+);
+```
+
+### FORY_FIELD_CONFIG Options Reference
+
+| Method           | Description                                 | Valid For                  |
+| ---------------- | ------------------------------------------- | -------------------------- |
+| `.nullable()`    | Mark field as nullable                      | Smart pointers, primitives |
+| `.ref()`         | Enable reference tracking                   | `std::shared_ptr` only     |
+| `.monomorphic()` | Mark pointer as always pointing to one type | Smart pointers             |
+| `.varint()`      | Use variable-length encoding                | `uint32_t`, `uint64_t`     |
+| `.fixed()`       | Use fixed-size encoding                     | `uint32_t`, `uint64_t`     |
+| `.tagged()`      | Use tagged hybrid encoding                  | `uint64_t` only            |
+| `.compress(v)`   | Enable/disable field compression            | All types                  |
+
+### Comparing Field Configuration Macros
+
+| Feature                 | `fory::field<>`       | `FORY_FIELD_TAGS` | `FORY_FIELD_CONFIG`       |
+| ----------------------- | --------------------- | ----------------- | ------------------------- |
+| **Struct modification** | Required (wrap types) | None              | None                      |
+| **Encoding control**    | No                    | No                | Yes (varint/fixed/tagged) |
+| **Builder pattern**     | No                    | No                | Yes                       |
+| **Compile-time verify** | Yes                   | Limited           | Yes (member pointers)     |
+| **Cross-lang compat**   | Limited               | Limited           | Full                      |
+| **Recommended for**     | Simple structs        | Third-party types | Complex/xlang structs     |
+
 ## Related Topics
 
 - [Type Registration](type-registration.md) - Registering types with FORY_STRUCT
 - [Schema Evolution](schema-evolution.md) - Using tag IDs for schema evolution
 - [Configuration](configuration.md) - Enabling reference tracking globally
+- [Cross-Language](cross-language.md) - Interoperability with Java, Rust, Python
