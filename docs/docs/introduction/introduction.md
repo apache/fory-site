@@ -4,7 +4,10 @@ title: Introduction
 sidebar_position: 1
 ---
 
-<img width="65%" alt="Apache Fory logo" src="/img/navbar-logo.png"/>
+<div class="themed-logo">
+    <img width="65%" alt="Apache Fory logo" src="/img/fory-logo-dark.png" class="themed-logo-dark"/>
+    <img width="65%" alt="Apache Fory logo" src="/img/fory-logo-light.png" class="themed-logo-light"/>
+</div>
 
 **Apache Fory™** is a blazingly-fast multi-language serialization framework powered by **JIT compilation**, **zero-copy** techniques, and **advanced code generation**, achieving up to **170x performance improvement** while maintaining simplicity and ease of use.
 
