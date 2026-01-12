@@ -16,6 +16,7 @@ sidebar_position: 1
 跨语言序列化 - 在 Rust 中序列化，在 Python 中反序列化：
 
 **Rust**
+
 ```rust
 use fory::{Fory, ForyObject};
 
@@ -37,6 +38,7 @@ fn main() {
 ```
 
 **Python**
+
 ```python
 import pyfory
 from dataclasses import dataclass

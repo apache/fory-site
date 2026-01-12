@@ -16,6 +16,7 @@ sidebar_position: 1
 Cross-language serialization — serialize in Rust, deserialize in Python:
 
 **Rust**
+
 ```rust
 use fory::{Fory, ForyObject};
 
@@ -37,6 +38,7 @@ fn main() {
 ```
 
 **Python**
+
 ```python
 import pyfory
 from dataclasses import dataclass
