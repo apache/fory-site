@@ -1,5 +1,5 @@
 ---
-title: Overview
+title: Go Serialization Guide
 sidebar_position: 0
 id: go_index
 license: |
@@ -34,6 +34,8 @@ Apache Fory Go is a high-performance, cross-language serialization library for G
 ## Quick Start
 
 ### Installation
+
+**Requirements**: Go 1.24 or later
 
 ```bash
 go get github.com/apache/fory/go/fory
