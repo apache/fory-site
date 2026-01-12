@@ -11,6 +11,52 @@ sidebar_position: 1
 
 **Apache Fory™** is a blazingly-fast multi-language serialization framework powered by **JIT compilation**, **zero-copy** techniques, and **advanced code generation**, achieving up to **170x performance improvement** while maintaining simplicity and ease of use.
 
+## Quick Example
+
+Cross-language serialization — serialize in Rust, deserialize in Python:
+
+**Rust**
+
+```rust
+use fory::{Fory, ForyObject};
+
+#[derive(ForyObject, Debug, PartialEq)]
+struct User {
+    name: String,
+    age: i32,
+}
+
+fn main() {
+    let mut fory = Fory::default().xlang(true);
+    fory.register::<User>(1);
+
+    let user = User { name: "Alice".to_string(), age: 30 };
+    let bytes = fory.serialize(&user).unwrap();
+    let decoded: User = fory.deserialize(&bytes).unwrap();
+    println!("{:?}", decoded);  // User { name: "Alice", age: 30 }
+}
+```
+
+**Python**
+
+```python
+import pyfory
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    age: int
+
+fory = pyfory.Fory(xlang=True)
+fory.register(User)
+
+user = User(name="Alice", age=30)
+data = fory.serialize(user)
+decoded = fory.deserialize(data)
+print(decoded.name, decoded.age)  # Alice 30
+```
+
 ## Key Features
 
 ### 🚀 High-Performance Serialization
