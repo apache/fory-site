@@ -151,7 +151,7 @@ types.
 
 ### Type mapping
 
-See [Type mapping](../docs/guide/xlang_type_mapping)
+See [Type mapping](../guide/xlang_type_mapping)
 
 ## Spec overview
 

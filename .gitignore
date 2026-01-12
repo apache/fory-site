@@ -8,6 +8,9 @@
 .docusaurus
 .cache-loader
 
+# Generated i18n specification folders (copied by prebuild script)
+i18n/zh-CN/docusaurus-plugin-content-docs/*/specification/
+
 # Misc
 .DS_Store
 .env.local

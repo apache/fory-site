@@ -3,16 +3,20 @@
     "message": "Fory Logo",
     "description": "The alt text of navbar logo"
   },
+  "item.label.Docs": {
+    "message": "文档",
+    "description": "Navbar item with label Docs"
+  },
   "item.label.Start": {
-    "message": "开始",
+    "message": "快速开始",
     "description": "Navbar item with label Start"
   },
   "item.label.Introduction": {
-    "message": "介绍",
+    "message": "Apache Fory 介绍",
     "description": "Navbar item with label Introduction"
   },
   "item.label.Guide": {
-    "message": "指南",
+    "message": "用户指南",
     "description": "Navbar item with label Guide"
   },
   "item.label.Specification": {
