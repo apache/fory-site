@@ -5,7 +5,8 @@
   "scripts": {
     "download-avatars": "node ./scripts/download_avatars/script.js",
     "docusaurus": "docusaurus",
-    "start": "docusaurus start --locale en-US --host 0.0.0.0",
+    "start": "docusaurus start --host 0.0.0.0",
+    "start-en": "docusaurus start --locale en-US --host 0.0.0.0",
     "start-zh": "docusaurus start --locale zh-CN --host 0.0.0.0",
     "copy-i18n-fallback": "bash ./scripts/copy-i18n-fallback.sh",
     "prebuild": "npm run copy-i18n-fallback",
