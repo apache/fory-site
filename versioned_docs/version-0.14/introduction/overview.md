@@ -69,7 +69,7 @@ Apache Fory™ delivers exceptional performance through advanced optimization te
 - **Intelligent Encoding**: Variable-length compression for integers and strings; SIMD acceleration for arrays (Java 16+)
 - **Meta Sharing**: Class metadata packing reduces redundant type information across serializations
 
-### 🌍 Cross-Language Serialization
+### 🔄 Cross-Language Serialization
 
 The **[xlang serialization format](../specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
 
