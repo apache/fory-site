@@ -334,20 +334,20 @@ data, _ := f.Serialize(status)
 
 ## Cross-Language Type Mapping
 
-| Go Type         | Java     | Python    | C++                | Rust         |
-| --------------- | -------- | --------- | ------------------ | ------------ |
-| `bool`          | boolean  | bool      | bool               | bool         |
-| `int8`          | byte     | int       | int8_t             | i8           |
-| `int16`         | short    | int       | int16_t            | i16          |
-| `int32`         | int      | int       | int32_t            | i32          |
-| `int64`         | long     | int       | int64_t            | i64          |
-| `float32`       | float    | float     | float              | f32          |
-| `float64`       | double   | float     | double             | f64          |
-| `string`        | String   | str       | std::string        | String       |
-| `[]T`           | List<T>  | list      | std::vector<T>     | Vec<T>       |
-| `map[K]V`       | Map<K,V> | dict      | std::unordered_map | HashMap<K,V> |
-| `time.Time`     | Instant  | datetime  | -                  | -            |
-| `time.Duration` | Duration | timedelta | -                  | -            |
+| Go Type         | Java       | Python    | C++                | Rust           |
+| --------------- | ---------- | --------- | ------------------ | -------------- |
+| `bool`          | boolean    | bool      | bool               | bool           |
+| `int8`          | byte       | int       | int8_t             | i8             |
+| `int16`         | short      | int       | int16_t            | i16            |
+| `int32`         | int        | int       | int32_t            | i32            |
+| `int64`         | long       | int       | int64_t            | i64            |
+| `float32`       | float      | float     | float              | f32            |
+| `float64`       | double     | float     | double             | f64            |
+| `string`        | String     | str       | std::string        | String         |
+| `[]T`           | `List<T>`  | list      | `std::vector<T>`   | `Vec<T>`       |
+| `map[K]V`       | `Map<K,V>` | dict      | std::unordered_map | `HashMap<K,V>` |
+| `time.Time`     | Instant    | datetime  | -                  | -              |
+| `time.Duration` | Duration   | timedelta | -                  | -              |
 
 See [Cross-Language Serialization](cross-language) for detailed mapping.
 
