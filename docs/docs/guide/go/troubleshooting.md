@@ -442,7 +442,7 @@ If you encounter issues not covered here:
 
 ## Related Topics
 
-- [Configuration](configuration)
-- [Cross-Language Serialization](cross-language)
-- [Schema Evolution](schema-evolution)
-- [Thread Safety](thread-safety)
+- [Configuration](configuration.md)
+- [Cross-Language Serialization](cross-language.md)
+- [Schema Evolution](schema-evolution.md)
+- [Thread Safety](thread-safety.md)

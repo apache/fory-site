@@ -280,6 +280,6 @@ func TestMySerializer(t *testing.T) {
 
 ## Related Topics
 
-- [Type Registration](type-registration)
-- [Supported Types](supported-types)
-- [Cross-Language Serialization](cross-language)
+- [Type Registration](type-registration.md)
+- [Supported Types](supported-types.md)
+- [Cross-Language Serialization](cross-language.md)

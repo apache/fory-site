@@ -330,6 +330,6 @@ type Session struct {
 
 ## Related Topics
 
-- [References](references)
-- [Basic Serialization](basic-serialization)
-- [Schema Evolution](schema-evolution)
+- [References](references.md)
+- [Basic Serialization](basic-serialization.md)
+- [Schema Evolution](schema-evolution.md)

@@ -97,7 +97,7 @@ data, _ := f.Serialize(myStruct)
 
 ### Code Generation (Experimental)
 
-For performance-critical paths, Fory provides optional ahead-of-time code generation that eliminates reflection overhead. See the [Code Generation](codegen) guide for details.
+For performance-critical paths, Fory provides optional ahead-of-time code generation that eliminates reflection overhead. See the [Code Generation](codegen.md) guide for details.
 
 ## Configuration
 
@@ -111,7 +111,7 @@ f := fory.New(
 )
 ```
 
-See [Configuration](configuration) for all available options.
+See [Configuration](configuration.md) for all available options.
 
 ## Supported Types
 
@@ -123,7 +123,7 @@ Fory Go supports a wide range of types:
 - **Pointers**: pointer types with automatic nil handling
 - **Structs**: any struct with exported fields
 
-See [Supported Types](supported-types) for the complete type mapping.
+See [Supported Types](supported-types.md) for the complete type mapping.
 
 ## Cross-Language Serialization
 
@@ -137,23 +137,23 @@ data, _ := f.Serialize(&User{ID: 1, Name: "Alice"})
 // 'data' can be deserialized by Java, Python, etc.
 ```
 
-See [Cross-Language Serialization](cross-language) for type mapping and compatibility details.
+See [Cross-Language Serialization](cross-language.md) for type mapping and compatibility details.
 
 ## Documentation
 
-| Topic                                      | Description                            |
-| ------------------------------------------ | -------------------------------------- |
-| [Configuration](configuration)             | Options and settings                   |
-| [Basic Serialization](basic-serialization) | Core APIs and usage patterns           |
-| [Type Registration](type-registration)     | Registering types for serialization    |
-| [Supported Types](supported-types)         | Complete type support reference        |
-| [References](references)                   | Circular references and shared objects |
-| [Struct Tags](struct-tags)                 | Field-level configuration              |
-| [Schema Evolution](schema-evolution)       | Forward/backward compatibility         |
-| [Cross-Language](cross-language)           | Multi-language serialization           |
-| [Code Generation](codegen)                 | Experimental AOT code generation       |
-| [Thread Safety](thread-safety)             | Concurrent usage patterns              |
-| [Troubleshooting](troubleshooting)         | Common issues and solutions            |
+| Topic                                         | Description                            |
+| --------------------------------------------- | -------------------------------------- |
+| [Configuration](configuration.md)             | Options and settings                   |
+| [Basic Serialization](basic-serialization.md) | Core APIs and usage patterns           |
+| [Type Registration](type-registration.md)     | Registering types for serialization    |
+| [Supported Types](supported-types.md)         | Complete type support reference        |
+| [References](references.md)                   | Circular references and shared objects |
+| [Struct Tags](struct-tags.md)                 | Field-level configuration              |
+| [Schema Evolution](schema-evolution.md)       | Forward/backward compatibility         |
+| [Cross-Language](cross-language.md)           | Multi-language serialization           |
+| [Code Generation](codegen.md)                 | Experimental AOT code generation       |
+| [Thread Safety](thread-safety.md)             | Concurrent usage patterns              |
+| [Troubleshooting](troubleshooting.md)         | Common issues and solutions            |
 
 ## Related Resources
 

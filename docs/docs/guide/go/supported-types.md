@@ -349,7 +349,7 @@ data, _ := f.Serialize(status)
 | `time.Time`     | Instant    | datetime  | -                  | -              |
 | `time.Duration` | Duration   | timedelta | -                  | -              |
 
-See [Cross-Language Serialization](cross-language) for detailed mapping.
+See [Cross-Language Serialization](cross-language.md) for detailed mapping.
 
 ## Unsupported Types
 
@@ -364,6 +364,6 @@ Attempting to serialize these types will result in an error.
 
 ## Related Topics
 
-- [Type Registration](type-registration)
-- [Cross-Language Serialization](cross-language)
-- [References](references)
+- [Type Registration](type-registration.md)
+- [Cross-Language Serialization](cross-language.md)
+- [References](references.md)

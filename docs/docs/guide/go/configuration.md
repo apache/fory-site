@@ -80,7 +80,7 @@ f := fory.New(fory.WithTrackRef(true))
 - Same object is referenced multiple times
 - Serializing graph structures (trees with parent pointers, linked lists with cycles)
 
-See [References](references) for details.
+See [References](references.md) for details.
 
 ### WithCompatible
 
@@ -104,7 +104,7 @@ f := fory.New(fory.WithCompatible(true))
 - Fields matched by sorted order
 - Requires consistent struct definitions across all services
 
-See [Schema Evolution](schema-evolution) for details.
+See [Schema Evolution](schema-evolution.md) for details.
 
 ### WithMaxDepth
 
@@ -179,7 +179,7 @@ data, err := threadsafe.Marshal(&myValue)
 err = threadsafe.Unmarshal(data, &result)
 ```
 
-See [Thread Safety](thread-safety) for details.
+See [Thread Safety](thread-safety.md) for details.
 
 ## Buffer Management
 
@@ -338,7 +338,7 @@ for req := range requests {
 
 ## Related Topics
 
-- [Basic Serialization](basic-serialization)
-- [References](references)
-- [Schema Evolution](schema-evolution)
-- [Thread Safety](thread-safety)
+- [Basic Serialization](basic-serialization.md)
+- [References](references.md)
+- [Schema Evolution](schema-evolution.md)
+- [Thread Safety](thread-safety.md)

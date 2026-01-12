@@ -415,6 +415,6 @@ For libraries: yes. For applications: either works.
 
 ## Related Topics
 
-- [Basic Serialization](basic-serialization)
-- [Configuration](configuration)
-- [Troubleshooting](troubleshooting)
+- [Basic Serialization](basic-serialization.md)
+- [Configuration](configuration.md)
+- [Troubleshooting](troubleshooting.md)

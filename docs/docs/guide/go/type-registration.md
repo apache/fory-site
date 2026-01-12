@@ -109,7 +109,7 @@ err := f.RegisterExtension(CustomType{}, 1, &CustomSerializer{})
 err = f.RegisterNamedExtension(CustomType{}, "example.Custom", &CustomSerializer{})
 ```
 
-See [Custom Serializers](custom-serializers) for details on implementing the `ExtensionSerializer` interface.
+See [Custom Serializers](custom-serializers.md) for details on implementing the `ExtensionSerializer` interface.
 
 ## Registration Scope
 
@@ -256,7 +256,7 @@ Two types registered with the same ID will conflict.
 
 ## Related Topics
 
-- [Basic Serialization](basic-serialization)
-- [Cross-Language Serialization](cross-language)
-- [Supported Types](supported-types)
-- [Troubleshooting](troubleshooting)
+- [Basic Serialization](basic-serialization.md)
+- [Cross-Language Serialization](cross-language.md)
+- [Supported Types](supported-types.md)
+- [Troubleshooting](troubleshooting.md)

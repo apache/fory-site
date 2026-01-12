@@ -109,7 +109,7 @@ type Container struct {
 - Pointer to primitive types (e.g., `*int`, `*string`) cannot use this tag
 - Default is `ref=false` (no reference tracking per field)
 
-See [Struct Tags](struct-tags) for more details.
+See [Struct Tags](struct-tags.md) for more details.
 
 ## Circular References
 
@@ -351,6 +351,6 @@ func main() {
 
 ## Related Topics
 
-- [Configuration](configuration)
-- [Struct Tags](struct-tags)
-- [Cross-Language Serialization](cross-language)
+- [Configuration](configuration.md)
+- [Struct Tags](struct-tags.md)
+- [Cross-Language Serialization](cross-language.md)

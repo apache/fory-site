@@ -275,8 +275,8 @@ Ensure other languages handle null appropriately.
 
 ## Related Topics
 
-- [Type Registration](type-registration)
-- [Supported Types](supported-types)
-- [Schema Evolution](schema-evolution)
+- [Type Registration](type-registration.md)
+- [Supported Types](supported-types.md)
+- [Schema Evolution](schema-evolution.md)
 - [Xlang Serialization Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec/)
 - [Type Mapping Specification](https://fory.apache.org/docs/specification/xlang_type_mapping)

@@ -41,9 +41,9 @@ f.RegisterNamedStruct(User{}, "example.User")
 f.RegisterEnum(Color(0), 3)
 ```
 
-**Important**: The Fory instance should be reused across serialization calls. Creating a new instance involves allocating internal buffers, type caches, and resolvers, which is expensive. The default Fory instance is not thread-safe; for concurrent usage, use the thread-safe wrapper (see [Thread Safety](thread-safety)).
+**Important**: The Fory instance should be reused across serialization calls. Creating a new instance involves allocating internal buffers, type caches, and resolvers, which is expensive. The default Fory instance is not thread-safe; for concurrent usage, use the thread-safe wrapper (see [Thread Safety](thread-safety.md)).
 
-See [Type Registration](type-registration) for more details.
+See [Type Registration](type-registration.md) for more details.
 
 ## Core API
 
@@ -304,7 +304,7 @@ Common error kinds:
 - `ErrKindMaxDepthExceeded`: Recursion depth limit exceeded
 - `ErrKindHashMismatch`: Struct hash mismatch (schema changed)
 
-See [Troubleshooting](troubleshooting) for error resolution.
+See [Troubleshooting](troubleshooting.md) for error resolution.
 
 ## Nil Handling
 
@@ -398,7 +398,7 @@ func main() {
 
 ## Related Topics
 
-- [Configuration](configuration)
-- [Type Registration](type-registration)
-- [Supported Types](supported-types)
-- [References](references)
+- [Configuration](configuration.md)
+- [Type Registration](type-registration.md)
+- [Supported Types](supported-types.md)
+- [References](references.md)

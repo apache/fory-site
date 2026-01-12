@@ -335,6 +335,6 @@ func main() {
 
 ## Related Topics
 
-- [Configuration](configuration)
-- [Cross-Language Serialization](cross-language)
-- [Troubleshooting](troubleshooting)
+- [Configuration](configuration.md)
+- [Cross-Language Serialization](cross-language.md)
+- [Troubleshooting](troubleshooting.md)
