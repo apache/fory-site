@@ -118,7 +118,7 @@ func main() {
   fory := forygo.NewFory()
 
   // Data with large arrays
-  list := []interface{}{
+  list := []any{
     "str",
     make([]byte, 1000), // Large byte array
   }
@@ -139,7 +139,7 @@ func main() {
   }
 
   // Deserialize with buffers
-  var newList []interface{}
+  var newList []any
   if err := fory.Deserialize(buf, &newList, buffers); err != nil {
     panic(err)
   }
