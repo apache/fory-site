@@ -49,7 +49,7 @@ class User:
     age: int
 
 fory = pyfory.Fory(xlang=True)
-fory.register(User)
+fory.register(User, type_id=1)
 
 user = User(name="Alice", age=30)
 data = fory.serialize(user)
