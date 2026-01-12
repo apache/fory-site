@@ -7,6 +7,8 @@
     "docusaurus": "docusaurus",
     "start": "docusaurus start --locale en-US --host 0.0.0.0",
     "start-zh": "docusaurus start --locale zh-CN --host 0.0.0.0",
+    "copy-i18n-fallback": "bash ./scripts/copy-i18n-fallback.sh",
+    "prebuild": "npm run copy-i18n-fallback",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",

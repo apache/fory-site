@@ -238,7 +238,7 @@ console.log(result);
   - **By ID** (`fory.register(Person.class, 1)`): Faster serialization, more compact encoding, but requires coordination to avoid ID conflicts
   - **By name** (`fory.register(Person.class, "example.Person")`): More flexible, less prone to conflicts, easier to manage across teams, but slightly larger encoding
 - Type IDs/names must match across all languages for successful deserialization
-- Only use types that have cross-language mappings (see [Type Mapping](docs/specification/xlang_type_mapping.md))
+- Only use types that have cross-language mappings (see [Type Mapping](../specification/xlang_type_mapping.md))
 
 For examples with **circular references**, **shared references**, and **polymorphism** across languages, see:
 

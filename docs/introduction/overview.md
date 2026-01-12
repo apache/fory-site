@@ -71,9 +71,9 @@ Apache Fory™ delivers exceptional performance through advanced optimization te
 
 ### 🔗 Cross-Language Serialization
 
-The **[xlang serialization format](docs/specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
+The **[xlang serialization format](../specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
 
-- **Automatic Type Mapping**: Intelligent conversion between language-specific types ([type mapping](docs/specification/xlang_type_mapping.md))
+- **Automatic Type Mapping**: Intelligent conversion between language-specific types ([type mapping](../specification/xlang_type_mapping.md))
 - **Reference Preservation**: Shared and circular references work correctly across languages
 - **Polymorphism**: Objects serialize/deserialize with their actual runtime types
 - **Schema Evolution**: Optional forward/backward compatibility for evolving schemas
@@ -81,7 +81,7 @@ The **[xlang serialization format](docs/specification/xlang_serialization_spec.m
 
 ### 📊 Row Format
 
-A cache-friendly **[row format](docs/specification/row_format_spec.md)** optimized for analytics workloads:
+A cache-friendly **[row format](../specification/row_format_spec.md)** optimized for analytics workloads:
 
 - **Zero-Copy Random Access**: Read individual fields without deserializing entire objects
 - **Partial Operations**: Selective field serialization and deserialization for efficiency
@@ -103,9 +103,9 @@ Apache Fory™ implements multiple binary protocols optimized for different scen
 
 | Protocol                                                                  | Use Case                       | Key Features                                           |
 | ------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
-| **[Xlang Serialization](docs/specification/xlang_serialization_spec.md)** | Cross-language object exchange | Automatic serialization, references, polymorphism      |
-| **[Java Serialization](docs/specification/java_serialization_spec.md)**   | High-performance Java-only     | Drop-in JDK serialization replacement, 100x faster     |
-| **[Row Format](docs/specification/row_format_spec.md)**                   | Analytics and data processing  | Zero-copy random access, Arrow compatibility           |
+| **[Xlang Serialization](../specification/xlang_serialization_spec.md)** | Cross-language object exchange | Automatic serialization, references, polymorphism      |
+| **[Java Serialization](../specification/java_serialization_spec.md)**   | High-performance Java-only     | Drop-in JDK serialization replacement, 100x faster     |
+| **[Row Format](../specification/row_format_spec.md)**                   | Analytics and data processing  | Zero-copy random access, Arrow compatibility           |
 | **Python Native**                                                         | Python-specific serialization  | Pickle/cloudpickle replacement with better performance |
 
 All protocols share the same optimized codebase, allowing improvements in one protocol to benefit others.
@@ -129,10 +129,10 @@ All protocols share the same optimized codebase, allowing improvements in one pr
 
 | Specification           | Description                    | Source                                                                        | Website                                                                             |
 | ----------------------- | ------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **Xlang Serialization** | Cross-language binary protocol | [xlang_serialization_spec.md](docs/specification/xlang_serialization_spec.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
-| **Java Serialization**  | Java-optimized protocol        | [java_serialization_spec.md](docs/specification/java_serialization_spec.md)   | [📖 View](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
-| **Row Format**          | Row-based binary format        | [row_format_spec.md](docs/specification/row_format_spec.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
-| **Type Mapping**        | Cross-language type conversion | [xlang_type_mapping.md](docs/specification/xlang_type_mapping.md)             | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| **Xlang Serialization** | Cross-language binary protocol | [xlang_serialization_spec.md](../specification/xlang_serialization_spec.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| **Java Serialization**  | Java-optimized protocol        | [java_serialization_spec.md](../specification/java_serialization_spec.md)   | [📖 View](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
+| **Row Format**          | Row-based binary format        | [row_format_spec.md](../specification/row_format_spec.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
+| **Type Mapping**        | Cross-language type conversion | [xlang_type_mapping.md](../specification/xlang_type_mapping.md)             | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
 
 ## Compatibility
 
