@@ -53,7 +53,7 @@ export default function HomepageHeader() {
               styles.button,
               styles.getStartedButton
             )}
-            to="/docs/docs/start/install"
+            to="/docs/start/install"
             data-aos="fade-up"
             data-aos-delay="400"
           >

@@ -231,15 +231,15 @@ const config: Config = {
           items: [
             {
               label: 'Install',
-              to: '/docs/docs/start/install',
+              to: '/docs/start/install',
             },
             {
               label: 'Usage',
-              to: '/docs/docs/start/usage',
+              to: '/docs/start/usage',
             },
             {
               label: 'Benchmark',
-              to: '/docs/docs/introduction/benchmark',
+              to: '/docs/introduction/benchmark',
             },
           ],
         },
