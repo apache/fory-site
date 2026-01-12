@@ -159,6 +159,6 @@ See [Cross-Language Serialization](cross-language.md) for type mapping and compa
 
 ## Related Resources
 
-- [Xlang Serialization Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec)
-- [Cross-Language Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Cross-Language Type Mapping](../../specification/xlang_type_mapping.md)
 - [GitHub Repository](https://github.com/apache/fory)

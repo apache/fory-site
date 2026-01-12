@@ -159,7 +159,7 @@ Not all Java types have equivalents in other languages. When using xlang mode:
 - Use **primitive types** (`int`, `long`, `double`, `String`) for maximum compatibility
 - Use **standard collections** (`List`, `Map`, `Set`) instead of language-specific ones
 - Avoid **Java-specific types** like `Optional`, `BigDecimal` (unless the target language supports them)
-- See [Type Mapping Guide](https://fory.apache.org/docs/specification/xlang_type_mapping) for complete compatibility matrix
+- See [Type Mapping Guide](../../specification/xlang_type_mapping.md) for complete compatibility matrix
 
 ### Compatible Types
 
@@ -210,7 +210,7 @@ Cross-language mode has additional overhead compared to Java-only mode:
 ### "Type mismatch" errors
 
 - Ensure field types are compatible across languages
-- Review [Type Mapping Guide](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
+- Review [Type Mapping Guide](../../specification/xlang_type_mapping.md)
 
 ### Data corruption or unexpected values
 
@@ -219,8 +219,8 @@ Cross-language mode has additional overhead compared to Java-only mode:
 
 ## See Also
 
-- [Cross-Language Serialization Specification](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec)
-- [Type Mapping Reference](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
+- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Type Mapping Reference](../../specification/xlang_type_mapping.md)
 - [Python Cross-Language Guide](../python/cross-language.md)
 - [Rust Cross-Language Guide](../rust/cross-language.md)
 

@@ -76,7 +76,7 @@ user = fory.deserialize(data)
 
 ## Type Mapping
 
-See [Type Mapping Specification](https://fory.apache.org/docs/specification/xlang_type_mapping) for detailed type mappings across all languages.
+See [Type Mapping Specification](../../specification/xlang_type_mapping.md) for detailed type mappings across all languages.
 
 ## Field Ordering
 
@@ -278,5 +278,5 @@ Ensure other languages handle null appropriately.
 - [Type Registration](type-registration.md)
 - [Supported Types](supported-types.md)
 - [Schema Evolution](schema-evolution.md)
-- [Xlang Serialization Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec/)
-- [Type Mapping Specification](https://fory.apache.org/docs/specification/xlang_type_mapping)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Type Mapping Specification](../../specification/xlang_type_mapping.md)

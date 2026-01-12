@@ -315,7 +315,7 @@ python deserializer.py data.bin
 
 ## See Also
 
-- [Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping) - Cross-language type mapping reference
+- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type mapping reference
 - [Getting Started](getting-started.md) - Setup guide
 - [Java Troubleshooting](../java/troubleshooting.md) - Java-specific issues
 - [Python Troubleshooting](../python/troubleshooting.md) - Python-specific issues

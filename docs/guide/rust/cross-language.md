@@ -129,7 +129,7 @@ person = fory.deserialize(bytes_from_rust)
 
 ## Type Mapping
 
-See [xlang_type_mapping.md](https://fory.apache.org/docs/specification/xlang_type_mapping) for complete type mapping across languages.
+See [xlang_type_mapping.md](../../specification/xlang_type_mapping.md) for complete type mapping across languages.
 
 ### Common Type Mappings
 
@@ -153,8 +153,8 @@ See [xlang_type_mapping.md](https://fory.apache.org/docs/specification/xlang_typ
 
 ## See Also
 
-- [Cross-Language Serialization Specification](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec)
-- [Type Mapping Reference](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
+- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Type Mapping Reference](../../specification/xlang_type_mapping.md)
 - [Java Cross-Language Guide](../java/cross-language.md)
 - [Python Cross-Language Guide](../python/cross-language.md)
 

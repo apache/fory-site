@@ -257,4 +257,4 @@ b.next = a;  // Circular reference
 
 - [Field Nullability](field-nullability.md) - How nullability affects serialization
 - [Serialization](serialization.md) - Basic cross-language serialization examples
-- [Xlang Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) - Binary protocol details
+- [Xlang Specification](../../specification/xlang_serialization_spec.md) - Binary protocol details

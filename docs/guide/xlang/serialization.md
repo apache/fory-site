@@ -537,6 +537,6 @@ Circular references cannot be implemented in Rust due to ownership restrictions.
 ## See Also
 
 - [Zero-Copy Serialization](zero-copy.md) - Out-of-band serialization for large data
-- [Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping) - Cross-language type mapping reference
+- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type mapping reference
 - [Getting Started](getting-started.md) - Installation and setup
-- [Xlang Serialization Specification](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec) - Binary protocol details
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md) - Binary protocol details
