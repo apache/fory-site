@@ -113,13 +113,13 @@ By default, **most fields do not track references** even when global `refTrackin
 
 ### Default Behavior by Language
 
-| Language | Default Ref Tracking | Types That Track Refs by Default |
-| -------- | -------------------- | -------------------------------- |
-| Java     | No                   | None (use annotation to enable)  |
-| Python   | No                   | None (use annotation to enable)  |
-| Go       | No                   | Pointer types (`*T`)             |
-| C++      | No                   | `std::shared_ptr<T>`             |
-| Rust     | No                   | `Rc<T>`, `Arc<T>`, `Weak<T>`     |
+| Language | Default Ref Tracking | Types That Track Refs by Default  |
+| -------- | -------------------- | --------------------------------- |
+| Java     | No                   | None (use annotation to enable)   |
+| Python   | No                   | None (use annotation to enable)   |
+| Go       | No                   | None (use `fory:"ref"` to enable) |
+| C++      | No                   | `std::shared_ptr<T>`              |
+| Rust     | No                   | `Rc<T>`, `Arc<T>`, `Weak<T>`      |
 
 ### Customizing Per-Field Ref Tracking
 
@@ -181,11 +181,11 @@ struct Document {
 type Document struct {
     Title string
 
-    // Pointer types track refs by default
-    Author *Author
+    // Enable ref tracking for pointer to struct
+    Author *Author `fory:"ref"`
 
-    // Use struct tag to control ref tracking
-    Tags []Tag `fory:"trackRef"`
+    // Enable ref tracking for slice
+    Tags []Tag `fory:"ref"`
 }
 ```
 
