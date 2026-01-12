@@ -1,150 +1,153 @@
 ---
 id: overview
-title: Overview
+title: 概述
 sidebar_position: 1
 ---
 
-<img width="65%" alt="Apache Fory logo" src="/img/navbar-logo.png"/>
+<div class="themed-logo">
+    <img width="65%" alt="Apache Fory logo" src="/img/fory-logo-dark.png" class="themed-logo-dark"/>
+    <img width="65%" alt="Apache Fory logo" src="/img/fory-logo-light.png" class="themed-logo-light"/>
+</div>
 
-**Apache Fory™** is a blazingly-fast multi-language serialization framework powered by **JIT compilation**, **zero-copy** techniques, and **advanced code generation**, achieving up to **170x performance improvement** while maintaining simplicity and ease of use.
+**Apache Fory™** 是一个由 **JIT 编译**、**零拷贝** 技术和 **高级代码生成** 驱动的超高性能多语言序列化框架，可实现高达 **170 倍性能提升**，同时保持简洁易用。
 
-## Key Features
+## 核心特性
 
-### 🚀 High-Performance Serialization
+### 🚀 高性能序列化
 
-Apache Fory™ delivers exceptional performance through advanced optimization techniques:
+Apache Fory™ 通过先进的优化技术提供卓越性能：
 
-- **JIT Compilation**: Runtime code generation for Java eliminates virtual method calls and inlines hot paths
-- **Static Code Generation**: Compile-time code generation for Rust, C++, and Go delivers peak performance without runtime overhead
-- **Zero-Copy Operations**: Direct memory access without intermediate buffer copies; row format enables random access and partial serialization
-- **Intelligent Encoding**: Variable-length compression for integers and strings; SIMD acceleration for arrays (Java 16+)
-- **Meta Sharing**: Class metadata packing reduces redundant type information across serializations
+- **JIT 编译**：Java 运行时代码生成消除虚方法调用并内联热路径
+- **静态代码生成**：Rust、C++ 和 Go 的编译时代码生成，无运行时开销即可达到峰值性能
+- **零拷贝操作**：无需中间缓冲区复制的直接内存访问；行格式支持随机访问和部分序列化
+- **智能编码**：整数和字符串的变长压缩；数组的 SIMD 加速（Java 16+）
+- **元数据共享**：类元数据打包减少跨序列化的冗余类型信息
 
-### 🌍 Cross-Language Serialization
+### 🌍 跨语言序列化
 
-The **[xlang serialization format](../specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
+**[xlang 序列化格式](../specification/xlang_serialization_spec.md)** 支持跨编程语言的无缝数据交换：
 
-- **Automatic Type Mapping**: Intelligent conversion between language-specific types ([type mapping](../specification/xlang_type_mapping.md))
-- **Reference Preservation**: Shared and circular references work correctly across languages
-- **Polymorphism**: Objects serialize/deserialize with their actual runtime types
-- **Schema Evolution**: Optional forward/backward compatibility for evolving schemas
-- **Automatic Serialization**: No IDL or schema definitions required; serialize any object directly without code generation
+- **自动类型映射**：语言特定类型之间的智能转换（[类型映射](../specification/xlang_type_mapping.md)）
+- **引用保持**：共享和循环引用在跨语言时正确工作
+- **多态支持**：对象以其实际运行时类型进行序列化/反序列化
+- **Schema 演进**：可选的向前/向后兼容性支持 Schema 演进
+- **自动序列化**：无需 IDL 或 Schema 定义；直接序列化任何对象，无需代码生成
 
-### 📊 Row Format
+### 📊 行格式
 
-A cache-friendly **[row format](../specification/row_format_spec.md)** optimized for analytics workloads:
+针对分析工作负载优化的缓存友好型 **[行格式](../specification/row_format_spec.md)**：
 
-- **Zero-Copy Random Access**: Read individual fields without deserializing entire objects
-- **Partial Operations**: Selective field serialization and deserialization for efficiency
-- **Apache Arrow Integration**: Seamless conversion to columnar format for analytics pipelines
-- **Multi-Language**: Available in Java, Python, Rust and C++
+- **零拷贝随机访问**：无需反序列化整个对象即可读取单个字段
+- **部分操作**：选择性字段序列化和反序列化以提高效率
+- **Apache Arrow 集成**：无缝转换为列格式以用于分析流水线
+- **多语言支持**：可用于 Java、Python、Rust 和 C++
 
-### 🔒 Security & Production-Readiness
+### 🔒 安全性与生产就绪
 
-Enterprise-grade security and compatibility:
+企业级安全性和兼容性：
 
-- **Class Registration**: Whitelist-based deserialization control (enabled by default)
-- **Depth Limiting**: Protection against recursive object graph attacks
-- **Configurable Policies**: Custom class checkers and deserialization policies
-- **Platform Support**: Java 8-24, GraalVM native image, multiple OS platforms
+- **类注册**：基于白名单的反序列化控制（默认启用）
+- **深度限制**：防止递归对象图攻击
+- **可配置策略**：自定义类检查器和反序列化策略
+- **平台支持**：Java 8-24、GraalVM 原生镜像、多操作系统平台
 
-## Protocols
+## 协议
 
-Apache Fory™ implements multiple binary protocols optimized for different scenarios:
+Apache Fory™ 实现了针对不同场景优化的多个二进制协议：
 
-| Protocol                                                                  | Use Case                       | Key Features                                           |
-| ------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
-| **[Xlang Serialization](../specification/xlang_serialization_spec.md)** | Cross-language object exchange | Automatic serialization, references, polymorphism      |
-| **[Java Serialization](../specification/java_serialization_spec.md)**   | High-performance Java-only     | Drop-in JDK serialization replacement, 100x faster     |
-| **[Row Format](../specification/row_format_spec.md)**                   | Analytics and data processing  | Zero-copy random access, Arrow compatibility           |
-| **Python Native**                                                         | Python-specific serialization  | Pickle/cloudpickle replacement with better performance |
+| 协议                                                                      | 使用场景               | 核心特性                                     |
+| ------------------------------------------------------------------------- | ---------------------- | -------------------------------------------- |
+| **[跨语言序列化](../specification/xlang_serialization_spec.md)**        | 跨语言对象交换         | 自动序列化、引用、多态                       |
+| **[Java 序列化](../specification/java_serialization_spec.md)**          | 高性能 Java 专用       | JDK 序列化的直接替代，快 100 倍              |
+| **[行格式](../specification/row_format_spec.md)**                       | 分析和数据处理         | 零拷贝随机访问、Arrow 兼容                   |
+| **Python 原生**                                                           | Python 专用序列化      | Pickle/cloudpickle 替代，性能更好            |
 
-All protocols share the same optimized codebase, allowing improvements in one protocol to benefit others.
+所有协议共享相同的优化代码库，一个协议的改进可以惠及其他协议。
 
-## Documentation
+## 文档
 
-### User Guides
+### 用户指南
 
-| Guide                            | Description                                | Source                                                                  | Website                                                                             |
-| -------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **Java Serialization**           | Comprehensive guide for Java serialization | [java_serialization_guide.md](../guide/java_serialization_guide.md)   | [📖 View](https://fory.apache.org/docs/guide/java_serialization)               |
-| **Cross-Language Serialization** | Multi-language object exchange             | [xlang_serialization_guide.md](../guide/xlang_serialization_guide.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
-| **Row Format**                   | Zero-copy random access format             | [row_format_guide.md](../guide/row_format_guide.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
-| **Python**                       | Python-specific features and usage         | [python_guide.md](../guide/python_guide.md)                           | [📖 View](https://fory.apache.org/docs/guide/python_serialization)             |
-| **Rust**                         | Rust implementation and patterns           | [rust_guide.md](../guide/rust_guide.md)                               | [📖 View](https://fory.apache.org/docs/guide/rust_serialization)               |
-| **Scala**                        | Scala integration and best practices       | [scala_guide.md](../guide/scala_guide.md)                             | [📖 View](https://fory.apache.org/docs/guide/scala_serialization)              |
-| **GraalVM**                      | Native image support and AOT compilation   | [graalvm_guide.md](../guide/graalvm_guide.md)                         | [📖 View](https://fory.apache.org/docs/guide/graalvm_serialization)            |
-| **Development**                  | Building and contributing to Fory          | [DEVELOPMENT.md](../guide/DEVELOPMENT.md)                             | [📖 View](https://fory.apache.org/docs/guide/development)                      |
+| 指南                   | 描述                              | 源文件                                                          | 网站                                                                                |
+| ---------------------- | --------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Java 序列化**        | Java 序列化综合指南               | [java_serialization_guide.md](../guide/java_serialization_guide.md)                             | [📖 查看](https://fory.apache.org/docs/guide/java_serialization)                                  |
+| **跨语言序列化**       | 多语言对象交换                    | [xlang_serialization_guide.md](../guide/xlang_serialization_guide.md)                           | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec)                                 |
+| **行格式**             | 零拷贝随机访问格式                | [row_format_guide.md](../guide/row_format_guide.md)                      | [📖 查看](https://fory.apache.org/docs/specification/fory_row_format_spec)                       |
+| **Python**             | Python 特定功能和用法             | [python_guide.md](../guide/python_guide.md)                         | [📖 查看](https://fory.apache.org/docs/guide/python_serialization)                                |
+| **Rust**               | Rust 实现和模式                   | [rust_guide.md](../guide/rust_guide.md)                             | [📖 查看](https://fory.apache.org/docs/guide/rust_serialization)                                  |
+| **Scala**              | Scala 集成和最佳实践              | [scala_guide.md](../guide/scala_guide.md)                           | [📖 查看](https://fory.apache.org/docs/guide/scala_serialization)                                 |
+| **GraalVM**            | 原生镜像支持和 AOT 编译           | [graalvm_guide.md](../guide/graalvm_guide.md)                       | [📖 查看](https://fory.apache.org/docs/guide/graalvm_serialization)                         |
+| **开发**               | 构建和贡献 Fory                   | [DEVELOPMENT.md](../guide/DEVELOPMENT.md)                             | [📖 查看](https://fory.apache.org/docs/guide/development)                           |
 
-### Protocol Specifications
+### 协议规范
 
-| Specification           | Description                    | Source                                                                        | Website                                                                             |
-| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **Xlang Serialization** | Cross-language binary protocol | [xlang_serialization_spec.md](../specification/xlang_serialization_spec.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
-| **Java Serialization**  | Java-optimized protocol        | [java_serialization_spec.md](../specification/java_serialization_spec.md)   | [📖 View](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
-| **Row Format**          | Row-based binary format        | [row_format_spec.md](../specification/row_format_spec.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
-| **Type Mapping**        | Cross-language type conversion | [xlang_type_mapping.md](../specification/xlang_type_mapping.md)             | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| 规范                   | 描述                     | 源文件                                                                        | 网站                                                                                |
+| ---------------------- | ------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **跨语言序列化**       | 跨语言二进制协议         | [xlang_serialization_spec.md](../specification/xlang_serialization_spec.md) | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| **Java 序列化**        | Java 优化协议            | [java_serialization_spec.md](../specification/java_serialization_spec.md)   | [📖 查看](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
+| **行格式**             | 基于行的二进制格式       | [row_format_spec.md](../specification/row_format_spec.md)                   | [📖 查看](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
+| **类型映射**           | 跨语言类型转换           | [xlang_type_mapping.md](../specification/xlang_type_mapping.md)             | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
 
-## Compatibility
+## 兼容性
 
-### Schema Compatibility
+### Schema 兼容性
 
-Apache Fory™ supports class schema forward/backward compatibility across **Java, Python, Rust, and Golang**, enabling seamless schema evolution in production systems without requiring coordinated upgrades across all services. Fory provides two schema compatibility modes:
+Apache Fory™ 支持 **Java、Python、Rust 和 Golang** 的类 Schema 向前/向后兼容，支持生产系统中的无缝 Schema 演进，无需跨所有服务协调升级。Fory 提供两种 Schema 兼容性模式：
 
-1. **Schema Consistent Mode (Default)**: Assumes identical class schemas between serialization and deserialization peers. This mode offers minimal serialization overhead, smallest data size, and fastest performance: ideal for stable schemas or controlled environments.
+1. **Schema 一致模式（默认）**：假设序列化和反序列化端之间的类 Schema 相同。此模式提供最小的序列化开销、最小的数据大小和最快的性能：适用于稳定的 Schema 或受控环境。
 
-2. **Compatible Mode**: Supports independent schema evolution with forward and backward compatibility. This mode enables field addition/deletion, limited type evolution, and graceful handling of schema mismatches. Enable using `withCompatibleMode(CompatibleMode.COMPATIBLE)` in Java, `compatible=True` in Python, `compatible_mode(true)` in Rust, or `NewFory(true)` in Go.
+2. **兼容模式**：支持独立的 Schema 演进，具有向前和向后兼容性。此模式支持字段添加/删除、有限的类型演进和优雅处理 Schema 不匹配。在 Java 中使用 `withCompatibleMode(CompatibleMode.COMPATIBLE)` 启用，在 Python 中使用 `compatible=True`，在 Rust 中使用 `compatible_mode(true)`，在 Go 中使用 `NewFory(true)`。
 
-### Binary Compatibility
+### 二进制兼容性
 
-**Current Status**: Binary compatibility is **not guaranteed** between Fory major releases as the protocol continues to evolve. However, compatibility **is guaranteed** between minor versions (e.g., 0.13.x).
+**当前状态**：由于协议持续演进，Fory 主要版本之间**不保证**二进制兼容性。但是，次要版本之间（例如 0.13.x）**保证**兼容性。
 
-**Recommendations**:
+**建议**：
 
-- Version your serialized data by Fory major version
-- Plan migration strategies when upgrading major versions
-- See [upgrade guide](../guide/java_serialization_guide.md#upgrade-fory) for details
+- 按 Fory 主要版本对序列化数据进行版本控制
+- 升级主要版本时规划迁移策略
+- 详见[升级指南](../guide/java_serialization_guide.md#upgrade-fory)
 
-**Future**: Binary compatibility will be guaranteed starting from Fory 1.0 release.
+**未来**：从 Fory 1.0 版本开始将保证二进制兼容性。
 
-## Security
+## 安全
 
-### Overview
+### 概述
 
-Serialization security varies by protocol:
+序列化安全性因协议而异：
 
-- **Row Format**: Secure with predefined schemas
-- **Object Graph Serialization** (Java/Python native): More flexible but requires careful security configuration
+- **行格式**：使用预定义 Schema，本质上安全
+- **对象图序列化**（Java/Python 原生）：更灵活但需要仔细的安全配置
 
-Dynamic serialization can deserialize arbitrary types, which may introduces risks. For example, the deserialization may invoke `init` constructor or `equals/hashCode` method, if the method body contains malicious code, the system will be at risk.
+动态序列化可以反序列化任意类型，这可能会带来风险。例如，反序列化可能会调用 `init` 构造函数或 `equals/hashCode` 方法，如果方法体包含恶意代码，系统将面临风险。
 
-Fory enables class registration **by default** for dynamic protocols, allowing only trusted registered types.
-**Do not disable class registration unless you can ensure your environment is secure**.
+Fory 默认**启用**动态协议的类注册，只允许受信任的已注册类型或内置类型。
+**除非您能确保环境安全，否则不要禁用类注册**。
 
-If this option is disabled, you are responsible for serialization security. You should implement and configure a customized `ClassChecker` or `DeserializationPolicy` for fine-grained security control
+如果禁用此选项，您需要对序列化安全负责。您应该实现并配置自定义的 `ClassChecker` 或 `DeserializationPolicy` 以进行细粒度的安全控制。
 
-To report security vulnerabilities in Apache Fory™, please follow the [ASF vulnerability reporting process](https://apache.org/security/#reporting-a-vulnerability).
+要报告 Apache Fory™ 中的安全漏洞，请遵循 [ASF 漏洞报告流程](https://apache.org/security/#reporting-a-vulnerability)。
 
-## Community and Support
+## 社区与支持
 
-### Getting Help
+### 获取帮助
 
-- **Slack**: Join our [Slack workspace](https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw) for community discussions
-- **Twitter/X**: Follow [@ApacheFory](https://x.com/ApacheFory) for updates and announcements
-- **GitHub Issues**: Report bugs and request features at [apache/fory](https://github.com/apache/fory/issues)
-- **Mailing Lists**: Subscribe to Apache Fory mailing lists for development discussions
+- **Slack**：加入我们的 [Slack 工作区](https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw)参与社区讨论
+- **Twitter/X**：关注 [@ApacheFory](https://x.com/ApacheFory) 获取更新和公告
+- **GitHub Issues**：在 [apache/fory](https://github.com/apache/fory/issues) 报告错误和请求功能
+- **邮件列表**：订阅 Apache Fory 邮件列表参与开发讨论
 
-### Contributing
+### 贡献
 
-We welcome contributions! Please read our [Contributing Guide](https://github.com/apache/fory/blob/main/CONTRIBUTING.md) to get started.
+我们欢迎贡献！请阅读我们的[贡献指南](https://github.com/apache/fory/blob/main/CONTRIBUTING.md)开始。
 
-**Ways to Contribute**:
+**贡献方式**：
 
-- 🐛 Report bugs and issues
-- 💡 Propose new features
-- 📝 Improve documentation
-- 🔧 Submit pull requests
-- 🧪 Add test cases
-- 📊 Share benchmarks
+- 🐛 报告错误和问题
+- 💡 提出新功能
+- 📝 改进文档
+- 🔧 提交 Pull Request
+- 🧪 添加测试用例
+- 📊 分享基准测试
 
-See [Development Guide](../guide/DEVELOPMENT.md) for build instructions and development workflow.
+详见[开发指南](../guide/DEVELOPMENT.md)了解构建说明和开发工作流程。

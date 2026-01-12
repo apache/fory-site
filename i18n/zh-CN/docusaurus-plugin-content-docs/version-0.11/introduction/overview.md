@@ -1,62 +1,58 @@
 ---
 id: overview
-title: Overview
+title: 概述
 sidebar_position: 1
 ---
 
-Apache Fory™ is a blazing fast multi-language serialization framework powered by jit(just-in-time compilation) and zero-copy.
+Fury 是一个由 JIT（即时编译）和零拷贝技术驱动的超高性能多语言序列化框架。
 
-## Protocols
+## 协议
 
-Different scenarios have different serialization requirements. Apache Fory™ designed and implemented
-multiple binary protocols for those requirements:
+不同场景有不同的序列化需求。Fury 针对这些需求设计并实现了多种二进制协议：
 
-- Cross-language object graph protocol:
-  - Cross-language serialize any object automatically, no need for IDL definition, schema compilation and object to/from protocol
-    conversion.
-  - Support shared reference and circular reference, no duplicate data or recursion error.
-  - Support object polymorphism.
-- Native java/python object graph protocol: highly-optimized based on type system of the language.
-- Row format protocol: a cache-friendly binary random access format, supports skipping serialization and partial serialization,
-  and can convert to column-format automatically.
+- 跨语言对象图协议：
+  - 自动跨语言序列化任何对象，无需 IDL 定义、Schema 编译和对象与协议之间的转换。
+  - 支持共享引用和循环引用，无重复数据或递归错误。
+  - 支持对象多态。
+- 原生 Java/Python 对象图协议：基于语言类型系统的高度优化。
+- 行格式协议：缓存友好的二进制随机访问格式，支持跳过序列化和部分序列化，可自动转换为列格式。
 
-New protocols can be added easily based on Apache Fory™ existing buffer, encoding, meta, codegen and other capabilities. All of those share same codebase, and the optimization for one protocol
-can be reused by another protocol.
+基于 Fury 现有的缓冲区、编码、元数据、代码生成等能力，可以轻松添加新协议。所有这些共享相同的代码库，一个协议的优化可以被另一个协议复用。
 
-## Compatibility
+## 兼容性
 
-### Schema Compatibility
+### Schema 兼容性
 
-Apache Fory™ java object graph serialization support class schema forward/backward compatibility. The serialization peer and deserialization peer can add/delete fields independently.
+Fury Java 对象图序列化支持类 Schema 的向前/向后兼容性。序列化端和反序列化端可以独立添加/删除字段。
 
-We plan to add support cross-language serialization after [meta compression](https://github.com/apache/fory/issues/203) are finished.
+我们计划在[元数据压缩](https://github.com/apache/fury/issues/203)完成后添加跨语言序列化支持。
 
-### Binary Compatibility
+### 二进制兼容性
 
-We are still improving our protocols, binary compatibility are not ensured between Apache Fory™ releases for now. Please `shade` Apache Fory™ if you will upgrade Apache Fory™ in the future.
+我们仍在改进协议，目前 Fury 版本之间不保证二进制兼容性。如果您将来要升级 Fury，请使用 `shade` 打包 Fury。
 
-Binary compatibility will be ensured before Apache Fory™ 1.0.
+二进制兼容性将在 Fury 1.0 之前得到保证。
 
-## Security
+## 安全性
 
-Static serialization such as row format are secure by nature. But dynamic object graph serialization supports deserialize unregistered types, which can introduce security risks.
+静态序列化（如行格式）本质上是安全的。但动态对象图序列化支持反序列化未注册的类型，这可能会引入安全风险。
 
-For example, the deserialization may invoke `init` constructor or `equals`/`hashCode` method, if the method body contains malicious code, the system will be at risks.
+例如，反序列化可能会调用 `init` 构造函数或 `equals`/`hashCode` 方法，如果方法体包含恶意代码，系统将面临风险。
 
-Apache Fory™ provides a class registration mode option and enabled by default for this protocol, which allows deserializing trusted registered types or built-in types only for security.
+Fury 为此协议提供了类注册模式选项，默认启用，只允许反序列化受信任的已注册类型或内置类型以确保安全。
 
-Apache Fory™ provides a class registration option and enabled by default for such protocols, which allows only deserializing trusted registered types or built-in types. **Do not disable class registration or class registration checks unless you can ensure your environment is indeed secure**. We are not responsible for security if you disabled the class registration option.
+Fury 提供了类注册选项，默认启用，只允许反序列化受信任的已注册类型或内置类型。**除非您能确保环境确实安全，否则不要禁用类注册或类注册检查**。如果您禁用了类注册选项，我们对安全性不承担责任。
 
-## RoadMap
+## 路线图
 
-- Meta compression, auto meta sharing and cross-language schema compatibility.
-- AOT Framework for c++/golang to generate code statically.
-- C++/Rust object graph serialization support
-- Golang/Rust/NodeJS row format support
-- ProtoBuffer compatibility support
-- Protocols for features and knowledge graph serialization
-- Continuously improve our serialization infrastructure for any new protocols
+- 元数据压缩、自动元数据共享和跨语言 Schema 兼容性
+- C++/Golang AOT 框架以静态生成代码
+- C++/Rust 对象图序列化支持
+- Golang/Rust/NodeJS 行格式支持
+- ProtoBuffer 兼容性支持
+- 特征和知识图谱序列化协议
+- 持续改进我们的序列化基础设施以支持任何新协议
 
-## How to Contribute
+## 如何贡献
 
-Please read the [CONTRIBUTING](https://github.com/apache/fory/blob/main/CONTRIBUTING.md) guide for instructions on how to contribute.
+请阅读 [CONTRIBUTING](https://github.com/apache/fury/blob/main/CONTRIBUTING.md) 指南了解如何贡献。
