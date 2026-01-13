@@ -58,9 +58,9 @@ This specification defines the Fory xlang binary format. The format is dynamic r
 - enum: a data type consisting of a set of named values. Rust enum with non-predefined field values are not supported as
   an enum.
 - named_enum: an enum whose value will be serialized as the registered name.
-- struct: a morphic(final) type serialized by Fory Struct serializer. i.e. it doesn't have subclasses. Suppose we're
-  deserializing `List<SomeClass>`, we can save dynamic serializer dispatch since `SomeClass` is morphic(final).
-- compatible_struct: a morphic(final) type serialized by Fory compatible Struct serializer.
+- struct: a dynamic(final) type serialized by Fory Struct serializer. i.e. it doesn't have subclasses. Suppose we're
+  deserializing `List<SomeClass>`, we can save dynamic serializer dispatch since `SomeClass` is dynamic(final).
+- compatible_struct: a dynamic(final) type serialized by Fory compatible Struct serializer.
 - named_struct: a `struct` whose type mapping will be encoded as a name.
 - named_compatible_struct: a `compatible_struct` whose type mapping will be encoded as a name.
 - ext: a type which will be serialized by a customized serializer.
@@ -592,11 +592,11 @@ Polymorphism spec:
 - `struct/named_struct/ext/named_ext` are taken as polymorphic, the meta for those types are written separately
   instead of inlining here to reduce meta space cost if object of this type is serialized in current object graph
   multiple times, and the field value may be null too.
-- `enum` is taken as morphic, if deserialization doesn't have this field, or the type is not enum, enum value
+- `enum` is taken as dynamic, if deserialization doesn't have this field, or the type is not enum, enum value
   will be skipped.
-- `list/map/set` are taken as morphic, when serializing values of those type, the concrete types won't be written
+- `list/map/set` are taken as dynamic, when serializing values of those type, the concrete types won't be written
   again.
-- Other types that fory supported are taken as morphic too.
+- Other types that fory supported are taken as dynamic too.
 
 List/Set/Map nested type spec:
 
