@@ -251,26 +251,24 @@ Fory will write the byte order for that object into the data instead of converti
 Fory header format for xlang serialization:
 
 ```
-|    2 bytes   |        1 byte bitmap           |   1 byte   |          optional 4 bytes          |
-+--------------+--------------------------------+------------+------------------------------------+
-| magic number |  4 bits reserved | 4 bits meta |  language  | unsigned int for meta start offset |
+|        1 byte bitmap           |   1 byte   |          optional 4 bytes          |
++--------------------------------+------------+------------------------------------+
+|  4 bits reserved | 4 bits meta |  language  | unsigned int for meta start offset |
 ```
 
 Detailed byte layout:
 
 ```
-Byte 0-1: Magic number (0x62d4) - little endian
-Byte 2:   Bitmap flags
+Byte 0:   Bitmap flags
           - Bit 0: null flag (0x01)
           - Bit 1: endian flag (0x02)
           - Bit 2: xlang flag (0x04)
           - Bit 3: oob flag (0x08)
           - Bits 4-7: reserved
-Byte 3:   Language ID (only present when xlang flag is set)
-Byte 4-7: Meta start offset (only present when meta share mode is enabled)
+Byte 1:   Language ID (only present when xlang flag is set)
+Byte 2-5: Meta start offset (only present when meta share mode is enabled)
 ```
 
-- **magic number**: `0x62d4` (2 bytes, little endian) - used to identify fory xlang serialization protocol.
 - **null flag** (bit 0): 1 when object is null, 0 otherwise. If an object is null, only this flag and endian flag are set.
 - **endian flag** (bit 1): 1 when data is encoded by little endian, 0 for big endian. Modern implementations always use little endian.
 - **xlang flag** (bit 2): 1 when serialization uses Fory xlang format, 0 when serialization uses Fory language-native format.
@@ -1528,7 +1526,6 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
    - [ ] Optionally implement Hybrid encoding (TAGGED_INT64/TAGGED_UINT64) for int64
 
 3. **Header Handling**
-   - [ ] Write magic number `0x62d4`
    - [ ] Write/read bitmap flags (null, endian, xlang, oob)
    - [ ] Write/read language ID
    - [ ] Handle meta start offset placeholder (for schema evolution)
