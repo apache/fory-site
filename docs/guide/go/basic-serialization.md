@@ -1,7 +1,7 @@
 ---
 title: Basic Serialization
 sidebar_position: 20
-id: go_basic_serialization
+id: basic_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

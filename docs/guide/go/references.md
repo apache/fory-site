@@ -1,7 +1,7 @@
 ---
 title: References
 sidebar_position: 50
-id: go_references
+id: references
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

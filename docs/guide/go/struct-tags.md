@@ -1,7 +1,7 @@
 ---
 title: Struct Tags
 sidebar_position: 60
-id: go_struct_tags
+id: struct_tags
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

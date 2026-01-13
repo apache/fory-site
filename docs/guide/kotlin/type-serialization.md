@@ -1,7 +1,7 @@
 ---
 title: Type Serialization
 sidebar_position: 2
-id: kotlin_type_serialization
+id: type_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

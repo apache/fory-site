@@ -1,7 +1,7 @@
 ---
 title: Zero-Copy Serialization
 sidebar_position: 50
-id: xlang_zero_copy
+id: zero_copy
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

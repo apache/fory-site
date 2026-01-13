@@ -1,7 +1,7 @@
 ---
 title: Troubleshooting
 sidebar_position: 11
-id: java_troubleshooting
+id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
