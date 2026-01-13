@@ -243,8 +243,7 @@ Here is the overall format:
 | fory header | object ref meta | object type meta | object value data |
 ```
 
-The data are serialized using little endian byte order overall. If bytes swap is costly for some object,
-Fory will write the byte order for that object into the data instead of converting it to little endian.
+The data are serialized using little endian byte order for all types.
 
 ## Fory header
 
@@ -261,18 +260,19 @@ Detailed byte layout:
 ```
 Byte 0:   Bitmap flags
           - Bit 0: null flag (0x01)
-          - Bit 1: endian flag (0x02)
-          - Bit 2: xlang flag (0x04)
-          - Bit 3: oob flag (0x08)
-          - Bits 4-7: reserved
+          - Bit 1: xlang flag (0x02)
+          - Bit 2: oob flag (0x04)
+          - Bits 3-7: reserved
 Byte 1:   Language ID (only present when xlang flag is set)
 Byte 2-5: Meta start offset (only present when meta share mode is enabled)
 ```
 
-- **null flag** (bit 0): 1 when object is null, 0 otherwise. If an object is null, only this flag and endian flag are set.
-- **endian flag** (bit 1): 1 when data is encoded by little endian, 0 for big endian. Modern implementations always use little endian.
-- **xlang flag** (bit 2): 1 when serialization uses Fory xlang format, 0 when serialization uses Fory language-native format.
-- **oob flag** (bit 3): 1 when out-of-band serialization is enabled (BufferCallback is not null), 0 otherwise.
+- **null flag** (bit 0): 1 when object is null, 0 otherwise. If an object is null, only this flag is set.
+- **xlang flag** (bit 1): 1 when serialization uses Fory xlang format, 0 when serialization uses Fory language-native format.
+- **oob flag** (bit 2): 1 when out-of-band serialization is enabled (BufferCallback is not null), 0 otherwise.
+
+All data is encoded in little-endian format.
+
 - **language**: 1 byte indicating the source language. This allows deserializers to optimize for specific language characteristics.
 
 ### Language IDs
