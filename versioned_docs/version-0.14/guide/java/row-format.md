@@ -1,7 +1,7 @@
 ---
 title: Row Format
 sidebar_position: 9
-id: java_row_format
+id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

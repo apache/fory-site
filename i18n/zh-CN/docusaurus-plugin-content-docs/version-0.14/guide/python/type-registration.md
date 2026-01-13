@@ -1,7 +1,7 @@
 ---
 title: 类型注册与安全性
 sidebar_position: 3
-id: python_type_registration
+id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

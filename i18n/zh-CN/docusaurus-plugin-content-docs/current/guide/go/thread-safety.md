@@ -1,7 +1,7 @@
 ---
 title: Thread Safety
 sidebar_position: 100
-id: go_thread_safety
+id: thread_safety
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

@@ -1,7 +1,7 @@
 ---
 title: Out-of-Band Serialization
 sidebar_position: 7
-id: python_out_of_band
+id: out_of_band
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

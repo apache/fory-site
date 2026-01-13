@@ -1,7 +1,7 @@
 ---
 title: Python 原生模式
 sidebar_position: 5
-id: python_native_mode
+id: native_mode
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

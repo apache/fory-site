@@ -1,7 +1,7 @@
 ---
 title: Migration Guide
 sidebar_position: 12
-id: python_migration
+id: migration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

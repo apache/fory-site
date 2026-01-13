@@ -1,7 +1,7 @@
 ---
 title: Field Configuration
 sidebar_position: 5
-id: cpp_field_configuration
+id: field_configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

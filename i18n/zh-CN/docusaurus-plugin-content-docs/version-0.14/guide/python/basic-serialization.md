@@ -1,7 +1,7 @@
 ---
 title: 基础序列化
 sidebar_position: 2
-id: python_basic_serialization
+id: basic_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
