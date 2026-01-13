@@ -1,7 +1,7 @@
 ---
 title: 共享和循环引用
 sidebar_position: 5
-id: rust_references
+id: references
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

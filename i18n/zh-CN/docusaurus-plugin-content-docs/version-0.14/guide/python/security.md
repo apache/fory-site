@@ -1,7 +1,7 @@
 ---
 title: 安全最佳实践
 sidebar_position: 9
-id: python_security
+id: security
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

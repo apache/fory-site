@@ -1,7 +1,7 @@
 ---
 title: Compression
 sidebar_position: 6
-id: java_compression
+id: compression
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

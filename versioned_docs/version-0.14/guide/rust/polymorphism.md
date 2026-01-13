@@ -1,7 +1,7 @@
 ---
 title: Trait Object Serialization
 sidebar_position: 6
-id: rust_polymorphism
+id: polymorphism
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

@@ -1,7 +1,7 @@
 ---
 title: Schema Evolution
 sidebar_position: 5
-id: java_schema_evolution
+id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
