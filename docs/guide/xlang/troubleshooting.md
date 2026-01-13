@@ -200,25 +200,6 @@ fory = pyfory.Fory(ref_tracking=True)
 
 ## Language Mode Issues
 
-### "Invalid magic number" Error
-
-**Symptom:**
-
-```
-Error: Invalid magic number in header
-```
-
-**Cause:** One side is using Java-native mode instead of xlang mode.
-
-**Solution:** Ensure both sides use xlang mode:
-
-```java
-// Java - must use Language.XLANG
-Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .build();
-```
-
 ### Incompatible Types in Xlang Mode
 
 **Symptom:**
