@@ -1,7 +1,7 @@
 ---
 title: Scala 序列化指南
 sidebar_position: 4
-id: scala_serialization
+id: serialization
 ---
 
 Apache Fury 支持所有 Scala 对象序列化：

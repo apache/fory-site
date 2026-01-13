@@ -46,7 +46,7 @@ from dataclasses import dataclass
 @dataclass
 class User:
     name: str
-    age: int
+    age: pyfory.int32
 
 fory = pyfory.Fory(xlang=True)
 fory.register(User, type_id=1)
@@ -54,7 +54,7 @@ fory.register(User, type_id=1)
 user = User(name="Alice", age=30)
 data = fory.serialize(user)
 decoded = fory.deserialize(data)
-print(decoded.name, decoded.age)  # Alice 30
+print(decoded)  # User(name='Alice', age=30)
 ```
 
 ## 核心特性
