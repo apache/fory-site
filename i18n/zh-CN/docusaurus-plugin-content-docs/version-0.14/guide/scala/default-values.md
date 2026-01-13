@@ -1,7 +1,7 @@
 ---
 title: 默认值
 sidebar_position: 3
-id: scala_default_values
+id: default_values
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

@@ -1,7 +1,7 @@
 ---
 title: Fury Java Serialization Format
 sidebar_position: 1
-id: fury_java_serialization_spec
+id: java_serialization_spec
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

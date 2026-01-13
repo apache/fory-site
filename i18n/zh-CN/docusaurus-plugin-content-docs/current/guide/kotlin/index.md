@@ -1,7 +1,7 @@
 ---
 title: Kotlin Serialization Guide
 sidebar_position: 0
-id: kotlin_serialization_index
+id: serialization_index
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
