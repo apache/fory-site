@@ -298,4 +298,4 @@ FORY_FIELD_CONFIG(Zoo,
 
 - [Field Nullability](field-nullability.md) - Controlling null handling for fields
 - [Field Reference Tracking](field-reference-tracking.md) - Managing shared/circular references
-- [Type Mapping](xlang_type_mapping.md) - Cross-language type compatibility
+- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type compatibility
