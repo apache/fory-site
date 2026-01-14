@@ -1,5 +1,5 @@
 ---
-title: NumPy & Scientific Computing
+title: NumPy & Pandas
 sidebar_position: 8
 id: numpy_integration
 license: |
@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Fory natively supports numpy arrays with optimized serialization.
+Fory natively supports numpy arrays and pandas DataFrame with optimized serialization.
 
 ## NumPy Array Serialization
 

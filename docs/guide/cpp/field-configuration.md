@@ -527,6 +527,46 @@ FORY_FIELD_CONFIG(DataV2,
 | **Cross-lang compat**   | Limited               | Limited           | Full                      |
 | **Recommended for**     | Simple structs        | Third-party types | Complex/xlang structs     |
 
+## Xlang Mode Defaults
+
+C++ only supports xlang (cross-language) mode. The defaults are strict due to type system differences between languages:
+
+- **Nullable**: Fields are non-nullable by default
+- **Ref tracking**: Disabled by default (except `std::shared_ptr` which tracks refs by default)
+
+You **need to configure fields** when:
+
+- A field can be null (use `std::optional<T>` or mark with `nullable()`)
+- A field needs reference tracking for shared/circular objects (use `ref()`)
+- Integer types need specific encoding for cross-language compatibility
+- You want to reduce metadata size (use field IDs)
+
+```cpp
+// Xlang mode: explicit configuration required
+struct User {
+    std::string name;                              // Non-nullable by default
+    std::optional<std::string> email;              // Nullable (std::optional)
+    std::shared_ptr<User> friend_ptr;              // Ref tracking by default
+};
+
+FORY_STRUCT(User, name, email, friend_ptr);
+
+FORY_FIELD_CONFIG(User,
+    (name, fory::F(0)),
+    (email, fory::F(1)),                           // nullable implicit for optional
+    (friend_ptr, fory::F(2).nullable().ref())      // explicit nullable + ref
+);
+```
+
+### Default Values Summary
+
+| Type                 | Default Nullable | Default Ref Tracking |
+| -------------------- | ---------------- | -------------------- |
+| Primitives, `string` | `false`          | `false`              |
+| `std::optional<T>`   | `true`           | `false`              |
+| `std::shared_ptr<T>` | `false`          | `true`               |
+| `std::unique_ptr<T>` | `false`          | `false`              |
+
 ## Related Topics
 
 - [Type Registration](type-registration.md) - Registering types with FORY_STRUCT
