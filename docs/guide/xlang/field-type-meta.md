@@ -1,6 +1,6 @@
 ---
 title: Field Type Meta
-sidebar_position: 4
+sidebar_position: 46
 id: field_type_meta
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
