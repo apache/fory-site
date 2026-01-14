@@ -527,12 +527,10 @@ FORY_FIELD_CONFIG(DataV2,
 | **Cross-lang compat**   | Limited               | Limited           | Full                      |
 | **Recommended for**     | Simple structs        | Third-party types | Complex/xlang structs     |
 
-## Xlang Mode Defaults
+## Default Values
 
-C++ only supports xlang (cross-language) mode. The defaults are strict due to type system differences between languages:
-
-- **Nullable**: Fields are non-nullable by default
-- **Ref tracking**: Disabled by default (except `std::shared_ptr` which tracks refs by default)
+- **Nullable**: Only `std::optional<T>` is nullable by default; all other types (including `std::shared_ptr`) are non-nullable
+- **Ref tracking**: Disabled by default for all types (including `std::shared_ptr`)
 
 You **need to configure fields** when:
 

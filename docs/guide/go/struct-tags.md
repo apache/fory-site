@@ -282,11 +282,18 @@ err := f.RegisterStruct(BadStruct{}, 1)
 // Error: ErrKindInvalidTag
 ```
 
-## Xlang Mode Defaults
+## Native Mode vs Xlang Mode
 
-Go only supports xlang (cross-language) mode. The defaults are strict due to type system differences between languages:
+Field configuration behaves differently depending on the serialization mode:
 
-- **Nullable**: Fields are non-nullable by default
+**Native Mode**:
+
+- **Nullable**: Pointer, slice, map, and interface types are nullable by default
+- **Ref tracking**: Disabled by default (`ref` tag not set)
+
+**Xlang Mode**:
+
+- **Nullable**: Only pointer types are nullable by default (slices and maps are NOT nullable)
 - **Ref tracking**: Disabled by default (`ref` tag not set)
 
 You **need to configure fields** when:
