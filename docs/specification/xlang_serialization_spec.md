@@ -148,9 +148,12 @@ Such information can be provided in other languages too:
 
 ### Type ID
 
-All internal data types are expressed using an ID in range `0~64`. Users can use IDs in range `0~8192` for registering their
-custom types (struct/ext/enum). User type IDs are in a separate namespace and combined with internal type IDs via bit shifting:
+All internal data types use an 8-bit internal ID (`0~255`, with `0~50` defined here). Users can
+register types by numeric ID (`0~4095` in current implementations). User IDs are encoded together
+with the internal type ID:
 `(user_type_id << 8) | internal_type_id`.
+
+Named types (`NAMED_*`) do not embed a user ID; their names are carried in metadata instead.
 
 #### Internal Type ID Table
 
@@ -250,9 +253,9 @@ The data are serialized using little endian byte order for all types.
 Fory header format for xlang serialization:
 
 ```
-|        1 byte bitmap           |   1 byte   |          optional 4 bytes          |
-+--------------------------------+------------+------------------------------------+
-|  4 bits reserved | 4 bits meta |  language  | unsigned int for meta start offset |
+|        1 byte bitmap           |   1 byte   |
++--------------------------------+------------+
+|            flags               |  language  |
 ```
 
 Detailed byte layout:
@@ -264,7 +267,6 @@ Byte 0:   Bitmap flags
           - Bit 2: oob flag (0x04)
           - Bits 3-7: reserved
 Byte 1:   Language ID (only present when xlang flag is set)
-Byte 2-5: Meta start offset (only present when meta share mode is enabled)
 ```
 
 - **null flag** (bit 0): 1 when object is null, 0 otherwise. If an object is null, only this flag is set.
@@ -287,10 +289,6 @@ All data is encoded in little-endian format.
 | JAVASCRIPT | 5   |
 | RUST       | 6   |
 | DART       | 7   |
-
-### Meta Start Offset
-
-If compatible mode is enabled, an uncompressed unsigned int32 (4 bytes, little endian) is appended to indicate the start offset of metadata. During serialization, this is initially written as a placeholder (e.g., `-1` or `0`), then updated after all objects are serialized and metadata is collected.
 
 ## Reference Meta
 
@@ -408,254 +406,151 @@ explicit smart pointers (`Rc`, `Arc`).
 
 ## Type Meta
 
-For every type to be serialized, it have a type id to indicate its type.
+Every non-primitive value begins with a type ID that identifies its concrete type. The type ID is
+followed by optional type-specific metadata.
 
-- basic types: the type id
-- enum:
-  - `Type.ENUM` + registered id
-  - `Type.NAMED_ENUM` + registered namespace+typename
-- list: `Type.List`
-- set: `Type.SET`
-- map: `Type.MAP`
-- ext:
-  - `Type.EXT` + registered id
-  - `Type.NAMED_EXT` + registered namespace+typename
-- struct:
-  - `Type.STRUCT` + struct meta
-  - `Type.NAMED_STRUCT` + struct meta
+### Type ID encoding
 
-Every type must be registered with an ID or name first. The registration can be used for security check and type
-identification.
+- The type ID is written as an unsigned varint32 (small7).
+- Internal types use their internal type ID directly (low 8 bits).
+- User-registered types use a full type ID: `(user_type_id << 8) | internal_type_id`.
+  - `user_type_id` is a numeric ID (0-4095 in current implementations).
+  - `internal_type_id` is one of `ENUM`, `STRUCT`, `COMPATIBLE_STRUCT`, or `EXT`.
+- Named types do not embed a user ID. They use `NAMED_*` internal type IDs and carry a namespace
+  and type name (or shared TypeDef) instead.
 
-Struct is a special type, depending whether schema compatibility is enabled, Fory will write struct meta
-differently.
+### Type meta payload
 
-Only ext/enum/struct can be registered using namespaced type.
+After the type ID:
 
-### Struct Schema consistent
+- **ENUM / STRUCT / EXT**: no extra bytes (registration by ID required on both sides).
+- **COMPATIBLE_STRUCT**:
+  - If meta share is enabled, write a shared TypeDef entry (see below).
+  - If meta share is disabled, no extra bytes.
+- **NAMED_ENUM / NAMED_STRUCT / NAMED_COMPATIBLE_STRUCT / NAMED_EXT**:
+  - If meta share is disabled, write `namespace` and `type_name` as meta strings.
+  - If meta share is enabled, write a shared TypeDef entry (see below).
+- **LIST / SET / MAP / ARRAY / primitives**: no extra bytes at this layer.
 
-- If schema consistent mode is enabled globally when creating fory, type meta will be written as a fory unsigned varint
-  of `type_id`. Schema evolution related meta will be ignored.
-- If schema evolution mode is enabled globally when creating fory, and current class is configured to use schema
-  consistent mode like `struct` vs `table` in flatbuffers:
-  - Type meta will be add to `captured_type_defs`: `captured_type_defs[type def stub] = map size` ahead when
-    registering type.
-  - Get index of the meta in `captured_type_defs`, write that index as `| unsigned varint: index |`.
+Unregistered types are serialized as named types:
 
-### Struct Schema evolution
+- Enums -> `NAMED_ENUM`
+- Struct-like classes -> `NAMED_STRUCT` (or `NAMED_COMPATIBLE_STRUCT` when meta share is enabled)
+- Custom extension types -> `NAMED_EXT`
 
-If schema evolution mode is enabled globally when creating fory, and enabled for current type, type meta will be written
-using one of the following mode. Which mode to use is configured when creating fory.
+The namespace is the package/module name and the type name is the simple class name.
 
-- Normal mode(meta share not enabled):
-  - If type meta hasn't been written before, add `type def`
-    to `captured_type_defs`: `captured_type_defs[type def] = map size`.
-  - Get index of the meta in `captured_type_defs`, write that index as `| unsigned varint: index |`.
-  - After finished the serialization of the object graph, fory will start to write `captured_type_defs`:
-    - Firstly, set current to `meta start offset` of fory header
-    - Then write `captured_type_defs` one by one:
+### Shared Type Meta (streaming)
 
-      ```python
-      buffer.write_var_uint32(len(writting_type_defs) - len(schema_consistent_type_def_stubs))
-      for type_meta in writting_type_defs:
-          if not type_meta.is_stub():
-              type_meta.write_type_def(buffer)
-      writing_type_defs = copy(schema_consistent_type_def_stubs)
-      ```
+When meta share is enabled, TypeDef metadata is written inline the first time a type is
+encountered, and subsequent occurrences only reference it.
 
-- Meta share mode: the writing steps are same as the normal mode, but `captured_type_defs` will be shared across
-  multiple serializations of different objects. For example, suppose we have a batch to serialize:
+Encoding:
 
-  ```python
-  captured_type_defs = {}
-  stream = ...
-  # add `Type1` to `captured_type_defs` and write `Type1`
-  fory.serialize(stream, [Type1()])
-  # add `Type2` to `captured_type_defs` and write `Type2`, `Type1` is written before.
-  fory.serialize(stream, [Type1(), Type2()])
-  # `Type1` and `Type2` are written before, no need to write meta.
-  fory.serialize(stream, [Type1(), Type2()])
-  ```
+- `marker = (index << 1) | flag`
+- `flag = 0`: new type definition follows
+- `flag = 1`: reference to a previously written type definition
+- `index` is the sequential index assigned to this type (starting from 0).
 
-- Streaming mode(streaming mode doesn't support meta share):
-  - If type meta hasn't been written before, the data will be written as:
+Write algorithm:
 
-    ```
-    | unsigned varint: 0b11111111 | type def |
-    ```
+1. Look up the class in the per-stream meta context map.
+2. If found, write `(index << 1) | 1`.
+3. If not found:
+   - assign `index = next_id`
+   - write `(index << 1)`
+   - write the encoded TypeDef bytes immediately after
 
-  - If type meta has been written before, the data will be written as:
+Read algorithm:
 
-    ```
-    | unsigned varint: written index << 1 |
-    ```
+1. Read `marker` as varuint32.
+2. `flag = marker & 1`, `index = marker >>> 1`.
+3. If `flag == 1`, use the cached TypeDef at `index`.
+4. If `flag == 0`, read a TypeDef, cache it at `index`, and use it.
 
-    `written index` is the id in `captured_type_defs`.
+TypeDef bytes include the 8-byte global header and optional size extension.
 
-  - With this mode, `meta start offset` can be omitted.
+### TypeDef (schema evolution metadata)
 
-> The normal mode and meta share mode will forbid streaming writing since it needs to look back for update the start
-> offset after the whole object graph writing and meta collecting is finished. Only in this way we can ensure
-> deserialization failure in meta share mode doesn't lost shared meta.
-
-#### Type Def
-
-Here we mainly describe the meta layout for schema evolution mode:
+TypeDef describes a struct-like type (or a named enum/ext) for schema evolution and name
+resolution. It is encoded as:
 
 ```
-|    8 bytes header    |   variable bytes   |  variable bytes   |
-+----------------------+--------------------+-------------------+
-| global binary header |    meta header     |    fields meta    |
+|    8-byte global header   | [optional size varuint] | TypeDef body |
 ```
 
-For languages which support inheritance, if parent class and subclass has fields with same name, using field in
-subclass.
+#### Global header
 
-##### Global binary header
+The 8-byte header is a little-endian uint64:
 
-`50 bits hash + 1bit compress flag + write fields meta + 12 bits meta size`. Right is the lower bits.
+- Low 12 bits: meta size (number of bytes in the TypeDef body).
+  - If meta size >= 0xFFF, the low 12 bits are set to 0xFFF and an extra
+    `varuint32(meta_size - 0xFFF)` follows immediately after the header.
+- Bit 12: `HAS_FIELDS_META` (1 = fields metadata present).
+- Bit 13: `COMPRESS_META` (1 = body is compressed; decompress before parsing).
+- High 50 bits: hash of the TypeDef body.
 
-- lower 12 bits are used to encode meta size. If meta size `>= 0b1111_1111_1111`, then write
-  `meta_ size - 0b1111_1111_1111` next.
-- 13rd bit is used to indicate whether to write fields meta. When this class is schema-consistent or use registered
-  serializer, fields meta will be skipped. Class Meta will be used for share namespace + type name only.
-- 14rd bit is used to indicate whether meta is compressed.
-- Other 50 bits is used to store the unique hash of `flags + all layers class meta`.
+#### TypeDef body
 
-##### Meta header
-
-Meta header is a 8 bits number value.
-
-- Lowest 5 digits `0b00000~0b11110` are used to record num fields. `0b11111` is preserved to indicate that Fory need to
-  read more bytes for length using Fory unsigned int encoding. Note that num_fields is the number of compatible fields.
-  Users can use tag id to mark some fields as compatible fields in schema consistent context. In such cases, schema
-  consistent fields will be serialized first, then compatible fields will be serialized next. At deserialization,
-  Fory will use fields info of those fields which aren't annotated by tag id for deserializing schema consistent
-  fields, then use fields info in meta for deserializing compatible fields.
-- The 6th bit: 0 for registered by id, 1 for registered by name.
-- Remaining 2 bits are reserved for future extension.
-
-##### Fields meta
-
-Format:
+TypeDef body has a single layer (fields are flattened in class hierarchy order):
 
 ```
-|   field info: variable bytes    | variable bytes  | ... |
-+---------------------------------+-----------------+-----+
-| header + type info + field name | next field info | ... |
+| meta header (1 byte) | type spec | field info ... |
 ```
 
-###### Field Header
+Meta header byte:
 
-Field Header is 8 bits, annotation can be used to provide more specific info. If annotation not exists, fory will infer
-those info automatically.
+- Bits 0-4: `num_fields` (0-30).
+  - If `num_fields == 31`, read an extra `varuint32` and add it.
+- Bit 5: `REGISTER_BY_NAME` (1 = namespace + type name, 0 = numeric type ID).
+- Bits 6-7: reserved.
 
-The format for field header is:
+Type spec:
 
-```
-2 bits field name encoding + 4 bits size + nullability flag + ref tracking flag
-```
+- If `REGISTER_BY_NAME` is set:
+  - `namespace` meta string
+  - `type_name` meta string
+- Otherwise:
+  - `type_id` as `varuint32` (small7)
 
-Detailed spec:
+Field info list:
 
-- 2 bits field name encoding:
-  - encoding: `UTF8/ALL_TO_LOWER_SPECIAL/LOWER_UPPER_DIGIT_SPECIAL/TAG_ID`
-  - If tag id is used, field name will be written by an unsigned varint tag id, and 2 bits encoding will be `11`.
-- size of field name:
-  - The `4 bits size: 0~14` will be used to indicate length `1~15`, the value `15` indicates to read more bytes,
-    the encoding will encode `size - 15` as a varint next.
-  - If encoding is `TAG_ID`, then num_bytes of field name will be used to store tag id.
-- ref tracking: when set to 1, ref tracking will be enabled for this field.
-- nullability: when set to 1, this field can be null.
-
-###### Field Type Info
-
-Field type info is written as unsigned int8. Detailed id spec is:
-
-- For struct registered by id, it will be `Type.STRUCT`.
-- For struct registered by name, it will be `Type.NAMED_STRUCT`.
-- For enum registered by id, it will be `Type.ENUM`.
-- For enum registered by name, it will be `Type.NAMED_ENUM`.
-- For ext type registered by id, it will be `Type.EXT`.
-- For ext type registered by name, it will be `Type.NAMED_EXT`.
-- For list/set type, it will be written as `Type.LIST/SET`, then write element type recursively.
-- For 1D primitive array type, it will be written as `Type.XXX_ARRAY`.
-- For multi-dimensional primitive array type with same size on each dim, it will be written as `Type.TENSOR`.
-- For other array type, it will be written as `Type.LIST`, then write element type recursively.
-- For map type, it will be written as `Type.MAP`, then write key and value type recursively.
-- For other types supported by fory directly, it will be fory type id for that type.
-- For other types not determined at compile time, write `Type.UNKNOWN` instead. For such types, actual type
-  will be written when serializing such field values.
-
-Polymorphism spec:
-
-- `struct/named_struct/ext/named_ext` are taken as polymorphic, the meta for those types are written separately
-  instead of inlining here to reduce meta space cost if object of this type is serialized in current object graph
-  multiple times, and the field value may be null too.
-- `enum` is taken as dynamic, if deserialization doesn't have this field, or the type is not enum, enum value
-  will be skipped.
-- `list/map/set` are taken as dynamic, when serializing values of those type, the concrete types won't be written
-  again.
-- Other types that fory supported are taken as dynamic too.
-
-List/Set/Map nested type spec:
-
-- `list`: `| list type id | nested type id << 2 + nullability flag + ref tracking flag | ... multi-layer type info |`
-- `set`: `| set type id | nested type id << 2 + nullability flag + ref tracking flag | ... multi-layer type info |`
-- `map`: `| set type id | key type info | value type info |`
-  - Key type format: `| nested type id << 2 + nullability flag + ref tracking flag | ... multi-layer type info |`
-  - Value type format: `| nested type id << 2 + nullability flag + ref tracking flag | ... multi-layer type info |`
-
-###### Field Name
-
-If tag id is set, tag id will be used instead. Otherwise meta string of field name will be written instead.
-
-###### Field order
-
-Field order are left as implementation details, which is not exposed to specification, the deserialization need to
-resort fields based on Fory fields sort algorithms. In this way, fory can compute statistics for field names or types and
-using a more compact encoding.
-
-## Extended Type Meta with Inheritance support
-
-If one want to support inheritance for struct, one can implement following spec.
-
-### Schema consistent
-
-Fields are serialized from parent type to leaf type. Fields are sorted using fory struct fields sort algorithms.
-
-### Schema Evolution
-
-Meta layout for schema evolution mode:
+Each field is encoded as:
 
 ```
-|    8 bytes header    | variable bytes | variable bytes |   variable bytes   |   variable bytes   |
-+----------------------+----------------+----------------+--------------------+--------------------+
-| global binary header |  meta header   |  fields meta   | parent meta header | parent fields meta |
+| field header (1 byte) | field type info | [field name bytes] |
 ```
 
-#### Meta header
+Field header layout:
 
-Meta header is a 64 bits number value encoded in little endian order.
+- Bits 6-7: field name encoding (`UTF8`, `ALL_TO_LOWER_SPECIAL`,
+  `LOWER_UPPER_DIGIT_SPECIAL`, or `TAG_ID`)
+- Bits 2-5: size
+  - For name encoding: `size = (name_bytes_length - 1)`
+  - For tag ID: `size = tag_id`
+  - If `size == 0b1111`, read `varuint32(size - 15)` and add it
+- Bit 1: nullable flag
+- Bit 0: reference tracking flag
 
-- Lowest 4 digits `0b0000~0b1110` are used to record num classes. `0b1111` is preserved to indicate that Fory need to
-  read more bytes for length using Fory unsigned int encoding. If current type doesn't has parent type, or parent
-  type doesn't have fields to serialize, or we're in a context which serialize fields of current type
-  only, num classes will be 1.
-- The 5th bit is used to indicate whether this type needs schema evolution.
-- Other 56 bits are used to store the unique hash of `flags + all layers type meta`.
+Field type info:
 
-#### Single layer type meta
+- The top-level field type is written as `varuint32(type_id)` (small7) without flags.
+- For `LIST` / `SET`, an element type follows, encoded as
+  `(nested_type_id << 2) | (nullable << 1) | tracking_ref`.
+- For `MAP`, key type and value type follow, both encoded the same way.
+- One-dimensional primitive arrays use `*_ARRAY` type IDs; other arrays are encoded as `LIST`.
 
-```
-| unsigned varint | var uint |  field info: variable bytes   | variable bytes  | ... |
-+-----------------+----------+-------------------------------+-----------------+-----+
-|   num_fields    | type id  | header + type id + field name | next field info | ... |
-```
+Field names:
 
-#### Other layers type meta
+- If `TAG_ID` encoding is used, no name bytes are written.
+- Otherwise, write the encoded field name bytes as a meta string.
+- For xlang, field names are converted to `snake_case` before encoding for
+  cross-language compatibility.
 
-Same encoding algorithm as the previous layer.
+Field order:
+
+Field order is implementation-defined. Decoders must match fields by name or tag ID rather than
+position. Fory uses a stable grouping and sorting order to produce deterministic TypeDefs.
 
 ## Meta String
 
@@ -1226,16 +1121,10 @@ then copy the whole buffer into the stream.
 Such serialization won't compress the array. If users want to compress primitive array, users need to register custom
 serializers for such types or mark it as list type.
 
-#### Tensor
+#### Multi-dimensional arrays
 
-Tensor is a special primitive multi-dimensional array which all dimensions have same size and type. The serialization
-format is:
-
-```
-| num_dims(unsigned varint) | shape[0](unsigned varint) | shape[...] | shape[N] | element type | data |
-```
-
-The data is continuous to reduce copy and may zero-copy in some cases.
+Xlang does not define a dedicated tensor encoding. Multi-dimensional arrays are serialized as
+nested lists, while one-dimensional primitive arrays use the `*_ARRAY` type IDs.
 
 #### object array
 
@@ -1331,98 +1220,97 @@ Not supported for now.
 
 ### struct
 
-Struct means object of `class/pojo/struct/bean/record` type.
-Struct will be serialized by writing its fields data in fory order.
+Struct means object of `class/pojo/struct/bean/record` type. Struct values are serialized by writing
+fields in Fory order. The type meta before the value is written according to the rules in
+[Type Meta](#type-meta).
 
-Depending on schema compatibility, structs will have different formats.
+#### Field order
 
-#### field order
+Field order must be deterministic and identical across languages. This section defines the
+language-neutral ordering algorithm; implementations must follow the rules here rather than any
+language-specific helper classes.
 
-Field will be ordered as following, every group of fields will have its own order:
+##### Step 1: Field identifier
 
-- primitive fields:
-  - larger size type first, smaller later, variable size type last.
-  - when same size, sort by type id
-  - when same size and type id, sort by snake case field name
-  - types: bool/int8/int16/int32/var32/int64/var64/h64/float16/float32/float64
-- nullable primitive fields: same order as primitive fields
-- other internal type fields: sort by type id then snake case field name
-- list fields: sort by snake case field name
-- set fields: sort by snake case field name
-- map fields: sort by snake case field name
-- other fields: sort by snake case field name
+For every field, compute a stable identifier used for ordering:
 
-If two fields have same type, then sort by snake_case styled field name.
+- If a tag ID is configured (e.g., `@ForyField(id=...)`), use the tag ID as a decimal string.
+- Otherwise, use the field name converted to `snake_case`.
 
-#### schema consistent
+Tag IDs must be unique within a type; duplicate tag IDs are invalid.
 
-Object will be written as:
+##### Step 2: Group assignment
+
+Assign each field to exactly one group in the following order:
+
+1. **Primitive (non-nullable)**: primitive or boxed numeric/boolean types with `nullable=false`.
+2. **Primitive (nullable)**: primitive or boxed numeric/boolean types with `nullable=true`.
+3. **Built-in (non-container)**: internal type IDs that are not user-defined and not UNKNOWN,
+   excluding collections and maps (for example: STRING, TIME types, UNION, primitive arrays).
+4. **Collection**: list/set/object-array fields. Non-primitive arrays are treated as LIST for
+   ordering purposes.
+5. **Map**: map fields.
+6. **Other**: user-defined enum/struct/ext and UNKNOWN types.
+
+##### Step 3: Intra-group ordering
+
+Within each group, apply the following sort keys in order until a difference is found:
+
+**Primitive groups (1 and 2):**
+
+1. **Compression category**: fixed-size numeric and boolean types first, then compressed numeric
+   types (`VARINT32`, `VAR_UINT32`, `VARINT64`, `VAR_UINT64`, `TAGGED_INT64`, `TAGGED_UINT64`).
+2. **Primitive size** (descending): 8-byte > 4-byte > 2-byte > 1-byte.
+3. **Internal type ID** (descending) as a tie-breaker for equal sizes.
+4. **Field identifier** (lexicographic ascending).
+
+**Built-in / Collection / Map groups (3-5):**
+
+1. **Internal type ID** (ascending).
+2. **Field identifier** (lexicographic ascending).
+
+**Other group (6):**
+
+1. **Field identifier** (lexicographic ascending).
+
+If two fields still compare equal after the rules above, preserve a deterministic order by
+comparing declaring class name and then the original field name. This tie-breaker should be
+reachable only in invalid schemas (e.g., duplicate tag IDs).
+
+##### Notes
+
+- The ordering above is used for serialization order and TypeDef field lists. Schema hashes use
+  the field identifier ordering described in the schema hash section.
+- Collection/map normalization is required so peers with different concrete types (e.g.,
+  `List` vs `Collection`) still agree on ordering.
+- The compressed numeric rule is critical for cross-language consistency: compressed integer
+  fields are always placed after all fixed-width integer fields.
+
+#### Schema consistent (meta share disabled)
+
+Object value layout:
 
 ```
-|    4 byte     |  variable bytes  |
-+---------------+------------------+
-|   type hash   |   field values   |
+| [optional 4-byte schema hash] | field values |
 ```
 
-Type hash is used to check the type schema consistency across languages. Type hash will be the first 32 bits of 56 bits
-value of the type meta.
+The schema hash is written only when class-version checking is enabled. It is the low 32 bits of a
+MurmurHash3 x64_128 of the struct fingerprint string:
 
-Object fields will be serialized one by one using following format:
+- For each field, build `<field_id_or_name>,<type_id>,<ref>,<nullable>;`.
+- Field identifier is the tag ID if present, otherwise the snake_case field name.
+- Sort by field identifier lexicographically before concatenation.
 
-```
-not null primitive field value:
-|   var bytes    |
-+----------------+
-|   value data   |
-+----------------+
-nullable primitive field value:
-| one byte  |   var bytes   |
-+-----------+---------------+
-| null flag |  field value  |
-+-----------+---------------+
-other interal types supported by fory
-| var bytes | var objects |
-+-----------+-------------+
-| null flag | value data  |
-+-----------+-------------+
-list field type:
-| one byte  | var objects |
-+-----------+-------------+
-| ref meta  | value data  |
-set field type:
-| one byte  | var objects |
-+-----------+-------------+
-| ref meta  | value data  |
-map field type:
-| one byte  | var objects |
-+-----------+-------------+
-| ref meta  | value data  |
-+-----------+-------------+-------------+
-other types such as enum/struct/ext
-| one byte  | var bytes | var objects |
-+-----------+------------+------------+
-| ref  flag | type meta | value data |
-+-----------+------------+------------+
-```
+Field values are serialized in Fory order. Primitive fields are written as raw values (nullable
+primitives include a null flag). Non-primitive fields write ref/null flags as needed and then the
+value; polymorphic fields include type meta.
 
-Type hash algorithm:
+#### Compatible mode (meta share enabled)
 
-- Sort fields by fields sort algorithm
-- Start with string `""`
-- Iterate every field, append string by:
-  - `snow_case(field_name),`. For camelcase name, convert it to snow_case first.
-  - `$type_id,`, for other fields, use type id `TypeId::UNKNOWN` instead.
-  - `$nullable;`, `1` if nullable, `0` otherwise.
-- Then convert string to utf8 bytes
-- Compute murmurhash3_x64_128, and use first 32 bits
-
-#### Schema evolution
-
-Schema evolution have similar format as schema consistent mode for object except:
-
-- For the object type, `schema consistent` mode will write type by id only, but `schema evolution` mode will
-  write type consisting of field names, types and other meta too, see [Type meta](#type-meta).
-- Type meta of `final custom type` needs to be written too, because peers may not have this type defined.
+The field value layout is the same as schema-consistent mode, but the type meta for
+`COMPATIBLE_STRUCT` and `NAMED_COMPATIBLE_STRUCT` uses shared TypeDef entries. Deserializers use
+TypeDef to map fields by name or tag ID and to honor nullable/ref flags from metadata; unknown fields
+are skipped.
 
 ### Type
 
@@ -1526,9 +1414,8 @@ This section provides a step-by-step guide for implementing Fory xlang serializa
    - [ ] Optionally implement Hybrid encoding (TAGGED_INT64/TAGGED_UINT64) for int64
 
 3. **Header Handling**
-   - [ ] Write/read bitmap flags (null, endian, xlang, oob)
-   - [ ] Write/read language ID
-   - [ ] Handle meta start offset placeholder (for schema evolution)
+   - [ ] Write/read bitmap flags (null, xlang, oob)
+   - [ ] Write/read language ID (when xlang flag is set)
 
 ### Phase 2: Basic Type Serializers
 
@@ -1597,26 +1484,26 @@ Meta strings are required for enum and struct serialization (encoding field name
     - [ ] Generate type IDs: `(user_id << 8) | internal_type_id`
 
 14. **Field Ordering**
-    - [ ] Implement Fory field ordering algorithm
-    - [ ] Sort primitives by size (larger first), then type ID, then name
-    - [ ] Handle nullable vs non-nullable fields
-    - [ ] Convert field names to snake_case for sorting
+    - [ ] Implement the spec-defined grouping and ordering (primitive/boxed/built-in, collections/maps, other)
+    - [ ] Use a stable comparator within each group (type ID and name)
+    - [ ] Use tag ID or snake_case field name as field identifier for fingerprints
 
 15. **Schema Consistent Mode**
-    - [ ] Compute type hash (MurmurHash3 of field info string)
-    - [ ] Write 4-byte type hash before fields
+    - [ ] If class-version check is enabled, compute schema hash from field identifiers
+    - [ ] Write 4-byte schema hash before fields
     - [ ] Serialize fields in Fory order
 
-16. **Schema Evolution Mode** (Optional)
-    - [ ] Implement type meta writing
-    - [ ] Support field addition/removal
-    - [ ] Handle unknown fields (skip during read)
+16. **Compatible/Meta Share Mode**
+    - [ ] Implement shared TypeDef stream (inline new TypeDefs, index references)
+    - [ ] Map fields by name or tag ID, skip unknown fields
+    - [ ] Apply nullable/ref flags from TypeDef metadata
 
 ### Phase 7: Other types
 
 17. **Binary/Array Types**
-    - [ ] Primitive arrays (direct buffer copy)
-    - [ ] Tensor (multi-dimensional arrays)
+
+- [ ] Primitive arrays (direct buffer copy)
+- [ ] Multi-dimensional arrays as nested lists (no tensor encoding)
 
 ### Testing Strategy
 
@@ -1672,8 +1559,8 @@ Meta strings are required for enum and struct serialization (encoding field name
 1. **Byte Order**: Always use little-endian for multi-byte values
 2. **Varint Sign Extension**: Ensure proper handling of signed vs unsigned varints
 3. **Reference ID Ordering**: IDs must be assigned in serialization order
-4. **Field Order Consistency**: Must match exactly across languages (schema consistent mode only; in evolution mode, deserialization follows serialization field order from type meta)
+4. **Field Order Consistency**: Must match exactly across languages in schema-consistent mode; in compatible mode, match by TypeDef field names or tag IDs
 5. **String Encoding**: Use best encoding for current language
 6. **Null Handling**: Different languages represent null differently
 7. **Empty Collections**: Still write length (0) and header byte
-8. **Type Hash Calculation**: Must use exact same algorithm across languages
+8. **Schema Hash Calculation**: Must use the same fingerprint and MurmurHash3 algorithm across languages when enabled
