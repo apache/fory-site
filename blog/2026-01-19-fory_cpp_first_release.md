@@ -26,19 +26,21 @@ Every backend team eventually needs to move complex objects across process or la
 
 Apache Fory C++ eliminates this false choice. It is designed to be fast, cross-language, and production friendly without sacrificing safety or developer ergonomics.
 
-## Core features you should know
+## Core features of Apache Fory C++
 
 - **Automatic object serialization**: Serialize numeric types, strings, collections, maps, enums, and structs automatically. No IDL required, so domain objects can be serialized and sent directly.
-- **Cross-language support**: Fory C++ speaks the same binary protocol as Java, Python, Rust and Go. IDL is optional, and structs with consistent or compatible schemas can be deserialized by other languages automatically.
+- **Cross-language support**: Fory C++ speaks the same binary protocol as Java, Python, Rust and Go. IDL is optional, and structs with consistent or compatible schemas can be deserialized across languages without a mandatory IDL.
 - **Automatic schema evolution**: Enable Compatible mode and Fory matches fields by field ID when provided, otherwise by name (not position), fills defaults for new fields, and safely skips unknown fields. This is built into the protocol and works across languages.
 - **Shared and circular references**: With `track_ref(true)`, Fory preserves object identity and handles cycles. This is essential for graphs, ORM models, or tree structures with parent pointers.
 - **Polymorphic and union support**: C++ supports `std::shared_ptr<Base>` polymorphism (named registration) and `std::variant` union types. This covers inheritance, plugin architectures, and heterogeneous collections.
 - **Compact binary protocol and meta packing**: The protocol uses compact headers, varints, and meta string encoding. Type metadata is packed with size and hash headers, written once per stream, and referenced by index on subsequent occurrences.
 - **Compile-time performance**: Serialization is generated through templates and macros. No runtime reflection. No dynamic field discovery. The fast path is direct memory writes with minimal branching.
 
-## Cross-language example (C++ -> Java and Rust)
+## Cross-language Example (C++ -> Java/Python)
 
-The example below serializes in C++ and deserializes in Java and Rust using the same type ID and field layout.
+The example below serializes in C++ and deserializes in Java and Python using the same type ID and field layout.
+
+C++ producer:
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -66,6 +68,8 @@ int main() {
 }
 ```
 
+Java consumer:
+
 ```java
 import org.apache.fory.Fory;
 import org.apache.fory.config.Language;
@@ -86,71 +90,34 @@ fory.register(Message.class, 100);
 Message msg = (Message) fory.deserialize(bytes);
 ```
 
-```rust
-use fory::{Fory, ForyObject};
-use std::collections::HashMap;
+Python consumer:
 
-#[derive(ForyObject)]
-struct Message {
-    topic: String,
-    timestamp: i64,
-    headers: HashMap<String, String>,
-    payload: Vec<u8>,
-}
+```python
+import pyfory
 
-let mut fory = Fory::default();
-fory.register::<Message>(100);
-let msg: Message = fory.deserialize(&bytes)?;
+class Message:
+    topic: str
+    timestamp: int
+    headers: dict[str, str]
+    payload: bytes
+
+fory = pyfory.Fory(xlang=True)
+fory.register(Message, type_id=100)
+
+msg = fory.deserialize(bytes)
 ```
 
-Tip: in xlang mode, fields are matched by field ID when provided; otherwise by snake_case field name. Keep names or IDs aligned across languages and use the same type IDs.
+Tip: in xlang mode, fields are matched by field ID when provided; otherwise by snake_case field name. Keep names or IDs aligned across languages and use the same types.
 
-## Struct serialization protocol: meta packing, sharing, and schema evolution
+## What Makes Apache Fory C++ Different?
 
-This is the core of Fory C++ and the reason it can evolve schemas safely without IDLs.
-
-### Protocol layout (high level)
-
-```
-| header | type info | reference meta | value data |
-```
-
-- **Header**: compact flags + language byte
-- **Type info**: type IDs and packed TypeMeta when compatible mode is enabled
-- **Reference meta**: flags and reference IDs for shared or circular objects
-- **Value data**: the serialized payload
-
-### Meta packing and sharing
-
-Fory C++ packs type metadata into a compact binary TypeMeta format that includes:
-
-- A size header and a hash of the metadata
-- Encoded namespace and type name (meta string encoding)
-- Field definitions (name + field type + options)
-
-When a type appears multiple times in a stream, the first occurrence writes the TypeMeta inline and assigns it an index. Later occurrences only write the index. This removes repeated schema payloads while keeping compatibility intact.
-
-### Meta string encoding and further compression
-
-Type names and namespaces are encoded with specialized meta string encodings (for example, lower-case and symbol-aware encodings). This reduces metadata size significantly. The design also enables additional meta compression in higher-level pipelines because the metadata payload is compact, structured, and hash-addressable.
-
-### Why this enables schema evolution
-
-Compatible mode builds a field map from TypeMeta and matches by field ID when present, otherwise by name. When schemas diverge:
-
-- Added fields are filled with default values
-- Removed fields are skipped
-- Reordered fields are resolved by ID or name
-- Nullability changes are supported
-- Field IDs, when provided, take precedence over names for matching
-
-This works across languages because the same TypeMeta format is used in each implementation.
-
-## Shared and circular references
+### Shared and circular references
 
 Reference tracking is built into the protocol using reference flags and IDs. In C++ you enable it with `track_ref(true)` so shared pointers preserve identity and circular graphs can be round-tripped safely.
 
-### Shared references (aliasing preserved)
+#### Shared references (aliasing preserved)
+
+Example:
 
 ```cpp
 struct Product {
@@ -181,9 +148,11 @@ assert(decoded.first->sku == "A-100");
 assert(decoded.first->price == 19.95);
 ```
 
-### Circular references (parent/child graph)
+#### Circular references (parent/child graph)
 
 Use `SharedWeak<T>` for non-owning back references so you can form cycles without memory leaks. Fory resolves these links during deserialization while keeping reference identity intact.
+
+Example:
 
 ```cpp
 struct Node {
@@ -212,11 +181,13 @@ auto decoded_parent = decoded_child->parent.upgrade();
 assert(decoded_parent == decoded);
 ```
 
-## Polymorphism and union support
+### Polymorphism and union support
 
-### Polymorphism
+#### Polymorphism
 
 Register derived types by name and serialize base-class pointers. The type info is written once and reused in the stream, so polymorphic dispatch works on deserialize.
+
+Example:
 
 ```cpp
 struct Animal {
@@ -263,9 +234,11 @@ assert(dog->speak() == "woof");
 assert(cat->speak() == "meow");
 ```
 
-### Union types
+#### Union types
 
 Use `std::variant` for union-like fields. Fory records the active alternative and preserves it across languages that support union types.
+
+Example:
 
 ```cpp
 using Value = std::variant<int32_t, std::string, double>;
@@ -274,32 +247,132 @@ auto bytes = fory.serialize(Value{42}).value();
 auto decoded = fory.deserialize<Value>(bytes).value();
 ```
 
-## Automatic schema evolution in practice
+### Automatic schema evolution in practice
+
+Docs: https://fory.apache.org/docs/guide/cpp/schema-evolution/
+
+Microservices evolve independently. Compatible mode lets schema changes roll out without tight coordination.
+
+Example:
 
 ```cpp
+#include "fory/serialization/fory.h"
+#include <map>
+#include <optional>
+#include <string>
+
 struct UserV1 {
   std::string name;
   int32_t age;
+  std::string address;
 };
-FORY_STRUCT(UserV1, name, age);
+FORY_STRUCT(UserV1, name, age, address);
 
 struct UserV2 {
   std::string name;
   int32_t age;
-  std::string email; // New field
+  std::optional<std::string> phone;          // New field
+  std::map<std::string, std::string> metadata; // Another new field
 };
-FORY_STRUCT(UserV2, name, age, email);
+FORY_STRUCT(UserV2, name, age, phone, metadata);
 
 auto fory_v1 = Fory::builder().compatible(true).xlang(true).build();
 auto fory_v2 = Fory::builder().compatible(true).xlang(true).build();
 
-fory_v1.register_struct<UserV1>(100);
-fory_v2.register_struct<UserV2>(100);
+constexpr uint32_t kUserTypeId = 100;
+fory_v1.register_struct<UserV1>(kUserTypeId);
+fory_v2.register_struct<UserV2>(kUserTypeId);
+
+UserV1 v1{"Alice", 30, "NYC"};
+auto bytes = fory_v1.serialize(v1).value();
+
+auto v2 = fory_v2.deserialize<UserV2>(bytes).value();
+// Missing fields get default values automatically.
+assert(!v2.phone.has_value());
+assert(v2.metadata.empty());
 ```
 
-Compatible mode supports adding, removing, or reordering fields and changing nullability. If you assign field IDs (via `fory::field<>`, `FORY_FIELD_TAGS`, or `FORY_FIELD_CONFIG`), those IDs become the primary match key. Type changes are not allowed.
+Compatibility rules:
 
-## Compile-time performance and runtime efficiency
+- Add new fields (default values applied)
+- Remove fields (skipped during deserialization)
+- Reorder fields (matched by ID or name)
+- Change nullability (`T` <-> `std::optional<T>`)
+- Type changes are not supported (except nullable variants)
+
+If you assign field IDs (via `fory::field<>`, `FORY_FIELD_TAGS`, or `FORY_FIELD_CONFIG`), those IDs become the primary match key.
+
+### Schema evolution with field IDs
+
+Docs: https://fory.apache.org/docs/guide/cpp/schema-evolution/
+
+Field IDs give you an explicit, stable schema key that remains consistent even when field names or ordering change.
+
+Example:
+
+```cpp
+struct AccountV1 {
+  fory::field<std::string, 1> id;
+  fory::field<int64_t, 2> balance;
+};
+FORY_STRUCT(AccountV1, id, balance);
+
+struct AccountV2 {
+  fory::field<int64_t, 2> balance;       // Reordered
+  fory::field<std::string, 1> id;        // Reordered
+  fory::field<std::string, 3> currency;  // New field
+};
+FORY_STRUCT(AccountV2, balance, id, currency);
+
+auto fory_v1 = Fory::builder().compatible(true).xlang(true).build();
+auto fory_v2 = Fory::builder().compatible(true).xlang(true).build();
+
+fory_v1.register_struct<AccountV1>(200);
+fory_v2.register_struct<AccountV2>(200);
+```
+
+## The Technical Rationals
+
+This is the core of Fory C++ and the reason it can evolve schemas safely without IDLs.
+
+### Protocol layout (high level)
+
+Protocol layout sketch:
+
+```
+| header | type info | reference meta | value data |
+```
+
+- **Header**: compact flags + language byte
+- **Type info**: type IDs and packed TypeMeta when compatible mode is enabled
+- **Reference meta**: flags and reference IDs for shared or circular objects
+- **Value data**: the serialized payload
+
+### Struct Meta packing and sharing
+
+Fory C++ packs type metadata into a compact binary TypeMeta format that includes:
+
+- A size header and a hash of the metadata
+- Encoded namespace and type name (meta string encoding)
+- Field definitions (name + field type + options)
+
+When a type appears multiple times in a stream, the first occurrence writes the TypeMeta inline and assigns it an index. Later occurrences only write the index. This removes repeated schema payloads while keeping compatibility intact.
+
+For minimized type meta space cost, the type names and namespaces are encoded with specialized meta string encodings (for example, lower-case and symbol-aware encodings). This reduces metadata size significantly. The design also enables additional meta compression in higher-level pipelines because the metadata payload is compact, structured, and hash-addressable.
+
+### Why this enables schema evolution
+
+Compatible mode builds a field map from TypeMeta and matches by field ID when present, otherwise by name. When schemas diverge:
+
+- Added fields are filled with default values
+- Removed fields are skipped
+- Reordered fields are resolved by ID or name
+- Nullability changes are supported
+- Field IDs, when provided, take precedence over names for matching
+
+This works across languages because the same TypeMeta format is used in each implementation.
+
+### Compile-time performance and runtime efficiency
 
 Fory C++ is designed for throughput and low latency:
 
@@ -346,6 +419,8 @@ cd benchmarks/cpp_benchmark
 
 ### Install by CMake
 
+CMake example:
+
 ```cmake
 cmake_minimum_required(VERSION 3.16)
 project(my_project LANGUAGES CXX)
@@ -372,6 +447,8 @@ target_link_libraries(my_app PRIVATE fory::serialization)
 For Bazel installation, see https://fory.apache.org/docs/guide/cpp/#using-bazel.
 
 ### Basic object serialization
+
+Example:
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -417,6 +494,8 @@ Why explicit registration matters:
 - Concrete type mapping across languages: custom types need a stable, shared identity (ID or name) so C++, Java, and Rust agree on the same schema.
 - Automatic polymorphic deserialization: registering concrete types enables downcasting when deserializing `shared_ptr<Base>` or other polymorphic containers.
 
+Example:
+
 ```cpp
 enum class Color { Red, Green, Blue };
 FORY_ENUM(Color, Red, Green, Blue);
@@ -435,6 +514,8 @@ if (!bytes_result.ok()) {
 ### Error handling
 
 All serialization APIs return `Result<T, Error>`. Check `ok()` before using the value and use `error().to_string()` for diagnostic output.
+
+Example:
 
 ```cpp
 auto result = fory.deserialize<Person>(bytes);
@@ -461,6 +542,8 @@ auto write_result = fory.serialize_to(buffer, person);
 
 ### Thread-safe variant
 
+Example:
+
 ```cpp
 auto fory = Fory::builder().xlang(true).build_thread_safe();
 // Register types before spawning threads.
@@ -471,6 +554,8 @@ auto fory = Fory::builder().xlang(true).build_thread_safe();
 ### Field metadata and schema control
 
 Use `fory::field<>` for inline metadata or `FORY_FIELD_TAGS` and `FORY_FIELD_CONFIG` for non-invasive configuration.
+
+Example:
 
 ```cpp
 struct Document {
@@ -490,6 +575,8 @@ If field IDs are defined, compatible mode uses them as the primary key for match
 ### Custom serializers
 
 When you cannot use `FORY_STRUCT`, specialize the `Serializer<T>` template and register the type as an extension.
+
+Example:
 
 ```cpp
 struct ExternalType { int32_t value; };
@@ -512,6 +599,8 @@ template <> struct Serializer<ExternalType> {
 } // namespace serialization
 } // namespace fory
 ```
+
+Registration example:
 
 ```cpp
 auto fory = Fory::builder().build();
