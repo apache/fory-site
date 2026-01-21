@@ -84,7 +84,7 @@ full_type_id = (user_type_id << 8) | internal_type_id
 - Named types use `NAMED_*` internal IDs and carry names in metadata rather than embedding a user
   ID.
 
-### Shared internal type IDs (0-30)
+### Shared internal type IDs (0-32)
 
 Java native mode shares the xlang internal IDs for basic types and user-defined enum/struct/ext
 tags. These IDs are stable across languages.
@@ -122,44 +122,46 @@ tags. These IDs are stable across languages.
 | 28      | NAMED_COMPATIBLE_STRUCT |
 | 29      | EXT                     |
 | 30      | NAMED_EXT               |
+| 31      | UNION                   |
+| 32      | NONE                    |
 
 ### Java native built-in type IDs
 
-Java native serialization assigns Java-specific built-ins starting at `Types.NAMED_EXT + 1`.
-Type IDs greater than 30 are not shared with xlang; they are only valid in Java native mode.
+Java native serialization assigns Java-specific built-ins starting at `Types.NONE + 1`.
+Type IDs greater than 32 are not shared with xlang; they are only valid in Java native mode.
 
 | Type ID | Name                       | Description                    |
 | ------- | -------------------------- | ------------------------------ |
-| 31      | VOID_ID                    | java.lang.Void                 |
-| 32      | CHAR_ID                    | java.lang.Character            |
-| 33      | PRIMITIVE_VOID_ID          | void                           |
-| 34      | PRIMITIVE_BOOL_ID          | boolean                        |
-| 35      | PRIMITIVE_INT8_ID          | byte                           |
-| 36      | PRIMITIVE_CHAR_ID          | char                           |
-| 37      | PRIMITIVE_INT16_ID         | short                          |
-| 38      | PRIMITIVE_INT32_ID         | int                            |
-| 39      | PRIMITIVE_FLOAT32_ID       | float                          |
-| 40      | PRIMITIVE_INT64_ID         | long                           |
-| 41      | PRIMITIVE_FLOAT64_ID       | double                         |
-| 42      | PRIMITIVE_BOOLEAN_ARRAY_ID | boolean[]                      |
-| 43      | PRIMITIVE_BYTE_ARRAY_ID    | byte[]                         |
-| 44      | PRIMITIVE_CHAR_ARRAY_ID    | char[]                         |
-| 45      | PRIMITIVE_SHORT_ARRAY_ID   | short[]                        |
-| 46      | PRIMITIVE_INT_ARRAY_ID     | int[]                          |
-| 47      | PRIMITIVE_FLOAT_ARRAY_ID   | float[]                        |
-| 48      | PRIMITIVE_LONG_ARRAY_ID    | long[]                         |
-| 49      | PRIMITIVE_DOUBLE_ARRAY_ID  | double[]                       |
-| 50      | STRING_ARRAY_ID            | String[]                       |
-| 51      | OBJECT_ARRAY_ID            | Object[]                       |
-| 52      | ARRAYLIST_ID               | java.util.ArrayList            |
-| 53      | HASHMAP_ID                 | java.util.HashMap              |
-| 54      | HASHSET_ID                 | java.util.HashSet              |
-| 55      | CLASS_ID                   | java.lang.Class                |
-| 56      | EMPTY_OBJECT_ID            | empty object stub              |
-| 57      | LAMBDA_STUB_ID             | lambda stub                    |
-| 58      | JDK_PROXY_STUB_ID          | JDK proxy stub                 |
-| 59      | REPLACE_STUB_ID            | writeReplace/readResolve stub  |
-| 60      | NONEXISTENT_META_SHARED_ID | meta-shared unknown class stub |
+| 33      | VOID_ID                    | java.lang.Void                 |
+| 34      | CHAR_ID                    | java.lang.Character            |
+| 35      | PRIMITIVE_VOID_ID          | void                           |
+| 36      | PRIMITIVE_BOOL_ID          | boolean                        |
+| 37      | PRIMITIVE_INT8_ID          | byte                           |
+| 38      | PRIMITIVE_CHAR_ID          | char                           |
+| 39      | PRIMITIVE_INT16_ID         | short                          |
+| 40      | PRIMITIVE_INT32_ID         | int                            |
+| 41      | PRIMITIVE_FLOAT32_ID       | float                          |
+| 42      | PRIMITIVE_INT64_ID         | long                           |
+| 43      | PRIMITIVE_FLOAT64_ID       | double                         |
+| 44      | PRIMITIVE_BOOLEAN_ARRAY_ID | boolean[]                      |
+| 45      | PRIMITIVE_BYTE_ARRAY_ID    | byte[]                         |
+| 46      | PRIMITIVE_CHAR_ARRAY_ID    | char[]                         |
+| 47      | PRIMITIVE_SHORT_ARRAY_ID   | short[]                        |
+| 48      | PRIMITIVE_INT_ARRAY_ID     | int[]                          |
+| 49      | PRIMITIVE_FLOAT_ARRAY_ID   | float[]                        |
+| 50      | PRIMITIVE_LONG_ARRAY_ID    | long[]                         |
+| 51      | PRIMITIVE_DOUBLE_ARRAY_ID  | double[]                       |
+| 52      | STRING_ARRAY_ID            | String[]                       |
+| 53      | OBJECT_ARRAY_ID            | Object[]                       |
+| 54      | ARRAYLIST_ID               | java.util.ArrayList            |
+| 55      | HASHMAP_ID                 | java.util.HashMap              |
+| 56      | HASHSET_ID                 | java.util.HashSet              |
+| 57      | CLASS_ID                   | java.lang.Class                |
+| 58      | EMPTY_OBJECT_ID            | empty object stub              |
+| 59      | LAMBDA_STUB_ID             | lambda stub                    |
+| 60      | JDK_PROXY_STUB_ID          | JDK proxy stub                 |
+| 61      | REPLACE_STUB_ID            | writeReplace/readResolve stub  |
+| 62      | NONEXISTENT_META_SHARED_ID | meta-shared unknown class stub |
 
 ### Registration and named types
 
