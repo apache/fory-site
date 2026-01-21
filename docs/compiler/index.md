@@ -147,7 +147,7 @@ data = fory.serialize(person)
 | [Type System](type-system.md)              | Primitive types, collections, and type rules |
 | [Compiler Guide](compiler-guide.md)        | CLI options and build integration            |
 | [Generated Code](generated-code.md)        | Output format for each target language       |
-| [Protocol Buffers vs FDL](proto-vs-fdl.md) | Comparison with protobuf and migration guide |
+| [Protocol Buffers vs FDL](protobuf-idl.md) | Comparison with protobuf and migration guide |
 
 ## Key Concepts
 
