@@ -37,7 +37,7 @@ const config: Config = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          sidebarCollapsible: false,
+          sidebarCollapsible: true,
           lastVersion: '0.14',
           versions: {
             current: {
