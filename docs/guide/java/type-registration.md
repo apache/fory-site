@@ -41,6 +41,9 @@ fory.register(SomeClass1.class, 1);
 
 Note that class registration order is important. Serialization and deserialization peers should have the same registration order.
 
+Internal type IDs 0-32 are reserved for built-in xlang types. Java native built-ins start at
+`Types.NONE + 1`, and user IDs are encoded as `(user_id << 8) | internal_type_id`.
+
 ### Register by Name
 
 Register class by ID will have better performance and smaller space overhead. But in some cases, management for a bunch of type IDs is complex. In such cases, registering class by name using API `register(Class<?> cls, String namespace, String typeName)` is recommended:
