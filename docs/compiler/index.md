@@ -141,13 +141,14 @@ data = fory.serialize(person)
 
 ## Documentation
 
-| Document                                   | Description                                  |
-| ------------------------------------------ | -------------------------------------------- |
-| [FDL Syntax Reference](fdl-syntax.md)      | Complete language syntax and grammar         |
-| [Type System](type-system.md)              | Primitive types, collections, and type rules |
-| [Compiler Guide](compiler-guide.md)        | CLI options and build integration            |
-| [Generated Code](generated-code.md)        | Output format for each target language       |
-| [Protocol Buffers vs FDL](protobuf-idl.md) | Comparison with protobuf and migration guide |
+| Document                                        | Description                                       |
+| ----------------------------------------------- | ------------------------------------------------- |
+| [FDL Syntax Reference](fdl-syntax.md)           | Complete language syntax and grammar              |
+| [Type System](type-system.md)                   | Primitive types, collections, and type rules      |
+| [Compiler Guide](compiler-guide.md)             | CLI options and build integration                 |
+| [Generated Code](generated-code.md)             | Output format for each target language            |
+| [Protocol Buffers IDL Support](protobuf-idl.md) | Comparison with protobuf and migration guide      |
+| [FlatBuffers IDL Support](flatbuffers-idl.md)   | FlatBuffers mapping rules and codegen differences |
 
 ## Key Concepts
 

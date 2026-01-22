@@ -709,7 +709,6 @@ int main() {
 | -------------------------- | -------------------------- |
 | `#[derive(ForyObject)]`    | Enables Fory serialization |
 | `#[fory(nullable = true)]` | Marks field as nullable    |
-| `#[tag("...")]`            | Name-based registration    |
 | `#[repr(i32)]`             | Enum representation        |
 
 ### C++ Macros
@@ -757,9 +756,7 @@ f.RegisterTagType("myapp.models.Config", Config{})
 **Rust:**
 
 ```rust
-#[derive(ForyObject)]
-#[tag("myapp.models.Config")]
-pub struct Config { ... }
+fory.register_by_namespace::<Config>("myapp.models", "Config")?;
 ```
 
 **C++:**
