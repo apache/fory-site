@@ -140,7 +140,7 @@ auto bytes = fory.serialize(shared).value();
 auto decoded = fory.deserialize<std::shared_ptr<Person>>(bytes).value();
 ```
 
-**With reference tracking enabled (`track_ref(true)`):**
+**With reference tracking enabled (default, `track_ref(true)`):**
 
 - Shared objects are serialized once
 - References to the same object are preserved
