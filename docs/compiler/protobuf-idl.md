@@ -219,7 +219,7 @@ message TreeNode {
 | Map        | `map<K, V>`                                                                                            | `map<K, V>`                                                                                     |
 | Nullable   | `optional T` (proto3)                                                                                  | `optional T`                                                                                    |
 | Oneof      | `oneof`                                                                                                | `union` (case id = field number)                                                                |
-| Any        | `google.protobuf.Any`                                                                                  | Not supported                                                                                   |
+| Any        | `google.protobuf.Any`                                                                                  | `any`                                                                                           |
 | Extensions | `extend`                                                                                               | Not supported                                                                                   |
 
 ### Wire Format

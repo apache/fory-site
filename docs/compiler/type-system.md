@@ -215,6 +215,29 @@ timestamp created_at = 1;
 | Rust     | `chrono::NaiveDateTime`          | Requires `chrono` crate |
 | C++      | `fory::serialization::Timestamp` |                         |
 
+### Any
+
+Dynamic value with runtime type information:
+
+```protobuf
+any payload = 1;
+```
+
+| Language | Type           | Notes                |
+| -------- | -------------- | -------------------- |
+| Java     | `Object`       | Runtime type written |
+| Python   | `Any`          | Runtime type written |
+| Go       | `any`          | Runtime type written |
+| Rust     | `Box<dyn Any>` | Runtime type written |
+| C++      | `std::any`     | Runtime type written |
+
+**Notes:**
+
+- `any` always writes a null flag (same as `nullable`) because values may be empty; codegen treats `any` as nullable even without `optional`.
+- Allowed runtime values are limited to `bool`, `string`, `enum`, `message`, and `union`. Other primitives (numeric, bytes, date/time) and list/map are not supported; wrap them in a message or use explicit fields instead.
+- `ref` is not allowed on `any` fields (including repeated/map values). Wrap `any` in a message if you need reference tracking.
+- The runtime type must be registered in the target language schema/IDL registration; unknown types fail to deserialize.
+
 ## Enum Types
 
 Enums define named integer constants:

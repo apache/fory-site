@@ -858,6 +858,7 @@ Modifiers before `repeated` apply to the field/collection. Modifiers after
 | `timestamp`     | Date and time with timezone               | Variable |
 | `duration`      | Duration                                  | Variable |
 | `decimal`       | Decimal value                             | Variable |
+| `any`           | Dynamic value (runtime type)              | Variable |
 
 See [Type System](type-system.md) for complete type mappings.
 
@@ -866,6 +867,11 @@ See [Type System](type-system.md) for complete type mappings.
 - `int32`/`int64` and `uint32`/`uint64` use varint encoding by default.
 - Use `fixed_*` for fixed-width integer encoding.
 - Use `tagged_*` for tagged/hybrid encoding (64-bit only).
+
+**Any type notes:**
+
+- `any` always writes a null flag (same as `nullable`) because the value may be empty.
+- `ref` is not allowed on `any` fields. Wrap `any` in a message if you need reference tracking.
 
 ### Named Types
 
@@ -1241,6 +1247,7 @@ primitive_type := 'bool'
                | 'float16' | 'float32' | 'float64'
                | 'string' | 'bytes'
                | 'date' | 'timestamp' | 'duration' | 'decimal'
+               | 'any'
 named_type   := qualified_name
 qualified_name := IDENTIFIER ('.' IDENTIFIER)*   // e.g., Parent.Child
 map_type     := 'map' '<' field_type ',' field_type '>'
