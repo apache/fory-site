@@ -7,12 +7,10 @@ Detects potential duplicate issues and PRs using text similarity analysis.
 import os
 import sys
 import argparse
-import json
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 from github import Github, GithubException
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 import yaml
 
 # Configuration defaults
@@ -22,6 +20,7 @@ DEFAULT_MAX_ISSUES_TO_CHECK = 200
 DEFAULT_AUTO_CLOSE_EXACT_MATCH = False
 DEFAULT_LABEL_POSSIBLE_DUPLICATE = "possible-duplicate"
 DEFAULT_LABEL_EXACT_DUPLICATE = "duplicate"
+DEFAULT_MAX_SIMILAR_TO_SHOW = 5
 
 
 class DuplicateDetector:
@@ -36,7 +35,7 @@ class DuplicateDetector:
             print(f"Error initializing GitHub connection: {e}")
             sys.exit(1)
         
-    def load_config(self, config_path: str = None) -> Dict:
+    def load_config(self, config_path: str = None) -> dict:
         """Load configuration from YAML file or use defaults."""
         default_config = {
             'similarity_threshold': DEFAULT_SIMILARITY_THRESHOLD,
@@ -47,6 +46,7 @@ class DuplicateDetector:
             'label_exact_duplicate': DEFAULT_LABEL_EXACT_DUPLICATE,
             'exclude_labels': ['wontfix', 'invalid'],
             'min_text_length': 20,
+            'max_similar_to_show': DEFAULT_MAX_SIMILAR_TO_SHOW,
         }
         
         if config_path and os.path.exists(config_path):
@@ -80,24 +80,6 @@ class DuplicateDetector:
         text = ' '.join(text.split())
         return text
     
-    def calculate_similarity(self, text1: str, text2: str) -> float:
-        """Calculate cosine similarity between two texts."""
-        if not text1 or not text2:
-            return 0.0
-        
-        try:
-            vectorizer = TfidfVectorizer(
-                min_df=1,
-                stop_words='english',
-                ngram_range=(1, 2)
-            )
-            tfidf_matrix = vectorizer.fit_transform([text1, text2])
-            similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-            return float(similarity)
-        except Exception as e:
-            print(f"Error calculating similarity: {e}")
-            return 0.0
-    
     def find_similar_issues(self, current_number: int, current_title: str, 
                            current_body: str, item_type: str = 'issue') -> List[Tuple[int, str, float]]:
         """Find similar issues or PRs."""
@@ -107,14 +89,14 @@ class DuplicateDetector:
             print(f"Text too short for meaningful comparison: {len(current_text)} chars")
             return []
         
-        similar_items = []
-        
         # Get existing items to compare against
         if item_type == 'issue':
             items = self.repo.get_issues(state='all')
         else:
             items = self.repo.get_pulls(state='all')
         
+        # First pass: collect all candidate items and their texts
+        candidates = []  # List of (item_number, item_title, item_text)
         checked_count = 0
         
         try:
@@ -126,18 +108,20 @@ class DuplicateDetector:
                 if item.number == current_number:
                     continue
                 
+                # Skip pull requests when checking issues (PRs are returned by get_issues API)
+                if item_type == 'issue' and hasattr(item, 'pull_request') and item.pull_request:
+                    continue
+                
                 try:
                     # Skip items with excluded labels
                     item_labels = [label.name for label in item.labels]
                     if any(label in self.config['exclude_labels'] for label in item_labels):
                         continue
                     
-                    # Calculate similarity
+                    # Preprocess and store candidate text
                     item_text = self.preprocess_text(f"{item.title} {item.body or ''}")
-                    similarity = self.calculate_similarity(current_text, item_text)
-                    
-                    if similarity >= self.config['similarity_threshold']:
-                        similar_items.append((item.number, item.title, similarity))
+                    if item_text:  # Only include non-empty texts
+                        candidates.append((item.number, item.title, item_text))
                 except Exception as e:
                     print(f"Warning: Error processing item #{item.number}: {e}")
                     continue
@@ -146,6 +130,37 @@ class DuplicateDetector:
         except Exception as e:
             print(f"Error fetching items from repository: {e}")
             print("This might be due to API rate limits or permissions issues.")
+            return []
+        
+        if not candidates:
+            return []
+        
+        # Second pass: calculate all similarities at once
+        try:
+            # Build corpus: current text + all candidate texts
+            corpus = [current_text] + [text for _, _, text in candidates]
+            
+            # Fit vectorizer once on entire corpus
+            vectorizer = TfidfVectorizer(
+                min_df=1,
+                stop_words='english',
+                ngram_range=(1, 2)
+            )
+            tfidf_matrix = vectorizer.fit_transform(corpus)
+            
+            # Compute similarities between current item (index 0) and all candidates
+            similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])[0]
+            
+            # Build results list with items meeting threshold
+            similar_items = []
+            for i, (num, title, _) in enumerate(candidates):
+                similarity = float(similarities[i])
+                if similarity >= self.config['similarity_threshold']:
+                    similar_items.append((num, title, similarity))
+            
+        except Exception as e:
+            print(f"Error calculating similarities: {e}")
+            return []
         
         # Sort by similarity (highest first)
         similar_items.sort(key=lambda x: x[2], reverse=True)
@@ -186,7 +201,8 @@ class DuplicateDetector:
         comment = f"👋 **Potential Duplicate Detected**\n\n"
         comment += f"This {item_type_name} appears to be similar to existing {item_type_name}s:\n\n"
         
-        for number, title, similarity in similar_items[:5]:  # Show top 5
+        max_to_show = self.config['max_similar_to_show']
+        for number, title, similarity in similar_items[:max_to_show]:
             similarity_pct = int(similarity * 100)
             comment += f"- #{number}: {title} (Similarity: {similarity_pct}%)\n"
         
@@ -252,7 +268,8 @@ class DuplicateDetector:
             self.add_label(item_number, self.config['label_exact_duplicate'], item_type)
             self.add_comment(item_number, similar_items, item_type)
             
-            if self.config['auto_close_exact_match']:
+            # Only auto-close issues; PRs should not be auto-closed by this flag
+            if item_type == 'issue' and self.config['auto_close_exact_match']:
                 self.close_item(item_number, highest_similar_number, item_type)
         else:
             print(f"\n⚠️  Possible duplicate detected ({highest_similarity:.2%})")
