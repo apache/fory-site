@@ -53,6 +53,10 @@ class DuplicateDetector:
             try:
                 with open(config_path, 'r') as f:
                     user_config = yaml.safe_load(f)
+                    if user_config is None:
+                        user_config = {}
+                    elif not isinstance(user_config, dict):
+                        raise ValueError("Config file must contain a mapping at the top level")
                     default_config.update(user_config)
             except Exception as e:
                 print(f"Warning: Could not load config file: {e}")
