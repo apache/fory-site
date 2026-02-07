@@ -141,8 +141,8 @@ class DuplicateDetector:
                 except Exception as e:
                     print(f"Warning: Error processing item #{item.number}: {e}")
                     continue
-                
-                checked_count += 1
+                finally:
+                    checked_count += 1
         except Exception as e:
             print(f"Error fetching items from repository: {e}")
             print("This might be due to API rate limits or permissions issues.")
