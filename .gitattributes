@@ -1,0 +1,26 @@
+# Git attributes for consistent line endings
+# This ensures shell scripts always use LF (Unix) line endings
+
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Shell scripts should always use LF line endings (even on Windows)
+*.sh text eol=lf
+
+# Explicitly declare files that should always have specific line endings
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+
+# Denote binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

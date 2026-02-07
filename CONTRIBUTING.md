@@ -16,6 +16,23 @@ Apache Fory's website consists of static pages hosted at https://github.com/apac
 
 Create an issue with [this form](https://github.com/apache/fory-site/issues/new/choose).
 
+## Automated Duplicate Detection
+
+This repository uses an automated system to detect duplicate issues and pull requests. When you create a new issue or PR:
+
+- **The bot will scan** for similar existing issues/PRs based on title and description
+- **If potential duplicates are found**, your issue will be labeled with `possible-duplicate` or `duplicate`
+- **A comment will be posted** with links to similar issues for your review
+
+### What to do if your issue is flagged as a duplicate:
+
+1. **Review the similar issues** linked in the bot comment
+2. **If it's truly a duplicate**: Close your issue and join the discussion in the existing one
+3. **If it's NOT a duplicate**: Add more details to differentiate your issue and mention a maintainer
+4. **Remove the duplicate label** if you believe the bot made a mistake
+
+This system helps reduce redundant discussions and ensures all related conversations happen in one place. For more details, see [.github/DUPLICATE_DETECTION.md](.github/DUPLICATE_DETECTION.md).
+
 ## How to update doc
 
 All updates about docs for [guide](https://github.com/apache/fory/tree/main/docs/guide) and [specification](https://github.com/apache/fory/tree/main/docs/specification) will be synced from [docs in fory repo](https://github.com/apache/fory/tree/main/docs) to this site repo automatically.
