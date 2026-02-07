@@ -9,7 +9,7 @@ import sys
 import argparse
 import json
 from typing import List, Dict, Tuple
-from github import Github
+from github import Github, GithubException
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
@@ -153,8 +153,8 @@ class DuplicateDetector:
             # Ensure label exists
             try:
                 self.repo.get_label(label)
-            except:
-                # Create label if it doesn't exist
+            except GithubException:
+                # Create label if it doesn't exist (label not found)
                 if label == self.config['label_possible_duplicate']:
                     self.repo.create_label(label, "FFA500", "Potential duplicate issue")
                 elif label == self.config['label_exact_duplicate']:
