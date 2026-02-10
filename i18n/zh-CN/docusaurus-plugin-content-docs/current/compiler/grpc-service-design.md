@@ -21,7 +21,7 @@ license: |
 
 > 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
 
-# gRPC Service IDL Design
+## gRPC Service IDL Design
 
 ## Thoughts and Constraints
 

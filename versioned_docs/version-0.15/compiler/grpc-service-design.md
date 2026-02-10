@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-# gRPC Service IDL Design
+## gRPC Service IDL Design
 
 ## Thoughts and Constraints
 
