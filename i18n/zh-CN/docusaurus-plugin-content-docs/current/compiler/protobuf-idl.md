@@ -1,5 +1,5 @@
 ---
-title: Protobuf IDL Support
+title: Protobuf IDL 支持
 sidebar_position: 10
 id: protobuf_idl_support
 license: |
@@ -19,17 +19,18 @@ license: |
   limitations under the License.
 ---
 
-This page explains how Apache Fory works with Protocol Buffers (`.proto`) schemas,
-how protobuf concepts map to Fory, and how to use protobuf-only Fory extension options.
+> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
 
-## What This Page Covers
+本页说明 Apache Fory 如何处理 Protocol Buffers（`.proto`）schema、protobuf 概念如何映射到 Fory，以及 protobuf 专用 Fory 扩展选项的使用方式。
+
+## 本页内容
 
 - Choosing protobuf vs Fory for your use case
 - Syntax and semantic differences that matter during migration
 - Supported Fory extension options in protobuf files
 - Practical migration patterns from protobuf to Fory
 
-## Quick Decision Guide
+## 快速决策指南
 
 | Situation                                                     | Recommended Format |
 | ------------------------------------------------------------- | ------------------ |
@@ -39,7 +40,7 @@ how protobuf concepts map to Fory, and how to use protobuf-only Fory extension o
 | You need strong unknown-field behavior for wire compatibility | Protocol Buffers   |
 | You need native structs/classes instead of protobuf wrappers  | Fory               |
 
-## Protobuf vs Fory at a Glance
+## Protobuf 与 Fory 对比
 
 | Aspect             | Protocol Buffers              | Fory                                  |
 | ------------------ | ----------------------------- | ------------------------------------- |
@@ -54,7 +55,7 @@ how protobuf concepts map to Fory, and how to use protobuf-only Fory extension o
 Fory gRPC support is under active development. For production gRPC
 workflows today, protobuf remains the mature/default choice.
 
-## Why Use Apache Fory
+## 为什么使用 Apache Fory
 
 - Idiomatic generated code: Fory IDL generates language-idiomatic classes and
   structs that can be used directly as domain objects.
@@ -172,7 +173,7 @@ Protobuf imports are supported. Common well-known types map directly:
 - `google.protobuf.Duration` -> `duration`
 - `google.protobuf.Any` -> `any`
 
-## Type Mapping Highlights
+## 类型映射 Highlights
 
 | Protobuf Type                            | Fory Mapping                             |
 | ---------------------------------------- | ---------------------------------------- |

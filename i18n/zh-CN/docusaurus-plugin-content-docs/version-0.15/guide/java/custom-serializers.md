@@ -1,5 +1,5 @@
 ---
-title: Custom Serializers
+title: 自定义序列化器
 sidebar_position: 4
 id: custom_serializers
 license: |
@@ -19,13 +19,13 @@ license: |
   limitations under the License.
 ---
 
-This page covers how to implement custom serializers for your types.
+本页介绍如何为你的类型实现自定义序列化器。
 
-## Basic Custom Serializer
+## 基本自定义序列化器
 
-In some cases, you may want to implement a serializer for your type, especially for classes that customize serialization using JDK `writeObject/writeReplace/readObject/readResolve`, which is very inefficient.
+在某些情况下，你可能想为你的类型实现序列化器，特别是对于使用 JDK `writeObject/writeReplace/readObject/readResolve` 自定义序列化的类，这非常低效。
 
-For example, if you don't want the following `Foo#writeObject` to be invoked, you can implement a custom serializer:
+例如，如果你不想调用以下 `Foo#writeObject`，你可以实现自定义序列化器：
 
 ```java
 class Foo {
@@ -56,61 +56,61 @@ class FooSerializer extends Serializer<Foo> {
 }
 ```
 
-### Register the Serializer
+### 注册序列化器
 
 ```java
 Fory fory = getFory();
 fory.registerSerializer(Foo.class, new FooSerializer(fory));
 ```
 
-Besides registering serializers, you can also implement `java.io.Externalizable` for a class to customize serialization logic. Such types will be serialized by Fory's `ExternalizableSerializer`.
+除了注册序列化器，你还可以为类实现 `java.io.Externalizable` 来自定义序列化逻辑。这种类型将由 Fory 的 `ExternalizableSerializer` 序列化。
 
-## Collection Serializer
+## 集合序列化器
 
-When implementing a serializer for a custom Collection type, you must extend `CollectionSerializer` or `CollectionLikeSerializer`. The key difference is that `CollectionLikeSerializer` can serialize a class which has a collection-like structure but is not a Java Collection subtype.
+在为自定义集合类型实现序列化器时，你必须扩展 `CollectionSerializer` 或 `CollectionLikeSerializer`。主要区别是 `CollectionLikeSerializer` 可以序列化具有类似集合结构但不是 Java Collection 子类型的类。
 
-### supportCodegenHook Parameter
+### supportCodegenHook 参数
 
-This special parameter controls serialization behavior:
+这个特殊参数控制序列化行为：
 
-**When `true`:**
+**当为 `true` 时：**
 
-- Enables optimized access to collection elements and JIT compilation for better performance
-- Direct serialization invocation and inline for collection items without dynamic serializer dispatch cost
-- Better performance for standard collection types
-- Recommended for most collections
+- 启用对集合元素的优化访问和 JIT 编译以获得更好的性能
+- 直接序列化调用和内联集合项，无需动态序列化器分派成本
+- 对标准集合类型有更好的性能
+- 对大多数集合推荐
 
-**When `false`:**
+**当为 `false` 时：**
 
-- Uses interface-based element access and dynamic serializer dispatch for elements (higher cost)
-- More flexible for custom collection types
-- Required when collection has special serialization needs
-- Handles complex collection implementations
+- 使用基于接口的元素访问和元素的动态序列化器分派（成本更高）
+- 对自定义集合类型更灵活
+- 当集合有特殊序列化需求时需要
+- 处理复杂的集合实现
 
-### Collection Serializer with JIT Support
+### 带 JIT 支持的集合序列化器
 
-When implementing a Collection serializer with JIT support, leverage Fory's existing binary format and collection serialization infrastructure:
+在实现带 JIT 支持的集合序列化器时，利用 Fory 现有的二进制格式和集合序列化基础设施：
 
 ```java
 public class CustomCollectionSerializer<T extends Collection> extends CollectionSerializer<T> {
     public CustomCollectionSerializer(Fory fory, Class<T> cls) {
-        // supportCodegenHook controls whether to use JIT compilation
+        // supportCodegenHook 控制是否使用 JIT 编译
         super(fory, cls, true);
     }
 
     @Override
     public Collection onCollectionWrite(MemoryBuffer buffer, T value) {
-        // Write collection size
+        // 写入集合大小
         buffer.writeVarUint32Small7(value.size());
-        // Write any additional collection metadata
+        // 写入任何额外的集合元数据
         return value;
     }
 
     @Override
     public Collection newCollection(MemoryBuffer buffer) {
-        // Create new collection instance
+        // 创建新的集合实例
         Collection collection = super.newCollection(buffer);
-        // Read and set collection size
+        // 读取并设置集合大小
         int numElements = getAndClearNumElements();
         setNumElements(numElements);
         return collection;
@@ -118,11 +118,11 @@ public class CustomCollectionSerializer<T extends Collection> extends Collection
 }
 ```
 
-Note: Invoke `setNumElements` when implementing `newCollection` to let Fory know how many elements to deserialize.
+注意：在实现 `newCollection` 时调用 `setNumElements`，让 Fory 知道要反序列化多少元素。
 
-### Custom Collection Serializer without JIT
+### 不带 JIT 的自定义集合序列化器
 
-For collections that use primitive arrays or have special requirements, implement a serializer with JIT disabled:
+对于使用原始数组或有特殊要求的集合，实现禁用 JIT 的序列化器：
 
 ```java
 class IntList extends AbstractCollection<Integer> {
@@ -185,16 +185,16 @@ class IntList extends AbstractCollection<Integer> {
 
 class IntListSerializer extends CollectionLikeSerializer<IntList> {
     public IntListSerializer(Fory fory) {
-        // Disable JIT since we're handling serialization directly
+        // 禁用 JIT，因为我们直接处理序列化
         super(fory, IntList.class, false);
     }
 
     @Override
     public void write(MemoryBuffer buffer, IntList value) {
-        // Write size
+        // 写入大小
         buffer.writeVarUint32Small7(value.size());
 
-        // Write elements directly as primitive ints
+        // 直接将元素写为原始 int
         int[] elements = value.getElements();
         for (int i = 0; i < value.size(); i++) {
             buffer.writeVarInt32(elements[i]);
@@ -203,10 +203,10 @@ class IntListSerializer extends CollectionLikeSerializer<IntList> {
 
     @Override
     public IntList read(MemoryBuffer buffer) {
-        // Read size
+        // 读取大小
         int size = buffer.readVarUint32Small7();
 
-        // Create array and read elements
+        // 创建数组并读取元素
         int[] elements = new int[size];
         for (int i = 0; i < size; i++) {
             elements[i] = buffer.readVarInt32();
@@ -215,7 +215,7 @@ class IntListSerializer extends CollectionLikeSerializer<IntList> {
         return new IntList(elements, size);
     }
 
-    // These methods are not used when JIT is disabled
+    // 当禁用 JIT 时不使用这些方法
     @Override
     public Collection onCollectionWrite(MemoryBuffer buffer, IntList value) {
         throw new UnsupportedOperationException();
@@ -233,16 +233,16 @@ class IntListSerializer extends CollectionLikeSerializer<IntList> {
 }
 ```
 
-**When to use this approach:**
+**何时使用此方法：**
 
-- Working with primitive types
-- Need maximum performance
-- Want to minimize memory overhead
-- Have special serialization requirements
+- 处理原始类型
+- 需要最大性能
+- 想要最小化内存开销
+- 有特殊的序列化需求
 
-### Collection-like Type Serializer
+### 类集合类型序列化器
 
-For types that behave like collections but aren't standard Java Collections:
+对于行为类似集合但不是标准 Java 集合的类型：
 
 ```java
 class CustomCollectionLike {
@@ -355,33 +355,33 @@ class CustomCollectionSerializer extends CollectionLikeSerializer<CustomCollecti
 }
 ```
 
-## Map Serializer
+## Map 序列化器
 
-When implementing a serializer for a custom Map type, extend `MapSerializer` or `MapLikeSerializer`. The key difference is that `MapLikeSerializer` can serialize a class which has a map-like structure but is not a Java Map subtype.
+在为自定义 Map 类型实现序列化器时，扩展 `MapSerializer` 或 `MapLikeSerializer`。主要区别是 `MapLikeSerializer` 可以序列化具有类似 map 结构但不是 Java Map 子类型的类。
 
-### Map Serializer with JIT Support
+### 带 JIT 支持的 Map 序列化器
 
 ```java
 public class CustomMapSerializer<T extends Map> extends MapSerializer<T> {
     public CustomMapSerializer(Fory fory, Class<T> cls) {
-        // supportCodegenHook is a critical parameter that determines serialization behavior
+        // supportCodegenHook 是决定序列化行为的关键参数
         super(fory, cls, true);
     }
 
     @Override
     public Map onMapWrite(MemoryBuffer buffer, T value) {
-        // Write map size
+        // 写入 map 大小
         buffer.writeVarUint32Small7(value.size());
-        // Write any additional map metadata here
+        // 在这里写入任何额外的 map 元数据
         return value;
     }
 
     @Override
     public Map newMap(MemoryBuffer buffer) {
-        // Read map size
+        // 读取 map 大小
         int numElements = buffer.readVarUint32Small7();
         setNumElements(numElements);
-        // Create and return new map instance
+        // 创建并返回新的 map 实例
         T map = (T) new HashMap(numElements);
         fory.getRefResolver().reference(map);
         return map;
@@ -389,11 +389,11 @@ public class CustomMapSerializer<T extends Map> extends MapSerializer<T> {
 }
 ```
 
-Note: Invoke `setNumElements` when implementing `newMap` to let Fory know how many elements to deserialize.
+注意：在实现 `newMap` 时调用 `setNumElements`，让 Fory 知道要反序列化多少元素。
 
-### Custom Map Serializer without JIT
+### 不带 JIT 的自定义 Map 序列化器
 
-For complete control over the serialization process:
+对于完全控制序列化过程：
 
 ```java
 class FixedValueMap extends AbstractMap<String, Integer> {
@@ -430,17 +430,17 @@ class FixedValueMap extends AbstractMap<String, Integer> {
 
 class FixedValueMapSerializer extends MapLikeSerializer<FixedValueMap> {
     public FixedValueMapSerializer(Fory fory) {
-        // Disable codegen since we're handling serialization directly
+        // 禁用 codegen，因为我们直接处理序列化
         super(fory, FixedValueMap.class, false);
     }
 
     @Override
     public void write(MemoryBuffer buffer, FixedValueMap value) {
-        // Write the fixed value
+        // 写入固定值
         buffer.writeInt32(value.getFixedValue());
-        // Write the number of keys
+        // 写入键的数量
         buffer.writeVarUint32Small7(value.getKeys().size());
-        // Write each key
+        // 写入每个键
         for (String key : value.getKeys()) {
             buffer.writeString(key);
         }
@@ -448,9 +448,9 @@ class FixedValueMapSerializer extends MapLikeSerializer<FixedValueMap> {
 
     @Override
     public FixedValueMap read(MemoryBuffer buffer) {
-        // Read the fixed value
+        // 读取固定值
         int fixedValue = buffer.readInt32();
-        // Read the number of keys
+        // 读取键的数量
         int size = buffer.readVarUint32Small7();
         Set<String> keys = new HashSet<>(size);
         for (int i = 0; i < size; i++) {
@@ -459,7 +459,7 @@ class FixedValueMapSerializer extends MapLikeSerializer<FixedValueMap> {
         return new FixedValueMap(keys, fixedValue);
     }
 
-    // These methods are not used when supportCodegenHook is false
+    // 当 supportCodegenHook 为 false 时不使用这些方法
     @Override
     public Map onMapWrite(MemoryBuffer buffer, FixedValueMap value) {
         throw new UnsupportedOperationException();
@@ -477,9 +477,9 @@ class FixedValueMapSerializer extends MapLikeSerializer<FixedValueMap> {
 }
 ```
 
-### Map-like Type Serializer
+### 类 Map 类型序列化器
 
-For types that behave like maps but aren't standard Java Maps:
+对于行为类似 map 但不是标准 Java Map 的类型：
 
 ```java
 class CustomMapLike {
@@ -629,31 +629,31 @@ class CustomMapLikeSerializer extends MapLikeSerializer<CustomMapLike> {
 }
 ```
 
-## Registering Custom Serializers
+## 注册自定义序列化器
 
 ```java
 Fory fory = Fory.builder()
     .withLanguage(Language.JAVA)
     .build();
 
-// Register map serializer
+// 注册 map 序列化器
 fory.registerSerializer(CustomMap.class, new CustomMapSerializer<>(fory, CustomMap.class));
 
-// Register collection serializer
+// 注册集合序列化器
 fory.registerSerializer(CustomCollection.class, new CustomCollectionSerializer<>(fory, CustomCollection.class));
 ```
 
-## Key Points
+## 关键点
 
-When implementing custom map or collection serializers:
+实现自定义 map 或集合序列化器时：
 
-1. Always extend the appropriate base class (`MapSerializer`/`MapLikeSerializer` for maps, `CollectionSerializer`/`CollectionLikeSerializer` for collections)
-2. Consider the impact of `supportCodegenHook` on performance and functionality
-3. Properly handle reference tracking if needed
-4. Implement proper size management using `setNumElements` and `getAndClearNumElements` when `supportCodegenHook` is `true`
+1. 始终扩展适当的基类（map 使用 `MapSerializer`/`MapLikeSerializer`，集合使用 `CollectionSerializer`/`CollectionLikeSerializer`）
+2. 考虑 `supportCodegenHook` 对性能和功能的影响
+3. 如果需要，适当处理引用跟踪
+4. 当 `supportCodegenHook` 为 `true` 时，使用 `setNumElements` 和 `getAndClearNumElements` 实现适当的大小管理
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md) - Register serializers
-- [Schema Evolution](schema-evolution.md) - Compatible mode considerations
-- [Configuration Options](configuration.md) - Serialization options
+- [类型注册](type-registration.md) - 注册序列化器
+- [Schema 演化](schema-evolution.md) - 兼容模式考虑
+- [配置选项](configuration.md) - 序列化选项

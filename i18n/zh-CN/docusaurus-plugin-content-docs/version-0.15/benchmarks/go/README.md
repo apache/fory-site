@@ -1,18 +1,18 @@
-# Go Serialization Benchmark Report
+# Go 序列化基准报告
 
-Generated: 2026-02-06 11:26:58
+生成时间：2026-02-06 11:26:58
 
-## System Information
+## 系统信息
 
 - **OS**: Darwin 24.6.0
 - **Architecture**: arm64
 - **Python**: 3.10.8
 
-## Performance Charts
+## 性能图表
 
 ![Benchmark](benchmark_combined.png)
 
-## Performance Summary
+## 性能汇总
 
 | Data Type        | Operation   | Fory (ops/s) | Protobuf (ops/s) | Msgpack (ops/s) | Fory vs PB | Fory vs MP |
 | ---------------- | ----------- | ------------ | ---------------- | --------------- | ---------- | ---------- |
@@ -29,7 +29,7 @@ Generated: 2026-02-06 11:26:58
 | Mediacontentlist | Serialize   | 268K         | 110K             | 72K             | 2.44x      | 3.72x      |
 | Mediacontentlist | Deserialize | 138K         | 87K              | 36K             | 1.58x      | 3.86x      |
 
-## Detailed Timing (ns/op)
+## 详细耗时（ns/op）
 
 | Data Type        | Operation   | Fory   | Protobuf | Msgpack |
 | ---------------- | ----------- | ------ | -------- | ------- |
@@ -46,7 +46,7 @@ Generated: 2026-02-06 11:26:58
 | Mediacontentlist | Serialize   | 3736.0 | 9107.0   | 13911.0 |
 | Mediacontentlist | Deserialize | 7247.0 | 11435.0  | 27975.0 |
 
-### Serialized Data Sizes (bytes)
+### 序列化数据大小（字节）
 
 | Data Type        | Fory | Protobuf | Msgpack |
 | ---------------- | ---- | -------- | ------- |

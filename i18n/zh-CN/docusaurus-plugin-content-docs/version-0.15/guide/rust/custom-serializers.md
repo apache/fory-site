@@ -1,5 +1,5 @@
 ---
-title: Custom Serializers
+title: 自定义序列化器
 sidebar_position: 4
 id: custom_serializers
 license: |
@@ -19,22 +19,22 @@ license: |
   limitations under the License.
 ---
 
-For types that don't support `#[derive(ForyObject)]`, implement the `Serializer` trait manually.
+对于不支持 `#[derive(ForyObject)]` 的类型，可以手动实现 `Serializer` trait。
 
-## When to Use Custom Serializers
+## 何时使用自定义序列化器
 
-- External types from other crates
-- Types with special serialization requirements
-- Legacy data format compatibility
-- Performance-critical custom encoding
+- 来自其他 crate 的外部类型
+- 具有特殊序列化要求的类型
+- 旧数据格式兼容性
+- 性能关键的自定义编码
 
-## Implementing the Serializer Trait
+## 实现 Serializer Trait
 
 ```rust
 use fory::{Fory, ReadContext, WriteContext, Serializer, ForyDefault, Error};
 use std::any::Any;
 
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, PartialEq)]
 struct CustomType {
     value: i32,
     name: String,
@@ -63,7 +63,6 @@ impl Serializer for CustomType {
     }
 }
 
-// ForyDefault delegates to Default
 impl ForyDefault for CustomType {
     fn fory_default() -> Self {
         Self::default()
@@ -71,12 +70,7 @@ impl ForyDefault for CustomType {
 }
 ```
 
-> **Note**: When implementing `ForyDefault` manually, ensure your type also implements `Default` if you use `Self::default()`.
-> Alternatively, you can construct a default instance directly in `fory_default()`.
->
-> **Tip**: If your type supports `#[derive(ForyObject)]`, you can use `#[fory(generate_default)]` to automatically generate both `ForyDefault` and `Default` implementations.
-
-## Registering Custom Serializers
+## 注册自定义序列化器
 
 ```rust
 let mut fory = Fory::default();
@@ -91,18 +85,18 @@ let decoded: CustomType = fory.deserialize(&bytes)?;
 assert_eq!(custom, decoded);
 ```
 
-## WriteContext and ReadContext
+## WriteContext 和 ReadContext
 
-The `WriteContext` and `ReadContext` provide access to:
+`WriteContext` 和 `ReadContext` 提供对以下内容的访问：
 
-- **writer/reader**: Binary buffer operations
-- **type_resolver**: Type registration information
-- **ref_resolver**: Reference tracking (for shared/circular references)
+- **writer/reader**：二进制缓冲区操作
+- **type_resolver**：类型注册信息
+- **ref_resolver**：引用跟踪（用于共享/循环引用）
 
-### Common Writer Methods
+### 常用 Writer 方法
 
 ```rust
-// Primitive types
+// 原始类型
 context.writer.write_i8(value);
 context.writer.write_i16(value);
 context.writer.write_i32(value);
@@ -111,18 +105,18 @@ context.writer.write_f32(value);
 context.writer.write_f64(value);
 context.writer.write_bool(value);
 
-// Variable-length integers
+// 变长整数
 context.writer.write_varint32(value);
 context.writer.write_varuint32(value);
 
-// Strings
+// 字符串
 context.writer.write_utf8_string(&string);
 ```
 
-### Common Reader Methods
+### 常用 Reader 方法
 
 ```rust
-// Primitive types
+// 原始类型
 let value = context.reader.read_i8();
 let value = context.reader.read_i16();
 let value = context.reader.read_i32();
@@ -131,23 +125,23 @@ let value = context.reader.read_f32();
 let value = context.reader.read_f64();
 let value = context.reader.read_bool();
 
-// Variable-length integers
+// 变长整数
 let value = context.reader.read_varint32();
 let value = context.reader.read_varuint32();
 
-// Strings
+// 字符串
 let string = context.reader.read_utf8_string(len);
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Use variable-length encoding** for integers that may be small
-2. **Write length first** for variable-length data
-3. **Handle errors properly** in read methods
-4. **Implement ForyDefault** for schema evolution support
+1. **使用变长编码**：对可能较小的整数使用变长编码
+2. **首先写入长度**：对变长数据先写入长度
+3. **正确处理错误**：在 read 方法中正确处理错误
+4. **实现 ForyDefault**：以支持 schema 演化
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md) - Registering serializers
-- [Basic Serialization](basic-serialization.md) - Using ForyObject derive
-- [Schema Evolution](schema-evolution.md) - Compatible mode
+- [类型注册](type-registration.md) - 注册序列化器
+- [基础序列化](basic-serialization.md) - 使用 ForyObject derive
+- [Schema 演化](schema-evolution.md) - Compatible 模式

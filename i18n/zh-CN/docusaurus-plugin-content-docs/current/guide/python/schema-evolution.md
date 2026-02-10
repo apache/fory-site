@@ -1,5 +1,5 @@
 ---
-title: Schema Evolution
+title: Schema 演化
 sidebar_position: 6
 id: schema_evolution
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ supports schema evolution in Compatible mode, allowing fields to be added/removed while maintaining compatibility.
+Apache Fory™ 在兼容模式下支持 schema 演化，允许在保持兼容性的同时添加/删除字段。
 
-## Enable Compatible Mode
+## 启用兼容模式
 
 ```python
 import pyfory
@@ -29,13 +29,13 @@ import pyfory
 f = pyfory.Fory(xlang=True, compatible=True)
 ```
 
-## Schema Evolution Example
+## Schema 演化示例
 
 ```python
 import pyfory
 from dataclasses import dataclass
 
-# Version 1: Original class
+# 版本 1：原始类
 @dataclass
 class User:
     name: str
@@ -45,33 +45,33 @@ f = pyfory.Fory(xlang=True, compatible=True)
 f.register(User, typename="User")
 data = f.dumps(User("Alice", 30))
 
-# Version 2: Add new field (backward compatible)
+# 版本 2：添加新字段（向后兼容）
 @dataclass
 class User:
     name: str
     age: int
-    email: str = "unknown@example.com"  # New field with default
+    email: str = "unknown@example.com"  # 带默认值的新字段
 
-# Can still deserialize old data
+# 仍然可以反序列化旧数据
 user = f.loads(data)
 print(user.email)  # "unknown@example.com"
 ```
 
-## Supported Changes
+## 支持的变更
 
-- **Add new fields**: With default values
-- **Remove fields**: Old data with extra fields will be skipped
-- **Reorder fields**: Fields are matched by name, not position
+- **添加新字段**：带默认值
+- **删除字段**：具有额外字段的旧数据将被跳过
+- **重新排序字段**：字段按名称匹配，而不是位置
 
-## Best Practices
+## 最佳实践
 
-1. **Always provide default values** for new fields
-2. **Use typename for cross-language compatibility**
-3. **Test schema changes** before deploying
-4. **Document schema versions** for your team
+1. **始终为新字段提供默认值**
+2. **使用 typename 实现跨语言兼容性**
+3. **在部署前测试 schema 变更**
+4. **为团队记录 schema 版本**
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Compatible mode settings
-- [Cross-Language](cross-language.md) - Schema evolution across languages
-- [Type Registration](type-registration.md) - Registration patterns
+- [配置](configuration.md) - 兼容模式设置
+- [跨语言](cross-language.md) - 跨语言的 schema 演化
+- [类型注册](type-registration.md) - 注册模式

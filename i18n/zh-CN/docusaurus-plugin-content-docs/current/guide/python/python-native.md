@@ -1,5 +1,5 @@
 ---
-title: Python Native Mode
+title: Python 原生模式
 sidebar_position: 5
 id: native_mode
 license: |
@@ -19,41 +19,41 @@ license: |
   limitations under the License.
 ---
 
-`pyfory` provides a Python-native serialization mode that offers the same functionality as pickle/cloudpickle, but with **significantly better performance, smaller data size, and enhanced security features**.
+`pyfory` 提供了 Python 原生序列化模式，提供与 pickle/cloudpickle 相同的功能，但具有**显著更好的性能、更小的数据大小和增强的安全特性**。
 
-## Overview
+## 概述
 
-The binary protocol and API are similar to Fory's xlang mode, but Python-native mode can serialize any Python object—including global functions, local functions, lambdas, local classes and types with customized serialization using `__getstate__/__reduce__/__reduce_ex__`, which are not allowed in xlang mode.
+二进制协议和 API 与 Fory 的 xlang 模式类似，但 Python 原生模式可以序列化任何 Python 对象——包括全局函数、局部函数、lambda、局部类以及使用 `__getstate__/__reduce__/__reduce_ex__` 自定义序列化的类型，这些在 xlang 模式中是不允许的。
 
-To use Python-native mode, create `Fory` with `xlang=False`:
+要使用 Python 原生模式，创建 `Fory` 时设置 `xlang=False`：
 
 ```python
 import pyfory
 fory = pyfory.Fory(xlang=False, ref=False, strict=True)
 ```
 
-## Drop-in Replacement for Pickle/Cloudpickle
+## 可直接替代 Pickle/Cloudpickle
 
-`pyfory` can serialize any Python object with the following configuration:
+`pyfory` 可以使用以下配置序列化任何 Python 对象：
 
-- **For circular references**: Set `ref=True` to enable reference tracking
-- **For functions/classes**: Set `strict=False` to allow deserialization of dynamic types
+- **对于循环引用**：设置 `ref=True` 启用引用跟踪
+- **对于函数/类**：设置 `strict=False` 允许反序列化动态类型
 
-**⚠️ Security Warning**: When `strict=False`, Fory will deserialize arbitrary types, which can pose security risks if data comes from untrusted sources. Only use `strict=False` in controlled environments where you trust the data source completely.
+**⚠️ 安全警告**：当 `strict=False` 时，Fory 将反序列化任意类型，如果数据来自不受信任的源，这可能带来安全风险。仅在完全信任数据源的受控环境中使用 `strict=False`。
 
-### Common Usage
+### 常见用法
 
 ```python
 import pyfory
 
-# Create Fory instance
+# 创建 Fory 实例
 fory = pyfory.Fory(xlang=False, ref=True, strict=False)
 
-# serialize common Python objects
+# 序列化常见 Python 对象
 data = fory.dumps({"name": "Alice", "age": 30, "scores": [95, 87, 92]})
 print(fory.loads(data))
 
-# serialize custom objects
+# 序列化自定义对象
 from dataclasses import dataclass
 
 @dataclass
@@ -66,9 +66,9 @@ data = fory.dumps(person)
 print(fory.loads(data))  # Person(name='Bob', age=25)
 ```
 
-## Serialize Global Functions
+## 序列化全局函数
 
-Capture and serialize functions defined at module level. Fory deserialize and return same function object:
+捕获并序列化在模块级别定义的函数。Fory 反序列化并返回相同的函数对象：
 
 ```python
 import pyfory
@@ -82,16 +82,16 @@ data = fory.dumps(my_global_function)
 print(fory.loads(data)(10))  # 100
 ```
 
-## Serialize Local Functions/Lambdas
+## 序列化局部函数/Lambda
 
-Serialize functions with closures and lambda expressions. Fory captures the closure variables automatically:
+序列化带闭包的函数和 lambda 表达式。Fory 自动捕获闭包变量：
 
 ```python
 import pyfory
 
 fory = pyfory.Fory(xlang=False, ref=True, strict=False)
 
-# Local functions with closures
+# 带闭包的局部函数
 def my_function():
     local_var = 10
     def local_func(x):
@@ -101,14 +101,14 @@ def my_function():
 data = fory.dumps(my_function())
 print(fory.loads(data)(10))  # 100
 
-# Lambdas
+# Lambda
 data = fory.dumps(lambda x: 10 * x)
 print(fory.loads(data)(10))  # 100
 ```
 
-## Serialize Global Classes/Methods
+## 序列化全局类/方法
 
-Serialize class objects, instance methods, class methods, and static methods:
+序列化类对象、实例方法、类方法和静态方法：
 
 ```python
 from dataclasses import dataclass
@@ -131,22 +131,22 @@ class Person:
     def h(x):
         return 10 * x
 
-# Serialize global class
+# 序列化全局类
 print(fory.loads(fory.dumps(Person))("Bob", 25))  # Person(name='Bob', age=25)
 
-# Serialize instance method
+# 序列化实例方法
 print(fory.loads(fory.dumps(Person("Bob", 20).f))(10))  # 200
 
-# Serialize class method
+# 序列化类方法
 print(fory.loads(fory.dumps(Person.g))(10))  # 100
 
-# Serialize static method
+# 序列化静态方法
 print(fory.loads(fory.dumps(Person.h))(10))  # 100
 ```
 
-## Serialize Local Classes/Methods
+## 序列化局部类/方法
 
-Serialize classes defined inside functions along with their methods:
+序列化在函数内定义的类及其方法：
 
 ```python
 from dataclasses import dataclass
@@ -167,24 +167,24 @@ def create_local_class():
             return 10 * x
     return LocalClass
 
-# Serialize local class
+# 序列化局部类
 data = fory.dumps(create_local_class())
 print(fory.loads(data)().f(10))  # 100
 
-# Serialize local class instance method
+# 序列化局部类实例方法
 data = fory.dumps(create_local_class()().f)
 print(fory.loads(data)(10))  # 100
 
-# Serialize local class method
+# 序列化局部类方法
 data = fory.dumps(create_local_class().g)
 print(fory.loads(data)(10))  # 100
 
-# Serialize local class static method
+# 序列化局部类静态方法
 data = fory.dumps(create_local_class().h)
 print(fory.loads(data)(10))  # 100
 ```
 
-## Performance Comparison
+## 性能比较
 
 ```python
 import pyfory
@@ -198,8 +198,8 @@ print(f"Fory: {timeit.timeit(lambda: fory.dumps(obj), number=1000):.3f}s")
 print(f"Pickle: {timeit.timeit(lambda: pickle.dumps(obj), number=1000):.3f}s")
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Python mode configuration
-- [Out-of-Band Serialization](out-of-band.md) - Zero-copy buffers
-- [Security](security.md) - DeserializationPolicy
+- [配置](configuration.md) - Python 模式配置
+- [带外序列化](out-of-band.md) - 零拷贝缓冲区
+- [安全性](security.md) - DeserializationPolicy

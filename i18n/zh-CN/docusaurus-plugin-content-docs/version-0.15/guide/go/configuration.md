@@ -1,5 +1,5 @@
 ---
-title: Configuration
+title: 配置
 sidebar_position: 10
 id: configuration
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-Fory Go uses a functional options pattern for configuration. This allows you to customize serialization behavior while maintaining sensible defaults.
+Fory Go 使用函数式选项模式进行配置。你可以在保持合理默认值的前提下，自定义序列化行为。
 
-## Creating a Fory Instance
+## 创建 Fory 实例
 
-### Default Configuration
+### 默认配置
 
 ```go
 import "github.com/apache/fory/go/fory"
@@ -31,16 +31,16 @@ import "github.com/apache/fory/go/fory"
 f := fory.New()
 ```
 
-Default settings:
+默认设置：
 
 | Option     | Default | Description                    |
 | ---------- | ------- | ------------------------------ |
-| TrackRef   | false   | Reference tracking disabled    |
-| MaxDepth   | 20      | Maximum nesting depth          |
-| IsXlang    | false   | Cross-language mode disabled   |
-| Compatible | false   | Schema evolution mode disabled |
+| TrackRef   | false   | 关闭引用跟踪                   |
+| MaxDepth   | 20      | 最大嵌套深度                   |
+| IsXlang    | false   | 关闭跨语言模式                 |
+| Compatible | false   | 关闭 Schema 演进兼容模式       |
 
-### With Options
+### 通过选项配置
 
 ```go
 f := fory.New(
@@ -50,97 +50,97 @@ f := fory.New(
 )
 ```
 
-## Configuration Options
+## 配置项
 
 ### WithTrackRef
 
-Enable reference tracking to handle circular references and shared objects:
+启用引用跟踪，以支持循环引用和共享对象：
 
 ```go
 f := fory.New(fory.WithTrackRef(true))
 ```
 
-**When enabled:**
+**开启后：**
 
-- Objects appearing multiple times are serialized once
-- Circular references are handled correctly
-- Per-field `fory:"ref"` tags take effect
-- Adds overhead for tracking object identity
+- 多次出现的同一对象只会序列化一次
+- 可正确处理循环引用
+- 字段级 `fory:"ref"` 标签生效
+- 会带来对象身份跟踪开销
 
-**When disabled (default):**
+**关闭（默认）时：**
 
-- Each object occurrence is serialized independently
-- Circular references cause stack overflow or max depth error
-- Per-field `fory:"ref"` tags are ignored
-- Better performance for simple data structures
+- 每次对象出现都独立序列化
+- 循环引用会导致栈溢出或超出最大深度错误
+- 字段级 `fory:"ref"` 标签被忽略
+- 对简单数据结构性能更好
 
-**Use reference tracking when:**
+**建议启用场景：**
 
-- Data contains circular references
-- Same object is referenced multiple times
-- Serializing graph structures (trees with parent pointers, linked lists with cycles)
+- 数据中存在循环引用
+- 同一对象被多处引用
+- 需要序列化图结构（如带父指针的树、带环链表）
 
-See [References](references.md) for details.
+详见 [引用](references.md)。
 
 ### WithCompatible
 
-Enable compatible mode for schema evolution:
+启用 schema 演进兼容模式：
 
 ```go
 f := fory.New(fory.WithCompatible(true))
 ```
 
-**When enabled:**
+**开启后：**
 
-- Type metadata is written to serialized data
-- Supports adding/removing fields between versions
-- Field names or ids are used for matching (order-independent)
-- Larger serialized output due to metadata
+- 会向序列化数据写入类型元信息
+- 支持版本间新增/删除字段
+- 按字段名或字段 ID 匹配（与顺序无关）
+- 因元信息导致输出更大
 
-**When disabled (default):**
+**关闭（默认）时：**
 
-- Compact serialization without field metadata
-- Faster serialization and smaller output
-- Fields matched by sorted order
-- Requires consistent struct definitions across all services
+- 不写字段元信息，序列化更紧凑
+- 序列化更快、输出更小
+- 字段按排序顺序匹配
+- 要求各服务间结构体定义保持一致
 
-See [Schema Evolution](schema-evolution.md) for details.
+详见 [Schema 演进](schema-evolution.md)。
 
 ### WithMaxDepth
 
-Set the maximum nesting depth to prevent stack overflow:
+设置最大嵌套深度，防止栈溢出：
 
 ```go
 f := fory.New(fory.WithMaxDepth(30))
 ```
 
-- Default: 20
-- Protects against deeply nested, recursive structures or malicious data
-- Serialization fails with error when exceeded
+- 默认值：20
+- 防护深层递归结构或恶意数据
+- 超过限制会返回错误
 
 ### WithXlang
 
-Enable cross-language serialization mode:
+启用跨语言序列化模式：
 
 ```go
 f := fory.New(fory.WithXlang(true))
 ```
 
-**When enabled:**
+**开启后：**
 
-- Uses cross-language type system
-- Compatible with Java, Python, C++, Rust, JavaScript
-- Type IDs follow xlang specification
+- 使用跨语言类型系统
+- 与 Java、Python、C++、Rust、JavaScript 兼容
+- 类型 ID 遵循 xlang 规范
 
-**When disabled (default):**
+**关闭（默认）时：**
 
-- Go-native serialization mode
-- Support more Go-native types
-- Not compatible with other language implementations
+- 使用 Go 原生序列化模式
+- 支持更多 Go 原生类型
+- 与其他语言实现不兼容
 
-## Thread Safety
+## 线程安全
 
-The default `Fory` instance is **NOT thread-safe**. For concurrent use, use the thread-safe wrapper:
+默认 `Fory` 实例**不是线程安全的**。并发场景请使用线程安全封装：
 
 ```go
 import "github.com/apache/fory/go/fory/threadsafe"
@@ -161,15 +161,15 @@ go func() {
 }()
 ```
 
-The thread-safe wrapper:
+线程安全封装具备：
 
-- Uses `sync.Pool` internally for efficient instance reuse
-- Automatically copies serialized data before returning
-- Accepts the same configuration options as `fory.New()`
+- 内部使用 `sync.Pool` 高效复用实例
+- 返回前自动复制序列化数据
+- 与 `fory.New()` 相同的配置选项
 
-### Global Thread-Safe Instance
+### 全局线程安全实例
 
-For convenience, the threadsafe package provides global functions:
+为了便捷，`threadsafe` 包提供全局函数：
 
 ```go
 import "github.com/apache/fory/go/fory/threadsafe"
@@ -179,13 +179,13 @@ data, err := threadsafe.Marshal(&myValue)
 err = threadsafe.Unmarshal(data, &result)
 ```
 
-See [Thread Safety](thread-safety.md) for details.
+详见 [线程安全](thread-safety.md)。
 
-## Buffer Management
+## 缓冲区管理
 
-### Zero-Copy Behavior
+### 零拷贝行为
 
-The default `Fory` instance reuses its internal buffer:
+默认 `Fory` 实例会复用内部缓冲区：
 
 ```go
 f := fory.New()
@@ -200,7 +200,7 @@ safeCopy := make([]byte, len(data1))
 copy(safeCopy, data1)
 ```
 
-The thread-safe wrapper automatically copies data, so this is not a concern:
+线程安全封装会自动拷贝数据，因此不存在该问题：
 
 ```go
 f := threadsafe.New()
@@ -209,9 +209,9 @@ data2, _ := f.Serialize(value2)
 // Both data1 and data2 are valid
 ```
 
-### Manual Buffer Control
+### 手动控制缓冲区
 
-For high-throughput scenarios, you can manage buffers manually:
+高吞吐场景可手动管理缓冲区：
 
 ```go
 f := fory.New()
@@ -229,11 +229,11 @@ data := buf.GetByteSlice(0, buf.WriterIndex())
 buf.Reset()
 ```
 
-## Configuration Examples
+## 配置示例
 
-### Simple Data (Default)
+### 简单数据（默认配置）
 
-For simple structs without circular references:
+适用于不含循环引用的简单结构体：
 
 ```go
 f := fory.New()
@@ -247,9 +247,9 @@ f.RegisterStruct(Config{}, 1)
 data, _ := f.Serialize(&Config{Host: "localhost", Port: 8080})
 ```
 
-### Graph Structures
+### 图结构数据
 
-For data with circular references:
+适用于存在循环引用的数据：
 
 ```go
 f := fory.New(fory.WithTrackRef(true))
@@ -268,9 +268,9 @@ n2.Next = n1  // Circular reference
 data, _ := f.Serialize(n1)
 ```
 
-### Schema Evolution
+### Schema 演进
 
-For data that may evolve over time:
+适用于结构可能随时间变化的数据：
 
 ```go
 // V1: original struct
@@ -298,9 +298,9 @@ var user UserV2
 f2.Deserialize(data, &user)
 ```
 
-### High-Performance Concurrent
+### 高性能并发场景
 
-For concurrent high-throughput scenarios:
+适用于高吞吐并发处理：
 
 ```go
 type Request struct {
@@ -322,23 +322,18 @@ for req := range requests {
 }
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Reuse Fory instances**: Creating a Fory instance involves initialization overhead. Create once and reuse.
+1. **复用 Fory 实例**：创建实例有初始化开销，建议创建一次后复用。
+2. **并发时使用线程安全封装**：不要在多个 goroutine 间共享默认实例。
+3. **按需启用引用跟踪**：引用跟踪会增加开销。
+4. **需要长期保存数据时请复制**：默认实例返回的字节切片会在后续调用后失效。
+5. **合理设置最大深度**：深层结构可适当调大，但需关注内存占用。
+6. **Schema 可能演进时启用兼容模式**：服务版本存在结构差异时建议开启。
 
-2. **Use thread-safe wrapper for concurrency**: Never share a non-thread-safe Fory instance across goroutines.
+## 相关主题
 
-3. **Enable reference tracking only when needed**: It adds overhead for tracking object identity.
-
-4. **Copy serialized data if keeping it**: With the default Fory, the returned byte slice is invalidated on the next operation.
-
-5. **Set appropriate max depth**: Increase for deeply nested structures, but be aware of memory usage.
-
-6. **Use compatible mode for evolving schemas**: Enable when struct definitions may change between service versions.
-
-## Related Topics
-
-- [Basic Serialization](basic-serialization.md)
-- [References](references.md)
-- [Schema Evolution](schema-evolution.md)
-- [Thread Safety](thread-safety.md)
+- [基本序列化](basic-serialization.md)
+- [引用](references.md)
+- [Schema 演进](schema-evolution.md)
+- [线程安全](thread-safety.md)

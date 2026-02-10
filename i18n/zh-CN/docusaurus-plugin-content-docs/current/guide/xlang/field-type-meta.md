@@ -1,5 +1,5 @@
 ---
-title: Field Type Meta
+title: 字段类型元信息
 sidebar_position: 46
 id: field_type_meta
 license: |
@@ -19,16 +19,16 @@ license: |
   limitations under the License.
 ---
 
-Field type meta configuration controls whether type information is written during serialization for struct fields. This is essential for supporting polymorphism where the actual runtime type may differ from the declared field type.
+字段类型元信息配置用于控制结构体字段序列化时是否写入类型信息。 This is essential for supporting polymorphism where the actual runtime type may differ from the declared field type.
 
-## Overview
+## 概述
 
 When serializing a struct field, Fory needs to determine whether to write type metadata:
 
 - **Static typing**: Use the declared field type's serializer directly (no type info written)
 - **Dynamic typing**: Write type information to support runtime subtypes
 
-## When Type Meta Is Needed
+## 何时需要类型元信息
 
 Type metadata is required when:
 
@@ -42,7 +42,7 @@ Type metadata is NOT needed when:
 2. **Primitive types**: Type is known at compile time
 3. **Performance optimization**: When you know the runtime type always matches the declared type
 
-## Language-Specific Configuration
+## 各语言配置
 
 ### Java
 
@@ -200,7 +200,7 @@ class Container:
 - **Native mode**: `dynamic` defaults to `True` for object types, `False` for numeric/str/time types
 - **Xlang mode**: `dynamic` defaults to `False` for concrete types
 
-## Default Behavior
+## 默认行为
 
 | Language | Interface/Abstract Types | Concrete Types   |
 | -------- | ------------------------ | ---------------- |

@@ -1,5 +1,5 @@
 ---
-title: Schema Evolution
+title: Schema 演化
 sidebar_position: 7
 id: schema_evolution
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ supports schema evolution in **Compatible mode**, allowing serialization and deserialization peers to have different type definitions.
+Apache Fory™ 在 **Compatible 模式**下支持 schema 演化，允许序列化和反序列化对等方具有不同的类型定义。
 
-## Compatible Mode
+## Compatible 模式
 
-Enable schema evolution with `compatible(true)`:
+使用 `compatible(true)` 启用 schema 演化：
 
 ```rust
 use fory::Fory;
@@ -41,8 +41,8 @@ struct PersonV1 {
 struct PersonV2 {
     name: String,
     age: i32,
-    // address removed
-    // phone added
+    // address 已移除
+    // phone 已添加
     phone: Option<String>,
     metadata: HashMap<String, String>,
 }
@@ -59,39 +59,39 @@ let person_v1 = PersonV1 {
     address: "123 Main St".to_string(),
 };
 
-// Serialize with V1
+// 使用 V1 序列化
 let bytes = fory1.serialize(&person_v1);
 
-// Deserialize with V2 - missing fields get default values
+// 使用 V2 反序列化 - 缺失的字段获得默认值
 let person_v2: PersonV2 = fory2.deserialize(&bytes)?;
 assert_eq!(person_v2.name, "Alice");
 assert_eq!(person_v2.age, 30);
 assert_eq!(person_v2.phone, None);
 ```
 
-## Schema Evolution Features
+## Schema 演化功能
 
-- Add new fields with default values
-- Remove obsolete fields (skipped during deserialization)
-- Change field nullability (`T` ↔ `Option<T>`)
-- Reorder fields (matched by name, not position)
-- Type-safe fallback to default values for missing fields
+- 添加具有默认值的新字段
+- 移除过时字段（在反序列化期间跳过）
+- 更改字段可空性（`T` ↔ `Option<T>`）
+- 重新排序字段（按名称匹配，而非位置）
+- 对缺失字段的类型安全回退到默认值
 
-## Compatibility Rules
+## 兼容性规则
 
-- Field names must match (case-sensitive)
-- Type changes are not supported (except nullable/non-nullable)
-- Nested struct types must be registered on both sides
+- 字段名称必须匹配（区分大小写）
+- 不支持类型更改（可空/非可空除外）
+- 嵌套结构体类型必须在两端都注册
 
-## Enum Support
+## 枚举支持
 
-Apache Fory™ supports three types of enum variants with full schema evolution in Compatible mode:
+Apache Fory™ 支持三种类型的枚举变体，在 Compatible 模式下具有完整的 schema 演化支持：
 
-**Variant Types:**
+**变体类型：**
 
-- **Unit**: C-style enums (`Status::Active`)
-- **Unnamed**: Tuple-like variants (`Message::Pair(String, i32)`)
-- **Named**: Struct-like variants (`Event::Click { x: i32, y: i32 }`)
+- **Unit**：C 风格枚举（`Status::Active`）
+- **Unnamed**：元组风格变体（`Message::Pair(String, i32)`）
+- **Named**：结构体风格变体（`Event::Click { x: i32, y: i32 }`）
 
 ```rust
 use fory::{Fory, ForyObject};
@@ -115,76 +115,76 @@ let decoded: Value = fory.deserialize(&bytes)?;
 assert_eq!(value, decoded);
 ```
 
-### Enum Schema Evolution
+### 枚举 Schema 演化
 
-Compatible mode enables robust schema evolution with variant type encoding (2 bits):
+Compatible 模式通过变体类型编码（2 位）实现强大的 schema 演化：
 
-- `0b0` = Unit, `0b1` = Unnamed, `0b10` = Named
+- `0b0` = Unit，`0b1` = Unnamed，`0b10` = Named
 
 ```rust
 use fory::{Fory, ForyObject};
 
-// Old version
+// 旧版本
 #[derive(ForyObject)]
 enum OldEvent {
     Click { x: i32, y: i32 },
     Scroll { delta: f64 },
 }
 
-// New version - added field and variant
+// 新版本 - 添加了字段和变体
 #[derive(Default, ForyObject)]
 enum NewEvent {
     #[default]
     Unknown,
-    Click { x: i32, y: i32, timestamp: u64 },  // Added field
+    Click { x: i32, y: i32, timestamp: u64 },  // 添加了字段
     Scroll { delta: f64 },
-    KeyPress(String),  // New variant
+    KeyPress(String),  // 新变体
 }
 
 let mut fory = Fory::builder().compatible().build();
 
-// Serialize with old schema
+// 使用旧 schema 序列化
 let old_bytes = fory.serialize(&OldEvent::Click { x: 100, y: 200 })?;
 
-// Deserialize with new schema - timestamp gets default value (0)
+// 使用新 schema 反序列化 - timestamp 获得默认值 (0)
 let new_event: NewEvent = fory.deserialize(&old_bytes)?;
 assert!(matches!(new_event, NewEvent::Click { x: 100, y: 200, timestamp: 0 }));
 ```
 
-**Evolution capabilities:**
+**演化能力：**
 
-- **Unknown variants** → Falls back to default variant
-- **Named variant fields** → Add/remove fields (missing fields use defaults)
-- **Unnamed variant elements** → Add/remove elements (extras skipped, missing use defaults)
-- **Variant type mismatches** → Automatically uses default value for current variant
+- **未知变体** → 回退到默认变体
+- **Named 变体字段** → 添加/移除字段（缺失字段使用默认值）
+- **Unnamed 变体元素** → 添加/移除元素（额外的跳过，缺失的使用默认值）
+- **变体类型不匹配** → 自动使用当前变体的默认值
 
-**Best practices:**
+**最佳实践：**
 
-- Always mark a default variant with `#[default]`
-- Named variants provide better evolution than unnamed
-- Use compatible mode for cross-version communication
+- 始终使用 `#[default]` 标记默认变体
+- Named 变体比 unnamed 变体提供更好的演化能力
+- 对跨版本通信使用 compatible 模式
 
-## Tuple Support
+## 元组支持
 
-Apache Fory™ supports tuples up to 22 elements out of the box with efficient serialization in both compatible and non-compatible modes.
+Apache Fory™ 在兼容和非兼容模式下均支持最多 22 个元素的元组，并具有高效的序列化。
 
-**Features:**
+**功能：**
 
-- Automatic serialization for tuples from 1 to 22 elements
-- Heterogeneous type support (each element can be a different type)
-- Schema evolution in Compatible mode (handles missing/extra elements)
+- 对 1 到 22 个元素的元组自动序列化
+- 异构类型支持（每个元素可以是不同的类型）
+- Compatible 模式下的 schema 演化（处理缺失/额外元素）
 
-**Serialization modes:**
+**序列化模式：**
 
-1. **Non-compatible mode**: Serializes elements sequentially without collection headers for minimal overhead
-2. **Compatible mode**: Uses collection protocol with type metadata for schema evolution
+1. **非兼容模式**：按顺序序列化元素，不使用集合头部，以实现最小开销
+2. **Compatible 模式**：使用带有类型元数据的集合协议以支持 schema 演化
 
 ```rust
 use fory::{Fory, Error};
 
 let mut fory = Fory::default();
 
-// Tuple with heterogeneous types
+// 具有异构类型的元组
 let data: (i32, String, bool, Vec<i32>) = (
     42,
     "hello".to_string(),
@@ -197,8 +197,8 @@ let decoded: (i32, String, bool, Vec<i32>) = fory.deserialize(&bytes)?;
 assert_eq!(data, decoded);
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Enabling compatible mode
-- [Polymorphism](polymorphism.md) - Trait objects with schema evolution
-- [Cross-Language](cross-language.md) - Schema evolution across languages
+- [配置](configuration.md) - 启用 compatible 模式
+- [多态](polymorphism.md) - 具有 schema 演化的 Trait 对象
+- [跨语言](cross-language.md) - 跨语言的 schema 演化

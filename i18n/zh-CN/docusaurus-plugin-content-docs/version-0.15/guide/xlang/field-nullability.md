@@ -1,5 +1,5 @@
 ---
-title: Field Nullability
+title: 字段可空性
 sidebar_position: 40
 id: field_nullability
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This page explains how Fory handles field nullability in cross-language (xlang) serialization mode.
+本页说明 Fory 在跨语言（xlang）序列化模式下如何处理字段可空性。
 
-## Default Behavior
+## 默认行为
 
 In xlang mode, **fields are non-nullable by default**. This means:
 
@@ -48,7 +48,7 @@ The following types are nullable by default:
 | Go pointer types (`*int32`, `*string`)     | Yes              | Yes               |
 | `Optional<T>` / `Option<T>`                | Yes              | Yes               |
 
-## Wire Format
+## 线格式
 
 The nullable flag controls whether a **null flag byte** is written before the field value:
 
@@ -62,7 +62,7 @@ Where `null_flag` is:
 - `-1` (NULL_FLAG): Value is null
 - `-2` (NOT_NULL_VALUE_FLAG): Value is present
 
-## Nullable vs Reference Tracking
+## 可空性与引用跟踪
 
 These are related but distinct concepts:
 
@@ -87,7 +87,7 @@ ref_flag >= 0  → reference to object at index ref_flag
 
 For detailed reference tracking behavior, see [Reference Tracking](field-reference-tracking.md).
 
-## Language-Specific Examples
+## 各语言示例
 
 ### Java
 

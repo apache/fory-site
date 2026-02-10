@@ -1,6 +1,6 @@
 ---
-title: Row Format
-sidebar_position: 8
+title: 行格式
+sidebar_position: 7
 id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,30 +19,30 @@ license: |
   limitations under the License.
 ---
 
-This page covers the row-based serialization format for high-performance, cache-friendly data access.
+本页介绍用于高性能、缓存友好的数据访问的行格式序列化。
 
-## Overview
+## 概述
 
-Apache Fory™ Row Format is a binary format optimized for:
+Apache Fory™ 行格式是一种针对以下场景优化的二进制格式：
 
-- **Random Access**: Read any field without deserializing the entire object
-- **Zero-Copy**: Direct memory access without data copying
-- **Cache-Friendly**: Contiguous memory layout for CPU cache efficiency
-- **Columnar Conversion**: Easy conversion to Apache Arrow format
-- **Partial Serialization**: Serialize only needed fields
+- **随机访问**：无需反序列化整个对象即可读取任意字段
+- **零拷贝**：无数据复制的直接内存访问
+- **缓存友好**：连续内存布局提高 CPU 缓存效率
+- **列式转换**：易于转换为 Apache Arrow 格式
+- **部分序列化**：只序列化需要的字段
 
-## When to Use Row Format
+## 何时使用行格式
 
-| Use Case                      | Row Format | Object Graph |
-| ----------------------------- | ---------- | ------------ |
-| Analytics/OLAP                | ✅         | ❌           |
-| Random field access           | ✅         | ❌           |
-| Full object serialization     | ❌         | ✅           |
-| Complex object graphs         | ❌         | ✅           |
-| Reference tracking            | ❌         | ✅           |
-| Cross-language (simple types) | ✅         | ✅           |
+| 使用场景           | 行格式 | 对象图 |
+| ------------------ | ------ | ------ |
+| 分析/OLAP          | ✅     | ❌     |
+| 随机字段访问       | ✅     | ❌     |
+| 完整对象序列化     | ❌     | ✅     |
+| 复杂对象图         | ❌     | ✅     |
+| 引用跟踪           | ❌     | ✅     |
+| 跨语言（简单类型） | ✅     | ✅     |
 
-## Quick Start
+## 快速开始
 
 ```cpp
 #include "fory/encoder/row_encoder.h"
@@ -51,28 +51,28 @@ Apache Fory™ Row Format is a binary format optimized for:
 using namespace fory::row;
 using namespace fory::row::encoder;
 
-// Define a struct
+// 定义结构体
 struct Person {
   int32_t id;
   std::string name;
   float score;
 };
 
-// Register field metadata (required for row encoding)
+// 注册字段元数据（行编码必需）
 FORY_FIELD_INFO(Person, id, name, score);
 
 int main() {
-  // Create encoder
+  // 创建编码器
   RowEncoder<Person> encoder;
 
-  // Encode a person
+  // 编码一个 person
   Person person{1, "Alice", 95.5f};
   encoder.Encode(person);
 
-  // Get the encoded row
+  // 获取编码后的行
   auto row = encoder.GetWriter().ToRow();
 
-  // Random access to fields
+  // 随机访问字段
   int32_t id = row->GetInt32(0);
   std::string name = row->GetString(1);
   float score = row->GetFloat(2);
@@ -85,38 +85,38 @@ int main() {
 }
 ```
 
-## Row Encoder
+## 行编码器
 
-### Basic Usage
+### 基本用法
 
-The `RowEncoder<T>` template class provides type-safe encoding:
+`RowEncoder<T>` 模板类提供类型安全的编码：
 
 ```cpp
 #include "fory/encoder/row_encoder.h"
 
-// Define struct with FORY_FIELD_INFO
+// 使用 FORY_FIELD_INFO 定义结构体
 struct Point {
   double x;
   double y;
 };
 FORY_FIELD_INFO(Point, x, y);
 
-// Create encoder
+// 创建编码器
 RowEncoder<Point> encoder;
 
-// Access schema (for inspection)
+// 访问 schema（用于检查）
 const Schema& schema = encoder.GetSchema();
 std::cout << "Fields: " << schema.field_names().size() << std::endl;
 
-// Encode value
+// 编码值
 Point p{1.0, 2.0};
 encoder.Encode(p);
 
-// Get result as Row
+// 获取结果作为 Row
 auto row = encoder.GetWriter().ToRow();
 ```
 
-### Nested Structs
+### 嵌套结构体
 
 ```cpp
 struct Address {
@@ -131,7 +131,7 @@ struct Person {
 };
 FORY_FIELD_INFO(Person, name, address);
 
-// Encode nested struct
+// 编码嵌套结构体
 RowEncoder<Person> encoder;
 Person person{"Alice", {"New York", "USA"}};
 encoder.Encode(person);
@@ -139,13 +139,13 @@ encoder.Encode(person);
 auto row = encoder.GetWriter().ToRow();
 std::string name = row->GetString(0);
 
-// Access nested struct
+// 访问嵌套结构体
 auto address_row = row->GetStruct(1);
 std::string city = address_row->GetString(0);
 std::string country = address_row->GetString(1);
 ```
 
-### Arrays / Lists
+### 数组 / 列表
 
 ```cpp
 struct Record {
@@ -167,10 +167,10 @@ for (int i = 0; i < count; i++) {
 }
 ```
 
-### Encoding Arrays Directly
+### 直接编码数组
 
 ```cpp
-// Encode a vector directly (not inside a struct)
+// 直接编码 vector（不在结构体内）
 std::vector<Person> people{
     {"Alice", {"NYC", "USA"}},
     {"Bob", {"London", "UK"}}
@@ -179,25 +179,25 @@ std::vector<Person> people{
 RowEncoder<decltype(people)> encoder;
 encoder.Encode(people);
 
-// Get array data
+// 获取数组数据
 auto array = encoder.GetWriter().CopyToArrayData();
 auto first_person = array->GetStruct(0);
 std::string first_name = first_person->GetString(0);
 ```
 
-## Row Data Access
+## 行数据访问
 
-### Row Class
+### Row 类
 
-The `Row` class provides random access to struct fields:
+`Row` 类提供对结构体字段的随机访问：
 
 ```cpp
 class Row {
 public:
-  // Null check
+  // 空值检查
   bool IsNullAt(int i) const;
 
-  // Primitive getters
+  // 基本类型 getter
   bool GetBoolean(int i) const;
   int8_t GetInt8(int i) const;
   int16_t GetInt16(int i) const;
@@ -206,85 +206,85 @@ public:
   float GetFloat(int i) const;
   double GetDouble(int i) const;
 
-  // String/binary getter
+  // 字符串/二进制 getter
   std::string GetString(int i) const;
   std::vector<uint8_t> GetBinary(int i) const;
 
-  // Nested types
+  // 嵌套类型
   std::shared_ptr<Row> GetStruct(int i) const;
   std::shared_ptr<ArrayData> GetArray(int i) const;
   std::shared_ptr<MapData> GetMap(int i) const;
 
-  // Metadata
+  // 元数据
   int num_fields() const;
   SchemaPtr schema() const;
 
-  // Debug
+  // 调试
   std::string ToString() const;
 };
 ```
 
-### ArrayData Class
+### ArrayData 类
 
-The `ArrayData` class provides access to list/array elements:
+`ArrayData` 类提供对列表/数组元素的访问：
 
 ```cpp
 class ArrayData {
 public:
-  // Null check
+  // 空值检查
   bool IsNullAt(int i) const;
 
-  // Element count
+  // 元素数量
   int num_elements() const;
 
-  // Primitive getters (same as Row)
+  // 基本类型 getter（与 Row 相同）
   int32_t GetInt32(int i) const;
-  // ... other primitives
+  // ... 其他基本类型
 
-  // String getter
+  // 字符串 getter
   std::string GetString(int i) const;
 
-  // Nested types
+  // 嵌套类型
   std::shared_ptr<Row> GetStruct(int i) const;
   std::shared_ptr<ArrayData> GetArray(int i) const;
   std::shared_ptr<MapData> GetMap(int i) const;
 
-  // Type info
+  // 类型信息
   ListTypePtr type() const;
 };
 ```
 
-### MapData Class
+### MapData 类
 
-The `MapData` class provides access to map key-value pairs:
+`MapData` 类提供对 map 键值对的访问：
 
 ```cpp
 class MapData {
 public:
-  // Element count
+  // 元素数量
   int num_elements();
 
-  // Access keys and values as arrays
+  // 以数组形式访问键和值
   std::shared_ptr<ArrayData> keys_array();
   std::shared_ptr<ArrayData> values_array();
 
-  // Type info
+  // 类型信息
   MapTypePtr type();
 };
 ```
 
-## Schema and Types
+## Schema 和类型
 
-### Schema Definition
+### Schema 定义
 
-Schemas define the structure of row data:
+Schema 定义行数据的结构：
 
 ```cpp
 #include "fory/row/schema.h"
 
 using namespace fory::row;
 
-// Create schema programmatically
+// 以编程方式创建 schema
 auto person_schema = schema({
     field("id", int32()),
     field("name", utf8()),
@@ -292,18 +292,18 @@ auto person_schema = schema({
     field("active", boolean())
 });
 
-// Access schema info
+// 访问 schema 信息
 for (const auto& f : person_schema->fields()) {
   std::cout << f->name() << ": " << f->type()->name() << std::endl;
 }
 ```
 
-### Type System
+### 类型系统
 
-Available types for row format:
+行格式可用的类型：
 
 ```cpp
-// Primitive types
+// 基本类型
 DataTypePtr boolean();    // bool
 DataTypePtr int8();       // int8_t
 DataTypePtr int16();      // int16_t
@@ -312,161 +312,161 @@ DataTypePtr int64();      // int64_t
 DataTypePtr float32();    // float
 DataTypePtr float64();    // double
 
-// String and binary
+// 字符串和二进制
 DataTypePtr utf8();       // std::string
 DataTypePtr binary();     // std::vector<uint8_t>
 
-// Complex types
+// 复杂类型
 DataTypePtr list(DataTypePtr element_type);
 DataTypePtr map(DataTypePtr key_type, DataTypePtr value_type);
 DataTypePtr struct_(std::vector<FieldPtr> fields);
 ```
 
-### Type Inference
+### 类型推断
 
-The `RowEncodeTrait` template automatically infers types:
+`RowEncodeTrait` 模板自动推断类型：
 
 ```cpp
-// Type inference for primitives
-RowEncodeTrait<int32_t>::Type();  // Returns int32()
-RowEncodeTrait<float>::Type();    // Returns float32()
-RowEncodeTrait<std::string>::Type();  // Returns utf8()
+// 基本类型的类型推断
+RowEncodeTrait<int32_t>::Type();  // 返回 int32()
+RowEncodeTrait<float>::Type();    // 返回 float32()
+RowEncodeTrait<std::string>::Type();  // 返回 utf8()
 
-// Type inference for collections
-RowEncodeTrait<std::vector<int32_t>>::Type();  // Returns list(int32())
+// 集合的类型推断
+RowEncodeTrait<std::vector<int32_t>>::Type();  // 返回 list(int32())
 
-// Type inference for maps
+// map 的类型推断
 RowEncodeTrait<std::map<std::string, int32_t>>::Type();
-// Returns map(utf8(), int32())
+// 返回 map(utf8(), int32())
 
-// Type inference for structs (requires FORY_FIELD_INFO)
-RowEncodeTrait<Person>::Type();  // Returns struct_({...})
-RowEncodeTrait<Person>::Schema();  // Returns schema({...})
+// 结构体的类型推断（需要 FORY_FIELD_INFO）
+RowEncodeTrait<Person>::Type();  // 返回 struct_({...})
+RowEncodeTrait<Person>::Schema();  // 返回 schema({...})
 ```
 
-## Row Writer
+## 行写入器
 
 ### RowWriter
 
-For manual row construction:
+用于手动构造行：
 
 ```cpp
 #include "fory/row/writer.h"
 
-// Create schema
+// 创建 schema
 auto my_schema = schema({
     field("x", int32()),
     field("y", float64()),
     field("name", utf8())
 });
 
-// Create writer
+// 创建写入器
 RowWriter writer(my_schema);
 writer.Reset();
 
-// Write fields
+// 写入字段
 writer.Write(0, 42);          // x = 42
 writer.Write(1, 3.14);        // y = 3.14
 writer.WriteString(2, "test"); // name = "test"
 
-// Get result
+// 获取结果
 auto row = writer.ToRow();
 ```
 
 ### ArrayWriter
 
-For manual array construction:
+用于手动构造数组：
 
 ```cpp
-// Create array type
+// 创建数组类型
 auto array_type = list(int32());
 
-// Create writer
+// 创建写入器
 ArrayWriter writer(array_type);
-writer.Reset(5);  // 5 elements
+writer.Reset(5);  // 5 个元素
 
-// Write elements
+// 写入元素
 for (int i = 0; i < 5; i++) {
   writer.Write(i, i * 10);
 }
 
-// Get result
+// 获取结果
 auto array = writer.CopyToArrayData();
 ```
 
-### Null Values
+### 空值
 
 ```cpp
-// Set null at specific index
-writer.SetNullAt(2);  // Field 2 is null
+// 在特定索引处设置空值
+writer.SetNullAt(2);  // 字段 2 为空
 
-// Check null when reading
+// 读取时检查空值
 if (!row->IsNullAt(2)) {
   std::string value = row->GetString(2);
 }
 ```
 
-## Memory Layout
+## 内存布局
 
-### Row Layout
+### 行布局
 
 ```
 +------------------+--------------------+--------------------+
-|   Null Bitmap    |  Fixed-Size Data   | Variable-Size Data |
+|    空值位图      |    固定大小数据     |    变长数据        |
 +------------------+--------------------+--------------------+
-|   ceil(n/8) B    |     8 * n bytes    |      variable      |
+|   ceil(n/8) B    |     8 * n 字节     |       可变         |
 +------------------+--------------------+--------------------+
 ```
 
-- **Null Bitmap**: One bit per field, indicates null values
-- **Fixed-Size Data**: 8 bytes per field (primitives stored directly, offset+size for variable)
-- **Variable-Size Data**: Strings, arrays, nested structs
+- **空值位图**：每字段一位，指示空值
+- **固定大小数据**：每字段 8 字节（基本类型直接存储，变长类型存储偏移量+大小）
+- **变长数据**：字符串、数组、嵌套结构体
 
-### Array Layout
+### 数组布局
 
 ```
 +------------+------------------+--------------------+--------------------+
-| Num Elems  |   Null Bitmap    |  Fixed-Size Data   | Variable-Size Data |
+| 元素数量   |    空值位图      |    固定大小数据     |    变长数据        |
 +------------+------------------+--------------------+--------------------+
-|   8 bytes  |  ceil(n/8) bytes |   elem_size * n    |      variable      |
+|   8 字节   |  ceil(n/8) 字节  |   elem_size * n    |       可变         |
 +------------+------------------+--------------------+--------------------+
 ```
 
-### Map Layout
+### Map 布局
 
 ```
 +------------------+------------------+
-|    Keys Array    |   Values Array   |
+|    键数组        |    值数组        |
 +------------------+------------------+
 ```
 
-## Performance Tips
+## 性能提示
 
-### 1. Reuse Encoders
+### 1. 复用编码器
 
 ```cpp
 RowEncoder<Person> encoder;
 
-// Encode multiple records
+// 编码多条记录
 for (const auto& person : people) {
   encoder.Encode(person);
   auto row = encoder.GetWriter().ToRow();
-  // Process row...
+  // 处理 row...
 }
 ```
 
-### 2. Pre-allocate Buffer
+### 2. 预分配缓冲区
 
 ```cpp
-// Get buffer reference for pre-allocation
+// 获取缓冲区引用进行预分配
 auto& buffer = encoder.GetWriter().buffer();
 buffer->Reserve(expected_size);
 ```
 
-### 3. Batch Processing
+### 3. 批量处理
 
 ```cpp
-// Process in batches for better cache utilization
+// 批量处理以提高缓存利用率
 std::vector<Person> batch;
 batch.reserve(BATCH_SIZE);
 
@@ -481,36 +481,36 @@ while (hasMore()) {
 }
 ```
 
-### 4. Zero-Copy Reading
+### 4. 零拷贝读取
 
 ```cpp
-// Point to existing buffer (zero-copy)
+// 指向现有缓冲区（零拷贝）
 Row row(schema);
 row.PointTo(buffer, offset, size);
 
-// Access fields directly from buffer
+// 直接从缓冲区访问字段
 int32_t id = row.GetInt32(0);
 ```
 
-## Supported Types Summary
+## 支持类型汇总
 
-| C++ Type                 | Row Type         | Fixed Size |
-| ------------------------ | ---------------- | ---------- |
-| `bool`                   | `boolean()`      | 1 byte     |
-| `int8_t`                 | `int8()`         | 1 byte     |
-| `int16_t`                | `int16()`        | 2 bytes    |
-| `int32_t`                | `int32()`        | 4 bytes    |
-| `int64_t`                | `int64()`        | 8 bytes    |
-| `float`                  | `float32()`      | 4 bytes    |
-| `double`                 | `float64()`      | 8 bytes    |
-| `std::string`            | `utf8()`         | Variable   |
-| `std::vector<T>`         | `list(T)`        | Variable   |
-| `std::map<K,V>`          | `map(K,V)`       | Variable   |
-| `std::optional<T>`       | Inner type       | Nullable   |
-| Struct (FORY_FIELD_INFO) | `struct_({...})` | Variable   |
+| C++ 类型                 | 行类型           | 固定大小 |
+| ------------------------ | ---------------- | -------- |
+| `bool`                   | `boolean()`      | 1 字节   |
+| `int8_t`                 | `int8()`         | 1 字节   |
+| `int16_t`                | `int16()`        | 2 字节   |
+| `int32_t`                | `int32()`        | 4 字节   |
+| `int64_t`                | `int64()`        | 8 字节   |
+| `float`                  | `float32()`      | 4 字节   |
+| `double`                 | `float64()`      | 8 字节   |
+| `std::string`            | `utf8()`         | 可变     |
+| `std::vector<T>`         | `list(T)`        | 可变     |
+| `std::map<K,V>`          | `map(K,V)`       | 可变     |
+| `std::optional<T>`       | 内部类型         | 可空     |
+| 结构体 (FORY_FIELD_INFO) | `struct_({...})` | 可变     |
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Object graph serialization
-- [Configuration](configuration.md) - Builder options
-- [Supported Types](supported-types.md) - All supported types
+- [基础序列化](basic-serialization.md) - 对象图序列化
+- [配置](configuration.md) - 构建器选项
+- [支持的类型](supported-types.md) - 所有支持的类型

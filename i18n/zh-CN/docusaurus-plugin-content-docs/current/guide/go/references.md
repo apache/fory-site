@@ -1,5 +1,5 @@
 ---
-title: References
+title: 引用处理
 sidebar_position: 50
 id: references
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Fory Go supports reference tracking to handle circular references and shared objects. This is essential for serializing complex data structures like graphs, trees with parent pointers, and linked lists with cycles.
+Fory Go 支持引用跟踪，可处理循环引用和共享对象。 This is essential for serializing complex data structures like graphs, trees with parent pointers, and linked lists with cycles.
 
-## Enabling Reference Tracking
+## 启用引用跟踪
 
 Reference tracking is **disabled by default**. Enable it when creating a Fory instance:
 
@@ -31,7 +31,7 @@ f := fory.New(fory.WithTrackRef(true))
 
 **Important**: Global reference tracking must be enabled for any reference tracking to occur. When `WithTrackRef(false)` (the default), all per-field reference tags are ignored.
 
-## How Reference Tracking Works
+## 引用跟踪工作原理
 
 ### Without Reference Tracking (Default)
 
@@ -61,7 +61,7 @@ data, _ := f.Serialize(container)
 // 'shared' is serialized ONCE, second occurrence is a reference
 ```
 
-## Reference Flags
+## 引用标记
 
 Fory uses flags to indicate reference states during serialization:
 
@@ -72,7 +72,7 @@ Fory uses flags to indicate reference states during serialization:
 | `NotNullValueFlag` | -1    | Non-null value (data follows)             |
 | `RefValueFlag`     | 0     | Reference value flag                      |
 
-## Referenceable Types
+## 可引用跟踪的类型
 
 Only certain types support reference tracking. In xlang mode, the following types can track references:
 
@@ -87,7 +87,7 @@ Only certain types support reference tracking. In xlang mode, the following type
 | `time.Time`, `time.Duration`  | No                | Value types                    |
 | Arrays (`[N]T`)               | No                | Value types                    |
 
-## Per-Field Reference Control
+## 字段级引用控制
 
 By default, reference tracking is **disabled** for individual fields even when global `WithTrackRef(true)` is set. You can enable reference tracking for specific fields using the `ref` struct tag:
 
@@ -111,7 +111,7 @@ type Container struct {
 
 See [Struct Tags](struct-tags.md) for more details.
 
-## Circular References
+## 循环引用
 
 Reference tracking is required for circular data structures:
 
@@ -349,7 +349,7 @@ func main() {
 }
 ```
 
-## Related Topics
+## 相关主题
 
 - [Configuration](configuration.md)
 - [Struct Tags](struct-tags.md)

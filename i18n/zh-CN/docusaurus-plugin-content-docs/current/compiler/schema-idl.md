@@ -1,5 +1,5 @@
 ---
-title: Schema IDL
+title: Schema IDL 语法
 sidebar_position: 2
 id: syntax
 license: |
@@ -19,14 +19,31 @@ license: |
   limitations under the License.
 ---
 
-This document provides the syntax and semantic reference for Fory IDL.
+## 中文章节导读
+
+本文描述 Fory IDL 的语法与语义规则，覆盖文件结构、声明、类型定义、字段约束、注解与扩展选项。它是编译器前端解析与代码生成的基础约束文档。
+
+阅读时可重点关注：
+
+1. **文件级结构**：package、option、import 与类型声明顺序。
+2. **类型系统语法**：enum/message/union 及字段声明规则。
+3. **字段标签与属性**：字段 ID、可空、引用、默认值与兼容性约束。
+4. **命名与作用域**：类型可见性、嵌套声明与名称解析。
+5. **与 protobuf/flatbuffers 的映射关系**：迁移与互操作规则。
+
+为保证编译行为一致，语法关键字、示例 schema 与标识符保持英文；说明性段落使用中文。
+
+
+> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
+
+本文档提供 Fory IDL 的语法与语义参考。
 
 For compiler usage and build integration, see
 [Compiler Guide](compiler-guide.md). For protobuf/FlatBuffers frontend mapping
 rules, see [Protocol Buffers IDL Support](protobuf-idl.md) and
 [FlatBuffers IDL Support](flatbuffers-idl.md).
 
-## File Structure
+## 文件结构
 
 An Fory IDL file typically consists of:
 
@@ -52,7 +69,7 @@ message Order [id=102] { ... }
 union Event [id=103] { ... }
 ```
 
-## Comments
+## 注释
 
 Fory IDL supports both single-line and block comments:
 

@@ -1,5 +1,5 @@
 ---
-title: Field Configuration
+title: 字段配置
 sidebar_position: 5
 id: field_configuration
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to configure field-level metadata for serialization in Rust.
+本页说明如何在 Rust 中配置序列化字段级元信息。
 
-## Overview
+## 概述
 
-Apache Fory™ provides the `#[fory(...)]` attribute macro to specify optional field-level metadata at compile time. This enables:
+Apache Fory™ 提供 `#[fory(...)]` 属性宏，用于在编译期声明可选字段级元信息。 This enables:
 
 - **Tag IDs**: Assign compact numeric IDs to minimize struct field meta size overhead
 - **Nullability**: Control whether fields can be null
@@ -31,7 +31,7 @@ Apache Fory™ provides the `#[fory(...)]` attribute macro to specify optional f
 - **Field Skipping**: Exclude fields from serialization
 - **Encoding Control**: Specify how integers are encoded (varint, fixed, tagged)
 
-## Basic Syntax
+## 基本语法
 
 The `#[fory(...)]` attribute is placed on individual struct fields:
 
@@ -53,7 +53,7 @@ struct Person {
 
 Multiple options are separated by commas.
 
-## Available Options
+## 可用选项
 
 ### Field ID (`id = N`)
 

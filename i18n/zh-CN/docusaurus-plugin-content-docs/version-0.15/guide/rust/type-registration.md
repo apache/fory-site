@@ -1,5 +1,5 @@
 ---
-title: Type Registration
+title: 类型注册
 sidebar_position: 3
 id: type_registration
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers type registration methods in Apache Fory™ Rust.
+本页涵盖 Apache Fory™ Rust 中的类型注册方法。
 
-## Register by ID
+## 按 ID 注册
 
-Register types with a numeric ID for fast, compact serialization:
+使用数字 ID 注册类型以实现快速、紧凑的序列化：
 
 ```rust
 use fory::Fory;
@@ -47,49 +47,49 @@ let bytes = fory.serialize(&user)?;
 let decoded: User = fory.deserialize(&bytes)?;
 ```
 
-## Register by Namespace
+## 按命名空间注册
 
-For cross-language compatibility, register with namespace and type name:
+为了跨语言兼容性，使用命名空间和类型名称注册：
 
 ```rust
 let mut fory = Fory::default()
     .compatible(true)
     .xlang(true);
 
-// Register with namespace-based naming
+// 使用基于命名空间的命名注册
 fory.register_by_namespace::<MyStruct>("com.example", "MyStruct");
 ```
 
-## Register Custom Serializer
+## 注册自定义序列化器
 
-For types that need custom serialization logic:
+对于需要自定义序列化逻辑的类型：
 
 ```rust
 let mut fory = Fory::default();
 fory.register_serializer::<CustomType>(100);
 ```
 
-## Registration Order
+## 注册顺序
 
-When using ID-based registration without explicit IDs, the registration order matters. Ensure consistent registration order between serialization and deserialization:
+当使用没有显式 ID 的基于 ID 的注册时，注册顺序很重要。确保序列化和反序列化之间的注册顺序一致：
 
 ```rust
-// Serializer side
+// 序列化器端
 let mut fory = Fory::default();
 fory.register::<TypeA>(1)?;
 fory.register::<TypeB>(2)?;
 fory.register::<TypeC>(3)?;
 
-// Deserializer side - MUST use same order
+// 反序列化器端 - 必须使用相同顺序
 let mut fory = Fory::default();
 fory.register::<TypeA>(1)?;
 fory.register::<TypeB>(2)?;
 fory.register::<TypeC>(3)?;
 ```
 
-## Thread-Safe Registration
+## 线程安全注册
 
-Perform all registrations before spawning threads:
+在生成线程之前执行所有注册：
 
 ```rust
 use std::sync::Arc;
@@ -99,28 +99,28 @@ let mut fory = Fory::default();
 fory.register::<User>(1)?;
 fory.register::<Order>(2)?;
 
-// Now share across threads
+// 现在可以在线程间共享
 let fory = Arc::new(fory);
 
 let handles: Vec<_> = (0..4)
     .map(|_| {
         let shared = Arc::clone(&fory);
         thread::spawn(move || {
-            // Use fory for serialization
+            // 使用 fory 进行序列化
         })
     })
     .collect();
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Use consistent IDs**: Same type ID across all languages for cross-language compatibility
-2. **Register before threading**: Complete all registrations before spawning threads
-3. **Use namespace for xlang**: Makes type names consistent across languages
-4. **Explicit IDs for stability**: Avoid auto-generated IDs in production
+1. **使用一致的 ID**：在所有语言中为相同类型使用相同的类型 ID 以实现跨语言兼容性
+2. **在线程化之前注册**：在生成线程之前完成所有注册
+3. **对 xlang 使用命名空间**：使类型名称在各语言之间保持一致
+4. **显式 ID 以保持稳定性**：在生产环境中避免自动生成的 ID
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Fory builder options
-- [Cross-Language](cross-language.md) - XLANG mode registration
-- [Custom Serializers](custom-serializers.md) - Custom serialization
+- [配置](configuration.md) - Fory 构建器选项
+- [跨语言](cross-language.md) - XLANG 模式注册
+- [自定义序列化器](custom-serializers.md) - 自定义序列化

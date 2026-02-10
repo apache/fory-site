@@ -1,5 +1,5 @@
 ---
-title: Advanced Features
+title: 高级特性
 sidebar_position: 7
 id: advanced_features
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers advanced features including zero-copy serialization, deep copy, memory management, and logging.
+本页介绍高级特性，包括零拷贝序列化、深拷贝、内存管理和日志记录。
 
-## Zero-Copy Serialization
+## 零拷贝序列化
 
-Fory supports zero-copy serialization for efficient handling of large binary data:
+Fory 支持零拷贝序列化，以高效处理大型二进制数据：
 
 ```java
 import org.apache.fory.*;
@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ZeroCopyExample {
-  // Note that fory instance should be reused instead of creation every time.
+  // 注意 fory 实例应该复用，而不是每次都创建。
   static Fory fory = Fory.builder()
     .withLanguage(Language.JAVA)
     .build();
@@ -51,11 +51,11 @@ public class ZeroCopyExample {
 }
 ```
 
-## Object Deep Copy
+## 对象深拷贝
 
-Fory provides efficient deep copy functionality:
+Fory 提供高效的深拷贝功能：
 
-### With Reference Tracking
+### 启用引用跟踪
 
 ```java
 Fory fory = Fory.builder().withRefCopy(true).build();
@@ -63,9 +63,9 @@ SomeClass a = xxx;
 SomeClass copied = fory.copy(a);
 ```
 
-### Without Reference Tracking (Better Performance)
+### 禁用引用跟踪（更好的性能）
 
-When disabled, deep copy will ignore circular and shared references. Same reference of an object graph will be copied into different objects in one `Fory#copy`:
+禁用时，深拷贝将忽略循环引用和共享引用。对象图的相同引用将在一次 `Fory#copy` 中被复制为不同的对象：
 
 ```java
 Fory fory = Fory.builder().withRefCopy(false).build();
@@ -73,40 +73,39 @@ SomeClass a = xxx;
 SomeClass copied = fory.copy(a);
 ```
 
-## Memory Allocation Customization
+## 内存分配自定义
 
-Fory provides a `MemoryAllocator` interface that allows you to customize how memory buffers are allocated and grown during serialization operations. This can be useful for performance optimization, memory pooling, or debugging memory usage.
+Fory 提供了 `MemoryAllocator` 接口，允许你自定义在序列化操作期间如何分配和增长内存缓冲区。这对于性能优化、内存池化或调试内存使用很有用。
 
-### MemoryAllocator Interface
+### MemoryAllocator 接口
 
-The `MemoryAllocator` interface defines two key methods:
+`MemoryAllocator` 接口定义了两个关键方法：
 
 ```java
 public interface MemoryAllocator {
   /**
-   * Allocates a new MemoryBuffer with the specified initial capacity.
+   * 分配具有指定初始容量的新 MemoryBuffer。
    */
   MemoryBuffer allocate(int initialCapacity);
 
   /**
-   * Grows an existing buffer to accommodate the new capacity.
-   * The implementation must grow the buffer in-place by modifying
-   * the existing buffer instance.
+   * 增长现有缓冲区以容纳新容量。
+   * 实现必须通过修改现有缓冲区实例来原地增长缓冲区。
    */
   MemoryBuffer grow(MemoryBuffer buffer, int newCapacity);
 }
 ```
 
-### Using Custom Memory Allocators
+### 使用自定义内存分配器
 
-You can set a global memory allocator that will be used by all `MemoryBuffer` instances:
+你可以设置一个全局内存分配器，所有 `MemoryBuffer` 实例都将使用它：
 
 ```java
-// Create a custom allocator
+// 创建自定义分配器
 MemoryAllocator customAllocator = new MemoryAllocator() {
   @Override
   public MemoryBuffer allocate(int initialCapacity) {
-    // Add extra capacity for debugging or pooling
+    // 为调试或池化添加额外容量
     return MemoryBuffer.fromByteArray(new byte[initialCapacity + 100]);
   }
 
@@ -116,7 +115,7 @@ MemoryAllocator customAllocator = new MemoryAllocator() {
       return buffer;
     }
 
-    // Custom growth strategy - add 100% extra capacity
+    // 自定义增长策略 - 添加 100% 额外容量
     int newSize = (int) (newCapacity * 2);
     byte[] data = new byte[newSize];
     buffer.copyToUnsafe(0, data, Platform.BYTE_ARRAY_OFFSET, buffer.size());
@@ -125,45 +124,45 @@ MemoryAllocator customAllocator = new MemoryAllocator() {
   }
 };
 
-// Set the custom allocator globally
+// 全局设置自定义分配器
 MemoryBuffer.setGlobalAllocator(customAllocator);
 
-// All subsequent MemoryBuffer allocations will use your custom allocator
+// 所有后续的 MemoryBuffer 分配都将使用你的自定义分配器
 Fory fory = Fory.builder().withLanguage(Language.JAVA).build();
-byte[] bytes = fory.serialize(someObject); // Uses custom allocator
+byte[] bytes = fory.serialize(someObject); // 使用自定义分配器
 ```
 
-### Default Memory Allocator Behavior
+### 默认内存分配器行为
 
-The default allocator uses the following growth strategy:
+默认分配器使用以下增长策略：
 
-- For buffers smaller than `BUFFER_GROW_STEP_THRESHOLD` (100MB): multiply capacity by 2
-- For larger buffers: multiply capacity by 1.5 (capped at `Integer.MAX_VALUE - 8`)
+- 对于小于 `BUFFER_GROW_STEP_THRESHOLD` (100MB) 的缓冲区：将容量乘以 2
+- 对于较大的缓冲区：将容量乘以 1.5（上限为 `Integer.MAX_VALUE - 8`）
 
-This provides a balance between avoiding frequent reallocations and preventing excessive memory usage.
+这在避免频繁重新分配和防止过度内存使用之间提供了平衡。
 
-### Use Cases
+### 使用场景
 
-Custom memory allocators are useful for:
+自定义内存分配器适用于：
 
-- **Memory Pooling**: Reuse allocated buffers to reduce GC pressure
-- **Performance Tuning**: Use different growth strategies based on your workload
-- **Debugging**: Add logging or tracking to monitor memory usage
-- **Off-heap Memory**: Integrate with off-heap memory management systems
+- **内存池化**：重用分配的缓冲区以减少 GC 压力
+- **性能调优**：根据你的工作负载使用不同的增长策略
+- **调试**：添加日志记录或跟踪以监控内存使用
+- **堆外内存**：与堆外内存管理系统集成
 
-## Logging
+## 日志记录
 
 ### ForyLogger
 
-By default, Fory uses a custom logger `ForyLogger` for internal needs. It builds resulting logged data into a single string and sends it directly to `System.out`. The result line layout is similar to (in Log4j notation):
+默认情况下，Fory 使用自定义日志记录器 `ForyLogger` 来满足内部需求。它将生成的日志数据构建为单个字符串，并直接发送到 `System.out`。结果行布局类似于（Log4j 表示法）：
 
 ```
 %d{yyyy-MM-dd hh:mm:ss} %p  %C:%L [%t] - %m%n
 ```
 
-The layout can't be changed.
+布局无法更改。
 
-Example output:
+示例输出：
 
 ```
 2025-11-07 08:49:59 INFO  CompileUnit:55 [main] - Generate code for org.apache.fory.builder.SerializedLambdaForyCodec_0 took 35 ms.
@@ -172,7 +171,7 @@ Example output:
 
 ### Slf4jLogger
 
-If a more sophisticated logger is required, configure Fory to use Slf4j via `LoggerFactory.useSlf4jLogging()`. For example, enabling Slf4j before creating Fory:
+如果需要更复杂的日志记录器，可以通过 `LoggerFactory.useSlf4jLogging()` 配置 Fory 使用 Slf4j。例如，在创建 Fory 之前启用 Slf4j：
 
 ```java
 public static final ThreadSafeFory FORY;
@@ -184,26 +183,26 @@ static {
 }
 ```
 
-**Note:** Enabling Slf4j via `useSlf4jLogging` will be ignored when the application runs in a GraalVM native image.
+**注意**：当应用程序在 GraalVM native image 中运行时，通过 `useSlf4jLogging` 启用 Slf4j 将被忽略。
 
-### Suppress Fory Logs
+### 抑制 Fory 日志
 
-Both `ForyLogger` and `Slf4jLogger` allow controlling log output level or suppressing logs entirely. Configure logger level via `LoggerFactory.setLogLevel()`:
+`ForyLogger` 和 `Slf4jLogger` 都允许控制日志输出级别或完全抑制日志。通过 `LoggerFactory.setLogLevel()` 配置日志级别：
 
 ```java
 static {
-  // to log only WARN and higher
+  // 只记录 WARN 及更高级别
   LoggerFactory.setLogLevel(LogLevel.WARN_LEVEL);
 
-  // to disable logging entirely
+  // 完全禁用日志记录
   LoggerFactory.disableLogging();
 }
 ```
 
-**Note:** Selected logging level is applied before Slf4j implementation's logger level. So if you set `WARN_LEVEL` (as in the example above) then you will not see INFO messages from Fory even if INFO is enabled in Logback.
+**注意**：所选的日志级别在 Slf4j 实现的日志级别之前应用。因此，如果你设置 `WARN_LEVEL`（如上例），即使在 Logback 中启用了 INFO，你也不会看到来自 Fory 的 INFO 消息。
 
-## Related Topics
+## 相关主题
 
-- [Compression](compression.md) - Data compression options
-- [Configuration Options](configuration.md) - All ForyBuilder options
-- [Cross-Language Serialization](cross-language.md) - XLANG mode
+- [压缩](compression.md) - 数据压缩选项
+- [配置选项](configuration.md) - 所有 ForyBuilder 选项
+- [跨语言序列化](cross-language.md) - XLANG 模式

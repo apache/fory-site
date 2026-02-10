@@ -1,8 +1,8 @@
-# C++ Benchmark Performance Report
+# C++ 基准性能报告
 
-_Generated on 2026-02-06 20:01:02_
+_生成时间：2026-02-06 20:01:02_
 
-## How to Generate This Report
+## 如何生成本报告
 
 ```bash
 cd benchmarks/cpp_benchmark/build
@@ -11,7 +11,7 @@ cd ..
 python benchmark_report.py --json-file build/benchmark_results.json --output-dir report
 ```
 
-## Hardware & OS Info
+## 硬件与系统信息
 
 | Key                        | Value                     |
 | -------------------------- | ------------------------- |
@@ -24,7 +24,7 @@ python benchmark_report.py --json-file build/benchmark_results.json --output-dir
 | Benchmark Date             | 2026-02-06T20:00:20+08:00 |
 | CPU Cores (from benchmark) | 12                        |
 
-## Benchmark Plots
+## 基准图表
 
 ### Mediacontent
 
@@ -68,9 +68,9 @@ python benchmark_report.py --json-file build/benchmark_results.json --output-dir
 <img src="throughput.png" width="90%" />
 </p>
 
-## Benchmark Results
+## 基准结果
 
-### Timing Results (nanoseconds)
+### 耗时结果（纳秒）
 
 | Datatype         | Operation   | Fory (ns) | Protobuf (ns) | Faster       |
 | ---------------- | ----------- | --------- | ------------- | ------------ |
@@ -87,7 +87,7 @@ python benchmark_report.py --json-file build/benchmark_results.json --output-dir
 | Structlist       | Serialize   | 308.4     | 1299.4        | Fory (4.2x)  |
 | Structlist       | Deserialize | 706.2     | 1188.0        | Fory (1.7x)  |
 
-### Throughput Results (ops/sec)
+### 吞吐结果（ops/sec）
 
 | Datatype         | Operation   | Fory TPS  | Protobuf TPS | Faster       |
 | ---------------- | ----------- | --------- | ------------ | ------------ |
@@ -104,7 +104,7 @@ python benchmark_report.py --json-file build/benchmark_results.json --output-dir
 | Structlist       | Serialize   | 3,242,105 | 769,562      | Fory (4.2x)  |
 | Structlist       | Deserialize | 1,416,005 | 841,739      | Fory (1.7x)  |
 
-### Serialized Data Sizes (bytes)
+### 序列化数据大小（字节）
 
 | Datatype         | Fory | Protobuf |
 | ---------------- | ---- | -------- |

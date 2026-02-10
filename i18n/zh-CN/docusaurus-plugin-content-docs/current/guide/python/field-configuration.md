@@ -1,5 +1,5 @@
 ---
-title: Field Configuration
+title: 字段配置
 sidebar_position: 5
 id: field_configuration
 license: |
@@ -19,11 +19,14 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to configure field-level metadata for serialization in Python.
+> 中文导读：本页介绍字段级序列化配置，包括字段 ID、可空控制、引用跟踪、忽略字段与动态类型控制等。
+> 建议在跨语言和兼容模式场景中优先显式配置字段 ID，并在需要时开启 ref/nullable 以保证行为一致。
 
-## Overview
+本页说明如何在 Python 中配置序列化字段级元信息。
 
-Apache ForyTM provides field-level configuration through:
+## 概述
+
+Apache ForyTM 通过以下方式提供字段级配置：
 
 - **`pyfory.field()`**: Configure field metadata (id, nullable, ref, ignore, dynamic)
 - **Type annotations**: Control integer encoding (varint, fixed, tagged)
@@ -38,7 +41,7 @@ This enables:
 - **Encoding Control**: Specify how integers are encoded (varint, fixed, tagged)
 - **Polymorphism**: Control whether type info is written for struct fields
 
-## Basic Syntax
+## 基本语法
 
 Use `@dataclass` decorator with type annotations and `pyfory.field()`:
 
@@ -54,7 +57,7 @@ class Person:
     nickname: Optional[str] = pyfory.field(id=2, nullable=True, default=None)
 ```
 
-## The `pyfory.field()` Function
+## `pyfory.field()` 函数
 
 Use `pyfory.field()` to configure field-level metadata:
 
@@ -68,7 +71,7 @@ class User:
     _cache: dict = pyfory.field(ignore=True, default_factory=dict)
 ```
 
-### Parameters
+### 参数
 
 | Parameter         | Type     | Default   | Description                          |
 | ----------------- | -------- | --------- | ------------------------------------ |

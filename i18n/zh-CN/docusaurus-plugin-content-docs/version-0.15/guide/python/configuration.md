@@ -1,5 +1,5 @@
 ---
-title: Configuration
+title: 配置
 sidebar_position: 1
 id: configuration
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers Fory configuration parameters and language modes.
+本页介绍 Fory 配置参数和语言模式。
 
-## Fory Class
+## Fory 类
 
-The main serialization interface:
+主要序列化接口：
 
 ```python
 class Fory:
@@ -37,9 +37,9 @@ class Fory:
     )
 ```
 
-## ThreadSafeFory Class
+## ThreadSafeFory 类
 
-Thread-safe serialization interface using thread-local storage:
+使用线程本地存储的线程安全序列化接口：
 
 ```python
 class ThreadSafeFory:
@@ -53,129 +53,129 @@ class ThreadSafeFory:
     )
 ```
 
-## Parameters
+## 参数
 
-| Parameter    | Type   | Default | Description                                                                                                                                                                                |
-| ------------ | ------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `xlang`      | `bool` | `False` | Enable cross-language serialization. When `False`, enables Python-native mode supporting all Python objects. When `True`, enables cross-language mode compatible with Java, Go, Rust, etc. |
-| `ref`        | `bool` | `False` | Enable reference tracking for shared/circular references. Disable for better performance if your data has no shared references.                                                            |
-| `strict`     | `bool` | `True`  | Require type registration for security. **Highly recommended** for production. Only disable in trusted environments.                                                                       |
-| `compatible` | `bool` | `False` | Enable schema evolution in cross-language mode, allowing fields to be added/removed while maintaining compatibility.                                                                       |
-| `max_depth`  | `int`  | `50`    | Maximum deserialization depth for security, preventing stack overflow attacks.                                                                                                             |
+| 参数         | 类型   | 默认值  | 描述                                                                                                                                    |
+| ------------ | ------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `xlang`      | `bool` | `False` | 启用跨语言序列化。当为 `False` 时，启用 Python 原生模式，支持所有 Python 对象。当为 `True` 时，启用跨语言模式，兼容 Java、Go、Rust 等。 |
+| `ref`        | `bool` | `False` | 启用引用跟踪以支持共享/循环引用。如果数据没有共享引用，禁用此选项可获得更好性能。                                                       |
+| `strict`     | `bool` | `True`  | 出于安全考虑需要类型注册。**生产环境强烈推荐**。仅在受信任的环境中禁用。                                                                |
+| `compatible` | `bool` | `False` | 在跨语言模式中启用 schema 演化，允许在保持兼容性的同时添加/删除字段。                                                                   |
+| `max_depth`  | `int`  | `50`    | 反序列化的最大深度，用于安全防护，防止栈溢出攻击。                                                                                      |
 
-## Key Methods
+## 核心方法
 
 ```python
-# Serialization (serialize/deserialize are identical to dumps/loads)
+# 序列化（serialize/deserialize 与 dumps/loads 完全相同）
 data: bytes = fory.serialize(obj)
 obj = fory.deserialize(data)
 
-# Alternative API (aliases)
+# 替代 API（别名）
 data: bytes = fory.dumps(obj)
 obj = fory.loads(data)
 
-# Type registration by id (for Python mode)
+# 按 ID 注册类型（用于 Python 模式）
 fory.register(MyClass, type_id=123)
 fory.register(MyClass, type_id=123, serializer=custom_serializer)
 
-# Type registration by name (for cross-language mode)
+# 按名称注册类型（用于跨语言模式）
 fory.register(MyClass, typename="my.package.MyClass")
 fory.register(MyClass, typename="my.package.MyClass", serializer=custom_serializer)
 ```
 
-## Language Modes Comparison
+## 语言模式比较
 
-| Feature               | Python Mode (`xlang=False`)          | Cross-Language Mode (`xlang=True`)    |
-| --------------------- | ------------------------------------ | ------------------------------------- |
-| **Use Case**          | Pure Python applications             | Multi-language systems                |
-| **Compatibility**     | Python only                          | Java, Go, Rust, C++, JavaScript, etc. |
-| **Supported Types**   | All Python types                     | Cross-language compatible types only  |
-| **Functions/Lambdas** | ✓ Supported                          | ✗ Not allowed                         |
-| **Local Classes**     | ✓ Supported                          | ✗ Not allowed                         |
-| **Dynamic Classes**   | ✓ Supported                          | ✗ Not allowed                         |
-| **Schema Evolution**  | ✓ Supported (with `compatible=True`) | ✓ Supported (with `compatible=True`)  |
-| **Performance**       | Extremely fast                       | Very fast                             |
-| **Data Size**         | Compact                              | Compact with type metadata            |
+| 特性            | Python 模式 (`xlang=False`)      | 跨语言模式 (`xlang=True`)          |
+| --------------- | -------------------------------- | ---------------------------------- |
+| **使用场景**    | 纯 Python 应用                   | 多语言系统                         |
+| **兼容性**      | 仅限 Python                      | Java、Go、Rust、C++、JavaScript 等 |
+| **支持的类型**  | 所有 Python 类型                 | 仅限跨语言兼容类型                 |
+| **函数/Lambda** | ✓ 支持                           | ✗ 不允许                           |
+| **本地类**      | ✓ 支持                           | ✗ 不允许                           |
+| **动态类**      | ✓ 支持                           | ✗ 不允许                           |
+| **Schema 演化** | ✓ 支持（需要 `compatible=True`） | ✓ 支持（需要 `compatible=True`）   |
+| **性能**        | 极快                             | 非常快                             |
+| **数据大小**    | 紧凑                             | 紧凑（带类型元数据）               |
 
-## Python Mode (`xlang=False`)
+## Python 模式 (`xlang=False`)
 
-Python mode supports all Python types including functions, classes, and closures:
+Python 模式支持所有 Python 类型，包括函数、类和闭包：
 
 ```python
 import pyfory
 
-# Full Python compatibility mode
+# 完全 Python 兼容模式
 fory = pyfory.Fory(xlang=False, ref=True, strict=False)
 
-# Supports ALL Python objects:
+# 支持所有 Python 对象：
 data = fory.dumps({
-    'function': lambda x: x * 2,        # Functions and lambdas
-    'class': type('Dynamic', (), {}),    # Dynamic classes
-    'method': str.upper,                # Methods
-    'nested': {'circular_ref': None}    # Circular references (when ref=True)
+    'function': lambda x: x * 2,        # 函数和 lambda
+    'class': type('Dynamic', (), {}),    # 动态类
+    'method': str.upper,                # 方法
+    'nested': {'circular_ref': None}    # 循环引用（当 ref=True 时）
 })
 
-# Drop-in replacement for pickle/cloudpickle
+# 可直接替代 pickle/cloudpickle
 import pickle
 obj = [1, 2, {"nested": [3, 4]}]
 assert fory.loads(fory.dumps(obj)) == pickle.loads(pickle.dumps(obj))
 ```
 
-## Cross-Language Mode (`xlang=True`)
+## 跨语言模式 (`xlang=True`)
 
-Cross-language mode restricts types to those compatible across all Fory implementations:
+跨语言模式将类型限制为所有 Fory 实现间兼容的类型：
 
 ```python
 import pyfory
 
-# Cross-language compatibility mode
+# 跨语言兼容模式
 f = pyfory.Fory(xlang=True, ref=True)
 
-# Only supports cross-language compatible types
+# 仅支持跨语言兼容类型
 f.register(MyDataClass, typename="com.example.MyDataClass")
 
-# Data can be read by Java, Go, Rust, etc.
+# 数据可以被 Java、Go、Rust 等读取
 data = f.serialize(MyDataClass(field1="value", field2=42))
 ```
 
-## Example Configurations
+## 示例配置
 
-### Production Configuration
+### 生产环境配置
 
 ```python
 import pyfory
 
-# Recommended settings for production
+# 生产环境推荐设置
 fory = pyfory.Fory(
-    xlang=False,        # Use True if you need cross-language support
-    ref=False,          # Enable if you have shared/circular references
-    strict=True,        # CRITICAL: Always True in production
-    compatible=False,   # Enable only if you need schema evolution
-    max_depth=20        # Adjust based on your data structure depth
+    xlang=False,        # 如果需要跨语言支持则使用 True
+    ref=False,          # 如果有共享/循环引用则启用
+    strict=True,        # 关键：生产环境始终为 True
+    compatible=False,   # 仅在需要 schema 演化时启用
+    max_depth=20        # 根据数据结构深度调整
 )
 
-# Register all types upfront
+# 预先注册所有类型
 fory.register(UserModel, type_id=100)
 fory.register(OrderModel, type_id=101)
 fory.register(ProductModel, type_id=102)
 ```
 
-### Development Configuration
+### 开发环境配置
 
 ```python
 import pyfory
 
-# Development settings (more permissive)
+# 开发设置（更宽松）
 fory = pyfory.Fory(
     xlang=False,
     ref=True,
-    strict=False,    # Allow any type for development
-    max_depth=1000   # Higher limit for development
+    strict=False,    # 开发时允许任何类型
+    max_depth=1000   # 开发时更高的限制
 )
 ```
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Using configured Fory
-- [Type Registration](type-registration.md) - Registration patterns
-- [Security](security.md) - Security best practices
+- [基础序列化](basic-serialization.md) - 使用已配置的 Fory
+- [类型注册](type-registration.md) - 注册模式
+- [安全性](security.md) - 安全最佳实践

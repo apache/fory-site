@@ -1,5 +1,5 @@
 ---
-title: Generated Code
+title: 生成代码
 sidebar_position: 5
 id: generated_code
 license: |
@@ -19,7 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This document explains generated code for each target language.
+> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
+
+本文档说明各目标语言的生成代码结构。
 
 Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and registration helpers.
 

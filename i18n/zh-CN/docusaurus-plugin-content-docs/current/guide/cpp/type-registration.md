@@ -1,5 +1,5 @@
 ---
-title: Type Registration
+title: 类型注册
 sidebar_position: 4
 id: type_registration
 license: |
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to register types for serialization.
+本页介绍如何注册类型以进行序列化。
 
-## Overview
+## 概述
 
-Apache Fory™ requires explicit type registration for struct types. This design enables:
+Apache Fory™ 要求显式注册结构体类型。这种设计使得：
 
-- **Cross-Language Compatibility**: Registered type IDs are used across language boundaries
-- **Type Safety**: Detects type mismatches at deserialization time
-- **Polymorphic Serialization**: Enables serialization of polymorphic objects via smart pointers
+- **跨语言兼容性**：注册的类型 ID 跨语言边界使用
+- **类型安全**：在反序列化时检测类型不匹配
+- **多态序列化**：通过智能指针启用多态对象的序列化
 
-## Registering Structs
+## 注册结构体
 
-Use `register_struct<T>(type_id)` to register a struct type:
+使用 `register_struct<T>(type_id)` 注册结构体类型：
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -47,7 +47,7 @@ FORY_STRUCT(Person, name, age);
 int main() {
   auto fory = Fory::builder().xlang(true).build();
 
-  // Register with a unique type ID
+  // 使用唯一的类型 ID 注册
   fory.register_struct<Person>(100);
 
   Person person{"Alice", 30};
@@ -56,68 +56,68 @@ int main() {
 }
 ```
 
-## Type ID Guidelines
+## 类型 ID 指南
 
-Type IDs must be:
+类型 ID 必须：
 
-1. **Unique**: Each type must have a unique ID within a Fory instance
-2. **Consistent**: Same ID must be used across all languages and versions
+1. **唯一**：每个类型在 Fory 实例中必须有唯一的 ID
+2. **一致**：必须在所有语言和版本中使用相同的 ID
 
-User-registered type IDs are in a separate namespace from built-in type IDs, so you can start from 0:
+用户注册的类型 ID 与内置类型 ID 在不同的命名空间中，因此可以从 0 开始：
 
 ```cpp
-// User type IDs can start from 0
+// 用户类型 ID 可以从 0 开始
 fory.register_struct<Address>(0);
 fory.register_struct<Person>(1);
 fory.register_struct<Order>(2);
 ```
 
-## Registering Enums
+## 注册枚举
 
-Use `register_enum<T>(type_id)` to register an enum type. For simple enums with continuous values starting from 0, no macro is needed:
+使用 `register_enum<T>(type_id)` 注册枚举类型。对于从 0 开始连续值的简单枚举，不需要宏：
 
 ```cpp
-// Simple continuous enum - no FORY_ENUM needed
-enum class Color { RED, GREEN, BLUE };  // Values: 0, 1, 2
+// 简单连续枚举 - 不需要 FORY_ENUM
+enum class Color { RED, GREEN, BLUE };  // 值：0、1、2
 
-// Register with register_enum
+// 使用 register_enum 注册
 fory.register_enum<Color>(0);
 ```
 
-For enums with non-continuous values, use the `FORY_ENUM` macro to map values to ordinals:
+对于具有非连续值的枚举，使用 `FORY_ENUM` 宏将值映射到序号：
 
 ```cpp
-// Non-continuous enum values - FORY_ENUM required
+// 非连续枚举值 - 需要 FORY_ENUM
 enum class Priority { LOW = 10, MEDIUM = 50, HIGH = 100 };
 FORY_ENUM(Priority, LOW, MEDIUM, HIGH);
 
-// Global namespace enum (prefix with ::)
+// 全局命名空间枚举（前缀 ::）
 enum LegacyStatus { UNKNOWN = -1, OK = 0, ERROR = 1 };
 FORY_ENUM(::LegacyStatus, UNKNOWN, OK, ERROR);
 
-// Register after FORY_ENUM
+// FORY_ENUM 后注册
 fory.register_enum<Priority>(1);
 fory.register_enum<LegacyStatus>(2);
 ```
 
-**When to use `FORY_ENUM`:**
+**何时使用 `FORY_ENUM`：**
 
-- Enum values don't start from 0
-- Enum values are not continuous (e.g., 10, 50, 100)
-- You need name-to-value mapping at compile time
+- 枚举值不从 0 开始
+- 枚举值不连续（例如 10、50、100）
+- 需要在编译时进行名称到值的映射
 
-## Thread-Safe Registration
+## 线程安全注册
 
-For `ThreadSafeFory`, register types before spawning threads:
+对于 `ThreadSafeFory`，在生成线程之前注册类型：
 
 ```cpp
 auto fory = Fory::builder().xlang(true).build_thread_safe();
 
-// Register all types first
+// 首先注册所有类型
 fory.register_struct<TypeA>(100);
 fory.register_struct<TypeB>(101);
 
-// Now safe to use from multiple threads
+// 现在可以从多个线程安全使用
 std::thread t1([&]() {
   auto result = fory.serialize(obj_a);
 });
@@ -126,12 +126,12 @@ std::thread t2([&]() {
 });
 ```
 
-## Cross-Language Registration
+## 跨语言注册
 
-For cross-language compatibility, ensure:
+为了跨语言兼容性，确保：
 
-1. **Same Type ID**: Use identical IDs in all languages
-2. **Compatible Types**: Use equivalent types across languages
+1. **相同类型 ID**：在所有语言中使用相同的 ID
+2. **兼容类型**：跨语言使用等效类型
 
 ### Java
 
@@ -159,11 +159,11 @@ fory.register_struct<Person>(100);
 fory.register_struct<Address>(101);
 ```
 
-## Built-in Type IDs
+## 内置类型 ID
 
-Built-in types have pre-assigned type IDs and don't need registration:
+内置类型有预分配的类型 ID，不需要注册：
 
-| Type ID | Type                 |
+| 类型 ID | 类型                 |
 | ------- | -------------------- |
 | 0       | NONE                 |
 | 1       | BOOL                 |
@@ -188,8 +188,8 @@ Built-in types have pre-assigned type IDs and don't need registration:
 | 20      | BINARY               |
 | 21      | ARRAY                |
 | 22      | BOOL_ARRAY           |
-| 23-28   | INT_ARRAY variants   |
-| 29-31   | FLOAT_ARRAY variants |
+| 23-28   | INT_ARRAY 变体       |
+| 29-31   | FLOAT_ARRAY 变体     |
 | 32      | STRUCT               |
 | 33      | COMPATIBLE_STRUCT    |
 | 34      | NAMED_STRUCT         |
@@ -198,28 +198,28 @@ Built-in types have pre-assigned type IDs and don't need registration:
 | 37      | NAMED_EXT            |
 | 63      | UNKNOWN              |
 
-## Error Handling
+## 错误处理
 
-Registration errors are checked at serialization/deserialization time:
+注册错误在序列化/反序列化时检查：
 
 ```cpp
-// Attempting to serialize unregistered type
+// 尝试序列化未注册的类型
 auto result = fory.serialize(unregistered_obj);
 if (!result.ok()) {
-  // Error: "Type not registered: ..."
+  // 错误："Type not registered: ..."
   std::cerr << result.error().to_string() << std::endl;
 }
 
-// Type ID mismatch during deserialization
+// 反序列化时类型 ID 不匹配
 auto result = fory.deserialize<WrongType>(bytes);
 if (!result.ok()) {
-  // Error: "Type mismatch: expected X, got Y"
+  // 错误："Type mismatch: expected X, got Y"
   std::cerr << result.error().to_string() << std::endl;
 }
 ```
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Using registered types
-- [Cross-Language](cross-language.md) - Cross-language considerations
-- [Supported Types](supported-types.md) - All supported types
+- [基础序列化](basic-serialization.md) - 使用已注册的类型
+- [跨语言](cross-language.md) - 跨语言注意事项
+- [支持的类型](supported-types.md) - 所有支持的类型

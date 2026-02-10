@@ -1,6 +1,6 @@
 ---
-title: Serialization
-sidebar_position: 30
+title: 序列化
+sidebar_position: 3
 id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page demonstrates cross-language serialization patterns with examples in all supported languages. Data serialized in one language can be deserialized in any other supported language.
+本页演示了所有支持语言的跨语言序列化模式示例。在一种语言中序列化的数据可以在任何其他支持的语言中反序列化。
 
-## Serialize Built-in Types
+## 序列化内置类型
 
-Common types can be serialized automatically without registration: primitive numeric types, string, binary, array, list, map, and more.
+常见类型可以自动序列化，无需注册：原始数值类型、字符串、二进制、数组、列表、映射等。
 
 ### Java
 
@@ -38,14 +38,14 @@ public class Example1 {
     Fory fory = Fory.builder().withLanguage(Language.XLANG).build();
     List<Object> list = ofArrayList(true, false, "str", -1.1, 1, new int[100], new double[20]);
     byte[] bytes = fory.serialize(list);
-    // bytes can be deserialized by other languages
+    // bytes 可以被其他语言反序列化
     fory.deserialize(bytes);
     Map<Object, Object> map = new HashMap<>();
     map.put("k1", "v1");
     map.put("k2", list);
     map.put("k3", -1);
     bytes = fory.serialize(map);
-    // bytes can be deserialized by other languages
+    // bytes 可以被其他语言反序列化
     fory.deserialize(bytes);
   }
 }
@@ -61,11 +61,11 @@ fory = pyfory.Fory()
 object_list = [True, False, "str", -1.1, 1,
                np.full(100, 0, dtype=np.int32), np.full(20, 0.0, dtype=np.double)]
 data = fory.serialize(object_list)
-# bytes can be deserialized by other languages
+# bytes 可以被其他语言反序列化
 new_list = fory.deserialize(data)
 object_map = {"k1": "v1", "k2": object_list, "k3": -1}
 data = fory.serialize(object_map)
-# bytes can be deserialized by other languages
+# bytes 可以被其他语言反序列化
 new_map = fory.deserialize(data)
 print(new_map)
 ```
@@ -79,19 +79,19 @@ import forygo "github.com/apache/fory/go/fory"
 import "fmt"
 
 func main() {
-  list := []any{true, false, "str", -1.1, 1, make([]int32, 10), make([]float64, 20)}
+  list := []interface{}{true, false, "str", -1.1, 1, make([]int32, 10), make([]float64, 20)}
   fory := forygo.NewFory()
   bytes, err := fory.Marshal(list)
   if err != nil {
     panic(err)
   }
-  var newValue any
-  // bytes can be deserialized by other languages
+  var newValue interface{}
+  // bytes 可以被其他语言反序列化
   if err := fory.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
   fmt.Println(newValue)
-  dict := map[string]any{
+  dict := map[string]interface{}{
     "k1": "v1",
     "k2": list,
     "k3": -1,
@@ -100,7 +100,7 @@ func main() {
   if err != nil {
     panic(err)
   }
-  // bytes can be deserialized by other languages
+  // bytes 可以被其他语言反序列化
   if err := fory.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
@@ -114,10 +114,10 @@ func main() {
 import Fory from "@apache-fory/fory";
 
 /**
- * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit,
- * ensure that the version of Node is 20 or above.
- * Experimental feature, installation success cannot be guaranteed at this moment.
- * If you are unable to install the module, replace it with `const hps = null;`
+ * @apache-fory/hps 使用 v8 的 fast-calls-api，可以直接被 jit 调用，
+ * 确保 Node 版本为 20 或更高。
+ * 实验性功能，目前无法保证安装成功。
+ * 如果无法安装该模块，请将其替换为 `const hps = null;`
  **/
 import hps from "@apache-fory/hps";
 
@@ -140,9 +140,9 @@ fn run() {
 }
 ```
 
-## Serialize Custom Types
+## 序列化自定义类型
 
-User-defined types must be registered using the register API to establish the mapping relationship between types in different languages. Use consistent type names across all languages.
+用户定义的类型必须使用 register API 进行注册，以建立不同语言中类型之间的映射关系。请在所有语言中使用一致的类型名称。
 
 ### Java
 
@@ -198,7 +198,7 @@ public class Example2 {
     fory.register(SomeClass1.class, "example.SomeClass1");
     fory.register(SomeClass2.class, "example.SomeClass2");
     byte[] bytes = fory.serialize(createObject());
-    // bytes can be deserialized by other languages
+    // bytes 可以被其他语言反序列化
     System.out.println(fory.deserialize(bytes));
   }
 }
@@ -227,11 +227,11 @@ class SomeClass2:
     f5: pyfory.Int8Type = None
     f6: pyfory.Int16Type = None
     f7: pyfory.Int32Type = None
-    # int type will be taken as `pyfory.Int64Type`.
-    # use `pyfory.Int32Type` for type hint if peer uses more narrow type.
+    # int 类型将被视为 `pyfory.Int64Type`。
+    # 如果对等方使用更窄的类型，请使用 `pyfory.Int32Type` 进行类型提示。
     f8: int = None
     f9: pyfory.Float32Type = None
-    # float type will be taken as `pyfory.Float64Type`
+    # float 类型将被视为 `pyfory.Float64Type`
     f10: float = None
     f11: pyfory.Int16ArrayType = None
     f12: List[pyfory.Int16Type] = None
@@ -257,7 +257,7 @@ if __name__ == "__main__":
         f12=[-1, 4],
     )
     data = f.serialize(obj)
-    # bytes can be deserialized by other languages
+    # bytes 可以被其他语言反序列化
     print(f.deserialize(data))
 ```
 
@@ -271,9 +271,9 @@ import "fmt"
 
 func main() {
   type SomeClass1 struct {
-    F1  any
+    F1  interface{}
     F2  string
-    F3  []any
+    F3  []interface{}
     F4  map[int8]int32
     F5  int8
     F6  int16
@@ -286,7 +286,7 @@ func main() {
   }
 
   type SomeClass2 struct {
-    F1 any
+    F1 interface{}
     F2 map[int8]int32
   }
   fory := forygo.NewFory()
@@ -302,7 +302,7 @@ func main() {
   obj := &SomeClass1{}
   obj.F1 = obj1
   obj.F2 = "abc"
-  obj.F3 = []any{"abc", "abc"}
+  obj.F3 = []interface{}{"abc", "abc"}
   f4 := map[int8]int32{1: 2}
   obj.F4 = f4
   obj.F5 = fory.MaxInt8
@@ -317,8 +317,8 @@ func main() {
   if err != nil {
     panic(err)
   }
-  var newValue any
-  // bytes can be deserialized by other languages
+  var newValue interface{}
+  // bytes 可以被其他语言反序列化
   if err := fory.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
@@ -332,14 +332,14 @@ func main() {
 import Fory, { Type, InternalSerializerType } from "@apache-fory/fory";
 
 /**
- * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit,
- * ensure that the version of Node is 20 or above.
- * Experimental feature, installation success cannot be guaranteed at this moment.
- * If you are unable to install the module, replace it with `const hps = null;`
+ * @apache-fory/hps 使用 v8 的 fast-calls-api，可以直接被 jit 调用，
+ * 确保 Node 版本为 20 或更高。
+ * 实验性功能，目前无法保证安装成功。
+ * 如果无法安装该模块，请将其替换为 `const hps = null;`
  **/
 import hps from "@apache-fory/hps";
 
-// Describe data structures using JSON schema
+// 使用 JSON schema 描述数据结构
 const description = Type.object("example.foo", {
   foo: Type.string(),
 });
@@ -409,9 +409,9 @@ fn complex_struct() {
 }
 ```
 
-## Serialize Shared and Circular References
+## 序列化共享引用和循环引用
 
-Shared references and circular references can be serialized automatically with no duplicate data or recursion errors. Enable reference tracking to use this feature.
+共享引用和循环引用可以自动序列化，不会有重复数据或递归错误。启用引用跟踪即可使用此功能。
 
 ### Java
 
@@ -441,7 +441,7 @@ public class ReferenceExample {
       .withRefTracking(true).build();
     fory.register(SomeClass.class, "example.SomeClass");
     byte[] bytes = fory.serialize(createObject());
-    // bytes can be deserialized by other languages
+    // bytes 可以被其他语言反序列化
     System.out.println(fory.deserialize(bytes));
   }
 }
@@ -464,7 +464,7 @@ obj = SomeClass()
 obj.f2 = {"k1": "v1", "k2": "v2"}
 obj.f1, obj.f3 = obj, obj.f2
 data = fory.serialize(obj)
-# bytes can be deserialized by other languages
+# bytes 可以被其他语言反序列化
 print(fory.deserialize(data))
 ```
 
@@ -493,8 +493,8 @@ func main() {
   if err != nil {
     panic(err)
   }
-  var newValue any
-  // bytes can be deserialized by other languages
+  var newValue interface{}
+  // bytes 可以被其他语言反序列化
   if err := fory.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
@@ -507,10 +507,10 @@ func main() {
 ```javascript
 import Fory, { Type } from "@apache-fory/fory";
 /**
- * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit,
- * ensure that the version of Node is 20 or above.
- * Experimental feature, installation success cannot be guaranteed at this moment.
- * If you are unable to install the module, replace it with `const hps = null;`
+ * @apache-fory/hps 使用 v8 的 fast-calls-api，可以直接被 jit 调用，
+ * 确保 Node 版本为 20 或更高。
+ * 实验性功能，目前无法保证安装成功。
+ * 如果无法安装该模块，请将其替换为 `const hps = null;`
  **/
 import hps from "@apache-fory/hps";
 
@@ -532,11 +532,11 @@ console.log(result.bar.foo === result.foo);
 
 ### Rust
 
-Circular references cannot be implemented in Rust due to ownership restrictions.
+由于所有权限制，Rust 中无法实现循环引用。
 
-## See Also
+## 另请参阅
 
-- [Zero-Copy Serialization](zero-copy.md) - Out-of-band serialization for large data
-- [Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping) - Cross-language type mapping reference
-- [Getting Started](getting-started.md) - Installation and setup
-- [Xlang Serialization Specification](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec) - Binary protocol details
+- [零拷贝序列化](zero-copy.md) - 大型数据的带外序列化
+- [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping) - 跨语言类型映射参考
+- [入门指南](getting-started.md) - 安装和设置
+- [Xlang 序列化规范](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec) - 二进制协议详情

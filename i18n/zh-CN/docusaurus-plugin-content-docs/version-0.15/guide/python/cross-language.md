@@ -1,5 +1,5 @@
 ---
-title: Cross-Language Serialization
+title: 跨语言序列化
 sidebar_position: 10
 id: cross_language
 license: |
@@ -19,29 +19,29 @@ license: |
   limitations under the License.
 ---
 
-`pyfory` supports cross-language object graph serialization, allowing you to serialize data in Python and deserialize it in Java, Go, Rust, or other supported languages.
+`pyfory` 支持跨语言对象图序列化，允许您在 Python 中序列化数据，并在 Java、Go、Rust 或其他支持的语言中反序列化。
 
-## Enable Cross-Language Mode
+## 启用跨语言模式
 
-To use xlang mode, create `Fory` with `xlang=True`:
+要使用 xlang 模式，创建 `Fory` 时设置 `xlang=True`：
 
 ```python
 import pyfory
 fory = pyfory.Fory(xlang=True, ref=False, strict=True)
 ```
 
-## Cross-Language Example
+## 跨语言示例
 
-### Python (Serializer)
+### Python（序列化器）
 
 ```python
 import pyfory
 from dataclasses import dataclass
 
-# Cross-language mode for interoperability
+# 跨语言模式实现互操作性
 f = pyfory.Fory(xlang=True, ref=True)
 
-# Register type for cross-language compatibility
+# 注册类型以实现跨语言兼容性
 @dataclass
 class Person:
     name: str
@@ -51,10 +51,10 @@ f.register(Person, typename="example.Person")
 
 person = Person("Charlie", 35)
 binary_data = f.serialize(person)
-# binary_data can now be sent to Java, Go, etc.
+# binary_data 现在可以发送到 Java、Go 等
 ```
 
-### Java (Deserializer)
+### Java（反序列化器）
 
 ```java
 import org.apache.fory.*;
@@ -73,7 +73,7 @@ fory.register(Person.class, "example.Person");
 Person person = (Person) fory.deserialize(binaryData);
 ```
 
-### Rust (Deserializer)
+### Rust（反序列化器）
 
 ```rust
 use fory::Fory;
@@ -93,9 +93,9 @@ fory.register_by_namespace::<Person>("example", "Person");
 let person: Person = fory.deserialize(&binary_data)?;
 ```
 
-## Type Annotations for Cross-Language
+## 跨语言的类型注解
 
-Use pyfory type annotations for explicit cross-language type mapping:
+使用 pyfory 类型注解进行显式跨语言类型映射：
 
 ```python
 from dataclasses import dataclass
@@ -103,13 +103,13 @@ import pyfory
 
 @dataclass
 class TypedData:
-    int_value: pyfory.int32      # 32-bit integer
-    long_value: pyfory.int64     # 64-bit integer
-    float_value: pyfory.float32  # 32-bit float
-    double_value: pyfory.float64 # 64-bit float
+    int_value: pyfory.int32      # 32 位整数
+    long_value: pyfory.int64     # 64 位整数
+    float_value: pyfory.float32  # 32 位浮点数
+    double_value: pyfory.float64 # 64 位浮点数
 ```
 
-## Type Mapping
+## 类型映射
 
 | Python           | Java     | Rust      | Go        |
 | ---------------- | -------- | --------- | --------- |
@@ -122,19 +122,19 @@ class TypedData:
 | `list`           | `List`   | `Vec`     | `[]T`     |
 | `dict`           | `Map`    | `HashMap` | `map[K]V` |
 
-## Differences from Python Native Mode
+## 与 Python 原生模式的区别
 
-The binary protocol and API are similar to `pyfory`'s python-native mode, but Python-native mode can serialize any Python object—including global functions, local functions, lambdas, local classes, and types with customized serialization using `__getstate__/__reduce__/__reduce_ex__`, which are **not allowed** in xlang mode.
+二进制协议和 API 与 `pyfory` 的 Python 原生模式类似，但 Python 原生模式可以序列化任何 Python 对象——包括全局函数、局部函数、lambda、局部类以及使用 `__getstate__/__reduce__/__reduce_ex__` 自定义序列化的类型，这些在 xlang 模式中**不允许**。
 
-## See Also
+## 另请参阅
 
-- [Cross-Language Serialization Specification](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec)
-- [Type Mapping Reference](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
-- [Java Cross-Language Guide](../java/cross-language.md)
-- [Rust Cross-Language Guide](../rust/cross-language.md)
+- [跨语言序列化规范](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec)
+- [类型映射参考](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
+- [Java 跨语言指南](../java/cross-language.md)
+- [Rust 跨语言指南](../rust/cross-language.md)
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - XLANG mode settings
-- [Schema Evolution](schema-evolution.md) - Compatible mode
-- [Type Registration](type-registration.md) - Registration patterns
+- [配置](configuration.md) - XLANG 模式设置
+- [Schema 演化](schema-evolution.md) - 兼容模式
+- [类型注册](type-registration.md) - 注册模式

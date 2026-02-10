@@ -1,5 +1,5 @@
 ---
-title: FlatBuffers IDL Support
+title: FlatBuffers IDL 支持
 sidebar_position: 7
 id: flatbuffers_idl
 license: |
@@ -19,17 +19,18 @@ license: |
   limitations under the License.
 ---
 
-This page explains how Apache Fory consumes FlatBuffers schemas (`.fbs`) and
-translates them into Fory IR for code generation.
+> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
 
-## What This Page Covers
+本页说明 Apache Fory 如何读取 FlatBuffers schema（`.fbs`）并将其转换为 Fory IR 以生成代码。
+
+## 本页内容
 
 - When to use FlatBuffers input with Fory
 - Exact FlatBuffers to Fory mapping behavior
 - Supported Fory-specific attributes in `.fbs`
 - Migration notes and generated-code differences
 
-## Why Use Apache Fory
+## 为什么使用 Apache Fory
 
 - Idiomatic generated code: Fory generates language-idiomatic classes/structs
   that can be used directly as domain objects.
@@ -45,7 +46,7 @@ translates them into Fory IR for code generation.
 - Better graph modeling: Shared and circular references are first-class features
   in Fory.
 
-## Quick Decision Guide
+## 快速决策指南
 
 | Situation                                                          | Recommended Path       |
 | ------------------------------------------------------------------ | ---------------------- |
@@ -54,7 +55,7 @@ translates them into Fory IR for code generation.
 | You need FlatBuffers wire compatibility at runtime                 | Keep FlatBuffers stack |
 | You need Fory object-graph semantics (`ref`, weak refs, etc.)      | Use Fory               |
 
-## FlatBuffers to Fory Mapping
+## FlatBuffers 到 Fory 的映射
 
 ### Schema-Level Rules
 

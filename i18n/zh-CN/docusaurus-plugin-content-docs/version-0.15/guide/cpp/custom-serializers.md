@@ -1,5 +1,5 @@
 ---
-title: Custom Serializers
+title: 自定义序列化器
 sidebar_position: 6
 id: custom_serializers
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-For types that don't support `FORY_STRUCT`, implement a `Serializer` template specialization manually.
+对于不支持 `FORY_STRUCT` 的类型，需要手动实现 `Serializer` 模板特化。
 
-## When to Use Custom Serializers
+## 何时使用自定义序列化器
 
 - External types from third-party libraries
 - Types with special serialization requirements
@@ -29,7 +29,7 @@ For types that don't support `FORY_STRUCT`, implement a `Serializer` template sp
 - Performance-critical custom encoding
 - Cross-language interoperability with custom protocols
 
-## Implementing the Serializer Template
+## 实现 Serializer 模板
 
 To create a custom serializer, specialize the `Serializer` template for your type within the `fory::serialization` namespace:
 

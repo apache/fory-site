@@ -1,5 +1,5 @@
 ---
-title: Thread Safety
+title: 线程安全
 sidebar_position: 100
 id: thread_safety
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This guide covers concurrent usage patterns for Fory Go, including the thread-safe wrapper and best practices for multi-goroutine environments.
+本指南介绍 Fory Go 的并发使用模式，包括线程安全封装以及多 goroutine 场景下的最佳实践。
 
-## Default Fory Instance
+## 默认 Fory 实例
 
 The default `Fory` instance is **not thread-safe**:
 
@@ -37,7 +37,7 @@ go func() {
 }()
 ```
 
-### Why Not Thread-Safe?
+### 为什么不是线程安全？
 
 For performance, Fory reuses internal state:
 
@@ -47,7 +47,7 @@ For performance, Fory reuses internal state:
 
 This avoids allocations but requires exclusive access.
 
-## Thread-Safe Wrapper
+## 线程安全封装
 
 For concurrent use, use the `threadsafe` package:
 
@@ -66,7 +66,7 @@ go func() {
 }()
 ```
 
-### How It Works
+### 工作机制
 
 The thread-safe wrapper uses `sync.Pool`:
 
@@ -112,7 +112,7 @@ data, err := threadsafe.Marshal(&value)
 err = threadsafe.Unmarshal(data, &target)
 ```
 
-## Type Registration
+## 类型注册
 
 Type registration should be done before concurrent use:
 
@@ -333,14 +333,14 @@ go func() {
 
 **Fix**: Register all types before concurrent use.
 
-## Best Practices
+## 最佳实践
 
 1. **Register types at startup**: Before any concurrent operations
 2. **Clone data if keeping references**: With non-thread-safe instance
 3. **Use per-worker instances for hot paths**: Eliminates pool contention
 4. **Profile before optimizing**: Thread-safe overhead may be negligible
 
-## Related Topics
+## 相关主题
 
 - [Configuration](configuration.md)
 - [Basic Serialization](basic-serialization.md)

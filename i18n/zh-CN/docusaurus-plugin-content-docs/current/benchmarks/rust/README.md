@@ -1,8 +1,8 @@
-## Performance Comparison Report
+## 性能对比报告
 
-_Generated on 2025-10-26 18:36:41_
+_生成时间：2025-10-26 18:36:41_
 
-How to generate performance report:
+如何生成性能报告：
 
 ```bash
 cd benchmarks/rust_benchmark
@@ -10,7 +10,7 @@ cargo bench 2>&1 | tee cargo_bench.log
 python benchmark_report.py --log-file cargo_bench.log --output-dir=report_output
 ```
 
-### Hardware & OS Info
+### 硬件与系统信息
 
 | Key                  | Value         |
 | -------------------- | ------------- |
@@ -21,7 +21,7 @@ python benchmark_report.py --log-file cargo_bench.log --output-dir=report_output
 | CPU Cores (Logical)  | 12            |
 | Total RAM (GB)       | 48.0          |
 
-### Benchmark Plots
+### 基准图表
 
 **company**
 
@@ -51,7 +51,7 @@ python benchmark_report.py --log-file cargo_bench.log --output-dir=report_output
 
 ![System Data](system_data.png)
 
-### Serialize Results
+### 序列化结果
 
 | Datatype       | Size   | Operation | Fory TPS   | JSON TPS   | Protobuf TPS | Fastest |
 | -------------- | ------ | --------- | ---------- | ---------- | ------------ | ------- |
@@ -77,7 +77,7 @@ python benchmark_report.py --log-file cargo_bench.log --output-dir=report_output
 | system_data    | medium | serialize | 174,240    | 11,896     | 14,753       | fory    |
 | system_data    | large  | serialize | 10,671     | 876        | 1,040        | fory    |
 
-### Deserialize Results
+### 反序列化结果
 
 | Datatype       | Size   | Operation   | Fory TPS   | JSON TPS   | Protobuf TPS | Fastest |
 | -------------- | ------ | ----------- | ---------- | ---------- | ------------ | ------- |

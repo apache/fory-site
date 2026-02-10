@@ -1,5 +1,5 @@
 ---
-title: Supported Types
+title: 支持类型
 sidebar_position: 40
 id: supported_types
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Fory Go supports a wide range of Go types for serialization. This guide covers all supported types and their cross-language mappings.
+Fory Go 支持广泛的 Go 类型序列化。本指南说明支持类型及其跨语言映射。
 
-## Primitive Types
+## 基础类型
 
 | Go Type          | Fory TypeId  | Encoding              | Notes                             |
 | ---------------- | ------------ | --------------------- | --------------------------------- |
@@ -59,9 +59,9 @@ var i64 int64 = 9223372036854775807
 data, _ := f.Serialize(i64)  // Uses varint encoding
 ```
 
-## Collection Types
+## 集合类型
 
-### Slices
+### Slice
 
 | Go Type         | Fory TypeId   | Notes                 |
 | --------------- | ------------- | --------------------- |
@@ -96,7 +96,7 @@ dynamic := []any{1, "hello", true}
 data, _ = f.Serialize(dynamic)
 ```
 
-### Maps
+### Map
 
 | Go Type              | Fory TypeId | Notes                   |
 | -------------------- | ----------- | ----------------------- |
@@ -362,7 +362,7 @@ The following Go types are **not supported**:
 
 Attempting to serialize these types will result in an error.
 
-## Related Topics
+## 相关主题
 
 - [Type Registration](type-registration.md)
 - [Cross-Language Serialization](cross-language.md)

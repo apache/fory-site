@@ -1,5 +1,5 @@
 ---
-title: Compression
+title: 压缩
 sidebar_position: 6
 id: compression
 license: |
@@ -19,107 +19,107 @@ license: |
   limitations under the License.
 ---
 
-This page covers compression options for reducing serialized data size.
+本页介绍用于减少序列化数据大小的压缩选项。
 
-## Integer Compression
+## 整数压缩
 
-`ForyBuilder#withIntCompressed`/`ForyBuilder#withLongCompressed` can be used to compress int/long for smaller size. Normally compressing int is enough.
+`ForyBuilder#withIntCompressed`/`ForyBuilder#withLongCompressed` 可用于压缩 int/long 以获得更小的大小。通常压缩 int 就足够了。
 
-Both compression options are enabled by default. If the serialized size is not important (for example, you use FlatBuffers for serialization before, which doesn't compress anything), then you should disable compression. If your data are all numbers, the compression may bring 80% performance regression.
+这两个压缩选项默认都是启用的。如果序列化大小不重要（例如，你之前使用 FlatBuffers 进行序列化，它不压缩任何东西），那么你应该禁用压缩。如果你的数据全是数字，压缩可能会带来 80% 的性能回退。
 
-### Int Compression
+### Int 压缩
 
-For int compression, Fory uses 1~5 bytes for encoding. The first bit in every byte indicates whether there is a next byte. If the first bit is set, then the next byte will be read until the first bit of the next byte is unset.
+对于 int 压缩，Fory 使用 1~5 个字节进行编码。每个字节中的第一位表示是否有下一个字节。如果设置了第一位，则将读取下一个字节，直到下一个字节的第一位未设置。
 
-### Long Compression
+### Long 压缩
 
-For long compression, Fory supports two encodings:
+对于 long 压缩，Fory 支持两种编码：
 
-#### SLI (Small Long as Int) Encoding (Default)
+#### SLI（Small Long as Int）编码（默认）
 
-- If long is in `[-1073741824, 1073741823]`, encode as 4 bytes int: `| little-endian: ((int) value) << 1 |`
-- Otherwise write as 9 bytes: `| 0b1 | little-endian 8bytes long |`
+- 如果 long 在 `[-1073741824, 1073741823]` 范围内，编码为 4 字节 int：`| little-endian: ((int) value) << 1 |`
+- 否则写为 9 字节：`| 0b1 | little-endian 8bytes long |`
 
-#### PVL (Progressive Variable-length Long) Encoding
+#### PVL（Progressive Variable-length Long）编码
 
-- First bit in every byte indicates whether there is a next byte. If first bit is set, then next byte will be read until first bit of next byte is unset.
-- Negative numbers will be converted to positive numbers by `(v << 1) ^ (v >> 63)` to reduce cost of small negative numbers.
+- 每个字节中的第一位表示是否有下一个字节。如果设置了第一位，则将读取下一个字节，直到下一个字节的第一位未设置。
+- 负数将通过 `(v << 1) ^ (v >> 63)` 转换为正数，以减少小负数的成本。
 
-If a number is of `long` type but can't be represented by smaller bytes mostly, the compression won't get good enough results—not worthy compared to performance cost. Maybe you should try to disable long compression if you find it didn't bring much space savings.
+如果数字是 `long` 类型，但大多数情况下不能用较小的字节表示，压缩不会得到足够好的结果——与性能成本相比不值得。如果你发现它没有带来太多空间节省，也许你应该尝试禁用 long 压缩。
 
-## Array Compression
+## 数组压缩
 
-Fory supports SIMD-accelerated compression for primitive arrays (`int[]` and `long[]`) when array values can fit in smaller data types. This feature is available on Java 16+ and uses the Vector API for optimal performance.
+当数组值可以适配较小的数据类型时，Fory 支持原始数组（`int[]` 和 `long[]`）的 SIMD 加速压缩。此功能在 Java 16+ 上可用，并使用 Vector API 以获得最佳性能。
 
-### How Array Compression Works
+### 数组压缩工作原理
 
-Array compression analyzes arrays to determine if values can be stored using fewer bytes:
+数组压缩分析数组以确定值是否可以使用更少的字节存储：
 
-- **`int[]` → `byte[]`**: When all values are in range [-128, 127] (75% size reduction)
-- **`int[]` → `short[]`**: When all values are in range [-32768, 32767] (50% size reduction)
-- **`long[]` → `int[]`**: When all values fit in integer range (50% size reduction)
+- **`int[]` → `byte[]`**：当所有值都在范围 [-128, 127] 内时（减少 75% 大小）
+- **`int[]` → `short[]`**：当所有值都在范围 [-32768, 32767] 内时（减少 50% 大小）
+- **`long[]` → `int[]`**：当所有值都适合整数范围时（减少 50% 大小）
 
-### Configuration and Registration
+### 配置和注册
 
-To enable array compression, you must explicitly register the serializers:
+要启用数组压缩，你必须显式注册序列化器：
 
 ```java
 Fory fory = Fory.builder()
   .withLanguage(Language.JAVA)
-  // Enable int array compression
+  // 启用 int 数组压缩
   .withIntArrayCompressed(true)
-  // Enable long array compression
+  // 启用 long 数组压缩
   .withLongArrayCompressed(true)
   .build();
 
-// You must explicitly register compressed array serializers
+// 你必须显式注册压缩数组序列化器
 CompressedArraySerializers.registerSerializers(fory);
 ```
 
-**Note**: The `fory-simd` module must be included in your dependencies for compressed array serializers to be available.
+**注意**：必须在依赖项中包含 `fory-simd` 模块，压缩数组序列化器才可用。
 
-### Maven Dependency
+### Maven 依赖
 
 ```xml
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-simd</artifactId>
-  <version>0.15.0</version>
+  <version>0.14.1</version>
 </dependency>
 ```
 
-## String Compression
+## 字符串压缩
 
-String compression can be enabled via `ForyBuilder#withStringCompressed(true)`. This is disabled by default.
+字符串压缩可以通过 `ForyBuilder#withStringCompressed(true)` 启用。这默认是禁用的。
 
-## Configuration Summary
+## 配置摘要
 
-| Option              | Description                                   | Default |
-| ------------------- | --------------------------------------------- | ------- |
-| `compressInt`       | Enable int compression                        | `true`  |
-| `compressLong`      | Enable long compression                       | `true`  |
-| `compressIntArray`  | Enable SIMD int array compression (Java 16+)  | `true`  |
-| `compressLongArray` | Enable SIMD long array compression (Java 16+) | `true`  |
-| `compressString`    | Enable string compression                     | `false` |
+| 选项                | 描述                                | 默认值  |
+| ------------------- | ----------------------------------- | ------- |
+| `compressInt`       | 启用 int 压缩                       | `true`  |
+| `compressLong`      | 启用 long 压缩                      | `true`  |
+| `compressIntArray`  | 启用 SIMD int 数组压缩（Java 16+）  | `true`  |
+| `compressLongArray` | 启用 SIMD long 数组压缩（Java 16+） | `true`  |
+| `compressString`    | 启用字符串压缩                      | `false` |
 
-## Performance Considerations
+## 性能考虑
 
-1. **Disable compression for numeric-heavy data**: If your data is mostly numbers, compression overhead may not be worth it
-2. **Array compression requires Java 16+**: Uses Vector API for SIMD acceleration
-3. **Long compression may not help large values**: If most longs can't fit in smaller representations, disable it
-4. **String compression has overhead**: Only enable if strings are highly compressible
+1. **对数字密集型数据禁用压缩**：如果你的数据主要是数字，压缩开销可能不值得
+2. **数组压缩需要 Java 16+**：使用 Vector API 进行 SIMD 加速
+3. **Long 压缩可能对大值无用**：如果大多数 long 不能适配较小的表示，请禁用它
+4. **字符串压缩有开销**：仅在字符串高度可压缩时启用
 
-## Example Configuration
+## 示例配置
 
 ```java
-// For mostly numeric data - disable compression
+// 对于主要是数字的数据 - 禁用压缩
 Fory fory = Fory.builder()
   .withLanguage(Language.JAVA)
   .withIntCompressed(false)
   .withLongCompressed(false)
   .build();
 
-// For mixed data with arrays - enable array compression
+// 对于包含数组的混合数据 - 启用数组压缩
 Fory fory = Fory.builder()
   .withLanguage(Language.JAVA)
   .withIntCompressed(true)
@@ -130,7 +130,7 @@ Fory fory = Fory.builder()
 CompressedArraySerializers.registerSerializers(fory);
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration Options](configuration.md) - All ForyBuilder options
-- [Advanced Features](advanced-features.md) - Memory management
+- [配置选项](configuration.md) - 所有 ForyBuilder 选项
+- [高级特性](advanced-features.md) - 内存管理

@@ -1,5 +1,5 @@
 ---
-title: Custom Serializers
+title: 自定义序列化器
 sidebar_position: 35
 id: custom_serializers
 license: |
@@ -19,16 +19,16 @@ license: |
   limitations under the License.
 ---
 
-Custom serializers allow you to define exactly how a type is serialized and deserialized. This is useful for types that require special handling, optimization, or cross-language compatibility.
+自定义序列化器允许你精确控制类型的序列化与反序列化过程。 This is useful for types that require special handling, optimization, or cross-language compatibility.
 
-## When to Use Custom Serializers
+## 何时使用自定义序列化器
 
 - **Special encoding**: Types that need a specific binary format
 - **Third-party types**: Types from external libraries that Fory doesn't handle automatically
 - **Optimization**: When you can serialize more efficiently than the default reflection-based approach
 - **Cross-language compatibility**: When you need precise control over the binary format for interoperability
 
-## ExtensionSerializer Interface
+## ExtensionSerializer 接口
 
 Custom serializers implement the `ExtensionSerializer` interface:
 
@@ -48,7 +48,7 @@ type ExtensionSerializer interface {
 }
 ```
 
-## Basic Example
+## 基础示例
 
 Here's a simple custom serializer for a type with an integer field:
 
@@ -79,7 +79,7 @@ f := fory.New()
 err := f.RegisterExtension(MyExt{}, 100, &MyExtSerializer{})
 ```
 
-## Context Methods
+## Context 方法
 
 The `WriteContext` and `ReadContext` provide access to serialization resources:
 
@@ -92,11 +92,11 @@ The `WriteContext` and `ReadContext` provide access to serialization resources:
 | `TypeResolver()` | Returns the type resolver for nested types     |
 | `RefResolver()`  | Returns the reference resolver for ref support |
 
-## ByteBuffer Methods
+## ByteBuffer 方法
 
 The `ByteBuffer` provides methods for reading and writing primitive types:
 
-### Writing Methods
+### 写入方法
 
 | Method                     | Description                                   |
 | -------------------------- | --------------------------------------------- |
@@ -111,7 +111,7 @@ The `ByteBuffer` provides methods for reading and writing primitive types:
 | `WriteVarint64(v int64)`   | Write a variable-length signed 64-bit integer |
 | `WriteBinary(data []byte)` | Write raw bytes                               |
 
-### Reading Methods
+### 读取方法
 
 All read methods take an `*Error` parameter for deferred error checking:
 
@@ -245,7 +245,7 @@ More flexible but more serialization cost, type name included in serialized data
 f.RegisterNamedExtension(MyType{}, "myapp.MyType", &MySerializer{})
 ```
 
-## Best Practices
+## 最佳实践
 
 1. **Keep it simple**: Only serialize what you need
 2. **Use variable-length integers**: `WriteVarint32`/`WriteVarint64` for integers that are often small
@@ -278,7 +278,7 @@ func TestMySerializer(t *testing.T) {
 }
 ```
 
-## Related Topics
+## 相关主题
 
 - [Type Registration](type-registration.md)
 - [Supported Types](supported-types.md)

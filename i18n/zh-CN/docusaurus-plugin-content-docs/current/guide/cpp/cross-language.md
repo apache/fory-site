@@ -1,6 +1,6 @@
 ---
-title: Cross-Language Serialization
-sidebar_position: 7
+title: 跨语言序列化
+sidebar_position: 6
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,13 +19,13 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to use Fory for cross-language serialization between C++ and other languages.
+本页介绍如何使用 Fory 在 C++ 和其他语言之间进行跨语言序列化。
 
-## Overview
+## 概述
 
-Apache Fory™ enables seamless data exchange between C++, Java, Python, Go, Rust, and JavaScript. The xlang (cross-language) mode ensures binary compatibility across all supported languages.
+Apache Fory™ 支持在 C++、Java、Python、Go、Rust 和 JavaScript 之间无缝交换数据。xlang（跨语言）模式确保所有支持语言之间的二进制兼容性。
 
-## Enabling Cross-Language Mode
+## 启用跨语言模式
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -33,13 +33,13 @@ Apache Fory™ enables seamless data exchange between C++, Java, Python, Go, Rus
 using namespace fory::serialization;
 
 auto fory = Fory::builder()
-    .xlang(true)  // Enable cross-language mode
+    .xlang(true)  // 启用跨语言模式
     .build();
 ```
 
-## Cross-Language Example
+## 跨语言示例
 
-### C++ Producer
+### C++ 生产者
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -74,7 +74,7 @@ int main() {
   auto result = fory.serialize(msg);
   if (result.ok()) {
     auto bytes = std::move(result).value();
-    // Write to file, send over network, etc.
+    // 写入文件、通过网络发送等
     std::ofstream file("message.bin", std::ios::binary);
     file.write(reinterpret_cast<const char*>(bytes.data()), bytes.size());
   }
@@ -82,7 +82,7 @@ int main() {
 }
 ```
 
-### Java Consumer
+### Java 消费者
 
 ```java
 import org.apache.fory.Fory;
@@ -100,7 +100,7 @@ public class Consumer {
         Fory fory = Fory.builder()
             .withLanguage(Language.XLANG)
             .build();
-        fory.register(Message.class, 100);  // Same ID as C++
+        fory.register(Message.class, 100);  // 与 C++ 相同的 ID
 
         byte[] bytes = Files.readAllBytes(Path.of("message.bin"));
         Message msg = (Message) fory.deserialize(bytes);
@@ -111,7 +111,7 @@ public class Consumer {
 }
 ```
 
-### Python Consumer
+### Python 消费者
 
 ```python
 import pyfory
@@ -123,7 +123,7 @@ class Message:
     payload: bytes
 
 fory = pyfory.Fory()
-fory.register(Message, type_id=100)  # Same ID as C++
+fory.register(Message, type_id=100)  # 与 C++ 相同的 ID
 
 with open("message.bin", "rb") as f:
     data = f.read()
@@ -133,11 +133,11 @@ print(f"Topic: {msg.topic}")
 print(f"Timestamp: {msg.timestamp}")
 ```
 
-## Type Mapping
+## 类型映射
 
-### Primitive Types
+### 基本类型
 
-| C++ Type  | Java Type | Python Type | Go Type   | Rust Type |
+| C++ 类型  | Java 类型 | Python 类型 | Go 类型   | Rust 类型 |
 | --------- | --------- | ----------- | --------- | --------- |
 | `bool`    | `boolean` | `bool`      | `bool`    | `bool`    |
 | `int8_t`  | `byte`    | `int`       | `int8`    | `i8`      |
@@ -147,50 +147,50 @@ print(f"Timestamp: {msg.timestamp}")
 | `float`   | `float`   | `float`     | `float32` | `f32`     |
 | `double`  | `double`  | `float`     | `float64` | `f64`     |
 
-### String Types
+### 字符串类型
 
-| C++ Type      | Java Type | Python Type | Go Type  | Rust Type |
+| C++ 类型      | Java 类型 | Python 类型 | Go 类型  | Rust 类型 |
 | ------------- | --------- | ----------- | -------- | --------- |
 | `std::string` | `String`  | `str`       | `string` | `String`  |
 
-### Collection Types
+### 集合类型
 
-| C++ Type         | Java Type  | Python Type | Go Type          |
+| C++ 类型         | Java 类型  | Python 类型 | Go 类型          |
 | ---------------- | ---------- | ----------- | ---------------- |
 | `std::vector<T>` | `List<T>`  | `list`      | `[]T`            |
 | `std::set<T>`    | `Set<T>`   | `set`       | `map[T]struct{}` |
 | `std::map<K,V>`  | `Map<K,V>` | `dict`      | `map[K]V`        |
 
-### Temporal Types
+### 时间类型
 
-| C++ Type    | Java Type   | Python Type     | Go Type         |
+| C++ 类型    | Java 类型   | Python 类型     | Go 类型         |
 | ----------- | ----------- | --------------- | --------------- |
 | `Timestamp` | `Instant`   | `datetime`      | `time.Time`     |
 | `Duration`  | `Duration`  | `timedelta`     | `time.Duration` |
 | `LocalDate` | `LocalDate` | `datetime.date` | `time.Time`     |
 
-## Field Order Requirements
+## 字段顺序要求
 
-**Critical:** Field will be sorted by their snake_cased field name, converted name must be considten across langauges
+**关键：** 字段将按照其 snake_cased 字段名排序，转换后的名称必须在各语言之间保持一致
 
 ### C++
 
 ```cpp
 struct Person {
-  std::string name;   // Field 0
-  int32_t age;        // Field 1
-  std::string email;  // Field 2
+  std::string name;   // 字段 0
+  int32_t age;        // 字段 1
+  std::string email;  // 字段 2
 };
-FORY_STRUCT(Person, name, age, email);  // Order matters!
+FORY_STRUCT(Person, name, age, email);  // 顺序很重要！
 ```
 
 ### Java
 
 ```java
 public class Person {
-    public String name;   // Field 0
-    public int age;       // Field 1
-    public String email;  // Field 2
+    public String name;   // 字段 0
+    public int age;       // 字段 1
+    public String email;  // 字段 2
 }
 ```
 
@@ -198,14 +198,14 @@ public class Person {
 
 ```python
 class Person:
-    name: str    # Field 0
-    age: int     # Field 1
-    email: str   # Field 2
+    name: str    # 字段 0
+    age: int     # 字段 1
+    email: str   # 字段 2
 ```
 
-## Type ID Consistency
+## 类型 ID 一致性
 
-All languages must use the same type IDs:
+所有语言必须使用相同的类型 ID：
 
 ```cpp
 // C++
@@ -228,44 +228,44 @@ fory.register(Address, type_id=101)
 fory.register(Order, type_id=102)
 ```
 
-## Compatible Mode
+## Compatible 模式
 
-For schema evolution across language boundaries:
+用于跨语言边界的 schema 演化：
 
 ```cpp
-// C++ with compatible mode
+// 使用 compatible 模式的 C++
 auto fory = Fory::builder()
     .xlang(true)
-    .compatible(true)  // Enable schema evolution
+    .compatible(true)  // 启用 schema 演化
     .build();
 ```
 
-Compatible mode allows:
+Compatible 模式允许：
 
-- Adding new fields (with defaults)
-- Removing unused fields
-- Reordering fields
+- 添加新字段（带默认值）
+- 删除未使用的字段
+- 重排字段顺序
 
-## Troubleshooting
+## 故障排查
 
-### Type Mismatch Errors
+### 类型不匹配错误
 
 ```
 Error: Type mismatch: expected 100, got 101
 ```
 
-**Solution:** Ensure type IDs match across all languages.
+**解决方案：** 确保类型 ID 在所有语言中匹配。
 
-### Encoding Errors
+### 编码错误
 
 ```
 Error: Invalid UTF-8 sequence
 ```
 
-**Solution:** Ensure strings are valid UTF-8 in all languages.
+**解决方案：** 确保所有语言中的字符串都是有效的 UTF-8。
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Builder options
-- [Type Registration](type-registration.md) - Registering types
-- [Supported Types](supported-types.md) - Type compatibility
+- [配置](configuration.md) - 构建器选项
+- [类型注册](type-registration.md) - 注册类型
+- [支持的类型](supported-types.md) - 类型兼容性

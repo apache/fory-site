@@ -1,12 +1,27 @@
 ---
 title: 开发指南
-sidebar_position: 8
+sidebar_position: 20
 id: development
+license: |
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 ---
 
-## 本地构建 Apache Fory™
+## 如何构建 Apache Fory™
 
-从 [Github 代码库](https://github.com/apache/fory) 拉取最新代码。
+请从 https://github.com/apache/fory 检出源代码树。
 
 ### 构建 Apache Fory™ Java
 
@@ -15,7 +30,7 @@ cd java
 mvn clean compile -DskipTests
 ```
 
-#### 本地环境要求
+#### 环境要求
 
 - java 1.8+
 - maven 3.6.3+
@@ -24,46 +39,49 @@ mvn clean compile -DskipTests
 
 ```bash
 cd python
-pip install pyarrow==14.0.0 Cython wheel numpy pytest
+# 首先卸载 numpy，以便在安装 pyarrow 时自动安装正确的 numpy 版本。
+# 对于 Python 版本低于 3.13，目前不支持 numpy 2。
+pip uninstall -y numpy
+# 为 Python < 3.13 安装必要的环境。
+pip install pyarrow Cython wheel pytest
+# pip install pyarrow Cython wheel pytest
 pip install -v -e .
 ```
 
-#### 本地环境要求
+#### 环境要求
 
 - python 3.6+
 
 ### 构建 Apache Fory™ C++
 
-Build fory row format：
+构建 fory 行格式：
 
 ```bash
-pip install pyarrow==14.0.0
 bazel build //cpp/fory/row:fory_row_format
 ```
 
-Build fory row format encoder:
+构建 fory 行格式编码器：
 
 ```bash
-pip install pyarrow==14.0.0
 bazel build //cpp/fory/encoder:fory_encoder
 ```
 
-#### 本地环境要求
+#### 环境要求
 
-- compilers with C++17 support
+- 支持 C++17 的编译器
 - bazel 6.3.2
 
 ### 构建 Apache Fory™ GoLang
 
 ```bash
 cd go/fory
-# run test
-go test -v
-# run xlang test
+# 运行测试
+go test -v ./...
+# 运行跨语言测试
 go test -v fory_xlang_test.go
 ```
 
-#### 本地环境要求
+#### 环境要求
 
 - go 1.13+
 
@@ -71,13 +89,21 @@ go test -v fory_xlang_test.go
 
 ```bash
 cd rust
-# build
+# 构建
 cargo build
-# run test
+# 运行测试
 cargo test
+# 运行特定测试
+cargo test -p tests  --test $test_file $test_method
+# 运行子目录下的特定测试
+cargo test --test mod $dir$::$test_file::$test_method
+# 调试子目录下的特定测试并获取回溯信息
+RUST_BACKTRACE=1 FORY_PANIC_ON_ERROR=1 cargo test --test mod $dir$::$test_file::$test_method
+# 检查 fory derive 宏生成的代码
+cargo expand --test mod $mod$::$file$ > expanded.rs
 ```
 
-#### 本地环境要求
+#### 环境要求
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -89,13 +115,32 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 cd javascript
 npm install
 
-# run build
+# 运行构建
 npm run build
-# run test
+# 运行测试
 npm run test
 ```
 
-#### 本地环境要求
+#### 环境要求
 
 - node 14+
 - npm 8+
+
+### Lint Markdown 文档
+
+```bash
+# 全局安装 prettier
+npm install -g prettier
+
+# 格式化 markdown 文件
+prettier --write "**/*.md"
+```
+
+#### 环境要求
+
+- node 14+
+- npm 8+
+
+## 贡献
+
+更多信息，请参考[如何贡献到 Apache Fory™](https://github.com/apache/fory/blob/main/CONTRIBUTING.md)。

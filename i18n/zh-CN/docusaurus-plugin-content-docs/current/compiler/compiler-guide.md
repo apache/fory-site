@@ -1,5 +1,5 @@
 ---
-title: Compiler Guide
+title: 编译器指南
 sidebar_position: 3
 id: compiler_guide
 license: |
@@ -19,26 +19,28 @@ license: |
   limitations under the License.
 ---
 
-This guide covers installation, usage, and integration of the Fory IDL compiler.
+> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
 
-## Installation
+本指南介绍 Fory IDL 编译器的安装、使用与集成。
 
-### From Source
+## 安装
+
+### 从源码安装
 
 ```bash
 cd compiler
 pip install -e .
 ```
 
-### Verify Installation
+### 验证安装
 
 ```bash
 foryc --help
 ```
 
-## Command Line Interface
+## 命令行接口
 
-### Basic Usage
+### 基本用法
 
 ```bash
 foryc [OPTIONS] FILES...
@@ -48,7 +50,7 @@ foryc [OPTIONS] FILES...
 foryc --scan-generated [OPTIONS]
 ```
 
-### Options
+### 选项
 
 Compile options:
 

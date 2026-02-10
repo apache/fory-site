@@ -1,5 +1,5 @@
 ---
-title: Basic Serialization
+title: 基础序列化
 sidebar_position: 2
 id: basic_serialization
 license: |
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-This page covers basic object graph serialization and supported types.
+本页涵盖基础对象图序列化和支持的类型。
 
-## Object Graph Serialization
+## 对象图序列化
 
-Apache Fory™ provides automatic serialization of complex object graphs, preserving the structure and relationships between objects. The `#[derive(ForyObject)]` macro generates efficient serialization code at compile time, eliminating runtime overhead.
+Apache Fory™ 提供复杂对象图的自动序列化，保留对象之间的结构和关系。`#[derive(ForyObject)]` 宏在编译时生成高效的序列化代码，消除运行时开销。
 
-**Key capabilities:**
+**核心功能：**
 
-- Nested struct serialization with arbitrary depth
-- Collection types (Vec, HashMap, HashSet, BTreeMap)
-- Optional fields with `Option<T>`
-- Automatic handling of primitive types and strings
-- Efficient binary encoding with variable-length integers
+- 任意深度的嵌套结构体序列化
+- 集合类型（Vec、HashMap、HashSet、BTreeMap）
+- 使用 `Option<T>` 的可选字段
+- 原始类型和字符串的自动处理
+- 使用变长整数的高效二进制编码
 
 ```rust
 use fory::{Fory, Error};
@@ -77,58 +77,58 @@ let decoded: Person = fory.deserialize(&bytes)?;
 assert_eq!(person, decoded);
 ```
 
-## Supported Types
+## 支持的类型
 
-### Primitive Types
+### 原始类型
 
-| Rust Type                 | Description     |
-| ------------------------- | --------------- |
-| `bool`                    | Boolean         |
-| `i8`, `i16`, `i32`, `i64` | Signed integers |
-| `f32`, `f64`              | Floating point  |
-| `String`                  | UTF-8 string    |
+| Rust 类型                 | 描述         |
+| ------------------------- | ------------ |
+| `bool`                    | 布尔值       |
+| `i8`, `i16`, `i32`, `i64` | 有符号整数   |
+| `f32`, `f64`              | 浮点数       |
+| `String`                  | UTF-8 字符串 |
 
-### Collections
+### 集合类型
 
-| Rust Type        | Description        |
-| ---------------- | ------------------ |
-| `Vec<T>`         | Dynamic array      |
-| `VecDeque<T>`    | Double-ended queue |
-| `LinkedList<T>`  | Doubly-linked list |
-| `HashMap<K, V>`  | Hash map           |
-| `BTreeMap<K, V>` | Ordered map        |
-| `HashSet<T>`     | Hash set           |
-| `BTreeSet<T>`    | Ordered set        |
-| `BinaryHeap<T>`  | Binary heap        |
-| `Option<T>`      | Optional value     |
+| Rust 类型        | 描述     |
+| ---------------- | -------- |
+| `Vec<T>`         | 动态数组 |
+| `VecDeque<T>`    | 双端队列 |
+| `LinkedList<T>`  | 双向链表 |
+| `HashMap<K, V>`  | 哈希映射 |
+| `BTreeMap<K, V>` | 有序映射 |
+| `HashSet<T>`     | 哈希集合 |
+| `BTreeSet<T>`    | 有序集合 |
+| `BinaryHeap<T>`  | 二叉堆   |
+| `Option<T>`      | 可选值   |
 
-### Smart Pointers
+### 智能指针
 
-| Rust Type    | Description                                          |
-| ------------ | ---------------------------------------------------- |
-| `Box<T>`     | Heap allocation                                      |
-| `Rc<T>`      | Reference counting (shared refs tracked)             |
-| `Arc<T>`     | Thread-safe reference counting (shared refs tracked) |
-| `RcWeak<T>`  | Weak reference to `Rc<T>` (breaks circular refs)     |
-| `ArcWeak<T>` | Weak reference to `Arc<T>` (breaks circular refs)    |
-| `RefCell<T>` | Interior mutability (runtime borrow checking)        |
-| `Mutex<T>`   | Thread-safe interior mutability                      |
+| Rust 类型    | 描述                                   |
+| ------------ | -------------------------------------- |
+| `Box<T>`     | 堆分配                                 |
+| `Rc<T>`      | 引用计数（跟踪共享引用）               |
+| `Arc<T>`     | 线程安全引用计数（跟踪共享引用）       |
+| `RcWeak<T>`  | 指向 `Rc<T>` 的弱引用（打破循环引用）  |
+| `ArcWeak<T>` | 指向 `Arc<T>` 的弱引用（打破循环引用） |
+| `RefCell<T>` | 内部可变性（运行时借用检查）           |
+| `Mutex<T>`   | 线程安全内部可变性                     |
 
-### Date and Time
+### 日期和时间
 
-| Rust Type               | Description                |
-| ----------------------- | -------------------------- |
-| `chrono::NaiveDate`     | Date without timezone      |
-| `chrono::NaiveDateTime` | Timestamp without timezone |
+| Rust 类型               | 描述             |
+| ----------------------- | ---------------- |
+| `chrono::NaiveDate`     | 不带时区的日期   |
+| `chrono::NaiveDateTime` | 不带时区的时间戳 |
 
-### Custom Types
+### 自定义类型
 
-| Macro                   | Description                |
-| ----------------------- | -------------------------- |
-| `#[derive(ForyObject)]` | Object graph serialization |
-| `#[derive(ForyRow)]`    | Row-based serialization    |
+| 宏                      | 描述         |
+| ----------------------- | ------------ |
+| `#[derive(ForyObject)]` | 对象图序列化 |
+| `#[derive(ForyRow)]`    | 行格式序列化 |
 
-## Serialization APIs
+## 序列化 API
 
 ```rust
 use fory::{Fory, Reader};
@@ -138,29 +138,29 @@ fory.register::<MyStruct>(1)?;
 
 let obj = MyStruct { /* ... */ };
 
-// Basic serialize/deserialize
+// 基础序列化/反序列化
 let bytes = fory.serialize(&obj)?;
 let decoded: MyStruct = fory.deserialize(&bytes)?;
 
-// Serialize to existing buffer
+// 序列化到现有缓冲区
 let mut buf: Vec<u8> = vec![];
 fory.serialize_to(&mut buf, &obj)?;
 
-// Deserialize from reader
+// 从 reader 反序列化
 let mut reader = Reader::new(&buf);
 let decoded: MyStruct = fory.deserialize_from(&mut reader)?;
 ```
 
-## Performance Tips
+## 性能优化建议
 
-- **Zero-Copy Deserialization**: Row format enables direct memory access without copying
-- **Buffer Pre-allocation**: Minimizes memory allocations during serialization
-- **Compact Encoding**: Variable-length encoding for space efficiency
-- **Little-Endian**: Optimized for modern CPU architectures
-- **Reference Deduplication**: Shared objects serialized only once
+- **零拷贝反序列化**：行格式支持直接内存访问而无需复制
+- **缓冲区预分配**：在序列化期间最小化内存分配
+- **紧凑编码**：变长编码以提高空间效率
+- **小端序**：为现代 CPU 架构优化
+- **引用去重**：共享对象仅序列化一次
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md) - Registering types
-- [References](references.md) - Shared and circular references
-- [Custom Serializers](custom-serializers.md) - Manual serialization
+- [类型注册](type-registration.md) - 注册类型
+- [引用](references.md) - 共享引用和循环引用
+- [自定义序列化器](custom-serializers.md) - 手动序列化

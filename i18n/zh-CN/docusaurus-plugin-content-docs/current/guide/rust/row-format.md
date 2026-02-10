@@ -1,5 +1,5 @@
 ---
-title: Row Format
+title: 行格式
 sidebar_position: 9
 id: row_format
 license: |
@@ -19,29 +19,29 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ provides a high-performance **row format** for zero-copy deserialization.
+Apache Fory™ 提供高性能的**行格式**以实现零拷贝反序列化。
 
-## Overview
+## 概述
 
-Unlike traditional object serialization that reconstructs entire objects in memory, row format enables **random access** to fields directly from binary data without full deserialization.
+与在内存中重构完整对象的传统对象序列化不同，行格式支持直接从二进制数据**随机访问**字段，无需完整反序列化。
 
-**Key benefits:**
+**主要优势：**
 
-- **Zero-copy access**: Read fields without allocating or copying data
-- **Partial deserialization**: Access only the fields you need
-- **Memory-mapped files**: Work with data larger than RAM
-- **Cache-friendly**: Sequential memory layout for better CPU cache utilization
-- **Lazy evaluation**: Defer expensive operations until field access
+- **零拷贝访问**：无需分配或复制数据即可读取字段
+- **部分反序列化**：仅访问所需的字段
+- **内存映射文件**：处理大于 RAM 的数据
+- **缓存友好**：顺序内存布局以提高 CPU 缓存利用率
+- **延迟计算**：将昂贵的操作延迟到字段访问时
 
-## When to Use Row Format
+## 何时使用行格式
 
-- Analytics workloads with selective field access
-- Large datasets where only a subset of fields is needed
-- Memory-constrained environments
-- High-throughput data pipelines
-- Reading from memory-mapped files or shared memory
+- 具有选择性字段访问的分析工作负载
+- 仅需要字段子集的大型数据集
+- 内存受限环境
+- 高吞吐量数据管道
+- 从内存映射文件或共享内存读取
 
-## Basic Usage
+## 基础用法
 
 ```rust
 use fory::{to_row, from_row};
@@ -70,19 +70,19 @@ let profile = UserProfile {
     is_active: true,
 };
 
-// Serialize to row format
+// 序列化为行格式
 let row_data = to_row(&profile);
 
-// Zero-copy deserialization - no object allocation!
+// 零拷贝反序列化 - 无对象分配！
 let row = from_row::<UserProfile>(&row_data);
 
-// Access fields directly from binary data
+// 直接从二进制数据访问字段
 assert_eq!(row.id(), 12345);
 assert_eq!(row.username(), "alice");
 assert_eq!(row.email(), "alice@example.com");
 assert_eq!(row.is_active(), true);
 
-// Access collections efficiently
+// 高效访问集合
 let scores = row.scores();
 assert_eq!(scores.size(), 4);
 assert_eq!(scores.get(0), 95);
@@ -94,33 +94,33 @@ assert_eq!(prefs.keys().get(0), "language");
 assert_eq!(prefs.values().get(0), "en");
 ```
 
-## How It Works
+## 工作原理
 
-- Fields are encoded in a binary row with fixed offsets for primitives
-- Variable-length data (strings, collections) stored with offset pointers
-- Null bitmap tracks which fields are present
-- Nested structures supported through recursive row encoding
+- 字段在二进制行中编码，原始类型使用固定偏移量
+- 变长数据（字符串、集合）使用偏移指针存储
+- Null 位图跟踪哪些字段存在
+- 通过递归行编码支持嵌套结构
 
-## Performance Comparison
+## 性能比较
 
-| Operation            | Object Format                 | Row Format                      |
-| -------------------- | ----------------------------- | ------------------------------- |
-| Full deserialization | Allocates all objects         | Zero allocation                 |
-| Single field access  | Full deserialization required | Direct offset read              |
-| Memory usage         | Full object graph in memory   | Only accessed fields in memory  |
-| Suitable for         | Small objects, full access    | Large objects, selective access |
+| 操作         | 对象格式           | 行格式               |
+| ------------ | ------------------ | -------------------- |
+| 完整反序列化 | 分配所有对象       | 零分配               |
+| 单字段访问   | 需要完整反序列化   | 直接偏移读取         |
+| 内存使用     | 内存中的完整对象图 | 仅已访问字段在内存中 |
+| 适用于       | 小对象，完整访问   | 大对象，选择性访问   |
 
 ## ForyRow vs ForyObject
 
-| Feature         | `#[derive(ForyRow)]`  | `#[derive(ForyObject)]`    |
-| --------------- | --------------------- | -------------------------- |
-| Deserialization | Zero-copy, lazy       | Full object reconstruction |
-| Field access    | Direct from binary    | Normal struct access       |
-| Memory usage    | Minimal               | Full object                |
-| Best for        | Analytics, large data | General serialization      |
+| 功能     | `#[derive(ForyRow)]` | `#[derive(ForyObject)]` |
+| -------- | -------------------- | ----------------------- |
+| 反序列化 | 零拷贝，延迟         | 完整对象重构            |
+| 字段访问 | 直接从二进制         | 正常结构体访问          |
+| 内存使用 | 最小                 | 完整对象                |
+| 最适合   | 分析，大数据         | 通用序列化              |
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Object graph serialization
-- [Cross-Language](cross-language.md) - Row format across languages
-- [Row Format Specification](https://fory.apache.org/docs/specification/row_format_spec) - Protocol details
+- [基础序列化](basic-serialization.md) - 对象图序列化
+- [跨语言](cross-language.md) - 跨语言的行格式
+- [行格式规范](https://fory.apache.org/docs/specification/row_format_spec) - 协议细节

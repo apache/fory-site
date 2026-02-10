@@ -1,5 +1,5 @@
 ---
-title: Type Registration & Security
+title: 类型注册与安全性
 sidebar_position: 3
 id: type_registration
 license: |
@@ -19,62 +19,62 @@ license: |
   limitations under the License.
 ---
 
-This page covers type registration mechanisms and security configurations.
+本页介绍类型注册机制和安全配置。
 
-## Type Registration
+## 类型注册
 
-In strict mode, only registered types can be deserialized. This prevents arbitrary code execution:
+在严格模式下，只有已注册的类型才能被反序列化。这可以防止任意代码执行：
 
 ```python
 import pyfory
 
-# Strict mode (recommended for production)
+# 严格模式（生产环境推荐）
 f = pyfory.Fory(strict=True)
 
 class SafeClass:
     def __init__(self, data):
         self.data = data
 
-# Must register types in strict mode
+# 在严格模式下必须注册类型
 f.register(SafeClass, typename="com.example.SafeClass")
 
-# Now serialization works
+# 现在序列化可以正常工作
 obj = SafeClass("safe data")
 data = f.serialize(obj)
 result = f.deserialize(data)
 
-# Unregistered types will raise an exception
+# 未注册的类型将引发异常
 class UnsafeClass:
     pass
 
-# This will fail in strict mode
+# 在严格模式下这将失败
 try:
     f.serialize(UnsafeClass())
 except Exception as e:
-    print("Security protection activated!")
+    print("安全保护已激活！")
 ```
 
-## Registration Patterns
+## 注册模式
 
-### Pattern 1: Simple Registration
+### 模式 1：简单注册
 
 ```python
 fory.register(MyClass, type_id=100)
 ```
 
-### Pattern 2: Cross-Language with Typename
+### 模式 2：使用类型名称的跨语言注册
 
 ```python
 fory.register(MyClass, typename="com.example.MyClass")
 ```
 
-### Pattern 3: With Custom Serializer
+### 模式 3：使用自定义序列化器
 
 ```python
 fory.register(MyClass, type_id=100, serializer=MySerializer(fory, MyClass))
 ```
 
-### Pattern 4: Batch Registration
+### 模式 4：批量注册
 
 ```python
 type_id = 100
@@ -83,64 +83,64 @@ for model_class in [User, Order, Product, Invoice]:
     type_id += 1
 ```
 
-## Security Modes
+## 安全模式
 
-### Strict Mode (Recommended)
+### 严格模式（推荐）
 
 ```python
-# Always use strict=True in production
+# 生产环境始终使用 strict=True
 fory = pyfory.Fory(strict=True)
 
-# Explicitly register allowed types
+# 显式注册允许的类型
 fory.register(UserModel, type_id=100)
 fory.register(OrderModel, type_id=101)
 ```
 
-### Non-Strict Mode
+### 非严格模式
 
-**⚠️ Security Warning**: When `strict=False`, Fory will deserialize arbitrary types, which can pose security risks if data comes from untrusted sources. Only use `strict=False` in controlled environments where you trust the data source completely.
+**⚠️ 安全警告**：当 `strict=False` 时，Fory 将反序列化任意类型，如果数据来自不受信任的源，这可能带来安全风险。仅在完全信任数据源的受控环境中使用 `strict=False`。
 
 ```python
-# Only in trusted environments
+# 仅在受信任的环境中
 fory = pyfory.Fory(xlang=False, ref=True, strict=False)
 ```
 
-If you do need to use `strict=False`, configure a `DeserializationPolicy`:
+如果确实需要使用 `strict=False`，请配置 `DeserializationPolicy`：
 
 ```python
 from pyfory import DeserializationPolicy
 
 class SafePolicy(DeserializationPolicy):
     def validate_class(self, cls, is_local, **kwargs):
-        # Block dangerous modules
+        # 阻止危险模块
         if cls.__module__ in {'subprocess', 'os', '__builtin__'}:
-            raise ValueError(f"Blocked: {cls}")
+            raise ValueError(f"已阻止：{cls}")
         return None
 
 fory = pyfory.Fory(xlang=False, strict=False, policy=SafePolicy())
 ```
 
-## Max Depth Protection
+## 最大深度保护
 
-Limit deserialization depth to prevent stack overflow attacks:
+限制反序列化深度以防止栈溢出攻击：
 
 ```python
 fory = pyfory.Fory(
     strict=True,
-    max_depth=100  # Adjust based on your data structure depth
+    max_depth=100  # 根据数据结构深度调整
 )
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Always use `strict=True` in production**
-2. **Use `type_id` for performance**, `typename` for flexibility
-3. **Register all types upfront** before any serialization
-4. **Set appropriate `max_depth`** based on your data structures
-5. **Use `DeserializationPolicy`** when `strict=False` is necessary
+1. **生产环境始终使用 `strict=True`**
+2. **使用 `type_id` 提高性能**，使用 `typename` 提高灵活性
+3. **在任何序列化之前预先注册所有类型**
+4. **根据数据结构设置适当的 `max_depth`**
+5. **必要时使用 `DeserializationPolicy`** 当需要 `strict=False` 时
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Fory parameters
-- [Security](security.md) - DeserializationPolicy details
-- [Custom Serializers](custom-serializers.md) - Custom serialization
+- [配置](configuration.md) - Fory 参数
+- [安全性](security.md) - DeserializationPolicy 详情
+- [自定义序列化器](custom-serializers.md) - 自定义序列化

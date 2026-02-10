@@ -1,6 +1,6 @@
 ---
-title: Troubleshooting
-sidebar_position: 70
+title: 故障排查
+sidebar_position: 6
 id: xlang_troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,23 +19,23 @@ license: |
   limitations under the License.
 ---
 
-This page covers common issues and solutions when using cross-language serialization.
+本页涵盖了使用跨语言序列化时的常见问题和解决方案。
 
-## Type Registration Errors
+## 类型注册错误
 
-### "Type not registered" Error
+### "类型未注册"错误
 
-**Symptom:**
+**症状：**
 
 ```
 Error: Type 'example.Person' is not registered
 ```
 
-**Cause:** The type was not registered before deserialization, or the type name doesn't match.
+**原因：** 在反序列化之前未注册类型，或类型名称不匹配。
 
-**Solution:**
+**解决方案：**
 
-1. Ensure the type is registered with the same name on both sides:
+1. 确保类型在双方使用相同的名称注册：
 
    ```java
    // Java
@@ -47,21 +47,21 @@ Error: Type 'example.Person' is not registered
    fory.register_type(Person, typename="example.Person")
    ```
 
-2. Check for typos or case differences in type names
+2. 检查类型名称中的拼写错误或大小写差异
 
-3. Register types before any serialization/deserialization calls
+3. 在任何序列化/反序列化调用之前注册类型
 
-### "Type ID mismatch" Error
+### "类型 ID 不匹配"错误
 
-**Symptom:**
+**症状：**
 
 ```
 Error: Expected type ID 100, got 101
 ```
 
-**Cause:** Different type IDs used across languages.
+**原因：** 跨语言使用了不同的类型 ID。
 
-**Solution:** Use consistent type IDs:
+**解决方案：** 使用一致的类型 ID：
 
 ```java
 // Java
@@ -75,78 +75,78 @@ fory.register_type(Person, type_id=100)
 fory.register_type(Address, type_id=101)
 ```
 
-## Type Mapping Issues
+## 类型映射问题
 
-### Integer Overflow
+### 整数溢出
 
-**Symptom:** Values are truncated or wrapped unexpectedly.
+**症状：** 值被截断或意外包装。
 
-**Cause:** Using different integer sizes across languages.
+**原因：** 跨语言使用了不同的整数大小。
 
-**Solution:**
+**解决方案：**
 
-1. In Python, use explicit type annotations:
-
-   ```python
-   @dataclass
-   class Data:
-       value: pyfory.Int32Type  # Not just 'int'
-   ```
-
-2. Ensure integer ranges are compatible:
-   - `int8`: -128 to 127
-   - `int16`: -32,768 to 32,767
-   - `int32`: -2,147,483,648 to 2,147,483,647
-
-### Float Precision Loss
-
-**Symptom:** Float values have unexpected precision.
-
-**Cause:** Mixing `float32` and `float64` types.
-
-**Solution:**
-
-1. Use consistent float types:
+1. 在 Python 中，使用显式类型注解：
 
    ```python
    @dataclass
    class Data:
-       value: pyfory.Float32Type  # Explicit 32-bit float
+       value: pyfory.Int32Type  # 而不仅仅是 'int'
    ```
 
-2. Be aware that Python's `float` maps to `float64` by default
+2. 确保整数范围兼容：
+   - `int8`：-128 到 127
+   - `int16`：-32,768 到 32,767
+   - `int32`：-2,147,483,648 到 2,147,483,647
 
-### String Encoding Errors
+### 浮点精度损失
 
-**Symptom:**
+**症状：** 浮点值的精度出乎意料。
+
+**原因：** 混合使用 `float32` 和 `float64` 类型。
+
+**解决方案：**
+
+1. 使用一致的浮点类型：
+
+   ```python
+   @dataclass
+   class Data:
+       value: pyfory.Float32Type  # 显式 32 位浮点数
+   ```
+
+2. 请注意，Python 的 `float` 默认映射到 `float64`
+
+### 字符串编码错误
+
+**症状：**
 
 ```
 Error: Invalid UTF-8 sequence
 ```
 
-**Cause:** Non-UTF-8 encoded strings.
+**原因：** 非 UTF-8 编码的字符串。
 
-**Solution:**
+**解决方案：**
 
-1. Ensure all strings are valid UTF-8
-2. In Python, decode bytes before serialization:
+1. 确保所有字符串都是有效的 UTF-8
+2. 在 Python 中，在序列化之前解码字节：
 
    ```python
    text = raw_bytes.decode('utf-8')
    ```
 
-## Field Order Issues
+## 字段顺序问题
 
-### "Field mismatch" Error
+### "字段不匹配"错误
 
-**Symptom:** Deserialized objects have wrong field values.
+**症状：** 反序列化的对象具有错误的字段值。
 
-**Cause:** Field order differs between languages.
+**原因：** 语言之间的字段顺序不同。
 
-**Solution:** Fory sorts fields by their snake_cased names. Ensure field names are consistent:
+**解决方案：** Fory 按字段的 snake_cased 名称对字段进行排序。确保字段名称一致：
 
 ```java
-// Java - fields will be sorted: age, email, name
+// Java - 字段将按以下顺序排序：age、email、name
 public class Person {
     public String name;
     public int age;
@@ -155,7 +155,7 @@ public class Person {
 ```
 
 ```python
-# Python - same field order
+# Python - 相同的字段顺序
 @dataclass
 class Person:
     name: str
@@ -163,19 +163,19 @@ class Person:
     email: str
 ```
 
-## Reference Tracking Issues
+## 引用跟踪问题
 
-### Stack Overflow with Circular References
+### 循环引用导致栈溢出
 
-**Symptom:**
+**症状：**
 
 ```
-StackOverflowError or RecursionError
+StackOverflowError 或 RecursionError
 ```
 
-**Cause:** Reference tracking is disabled but data has circular references.
+**原因：** 引用跟踪被禁用，但数据具有循环引用。
 
-**Solution:** Enable reference tracking:
+**解决方案：** 启用引用跟踪：
 
 ```java
 // Java
@@ -190,102 +190,102 @@ Fory fory = Fory.builder()
 fory = pyfory.Fory(ref_tracking=True)
 ```
 
-### Duplicate Objects
+### 重复对象
 
-**Symptom:** Shared objects are duplicated after deserialization.
+**症状：** 共享对象在反序列化后被重复。
 
-**Cause:** Reference tracking is disabled.
+**原因：** 引用跟踪被禁用。
 
-**Solution:** Enable reference tracking if objects are shared within the graph.
+**解决方案：** 如果对象在图中共享，请启用引用跟踪。
 
-## Language Mode Issues
+## 语言模式问题
 
-### "Invalid magic number" Error
+### "无效的魔术数字"错误
 
-**Symptom:**
+**症状：**
 
 ```
 Error: Invalid magic number in header
 ```
 
-**Cause:** One side is using Java-native mode instead of xlang mode.
+**原因：** 一方使用 Java 原生模式而不是 xlang 模式。
 
-**Solution:** Ensure both sides use xlang mode:
+**解决方案：** 确保双方都使用 xlang 模式：
 
 ```java
-// Java - must use Language.XLANG
+// Java - 必须使用 Language.XLANG
 Fory fory = Fory.builder()
     .withLanguage(Language.XLANG)
     .build();
 ```
 
-### Incompatible Types in Xlang Mode
+### Xlang 模式中的不兼容类型
 
-**Symptom:**
+**症状：**
 
 ```
 Error: Type 'Optional' is not supported in xlang mode
 ```
 
-**Cause:** Using Java-specific types that don't have cross-language equivalents.
+**原因：** 使用了没有跨语言等效项的 Java 特定类型。
 
-**Solution:** Use compatible types:
+**解决方案：** 使用兼容的类型：
 
 ```java
-// Instead of Optional<String>
+// 而不是 Optional<String>
 public String email;  // nullable
 
-// Instead of BigDecimal
+// 而不是 BigDecimal
 public double amount;
 
-// Instead of EnumSet<Status>
+// 而不是 EnumSet<Status>
 public Set<Status> statuses;
 ```
 
-## Version Compatibility
+## 版本兼容性
 
-### Serialization Format Changed
+### 序列化格式已更改
 
-**Symptom:** Deserialization fails after upgrading Fory.
+**症状：** 升级 Fory 后反序列化失败。
 
-**Cause:** Breaking changes in serialization format.
+**原因：** 序列化格式中的破坏性更改。
 
-**Solution:**
+**解决方案：**
 
-1. Ensure all services use compatible Fory versions
-2. Check release notes for breaking changes
-3. Consider using schema evolution (compatible mode) for gradual upgrades
+1. 确保所有服务使用兼容的 Fory 版本
+2. 检查发布说明中的破坏性更改
+3. 考虑使用 schema 演化（compatible 模式）进行渐进式升级
 
-## Debugging Tips
+## 调试技巧
 
-### Enable Debug Logging
+### 启用调试日志
 
-**Java:**
+**Java：**
 
 ```java
-// Add to JVM options
+// 添加到 JVM 选项
 -Dfory.debug=true
 ```
 
-**Python:**
+**Python：**
 
 ```python
 import logging
 logging.getLogger('pyfory').setLevel(logging.DEBUG)
 ```
 
-### Inspect Serialized Data
+### 检查序列化数据
 
-Use hex dump to inspect the binary format:
+使用十六进制转储检查二进制格式：
 
 ```python
 data = fory.serialize(obj)
 print(data.hex())
 ```
 
-### Test Round-Trip
+### 测试往返
 
-Always test round-trip serialization in each language:
+始终在每种语言中测试往返序列化：
 
 ```java
 byte[] bytes = fory.serialize(obj);
@@ -293,29 +293,29 @@ Object result = fory.deserialize(bytes);
 assert obj.equals(result);
 ```
 
-### Cross-Language Testing
+### 跨语言测试
 
-Test serialization across all target languages before deployment:
+在部署之前测试所有目标语言的序列化：
 
 ```bash
-# Serialize in Java
+# 在 Java 中序列化
 java -jar serializer.jar > data.bin
 
-# Deserialize in Python
+# 在 Python 中反序列化
 python deserializer.py data.bin
 ```
 
-## Common Mistakes
+## 常见错误
 
-1. **Not registering types**: Always register custom types before use
-2. **Inconsistent type names/IDs**: Use the same names/IDs across all languages
-3. **Forgetting xlang mode**: Use `Language.XLANG` in Java
-4. **Wrong type annotations**: Use `pyfory.Int32Type` etc. in Python
-5. **Ignoring reference tracking**: Enable for circular/shared references
+1. **未注册类型**：始终在使用前注册自定义类型
+2. **类型名称/ID 不一致**：在所有语言中使用相同的名称/ID
+3. **忘记 xlang 模式**：在 Java 中使用 `Language.XLANG`
+4. **错误的类型注解**：在 Python 中使用 `pyfory.Int32Type` 等
+5. **忽略引用跟踪**：为循环/共享引用启用
 
-## See Also
+## 另请参阅
 
-- [Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping) - Cross-language type mapping reference
-- [Getting Started](getting-started.md) - Setup guide
-- [Java Troubleshooting](../java/troubleshooting.md) - Java-specific issues
-- [Python Troubleshooting](../python/troubleshooting.md) - Python-specific issues
+- [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping) - 跨语言类型映射参考
+- [入门指南](getting-started.md) - 设置指南
+- [Java 故障排查](../java/troubleshooting.md) - Java 特定问题
+- [Python 故障排查](../python/troubleshooting.md) - Python 特定问题

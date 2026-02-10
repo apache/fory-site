@@ -1,5 +1,5 @@
 ---
-title: Polymorphic Serialization
+title: 多态序列化
 sidebar_position: 5
 id: polymorphism
 license: |
@@ -19,16 +19,16 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ supports polymorphic serialization through smart pointers (`std::shared_ptr` and `std::unique_ptr`), enabling dynamic dispatch and type flexibility for inheritance hierarchies.
+Apache Fory™ 通过智能指针（`std::shared_ptr` 与 `std::unique_ptr`）支持多态序列化，为继承体系提供动态分派与类型灵活性。
 
-## Supported Polymorphic Types
+## 支持的多态类型
 
 - `std::shared_ptr<Base>` - Shared ownership with polymorphic dispatch
 - `std::unique_ptr<Base>` - Exclusive ownership with polymorphic dispatch
 - Collections: `std::vector<std::shared_ptr<Base>>`, `std::map<K, std::unique_ptr<Base>>`
 - Optional: `std::optional<std::shared_ptr<Base>>`
 
-## Basic Polymorphic Serialization
+## 基础多态序列化
 
 ```cpp
 #include "fory/serialization/fory.h"

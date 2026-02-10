@@ -1,5 +1,5 @@
 ---
-title: Overview
+title: 概览
 sidebar_position: 1
 id: index
 license: |
@@ -19,11 +19,13 @@ license: |
   limitations under the License.
 ---
 
+> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
+
 Fory IDL is a schema definition language for Apache Fory that enables type-safe
 cross-language serialization. Define your data structures once and generate
 native data structure code for Java, Python, Go, Rust, and C++.
 
-## Example Schema
+## 示例 Schema
 
 Fory IDL provides a simple, intuitive syntax for defining cross-language data structures:
 
