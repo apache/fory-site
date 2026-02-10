@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[66973],{96964:(e,s,t)=>{t.r(s),t.d(s,{default:()=>r});var u=t(67294),f=t(16550);function r(){const e=(0,f.k6)();return(0,u.useEffect)((()=>{e.replace("/")}),[e]),null}}}]);

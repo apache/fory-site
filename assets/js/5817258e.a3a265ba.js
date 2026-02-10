@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[5061],{18422:s=>{s.exports=JSON.parse('{"label":"serialization","permalink":"/blog/tags/serialization","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
