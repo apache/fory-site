@@ -19,9 +19,7 @@ license: |
   limitations under the License.
 ---
 
-> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
-
-本指南介绍 Fory IDL 编译器的安装、使用与集成。
+本指南介绍 Fory IDL 编译器的安装、命令行使用方式以及构建系统集成方案。
 
 ## 安装
 
@@ -52,155 +50,153 @@ foryc --scan-generated [OPTIONS]
 
 ### 选项
 
-Compile options:
+编译选项：
 
-| Option                                | Description                                           | Default             |
-| ------------------------------------- | ----------------------------------------------------- | ------------------- |
-| `--lang`                              | Comma-separated target languages                      | `all`               |
-| `--output`, `-o`                      | Output directory                                      | `./generated`       |
-| `--package`                           | Override package name from Fory IDL file              | (from file)         |
-| `-I`, `--proto_path`, `--import_path` | Add directory to import search path (can be repeated) | (none)              |
-| `--java_out=DST_DIR`                  | Generate Java code in DST_DIR                         | (none)              |
-| `--python_out=DST_DIR`                | Generate Python code in DST_DIR                       | (none)              |
-| `--cpp_out=DST_DIR`                   | Generate C++ code in DST_DIR                          | (none)              |
-| `--go_out=DST_DIR`                    | Generate Go code in DST_DIR                           | (none)              |
-| `--rust_out=DST_DIR`                  | Generate Rust code in DST_DIR                         | (none)              |
-| `--go_nested_type_style`              | Go nested type naming: `camelcase` or `underscore`    | from schema/default |
-| `--emit-fdl`                          | Print translated Fory IDL for non-`.fdl` inputs       | `false`             |
-| `--emit-fdl-path`                     | Write translated Fory IDL to a file or directory      | (stdout)            |
+| 选项                                  | 说明                                              | 默认值              |
+| ------------------------------------- | ------------------------------------------------- | ------------------- |
+| `--lang`                              | 目标语言列表（逗号分隔）                          | `all`               |
+| `--output`, `-o`                      | 输出目录                                          | `./generated`       |
+| `--package`                           | 覆盖 Fory IDL 文件中的 package                    | （来自文件）        |
+| `-I`, `--proto_path`, `--import_path` | 添加 import 搜索路径（可重复）                    | （无）              |
+| `--java_out=DST_DIR`                  | 将 Java 代码输出到 `DST_DIR`                      | （无）              |
+| `--python_out=DST_DIR`                | 将 Python 代码输出到 `DST_DIR`                    | （无）              |
+| `--cpp_out=DST_DIR`                   | 将 C++ 代码输出到 `DST_DIR`                       | （无）              |
+| `--go_out=DST_DIR`                    | 将 Go 代码输出到 `DST_DIR`                        | （无）              |
+| `--rust_out=DST_DIR`                  | 将 Rust 代码输出到 `DST_DIR`                      | （无）              |
+| `--go_nested_type_style`              | Go 嵌套类型命名风格：`camelcase` 或 `underscore` | schema/默认值       |
+| `--emit-fdl`                          | 对非 `.fdl` 输入打印转换后的 Fory IDL             | `false`             |
+| `--emit-fdl-path`                     | 将转换后的 Fory IDL 写入文件或目录                | （stdout）          |
 
-Scan options (with `--scan-generated`):
+扫描选项（配合 `--scan-generated`）：
 
-| Option       | Description                    | Default |
-| ------------ | ------------------------------ | ------- |
-| `--root`     | Root directory to scan         | `.`     |
-| `--relative` | Print paths relative to root   | `false` |
-| `--delete`   | Delete matched generated files | `false` |
-| `--dry-run`  | Scan/print only, do not delete | `false` |
+| 选项         | 说明                     | 默认值  |
+| ------------ | ------------------------ | ------- |
+| `--root`     | 扫描根目录               | `.`     |
+| `--relative` | 以相对路径输出           | `false` |
+| `--delete`   | 删除匹配到的生成文件     | `false` |
+| `--dry-run`  | 仅扫描输出，不执行删除   | `false` |
 
-### Scan Generated Files
+### 扫描生成文件
 
-Use `--scan-generated` to find files produced by `foryc`. The scanner walks
-the tree recursively, skips `build/`, `target/`, and hidden directories, and prints
-each generated file as it is found.
+使用 `--scan-generated` 可以定位 `foryc` 生成的文件。扫描器会递归遍历目录树，跳过 `build/`、`target/` 和隐藏目录，并输出找到的每个生成文件。
 
 ```bash
-# Scan current directory
+# 扫描当前目录
 foryc --scan-generated
 
-# Scan a specific root
+# 扫描指定根目录
 foryc --scan-generated --root ./src
 
-# Print paths relative to the scan root
+# 输出相对路径
 foryc --scan-generated --root ./src --relative
 
-# Delete scanned generated files
+# 删除扫描到的生成文件
 foryc --scan-generated --root ./src --delete
 
-# Dry-run (scan and print only)
+# Dry-run（仅扫描与输出）
 foryc --scan-generated --root ./src --dry-run
 ```
 
-### Examples
+### 示例
 
-**Compile for all languages:**
+**为所有语言编译：**
 
 ```bash
 foryc schema.fdl
 ```
 
-**Compile for specific languages:**
+**为指定语言编译：**
 
 ```bash
 foryc schema.fdl --lang java,python
 ```
 
-**Specify output directory:**
+**指定输出目录：**
 
 ```bash
 foryc schema.fdl --output ./src/generated
 ```
 
-**Override package name:**
+**覆盖 package：**
 
 ```bash
 foryc schema.fdl --package com.myapp.models
 ```
 
-**Compile multiple files:**
+**编译多个文件：**
 
 ```bash
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**Use import search paths:**
+**使用 import 搜索路径：**
 
 ```bash
-# Add a single import path
+# 单个路径
 foryc src/main.fdl -I libs/common
 
-# Add multiple import paths (repeated option)
+# 多个路径（重复参数）
 foryc src/main.fdl -I libs/common -I libs/types
 
-# Add multiple import paths (comma-separated)
+# 多个路径（逗号分隔）
 foryc src/main.fdl -I libs/common,libs/types,third_party/
 
-# Using --proto_path (protoc-compatible alias)
+# --proto_path（protoc 兼容别名）
 foryc src/main.fdl --proto_path=libs/common
 
-# Mix all styles
+# 混合写法
 foryc src/main.fdl -I libs/common,libs/types --proto_path third_party/
 ```
 
-**Language-specific output directories (protoc-style):**
+**语言定向输出目录（protoc 风格）：**
 
 ```bash
-# Generate only Java code to a specific directory
+# 仅生成 Java
 foryc schema.fdl --java_out=./src/main/java
 
-# Generate multiple languages to different directories
+# 多语言分别输出到不同目录
 foryc schema.fdl --java_out=./java/gen --python_out=./python/src --go_out=./go/gen
 
-# Combine with import paths
+# 结合 import 路径
 foryc schema.fdl --java_out=./gen/java -I proto/ -I common/
 ```
 
-When using `--{lang}_out` options:
+使用 `--{lang}_out` 时：
 
-- Only the specified languages are generated (not all languages)
-- The compiler writes under the specified directory (language-specific generators may still create package/module subdirectories)
-- This is compatible with protoc-style workflows
+- 只生成显式指定的语言（不会生成全部语言）
+- 输出写入指定目录（语言生成器可能继续按包/模块分层）
+- 兼容 protoc 风格工作流
 
-**Inspect translated Fory IDL from proto/fbs input:**
+**查看 proto/fbs 输入转换后的 Fory IDL：**
 
 ```bash
-# Print translated Fory IDL to stdout
+# 输出到 stdout
 foryc schema.proto --emit-fdl
 
-# Write translated Fory IDL to a directory
+# 输出到目录
 foryc schema.fbs --emit-fdl --emit-fdl-path ./translated
 ```
 
-## Import Path Resolution
+## Import 路径解析
 
-When compiling Fory IDL files with imports, the compiler searches for imported files in this order:
+编译含 import 的 Fory IDL 文件时，导入文件按以下顺序查找：
 
-1. **Relative to the importing file (default)** - The directory containing the file with the import statement is always searched first, automatically. No `-I` flag needed for same-directory imports.
-2. **Each `-I` path in order** - Additional search paths specified on the command line
+1. **相对于导入者文件目录（默认）**：始终优先查找，无需 `-I`
+2. **按顺序遍历每个 `-I` 路径**
 
-**Same-directory imports work automatically:**
+**同目录 import 可直接生效：**
 
 ```protobuf
 // main.fdl
-import "common.fdl";  // Found if common.fdl is in the same directory
+import "common.fdl";  // 若 common.fdl 在同目录，将自动找到
 ```
 
 ```bash
-# No -I needed for same-directory imports
+# 同目录导入无需 -I
 foryc main.fdl
 ```
 
-**Example project structure:**
+**示例目录结构：**
 
 ```
 project/
@@ -210,7 +206,7 @@ project/
     └── common.fdl
 ```
 
-**Without `-I` (fails):**
+**不加 `-I`（失败）：**
 
 ```bash
 $ foryc src/main.fdl
@@ -218,7 +214,7 @@ Import error: Import not found: common.fdl
   Searched in: /project/src
 ```
 
-**With `-I` (succeeds):**
+**加 `-I`（成功）：**
 
 ```bash
 $ foryc src/main.fdl -I libs/
@@ -226,17 +222,17 @@ Compiling src/main.fdl...
   Resolved 1 import(s)
 ```
 
-## Supported Languages
+## 支持语言
 
-| Language | Flag     | Output Extension | Description                 |
-| -------- | -------- | ---------------- | --------------------------- |
-| Java     | `java`   | `.java`          | POJOs with Fory annotations |
-| Python   | `python` | `.py`            | Dataclasses with type hints |
-| Go       | `go`     | `.go`            | Structs with struct tags    |
-| Rust     | `rust`   | `.rs`            | Structs with derive macros  |
-| C++      | `cpp`    | `.h`             | Structs with FORY macros    |
+| 语言   | 标记     | 输出后缀 | 说明                          |
+| ------ | -------- | -------- | ----------------------------- |
+| Java   | `java`   | `.java`  | 带 Fory 注解的 POJO           |
+| Python | `python` | `.py`    | 带类型提示的 dataclass        |
+| Go     | `go`     | `.go`    | 带 struct tag 的结构体        |
+| Rust   | `rust`   | `.rs`    | 带 derive 宏的结构体          |
+| C++    | `cpp`    | `.h`     | 带 FORY 宏的结构体            |
 
-## Output Structure
+## 输出结构
 
 ### Java
 
@@ -251,9 +247,9 @@ generated/
             └── ExampleForyRegistration.java
 ```
 
-- One file per type (enum or message)
-- Package structure matches Fory IDL package
-- Registration helper class generated
+- 每个类型（enum/message）单独一个文件
+- 包路径与 Fory IDL package 一致
+- 会生成注册辅助类
 
 ### Python
 
@@ -263,9 +259,9 @@ generated/
     └── example.py
 ```
 
-- Single module with all types
-- Module name derived from package
-- Registration function included
+- 所有类型位于单模块
+- 模块名由 package 派生
+- 包含注册函数
 
 ### Go
 
@@ -276,9 +272,9 @@ generated/
         └── example.go
 ```
 
-- Single file with all types
-- Directory and package name are derived from `go_package` or the Fory IDL package
-- Registration function included
+- 所有类型在单文件中
+- 目录名与包名来自 `go_package` 或 Fory IDL package
+- 包含注册函数
 
 ### Rust
 
@@ -288,9 +284,9 @@ generated/
     └── example.rs
 ```
 
-- Single module with all types
-- Module name derived from package
-- Registration function included
+- 所有类型位于单模块
+- 模块名由 package 派生
+- 包含注册函数
 
 ### C++
 
@@ -300,15 +296,15 @@ generated/
     └── example.h
 ```
 
-- Single header file
-- Namespace matches package (dots to `::`)
-- Header guards and forward declarations
+- 单头文件输出
+- 命名空间与 package 对齐（点号转换为 `::`）
+- 自动包含 header guard 与前向声明
 
-## Build Integration
+## 构建系统集成
 
 ### Maven (Java)
 
-Add to your `pom.xml`:
+在 `pom.xml` 中添加：
 
 ```xml
 <build>
@@ -339,7 +335,7 @@ Add to your `pom.xml`:
 </build>
 ```
 
-Add generated sources:
+添加生成源码目录：
 
 ```xml
 <build>
@@ -368,7 +364,7 @@ Add generated sources:
 
 ### Gradle (Java/Kotlin)
 
-Add to `build.gradle`:
+在 `build.gradle` 中添加：
 
 ```groovy
 task generateForyTypes(type: Exec) {
@@ -390,7 +386,7 @@ sourceSets {
 
 ### Python (setuptools)
 
-Add to `setup.py` or `pyproject.toml`:
+在 `setup.py` 或 `pyproject.toml` 中加入生成步骤：
 
 ```python
 # setup.py
@@ -413,24 +409,24 @@ setup(
 )
 ```
 
-### Go (go generate)
+### Go (`go generate`)
 
-Add to your Go file:
+在 Go 文件中添加：
 
 ```go
 //go:generate foryc ../schema.fdl --lang go --output .
 package models
 ```
 
-Run:
+执行：
 
 ```bash
 go generate ./...
 ```
 
-### Rust (build.rs)
+### Rust (`build.rs`)
 
-Add to `build.rs`:
+在 `build.rs` 中添加：
 
 ```rust
 use std::process::Command;
@@ -451,7 +447,7 @@ fn main() {
 
 ### CMake (C++)
 
-Add to `CMakeLists.txt`:
+在 `CMakeLists.txt` 中添加：
 
 ```cmake
 find_program(FORY_COMPILER foryc)
@@ -474,7 +470,7 @@ target_include_directories(mylib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 
 ### Bazel
 
-Create a rule in `BUILD`:
+在 `BUILD` 中添加规则：
 
 ```python
 genrule(
@@ -492,51 +488,51 @@ cc_library(
 )
 ```
 
-## Error Handling
+## 错误处理
 
-### Syntax Errors
+### 语法错误
 
 ```
 Error: Line 5, Column 12: Expected ';' after field declaration
 ```
 
-Fix: Check the indicated line for missing semicolons or syntax issues.
+修复方式：检查对应行是否缺少分号或存在语法问题。
 
-### Duplicate Type Names
+### 类型名重复
 
 ```
 Error: Duplicate type name: User
 ```
 
-Fix: Ensure each enum and message has a unique name within the file.
+修复方式：确保同一文件内每个 enum/message 名称唯一。
 
-### Duplicate Type IDs
+### 类型 ID 重复
 
 ```
 Error: Duplicate type ID 100: User and Order
 ```
 
-Fix: Assign unique type IDs to each type.
+修复方式：为每个类型分配唯一 ID。
 
-### Unknown Type References
+### 未知类型引用
 
 ```
 Error: Unknown type 'Address' in Customer.address
 ```
 
-Fix: Define the referenced type before using it, or check for typos.
+修复方式：先定义被引用类型，或检查类型名拼写。
 
-### Duplicate Field Numbers
+### 字段号重复
 
 ```
 Error: Duplicate field number 1 in User: name and id
 ```
 
-Fix: Assign unique field numbers within each message.
+修复方式：确保同一 message 内字段号唯一。
 
-## Best Practices
+## 最佳实践
 
-### Project Structure
+### 项目结构
 
 ```
 project/
@@ -549,12 +545,12 @@ project/
 └── build.gradle
 ```
 
-### Version Control
+### 版本控制
 
-- **Track**: Fory IDL schema files
-- **Ignore**: Generated code (can be regenerated)
+- **纳入版本控制**：Fory IDL schema 文件
+- **忽略生成代码**：可在构建时再生成
 
-Add to `.gitignore`:
+在 `.gitignore` 中加入：
 
 ```
 # Generated Fory IDL code
@@ -562,12 +558,12 @@ src/generated/
 generated/
 ```
 
-### CI/CD Integration
+### CI/CD 集成
 
-Always regenerate during builds:
+在构建流程中始终重新生成代码：
 
 ```yaml
-# GitHub Actions example
+# GitHub Actions 示例
 steps:
   - name: Install Fory IDL Compiler
     run: pip install ./compiler
@@ -579,14 +575,14 @@ steps:
     run: ./gradlew build
 ```
 
-### Schema Evolution
+### Schema 演进
 
-When modifying schemas:
+修改 schema 时建议遵循：
 
-1. **Never reuse field numbers** - Mark as reserved instead
-2. **Never change type IDs** - They're part of the binary format
-3. **Add new fields** - Use new field numbers
-4. **Use `optional`** - For backward compatibility
+1. **不要复用字段号**：删除字段后应保留/预留
+2. **不要改动类型 ID**：类型 ID 属于二进制协议的一部分
+3. **新增字段使用新字段号**
+4. **优先使用 `optional`**：保持向后兼容
 
 ```protobuf
 message User [id=100] {
@@ -597,7 +593,7 @@ message User [id=100] {
 }
 ```
 
-## Troubleshooting
+## 故障排查
 
 ### Command Not Found
 
@@ -605,7 +601,7 @@ message User [id=100] {
 foryc: command not found
 ```
 
-**Solution:** Ensure the compiler is installed and in your PATH:
+**解决：** 确认编译器已安装且在 PATH 中：
 
 ```bash
 pip install -e ./compiler
@@ -619,15 +615,15 @@ export PATH=$PATH:~/.local/bin
 Permission denied: ./generated
 ```
 
-**Solution:** Ensure write permissions on the output directory:
+**解决：** 确保输出目录具备写权限：
 
 ```bash
 chmod -R u+w ./generated
 ```
 
-### Import Errors in Generated Code
+### 生成代码 import 错误
 
-**Java:** Ensure Fory dependency is in your project:
+**Java：** 确保项目包含 Fory 依赖：
 
 ```xml
 <dependency>
@@ -637,23 +633,23 @@ chmod -R u+w ./generated
 </dependency>
 ```
 
-**Python:** Ensure pyfory is installed:
+**Python：** 确保安装 `pyfory`：
 
 ```bash
 pip install pyfory
 ```
 
-**Go:** Ensure fory module is available:
+**Go：** 确保可获取 fory 模块：
 
 ```bash
 go get github.com/apache/fory/go/fory
 ```
 
-**Rust:** Ensure fory crate is in `Cargo.toml`:
+**Rust：** 确保 `Cargo.toml` 中包含 fory crate：
 
 ```toml
 [dependencies]
 fory = "x.y.z"
 ```
 
-**C++:** Ensure Fory headers are in include path.
+**C++：** 确保编译器 include 路径可找到 Fory 头文件。

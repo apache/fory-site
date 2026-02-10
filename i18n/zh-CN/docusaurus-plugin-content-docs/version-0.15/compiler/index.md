@@ -19,15 +19,12 @@ license: |
   limitations under the License.
 ---
 
-> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
-
-Fory IDL is a schema definition language for Apache Fory that enables type-safe
-cross-language serialization. Define your data structures once and generate
-native data structure code for Java, Python, Go, Rust, and C++.
+Fory IDL 是 Apache Fory 的 Schema 定义语言，可实现类型安全的跨语言序列化。
+你只需定义一次数据结构，即可为 Java、Python、Go、Rust 和 C++ 生成原生数据结构代码。
 
 ## 示例 Schema
 
-Fory IDL provides a simple, intuitive syntax for defining cross-language data structures:
+Fory IDL 提供了简单直观的语法来定义跨语言数据结构：
 
 ```protobuf
 package example;
@@ -73,54 +70,54 @@ union Animal [id=106] {
 }
 ```
 
-## Why Fory IDL?
+## 为什么选择 Fory IDL？
 
-### Schema-First Development
+### Schema 优先开发
 
-Define your data model once in Fory IDL and generate consistent, type-safe code across all languages. This ensures:
+在 Fory IDL 中一次定义数据模型，即可在所有语言中生成一致且类型安全的代码。这样可以确保：
 
-- **Type Safety**: Catch type errors at compile time, not runtime
-- **Consistency**: All languages use the same field names, types, and structures
-- **Documentation**: Schema serves as living documentation
-- **Evolution**: Managed schema changes across all implementations
+- **类型安全**：在编译期而不是运行期发现类型错误
+- **一致性**：各语言使用相同字段名、类型和结构
+- **文档性**：Schema 本身就是可持续演进的文档
+- **可演进性**：可在所有实现中受控地进行 Schema 变更
 
-### Fory-Native Features
+### Fory 原生能力
 
-Unlike generic IDLs, Fory IDL is designed specifically for Fory serialization:
+与通用 IDL 不同，Fory IDL 专门为 Fory 序列化设计：
 
-- **Reference Tracking**: First-class support for shared and circular references via `ref`
-- **Nullable Fields**: Explicit `optional` modifier for nullable types
-- **Type Registration**: Built-in support for both numeric IDs and namespace-based registration
-- **Native Code Generation**: Generates idiomatic code with Fory annotations/macros
+- **引用跟踪**：通过 `ref` 一等支持共享引用和循环引用
+- **可空字段**：通过 `optional` 显式声明可空类型
+- **类型注册**：内置支持数值 ID 与基于命名空间的注册
+- **原生代码生成**：生成带 Fory 注解/宏的语言惯用代码
 
-### Low Integration Overhead
+### 集成开销低
 
-Generated code uses native language constructs:
+生成代码直接使用各语言原生构造：
 
-- Java: Plain POJOs with `@ForyField` annotations
-- Python: Dataclasses with type hints
-- Go: Structs with struct tags
-- Rust: Structs with `#[derive(ForyObject)]`
-- C++: Structs with `FORY_STRUCT` macros
+- Java：带 `@ForyField` 注解的普通 POJO
+- Python：带类型提示的 dataclass
+- Go：带 struct tag 的结构体
+- Rust：带 `#[derive(ForyObject)]` 的结构体
+- C++：带 `FORY_STRUCT` 宏的结构体
 
-## Quick Start
+## 快速开始
 
-### 1. Install the Compiler
+### 1. 安装编译器
 
 ```bash
 pip install fory-compiler
 ```
 
-Or install from source:
+或从源码安装：
 
 ```bash
 cd compiler
 pip install -e .
 ```
 
-### 2. Write Your Schema
+### 2. 编写 Schema
 
-Create `example.fdl`:
+创建 `example.fdl`：
 
 ```protobuf
 package example;
@@ -132,19 +129,19 @@ message Person {
 }
 ```
 
-### 3. Generate Code
+### 3. 生成代码
 
 ```bash
-# Generate for all languages
+# 为所有语言生成
 foryc example.fdl --output ./generated
 
-# Generate for specific languages
+# 为指定语言生成
 foryc example.fdl --lang java,python --output ./generated
 ```
 
-### 4. Use Generated Code
+### 4. 使用生成代码
 
-**Java:**
+**Java：**
 
 ```java
 Person person = new Person();
@@ -153,34 +150,34 @@ person.setAge(30);
 byte[] data = person.toBytes();
 ```
 
-**Python:**
+**Python：**
 
 ```python
 import pyfory
 from example import Person
 
 person = Person(name="Alice", age=30)
-data = bytes(person) # or `person.to_bytes()`
+data = bytes(person) # 或 `person.to_bytes()`
 ```
 
-## Documentation
+## 文档导航
 
-| Document                                        | Description                                       |
-| ----------------------------------------------- | ------------------------------------------------- |
-| [Fory IDL Syntax](schema-idl.md)                | Complete language syntax and grammar              |
-| [Type System](schema-idl.md#type-system)        | Primitive types, collections, and type rules      |
-| [Compiler Guide](compiler-guide.md)             | CLI options and build integration                 |
-| [Generated Code](generated-code.md)             | Output format for each target language            |
-| [Protocol Buffers IDL Support](protobuf-idl.md) | Comparison with protobuf and migration guide      |
-| [FlatBuffers IDL Support](flatbuffers-idl.md)   | FlatBuffers mapping rules and codegen differences |
+| 文档                                            | 说明                                         |
+| ----------------------------------------------- | -------------------------------------------- |
+| [Fory IDL 语法](schema-idl.md)                  | 完整语言语法与文法                           |
+| [类型系统](schema-idl.md#type-system)           | 基础类型、集合类型与类型规则                 |
+| [编译器指南](compiler-guide.md)                 | CLI 选项与构建集成                           |
+| [生成代码](generated-code.md)                   | 各目标语言的输出格式                         |
+| [Protocol Buffers IDL 支持](protobuf-idl.md)    | 与 protobuf 的对比及迁移指南                 |
+| [FlatBuffers IDL 支持](flatbuffers-idl.md)      | FlatBuffers 映射规则与代码生成差异           |
 
-## Key Concepts
+## 核心概念
 
-### Field Modifiers
+### 字段修饰符
 
-- **`optional`**: Field can be null/None
-- **`ref`**: Enable reference tracking for shared/circular references
-- **`list`**: Field is a list/array (alias: `repeated`)
+- **`optional`**：字段可为 null/None
+- **`ref`**：为共享/循环引用启用引用跟踪
+- **`list`**：字段为列表/数组（别名：`repeated`）
 
 ```protobuf
 message Example {
@@ -190,26 +187,26 @@ message Example {
 }
 ```
 
-### Cross-Language Compatibility
+### 跨语言兼容
 
-Fory IDL types map to native types in each language:
+Fory IDL 类型会映射为各语言原生类型：
 
-| Fory IDL Type | Java      | Python         | Go       | Rust     | C++           |
+| Fory IDL 类型 | Java      | Python         | Go       | Rust     | C++           |
 | ------------- | --------- | -------------- | -------- | -------- | ------------- |
 | `int32`       | `int`     | `pyfory.int32` | `int32`  | `i32`    | `int32_t`     |
 | `string`      | `String`  | `str`          | `string` | `String` | `std::string` |
 | `bool`        | `boolean` | `bool`         | `bool`   | `bool`   | `bool`        |
 
-See [Type System](schema-idl.md#type-system) for complete mappings.
+完整映射请参见 [类型系统](schema-idl.md#type-system)。
 
-## Best Practices
+## 最佳实践
 
-1. **Use meaningful package names**: Group related types together
-2. **Assign type IDs for performance**: Numeric IDs are faster than name-based registration
-3. **Reserve ID ranges**: Leave gaps for future additions (e.g., 100-199 for users, 200-299 for orders)
-4. **Use `optional` explicitly**: Make nullability clear in the schema
-5. **Use `ref` for shared objects**: Enable reference tracking when objects are shared
+1. **使用有意义的 package 名称**：将相关类型分组管理
+2. **为性能分配类型 ID**：数值 ID 比基于名称的注册更高效
+3. **预留 ID 范围**：为后续扩展保留空隙（例如用户 100-199，订单 200-299）
+4. **显式使用 `optional`**：清晰表达可空语义
+5. **共享对象使用 `ref`**：对象可能被多处引用时开启引用跟踪
 
-## Examples
+## 示例
 
-See the [examples](https://github.com/apache/fory/tree/main/compiler/examples) directory for complete working examples.
+完整可运行示例见 [examples](https://github.com/apache/fory/tree/main/compiler/examples) 目录。

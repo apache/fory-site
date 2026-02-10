@@ -19,59 +19,49 @@ license: |
   limitations under the License.
 ---
 
-> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
-
 本页说明 Apache Fory 如何读取 FlatBuffers schema（`.fbs`）并将其转换为 Fory IR 以生成代码。
 
 ## 本页内容
 
-- When to use FlatBuffers input with Fory
-- Exact FlatBuffers to Fory mapping behavior
-- Supported Fory-specific attributes in `.fbs`
-- Migration notes and generated-code differences
+- 何时应在 Fory 中使用 FlatBuffers 输入
+- FlatBuffers 到 Fory 的精确映射行为
+- `.fbs` 中支持的 Fory 扩展属性
+- 迁移注意事项与生成代码差异
 
 ## 为什么使用 Apache Fory
 
-- Idiomatic generated code: Fory generates language-idiomatic classes/structs
-  that can be used directly as domain objects.
-- Java performance: In Java object-serialization workloads, Fory is faster than
-  FlatBuffers in Fory benchmarks.
-- Other languages: serialization performance is generally in a similar range.
-- Deserialization in practice: FlatBuffers does not perform native-object deserialization and is
-  faster by default, but if your application needs native objects, it requires
-  conversion and that conversion step can dominate read cost. In those cases,
-  Fory deserialization is often faster end-to-end.
-- Easier APIs: Fory uses direct native objects, so you do not need to
-  reverse-build tables or manually manage offsets.
-- Better graph modeling: Shared and circular references are first-class features
-  in Fory.
+- **生成代码更符合语言习惯**：Fory 会生成各语言常用风格的类/结构体，可直接作为领域对象使用。
+- **Java 性能更优**：在 Fory 的 Java 对象序列化基准中，Fory 通常快于 FlatBuffers。
+- **其他语言性能相近**：序列化性能通常处于同一量级。
+- **实际反序列化链路更高效**：FlatBuffers 默认并不做原生对象反序列化，因此看起来更快；但当业务需要原生对象时，还需额外转换，这一步往往成为主要开销。在这种场景下，Fory 端到端反序列化通常更快。
+- **API 更简单**：Fory 直接操作原生对象，无需反向构建 table 或手动管理 offset。
+- **对象图建模能力更强**：Fory 原生支持共享引用和循环引用。
 
 ## 快速决策指南
 
-| Situation                                                          | Recommended Path       |
-| ------------------------------------------------------------------ | ---------------------- |
-| You already have `.fbs` schemas and want Fory runtime/codegen      | Use FlatBuffers input  |
-| You are starting new schema work and want full Fory syntax control | Use native Fory IDL    |
-| You need FlatBuffers wire compatibility at runtime                 | Keep FlatBuffers stack |
-| You need Fory object-graph semantics (`ref`, weak refs, etc.)      | Use Fory               |
+| 场景                                                         | 建议路径                |
+| ------------------------------------------------------------ | ----------------------- |
+| 已有 `.fbs` schema，想接入 Fory 运行时/代码生成             | 使用 FlatBuffers 输入   |
+| 新建 schema，希望完整使用 Fory 语法能力                     | 使用原生 Fory IDL       |
+| 运行时必须保持 FlatBuffers 线格式兼容                       | 继续使用 FlatBuffers 栈 |
+| 需要 Fory 对象图语义（`ref`、弱引用等）                     | 使用 Fory               |
 
 ## FlatBuffers 到 Fory 的映射
 
-### Schema-Level Rules
+### Schema 级规则
 
-- `namespace` maps to Fory package namespace.
-- `include` entries map to Fory imports.
-- `table` is translated as `evolving=true`.
-- `struct` is translated as `evolving=false`.
-- `root_type` is parsed but ignored by Fory runtime/codegen.
-- `file_identifier` and `file_extension` are parsed but not used by Fory codegen.
+- `namespace` 映射为 Fory package 命名空间。
+- `include` 映射为 Fory import。
+- `table` 会被翻译为 `evolving=true`。
+- `struct` 会被翻译为 `evolving=false`。
+- `root_type` 会被解析，但 Fory 运行时/代码生成不会使用。
+- `file_identifier` 与 `file_extension` 会被解析，但 Fory 代码生成不会使用。
 
-### Field Numbering
+### 字段编号
 
-FlatBuffers fields do not have explicit field IDs. Fory assigns field numbers by
-source declaration order, starting at `1`.
+FlatBuffers 字段没有显式 field ID。Fory 会按源码声明顺序分配字段号，从 `1` 开始。
 
-### Scalar Type Mapping
+### 标量类型映射
 
 | FlatBuffers | Fory Type |
 | ----------- | --------- |
@@ -88,14 +78,14 @@ source declaration order, starting at `1`.
 | `bool`      | `bool`    |
 | `string`    | `string`  |
 
-Vectors (`[T]`) map to Fory lists.
+向量（`[T]`）映射为 Fory 列表类型。
 
-### Unions
+### 联合类型
 
-FlatBuffers unions map to Fory unions.
+FlatBuffers union 映射为 Fory union。
 
-- Case IDs are assigned by declaration order, starting at `1`.
-- Case names are derived from type names using snake_case field naming.
+- case ID 按声明顺序分配，从 `1` 开始。
+- case 名称由类型名转换为 snake_case 字段名。
 
 **FlatBuffers**
 
@@ -110,7 +100,7 @@ table Container {
 }
 ```
 
-**Fory shape after translation**
+**转换后的 Fory 结构**
 
 ```protobuf
 union Payload {
@@ -123,33 +113,31 @@ message Container {
 }
 ```
 
-### Defaults and Metadata
+### 默认值与元数据
 
-- FlatBuffers default values are parsed but not applied as Fory runtime defaults.
-- Non-Fory metadata attributes are preserved as generic options in IR and may be
-  consumed by downstream tooling.
+- FlatBuffers 默认值会被解析，但不会作为 Fory 运行时默认值生效。
+- 非 Fory 的 metadata 属性会作为通用 option 保留在 IR 中，供下游工具按需消费。
 
-## Fory-Specific Attributes in FlatBuffers
+## FlatBuffers 中的 Fory 扩展属性
 
-FlatBuffers metadata attributes use `key:value`. For Fory-specific options, use
-`fory_` (or `fory.`) prefix in `.fbs`; the prefix is removed during parsing.
+FlatBuffers metadata 属性写法为 `key:value`。对于 Fory 扩展选项，在 `.fbs` 中使用 `fory_`（或 `fory.`）前缀；解析时会去掉该前缀。
 
-### Supported Field Attributes
+### 支持的字段属性
 
-| FlatBuffers Attribute            | Effect in Fory                                        |
+| FlatBuffers Attribute            | 在 Fory 中的效果                                      |
 | -------------------------------- | ----------------------------------------------------- |
-| `fory_ref:true`                  | Enable reference tracking for the field               |
-| `fory_nullable:true`             | Mark field optional/nullable                          |
-| `fory_weak_ref:true`             | Enable weak reference semantics and implies `ref`     |
-| `fory_thread_safe_pointer:false` | For ref fields, select non-thread-safe pointer flavor |
+| `fory_ref:true`                  | 为字段启用引用跟踪                                    |
+| `fory_nullable:true`             | 将字段标记为 optional/nullable                        |
+| `fory_weak_ref:true`             | 启用弱引用语义，并隐含开启 `ref`                      |
+| `fory_thread_safe_pointer:false` | 对 ref 字段选择非线程安全指针类型                     |
 
-Semantics:
+语义说明：
 
-- `fory_weak_ref:true` implies `ref`.
-- `fory_thread_safe_pointer` only takes effect when the field is ref-tracked.
-- For list fields, `fory_ref:true` applies to list elements.
+- `fory_weak_ref:true` 隐含 `ref`。
+- `fory_thread_safe_pointer` 仅在字段启用 ref 跟踪时生效。
+- 对列表字段，`fory_ref:true` 作用于列表元素。
 
-Example:
+示例：
 
 ```fbs
 table Node {
@@ -159,42 +147,37 @@ table Node {
 }
 ```
 
-## Generated Code Differences
+## 生成代码差异
 
-Using `.fbs` as input to Fory still produces normal Fory-generated code, not
-FlatBuffers `ByteBuffer`-style APIs.
+即使用 `.fbs` 作为 Fory 输入，生成的依然是标准 Fory 代码，而不是 FlatBuffers 的 `ByteBuffer` 风格 API。
 
-- Java: POJOs/records with Fory metadata
-- Python: dataclasses plus registration helpers
-- Go/Rust/C++: native structs and Fory metadata
+- Java：带 Fory 元数据的 POJO/record
+- Python：dataclass 与注册辅助代码
+- Go/Rust/C++：原生结构体与 Fory 元数据
 
-The serialization format is Fory binary protocol, not FlatBuffers wire format.
+最终序列化格式是 Fory 二进制协议，而不是 FlatBuffers 线格式。
 
-## Usage
+## 用法
 
-Compile a FlatBuffers schema directly:
+直接编译 FlatBuffers schema：
 
 ```bash
 foryc schema.fbs --lang java,python --output ./generated
 ```
 
-Inspect translated schema syntax for debugging:
+输出转换后的 Fory schema 语法以便调试：
 
 ```bash
 foryc schema.fbs --emit-fdl --emit-fdl-path ./translated
 ```
 
-## Migration Notes
+## 迁移注意事项
 
-1. Keep existing `namespace` values stable to keep type registration stable.
-2. Review fields that relied on FlatBuffers default literals and set explicit
-   defaults in application code if needed.
-3. Add `fory_ref`/`fory_weak_ref` where object-graph semantics are required.
-4. Validate generated model behavior with roundtrip tests before replacing
-   existing serialization paths.
+1. 保持现有 `namespace` 稳定，以保证类型注册稳定。
+2. 检查依赖 FlatBuffers 字面量默认值的字段，并在业务代码中补充显式默认值。
+3. 在需要对象图语义的字段上添加 `fory_ref`/`fory_weak_ref`。
+4. 替换现有序列化路径前，先用 roundtrip 测试验证生成模型行为。
 
-## Summary
+## 总结
 
-FlatBuffers input lets you reuse existing `.fbs` schemas while moving to Fory's
-runtime and code generation model. This is useful for incremental migration,
-while preserving schema investment and adopting Fory-native object APIs.
+FlatBuffers 输入模式可让你复用现有 `.fbs` schema，同时迁移到 Fory 运行时与代码生成模型。它适合渐进式迁移场景：既保留既有 schema 投入，又能采用 Fory 原生对象 API。
