@@ -143,19 +143,19 @@ data, _ := f.Serialize(&User{ID: 1, Name: "Alice"})
 
 ## 文档导航
 
-| 主题                                         | 说明                                   |
-| -------------------------------------------- | -------------------------------------- |
-| [配置](configuration.md)                     | 配置项与运行参数                       |
-| [基本序列化](basic-serialization.md)         | 核心 API 与使用模式                    |
-| [类型注册](type-registration.md)             | 序列化前的类型注册                     |
-| [支持类型](supported-types.md)               | 完整类型支持说明                       |
-| [引用](references.md)                        | 循环引用与共享对象                     |
-| [Struct 标签](struct-tags.md)                | 字段级配置                             |
-| [Schema 演进](schema-evolution.md)           | 前向/后向兼容策略                      |
-| [跨语言](cross-language.md)                  | 多语言序列化                           |
-| [代码生成](codegen.md)                       | 实验性的 AOT 代码生成                  |
-| [线程安全](thread-safety.md)                 | 并发使用模式                           |
-| [故障排查](troubleshooting.md)               | 常见问题与解决方案                     |
+| 主题                                 | 说明                  |
+| ------------------------------------ | --------------------- |
+| [配置](configuration.md)             | 配置项与运行参数      |
+| [基本序列化](basic-serialization.md) | 核心 API 与使用模式   |
+| [类型注册](type-registration.md)     | 序列化前的类型注册    |
+| [支持类型](supported-types.md)       | 完整类型支持说明      |
+| [引用](references.md)                | 循环引用与共享对象    |
+| [Struct 标签](struct-tags.md)        | 字段级配置            |
+| [Schema 演进](schema-evolution.md)   | 前向/后向兼容策略     |
+| [跨语言](cross-language.md)          | 多语言序列化          |
+| [代码生成](codegen.md)               | 实验性的 AOT 代码生成 |
+| [线程安全](thread-safety.md)         | 并发使用模式          |
+| [故障排查](troubleshooting.md)       | 常见问题与解决方案    |
 
 ## 相关资源
 

@@ -162,14 +162,14 @@ data = bytes(person) # 或 `person.to_bytes()`
 
 ## 文档导航
 
-| 文档                                            | 说明                                         |
-| ----------------------------------------------- | -------------------------------------------- |
-| [Fory IDL 语法](schema-idl.md)                  | 完整语言语法与文法                           |
-| [类型系统](schema-idl.md#type-system)           | 基础类型、集合类型与类型规则                 |
-| [编译器指南](compiler-guide.md)                 | CLI 选项与构建集成                           |
-| [生成代码](generated-code.md)                   | 各目标语言的输出格式                         |
-| [Protocol Buffers IDL 支持](protobuf-idl.md)    | 与 protobuf 的对比及迁移指南                 |
-| [FlatBuffers IDL 支持](flatbuffers-idl.md)      | FlatBuffers 映射规则与代码生成差异           |
+| 文档                                         | 说明                               |
+| -------------------------------------------- | ---------------------------------- |
+| [Fory IDL 语法](schema-idl.md)               | 完整语言语法与文法                 |
+| [类型系统](schema-idl.md#type-system)        | 基础类型、集合类型与类型规则       |
+| [编译器指南](compiler-guide.md)              | CLI 选项与构建集成                 |
+| [生成代码](generated-code.md)                | 各目标语言的输出格式               |
+| [Protocol Buffers IDL 支持](protobuf-idl.md) | 与 protobuf 的对比及迁移指南       |
+| [FlatBuffers IDL 支持](flatbuffers-idl.md)   | FlatBuffers 映射规则与代码生成差异 |
 
 ## 核心概念
 

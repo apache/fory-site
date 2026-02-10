@@ -39,12 +39,12 @@ license: |
 
 ## 快速决策指南
 
-| 场景                                                         | 建议路径                |
-| ------------------------------------------------------------ | ----------------------- |
-| 已有 `.fbs` schema，想接入 Fory 运行时/代码生成             | 使用 FlatBuffers 输入   |
-| 新建 schema，希望完整使用 Fory 语法能力                     | 使用原生 Fory IDL       |
-| 运行时必须保持 FlatBuffers 线格式兼容                       | 继续使用 FlatBuffers 栈 |
-| 需要 Fory 对象图语义（`ref`、弱引用等）                     | 使用 Fory               |
+| 场景                                            | 建议路径                |
+| ----------------------------------------------- | ----------------------- |
+| 已有 `.fbs` schema，想接入 Fory 运行时/代码生成 | 使用 FlatBuffers 输入   |
+| 新建 schema，希望完整使用 Fory 语法能力         | 使用原生 Fory IDL       |
+| 运行时必须保持 FlatBuffers 线格式兼容           | 继续使用 FlatBuffers 栈 |
+| 需要 Fory 对象图语义（`ref`、弱引用等）         | 使用 Fory               |
 
 ## FlatBuffers 到 Fory 的映射
 
@@ -124,12 +124,12 @@ FlatBuffers metadata 属性写法为 `key:value`。对于 Fory 扩展选项，�
 
 ### 支持的字段属性
 
-| FlatBuffers Attribute            | 在 Fory 中的效果                                      |
-| -------------------------------- | ----------------------------------------------------- |
-| `fory_ref:true`                  | 为字段启用引用跟踪                                    |
-| `fory_nullable:true`             | 将字段标记为 optional/nullable                        |
-| `fory_weak_ref:true`             | 启用弱引用语义，并隐含开启 `ref`                      |
-| `fory_thread_safe_pointer:false` | 对 ref 字段选择非线程安全指针类型                     |
+| FlatBuffers Attribute            | 在 Fory 中的效果                  |
+| -------------------------------- | --------------------------------- |
+| `fory_ref:true`                  | 为字段启用引用跟踪                |
+| `fory_nullable:true`             | 将字段标记为 optional/nullable    |
+| `fory_weak_ref:true`             | 启用弱引用语义，并隐含开启 `ref`  |
+| `fory_thread_safe_pointer:false` | 对 ref 字段选择非线程安全指针类型 |
 
 语义说明：
 

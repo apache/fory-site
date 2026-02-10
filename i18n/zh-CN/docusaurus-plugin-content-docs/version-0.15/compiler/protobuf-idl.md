@@ -30,25 +30,25 @@ license: |
 
 ## 快速决策指南
 
-| 场景                                                         | 建议格式           |
-| ------------------------------------------------------------ | ------------------ |
-| 主要构建 gRPC API，依赖 protobuf 工具链                      | Protocol Buffers   |
-| 需要极致对象图性能与引用跟踪                                 | Fory               |
-| 需要在序列化数据中表达循环/共享引用                          | Fory               |
-| 需要强 unknown-field 语义保证线格式兼容                      | Protocol Buffers   |
-| 希望直接使用原生 struct/class，而非 protobuf 包装类型        | Fory               |
+| 场景                                                  | 建议格式         |
+| ----------------------------------------------------- | ---------------- |
+| 主要构建 gRPC API，依赖 protobuf 工具链               | Protocol Buffers |
+| 需要极致对象图性能与引用跟踪                          | Fory             |
+| 需要在序列化数据中表达循环/共享引用                   | Fory             |
+| 需要强 unknown-field 语义保证线格式兼容               | Protocol Buffers |
+| 希望直接使用原生 struct/class，而非 protobuf 包装类型 | Fory             |
 
 ## Protobuf 与 Fory 对比
 
-| 维度                 | Protocol Buffers             | Fory                                  |
-| -------------------- | ---------------------------- | ------------------------------------- |
-| 主要目标             | RPC/消息契约                | 高性能对象序列化                      |
-| 编码模型             | Tag-Length-Value             | Fory 二进制协议                       |
-| 引用跟踪             | 非内建                       | 一等支持（`ref`）                     |
-| 循环引用             | 不支持                       | 支持                                  |
-| 未知字段             | 保留                         | 不保留                                |
-| 生成类型             | protobuf 专用模型类型        | 语言原生构造                          |
-| gRPC 生态            | 原生成熟                     | 持续建设中（活跃开发）                |
+| 维度      | Protocol Buffers      | Fory                   |
+| --------- | --------------------- | ---------------------- |
+| 主要目标  | RPC/消息契约          | 高性能对象序列化       |
+| 编码模型  | Tag-Length-Value      | Fory 二进制协议        |
+| 引用跟踪  | 非内建                | 一等支持（`ref`）      |
+| 循环引用  | 不支持                | 支持                   |
+| 未知字段  | 保留                  | 不保留                 |
+| 生成类型  | protobuf 专用模型类型 | 语言原生构造           |
+| gRPC 生态 | 原生成熟              | 持续建设中（活跃开发） |
 
 Fory 的 gRPC 支持仍在持续开发中。当前生产级 gRPC 工作流里，protobuf 仍是更成熟的默认选择。
 
@@ -167,23 +167,23 @@ message Event {
 
 ## 类型映射要点
 
-| Protobuf Type                            | Fory 映射                                   |
-| ---------------------------------------- | ------------------------------------------- |
-| `bool`                                   | `bool`                                      |
-| `int32`, `uint32`                        | 可变长 32 位整型家族                        |
-| `sint32`                                 | zigzag 32 位整型                            |
-| `int64`, `uint64`                        | 可变长 64 位整型家族                        |
-| `sint64`                                 | zigzag 64 位整型                            |
-| `fixed32`, `fixed64`                     | 定长无符号整型家族                          |
-| `sfixed32`, `sfixed64`                   | 定长有符号整型家族                          |
-| `float`, `double`                        | `float32`, `float64`                        |
-| `string`, `bytes`                        | `string`, `bytes`                           |
-| `repeated T`                             | `list<T>`                                   |
-| `map<K, V>`                              | `map<K, V>`                                 |
-| `optional T`                             | `optional T`                                |
-| `oneof`                                  | `union` + 可选 union 引用字段              |
-| `int64 [(fory).type = "tagged_int64"]`   | `tagged_int64` 编码                        |
-| `uint64 [(fory).type = "tagged_uint64"]` | `tagged_uint64` 编码                       |
+| Protobuf Type                            | Fory 映射                     |
+| ---------------------------------------- | ----------------------------- |
+| `bool`                                   | `bool`                        |
+| `int32`, `uint32`                        | 可变长 32 位整型家族          |
+| `sint32`                                 | zigzag 32 位整型              |
+| `int64`, `uint64`                        | 可变长 64 位整型家族          |
+| `sint64`                                 | zigzag 64 位整型              |
+| `fixed32`, `fixed64`                     | 定长无符号整型家族            |
+| `sfixed32`, `sfixed64`                   | 定长有符号整型家族            |
+| `float`, `double`                        | `float32`, `float64`          |
+| `string`, `bytes`                        | `string`, `bytes`             |
+| `repeated T`                             | `list<T>`                     |
+| `map<K, V>`                              | `map<K, V>`                   |
+| `optional T`                             | `optional T`                  |
+| `oneof`                                  | `union` + 可选 union 引用字段 |
+| `int64 [(fory).type = "tagged_int64"]`   | `tagged_int64` 编码           |
+| `uint64 [(fory).type = "tagged_uint64"]` | `tagged_uint64` 编码          |
 
 ## Fory 扩展选项（Protobuf）
 
@@ -200,35 +200,35 @@ message TreeNode {
 
 ### 文件级选项
 
-| 选项                                  | 类型   | 说明                                                          |
-| ------------------------------------- | ------ | ------------------------------------------------------------- |
-| `(fory).use_record_for_java_message`  | bool   | 对该文件所有 message 生成 Java record                         |
-| `(fory).polymorphism`                 | bool   | 默认开启多态序列化元信息                                      |
-| `(fory).enable_auto_type_id`          | bool   | 缺失时自动生成类型 ID（编译器默认 true）                      |
-| `(fory).evolving`                     | bool   | message 的默认 schema 演进行为                                |
-| `(fory).go_nested_type_style`         | string | Go 嵌套命名风格：`underscore`（默认）或 `camelcase`           |
+| 选项                                 | 类型   | 说明                                                |
+| ------------------------------------ | ------ | --------------------------------------------------- |
+| `(fory).use_record_for_java_message` | bool   | 对该文件所有 message 生成 Java record               |
+| `(fory).polymorphism`                | bool   | 默认开启多态序列化元信息                            |
+| `(fory).enable_auto_type_id`         | bool   | 缺失时自动生成类型 ID（编译器默认 true）            |
+| `(fory).evolving`                    | bool   | message 的默认 schema 演进行为                      |
+| `(fory).go_nested_type_style`        | string | Go 嵌套命名风格：`underscore`（默认）或 `camelcase` |
 
 ### Message 与 Enum 级选项
 
-| 选项                          | 作用对象      | 类型   | 说明                                   |
-| ----------------------------- | ------------- | ------ | -------------------------------------- |
-| `(fory).id`                   | message, enum | int    | 显式类型 ID（用于注册）                |
-| `(fory).alias`                | message, enum | string | 自动 ID 哈希使用的别名                 |
-| `(fory).evolving`             | message       | bool   | 覆盖文件级演进设置                     |
-| `(fory).use_record_for_java`  | message       | bool   | 为该 message 生成 Java record          |
-| `(fory).deprecated`           | message, enum | bool   | 标记类型为弃用                         |
-| `(fory).namespace`            | message       | string | 覆盖默认 package 命名空间              |
+| 选项                         | 作用对象      | 类型   | 说明                          |
+| ---------------------------- | ------------- | ------ | ----------------------------- |
+| `(fory).id`                  | message, enum | int    | 显式类型 ID（用于注册）       |
+| `(fory).alias`               | message, enum | string | 自动 ID 哈希使用的别名        |
+| `(fory).evolving`            | message       | bool   | 覆盖文件级演进设置            |
+| `(fory).use_record_for_java` | message       | bool   | 为该 message 生成 Java record |
+| `(fory).deprecated`          | message, enum | bool   | 标记类型为弃用                |
+| `(fory).namespace`           | message       | string | 覆盖默认 package 命名空间     |
 
 ### 字段级选项
 
-| 选项                          | 类型   | 说明                                                      |
-| ----------------------------- | ------ | --------------------------------------------------------- |
-| `(fory).ref`                  | bool   | 为该字段启用引用跟踪                                      |
-| `(fory).nullable`             | bool   | 将字段视为可空（`optional`）                              |
-| `(fory).weak_ref`             | bool   | 生成弱指针语义（C++/Rust 代码生成）                       |
-| `(fory).thread_safe_pointer`  | bool   | ref 字段在 Rust 中的指针类型（`Arc` vs `Rc`）             |
-| `(fory).deprecated`           | bool   | 标记字段为弃用                                            |
-| `(fory).type`                 | string | 基础类型覆盖，目前支持 `tagged_int64`/`tagged_uint64`    |
+| 选项                         | 类型   | 说明                                                  |
+| ---------------------------- | ------ | ----------------------------------------------------- |
+| `(fory).ref`                 | bool   | 为该字段启用引用跟踪                                  |
+| `(fory).nullable`            | bool   | 将字段视为可空（`optional`）                          |
+| `(fory).weak_ref`            | bool   | 生成弱指针语义（C++/Rust 代码生成）                   |
+| `(fory).thread_safe_pointer` | bool   | ref 字段在 Rust 中的指针类型（`Arc` vs `Rc`）         |
+| `(fory).deprecated`          | bool   | 标记字段为弃用                                        |
+| `(fory).type`                | string | 基础类型覆盖，目前支持 `tagged_int64`/`tagged_uint64` |
 
 引用相关行为：
 

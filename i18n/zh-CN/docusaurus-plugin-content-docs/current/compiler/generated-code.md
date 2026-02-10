@@ -695,20 +695,20 @@ if err := restored.FromBytes(data); err != nil {
 
 ### 嵌套类型形态
 
-| 语言   | 嵌套类型形式                  |
-| ------ | ----------------------------- |
-| Java   | `Person.PhoneNumber`          |
-| Python | `Person.PhoneNumber`          |
-| Rust   | `person::PhoneNumber`         |
-| C++    | `Person::PhoneNumber`         |
-| Go     | `Person_PhoneNumber`（默认）  |
+| 语言   | 嵌套类型形式                 |
+| ------ | ---------------------------- |
+| Java   | `Person.PhoneNumber`         |
+| Python | `Person.PhoneNumber`         |
+| Rust   | `person::PhoneNumber`        |
+| C++    | `Person::PhoneNumber`        |
+| Go     | `Person_PhoneNumber`（默认） |
 
 ### 字节辅助方法命名
 
-| 语言   | 辅助方法名称                  |
-| ------ | ----------------------------- |
-| Java   | `toBytes` / `fromBytes`       |
-| Python | `to_bytes` / `from_bytes`     |
-| Rust   | `to_bytes` / `from_bytes`     |
-| C++    | `to_bytes` / `from_bytes`     |
-| Go     | `ToBytes` / `FromBytes`       |
+| 语言   | 辅助方法名称              |
+| ------ | ------------------------- |
+| Java   | `toBytes` / `fromBytes`   |
+| Python | `to_bytes` / `from_bytes` |
+| Rust   | `to_bytes` / `from_bytes` |
+| C++    | `to_bytes` / `from_bytes` |
+| Go     | `ToBytes` / `FromBytes`   |

@@ -82,12 +82,12 @@ public class User {
 
 ### 参数
 
-| 参数       | 类型      | 默认值  | 说明                                      |
-| ---------- | --------- | ------- | ----------------------------------------- |
-| `id`       | `int`     | `-1`    | 字段 tag ID（`-1` 表示使用字段名编码）    |
-| `nullable` | `boolean` | `false` | 字段是否可为 null                         |
-| `ref`      | `boolean` | `false` | 是否开启引用跟踪                          |
-| `dynamic`  | `Dynamic` | `AUTO`  | 控制 struct 字段多态行为                  |
+| 参数       | 类型      | 默认值  | 说明                                   |
+| ---------- | --------- | ------- | -------------------------------------- |
+| `id`       | `int`     | `-1`    | 字段 tag ID（`-1` 表示使用字段名编码） |
+| `nullable` | `boolean` | `false` | 字段是否可为 null                      |
+| `ref`      | `boolean` | `false` | 是否开启引用跟踪                       |
+| `dynamic`  | `Dynamic` | `AUTO`  | 控制 struct 字段多态行为               |
 
 ## 字段 ID（`id`）
 
@@ -212,11 +212,11 @@ public class Container {
 
 **取值：**
 
-| 值      | 说明                                                         |
-| ------- | ------------------------------------------------------------ |
-| `AUTO`  | 自动判断：接口/抽象类型动态，具体类型非动态                 |
-| `FALSE` | 不写类型信息，直接使用声明类型的序列化器                    |
-| `TRUE`  | 写入类型信息，以支持运行时子类型                            |
+| 值      | 说明                                        |
+| ------- | ------------------------------------------- |
+| `AUTO`  | 自动判断：接口/抽象类型动态，具体类型非动态 |
+| `FALSE` | 不写类型信息，直接使用声明类型的序列化器    |
+| `TRUE`  | 写入类型信息，以支持运行时子类型            |
 
 ## 跳过字段
 
@@ -337,20 +337,20 @@ public class UnsignedStruct {
 
 ### 编码汇总
 
-| 注解                             | Type ID | 编码    | 大小         |
-| -------------------------------- | ------- | ------- | ------------ |
-| `@Int32Type(compress = true)`    | 5       | varint  | 1-5 字节     |
-| `@Int32Type(compress = false)`   | 4       | fixed   | 4 字节       |
-| `@Int64Type(encoding = VARINT)`  | 7       | varint  | 1-10 字节    |
-| `@Int64Type(encoding = FIXED)`   | 6       | fixed   | 8 字节       |
-| `@Int64Type(encoding = TAGGED)`  | 8       | tagged  | 4 或 9 字节  |
-| `@Uint8Type`                     | 9       | fixed   | 1 字节       |
-| `@Uint16Type`                    | 10      | fixed   | 2 字节       |
-| `@Uint32Type(compress = true)`   | 12      | varint  | 1-5 字节     |
-| `@Uint32Type(compress = false)`  | 11      | fixed   | 4 字节       |
-| `@Uint64Type(encoding = VARINT)` | 14      | varint  | 1-10 字节    |
-| `@Uint64Type(encoding = FIXED)`  | 13      | fixed   | 8 字节       |
-| `@Uint64Type(encoding = TAGGED)` | 15      | tagged  | 4 或 9 字节  |
+| 注解                             | Type ID | 编码   | 大小        |
+| -------------------------------- | ------- | ------ | ----------- |
+| `@Int32Type(compress = true)`    | 5       | varint | 1-5 字节    |
+| `@Int32Type(compress = false)`   | 4       | fixed  | 4 字节      |
+| `@Int64Type(encoding = VARINT)`  | 7       | varint | 1-10 字节   |
+| `@Int64Type(encoding = FIXED)`   | 6       | fixed  | 8 字节      |
+| `@Int64Type(encoding = TAGGED)`  | 8       | tagged | 4 或 9 字节 |
+| `@Uint8Type`                     | 9       | fixed  | 1 字节      |
+| `@Uint16Type`                    | 10      | fixed  | 2 字节      |
+| `@Uint32Type(compress = true)`   | 12      | varint | 1-5 字节    |
+| `@Uint32Type(compress = false)`  | 11      | fixed  | 4 字节      |
+| `@Uint64Type(encoding = VARINT)` | 14      | varint | 1-10 字节   |
+| `@Uint64Type(encoding = FIXED)`  | 13      | fixed  | 8 字节      |
+| `@Uint64Type(encoding = TAGGED)` | 15      | tagged | 4 或 9 字节 |
 
 **何时使用：**
 
@@ -566,11 +566,11 @@ public class User {
 
 ### 默认值汇总
 
-| 选项       | Native 模式默认值           | Xlang 模式默认值                    |
-| ---------- | -------------------------- | ----------------------------------- |
-| `nullable` | `true`（引用类型）         | `false`                             |
-| `ref`      | `true`                     | `false`                             |
-| `dynamic`  | `true`（非 final 类）      | `AUTO`（具体类型通常按非动态处理）  |
+| 选项       | Native 模式默认值     | Xlang 模式默认值                   |
+| ---------- | --------------------- | ---------------------------------- |
+| `nullable` | `true`（引用类型）    | `false`                            |
+| `ref`      | `true`                | `false`                            |
+| `dynamic`  | `true`（非 final 类） | `AUTO`（具体类型通常按非动态处理） |
 
 ## 最佳实践
 
@@ -584,19 +584,19 @@ public class User {
 
 ## 注解速查
 
-| 注解                             | 说明                                      |
-| -------------------------------- | ----------------------------------------- |
-| `@ForyField(id = N)`             | 配置字段 tag ID，减少元信息开销           |
-| `@ForyField(nullable = true)`    | 将字段标记为可空                          |
-| `@ForyField(ref = true)`         | 为字段启用引用跟踪                        |
-| `@ForyField(dynamic = ...)`      | 控制 struct 字段多态行为                  |
-| `@Ignore`                        | 将字段排除在序列化之外                    |
-| `@Int32Type(compress = ...)`     | 32 位有符号整数编码                       |
-| `@Int64Type(encoding = ...)`     | 64 位有符号整数编码                       |
-| `@Uint8Type`                     | 8 位无符号整数                            |
-| `@Uint16Type`                    | 16 位无符号整数                           |
-| `@Uint32Type(compress = ...)`    | 32 位无符号整数编码                       |
-| `@Uint64Type(encoding = ...)`    | 64 位无符号整数编码                       |
+| 注解                          | 说明                            |
+| ----------------------------- | ------------------------------- |
+| `@ForyField(id = N)`          | 配置字段 tag ID，减少元信息开销 |
+| `@ForyField(nullable = true)` | 将字段标记为可空                |
+| `@ForyField(ref = true)`      | 为字段启用引用跟踪              |
+| `@ForyField(dynamic = ...)`   | 控制 struct 字段多态行为        |
+| `@Ignore`                     | 将字段排除在序列化之外          |
+| `@Int32Type(compress = ...)`  | 32 位有符号整数编码             |
+| `@Int64Type(encoding = ...)`  | 64 位有符号整数编码             |
+| `@Uint8Type`                  | 8 位无符号整数                  |
+| `@Uint16Type`                 | 16 位无符号整数                 |
+| `@Uint32Type(compress = ...)` | 32 位无符号整数编码             |
+| `@Uint64Type(encoding = ...)` | 64 位无符号整数编码             |
 
 ## 相关主题
 

@@ -52,29 +52,29 @@ foryc --scan-generated [OPTIONS]
 
 编译选项：
 
-| 选项                                  | 说明                                              | 默认值              |
-| ------------------------------------- | ------------------------------------------------- | ------------------- |
-| `--lang`                              | 目标语言列表（逗号分隔）                          | `all`               |
-| `--output`, `-o`                      | 输出目录                                          | `./generated`       |
-| `--package`                           | 覆盖 Fory IDL 文件中的 package                    | （来自文件）        |
-| `-I`, `--proto_path`, `--import_path` | 添加 import 搜索路径（可重复）                    | （无）              |
-| `--java_out=DST_DIR`                  | 将 Java 代码输出到 `DST_DIR`                      | （无）              |
-| `--python_out=DST_DIR`                | 将 Python 代码输出到 `DST_DIR`                    | （无）              |
-| `--cpp_out=DST_DIR`                   | 将 C++ 代码输出到 `DST_DIR`                       | （无）              |
-| `--go_out=DST_DIR`                    | 将 Go 代码输出到 `DST_DIR`                        | （无）              |
-| `--rust_out=DST_DIR`                  | 将 Rust 代码输出到 `DST_DIR`                      | （无）              |
-| `--go_nested_type_style`              | Go 嵌套类型命名风格：`camelcase` 或 `underscore` | schema/默认值       |
-| `--emit-fdl`                          | 对非 `.fdl` 输入打印转换后的 Fory IDL             | `false`             |
-| `--emit-fdl-path`                     | 将转换后的 Fory IDL 写入文件或目录                | （stdout）          |
+| 选项                                  | 说明                                             | 默认值        |
+| ------------------------------------- | ------------------------------------------------ | ------------- |
+| `--lang`                              | 目标语言列表（逗号分隔）                         | `all`         |
+| `--output`, `-o`                      | 输出目录                                         | `./generated` |
+| `--package`                           | 覆盖 Fory IDL 文件中的 package                   | （来自文件）  |
+| `-I`, `--proto_path`, `--import_path` | 添加 import 搜索路径（可重复）                   | （无）        |
+| `--java_out=DST_DIR`                  | 将 Java 代码输出到 `DST_DIR`                     | （无）        |
+| `--python_out=DST_DIR`                | 将 Python 代码输出到 `DST_DIR`                   | （无）        |
+| `--cpp_out=DST_DIR`                   | 将 C++ 代码输出到 `DST_DIR`                      | （无）        |
+| `--go_out=DST_DIR`                    | 将 Go 代码输出到 `DST_DIR`                       | （无）        |
+| `--rust_out=DST_DIR`                  | 将 Rust 代码输出到 `DST_DIR`                     | （无）        |
+| `--go_nested_type_style`              | Go 嵌套类型命名风格：`camelcase` 或 `underscore` | schema/默认值 |
+| `--emit-fdl`                          | 对非 `.fdl` 输入打印转换后的 Fory IDL            | `false`       |
+| `--emit-fdl-path`                     | 将转换后的 Fory IDL 写入文件或目录               | （stdout）    |
 
 扫描选项（配合 `--scan-generated`）：
 
-| 选项         | 说明                     | 默认值  |
-| ------------ | ------------------------ | ------- |
-| `--root`     | 扫描根目录               | `.`     |
-| `--relative` | 以相对路径输出           | `false` |
-| `--delete`   | 删除匹配到的生成文件     | `false` |
-| `--dry-run`  | 仅扫描输出，不执行删除   | `false` |
+| 选项         | 说明                   | 默认值  |
+| ------------ | ---------------------- | ------- |
+| `--root`     | 扫描根目录             | `.`     |
+| `--relative` | 以相对路径输出         | `false` |
+| `--delete`   | 删除匹配到的生成文件   | `false` |
+| `--dry-run`  | 仅扫描输出，不执行删除 | `false` |
 
 ### 扫描生成文件
 
@@ -224,13 +224,13 @@ Compiling src/main.fdl...
 
 ## 支持语言
 
-| 语言   | 标记     | 输出后缀 | 说明                          |
-| ------ | -------- | -------- | ----------------------------- |
-| Java   | `java`   | `.java`  | 带 Fory 注解的 POJO           |
-| Python | `python` | `.py`    | 带类型提示的 dataclass        |
-| Go     | `go`     | `.go`    | 带 struct tag 的结构体        |
-| Rust   | `rust`   | `.rs`    | 带 derive 宏的结构体          |
-| C++    | `cpp`    | `.h`     | 带 FORY 宏的结构体            |
+| 语言   | 标记     | 输出后缀 | 说明                   |
+| ------ | -------- | -------- | ---------------------- |
+| Java   | `java`   | `.java`  | 带 Fory 注解的 POJO    |
+| Python | `python` | `.py`    | 带类型提示的 dataclass |
+| Go     | `go`     | `.go`    | 带 struct tag 的结构体 |
+| Rust   | `rust`   | `.rs`    | 带 derive 宏的结构体   |
+| C++    | `cpp`    | `.h`     | 带 FORY 宏的结构体     |
 
 ## 输出结构
 

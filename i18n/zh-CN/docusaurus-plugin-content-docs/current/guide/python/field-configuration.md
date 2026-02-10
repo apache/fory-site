@@ -70,15 +70,15 @@ class User:
 
 ### 参数
 
-| 参数              | 类型       | 默认值    | 说明                                 |
-| ----------------- | ---------- | --------- | ------------------------------------ |
-| `id`              | `int`      | `-1`      | 字段 tag ID（`-1` 表示使用字段名）   |
-| `nullable`        | `bool`     | `False`   | 字段是否可为 null/None               |
-| `ref`             | `bool`     | `False`   | 是否启用引用跟踪                     |
-| `ignore`          | `bool`     | `False`   | 是否从序列化中排除                   |
-| `dynamic`         | `bool`     | `None`    | 控制是否写入类型信息                 |
-| `default`         | Any        | `MISSING` | 字段默认值                           |
-| `default_factory` | Callable   | `MISSING` | 默认值工厂函数                       |
+| 参数              | 类型     | 默认值    | 说明                               |
+| ----------------- | -------- | --------- | ---------------------------------- |
+| `id`              | `int`    | `-1`      | 字段 tag ID（`-1` 表示使用字段名） |
+| `nullable`        | `bool`   | `False`   | 字段是否可为 null/None             |
+| `ref`             | `bool`   | `False`   | 是否启用引用跟踪                   |
+| `ignore`          | `bool`   | `False`   | 是否从序列化中排除                 |
+| `dynamic`         | `bool`   | `None`    | 控制是否写入类型信息               |
+| `default`         | Any      | `MISSING` | 字段默认值                         |
+| `default_factory` | Callable | `MISSING` | 默认值工厂函数                     |
 
 ## 字段 ID（`id`）
 
@@ -272,21 +272,21 @@ class FloatingPoint:
 
 ### 编码汇总
 
-| 类型                   | 编码    | 大小       |
-| ---------------------- | ------- | ---------- |
-| `pyfory.int8`          | fixed   | 1 字节     |
-| `pyfory.int16`         | fixed   | 2 字节     |
-| `pyfory.int32`         | varint  | 1-5 字节   |
-| `pyfory.int64`         | varint  | 1-10 字节  |
-| `pyfory.uint8`         | fixed   | 1 字节     |
-| `pyfory.uint16`        | fixed   | 2 字节     |
-| `pyfory.uint32`        | varint  | 1-5 字节   |
-| `pyfory.uint64`        | varint  | 1-10 字节  |
-| `pyfory.fixed_uint32`  | fixed   | 4 字节     |
-| `pyfory.fixed_uint64`  | fixed   | 8 字节     |
-| `pyfory.tagged_uint64` | tagged  | 1-9 字节   |
-| `pyfory.float32`       | fixed   | 4 字节     |
-| `pyfory.float64`       | fixed   | 8 字节     |
+| 类型                   | 编码   | 大小      |
+| ---------------------- | ------ | --------- |
+| `pyfory.int8`          | fixed  | 1 字节    |
+| `pyfory.int16`         | fixed  | 2 字节    |
+| `pyfory.int32`         | varint | 1-5 字节  |
+| `pyfory.int64`         | varint | 1-10 字节 |
+| `pyfory.uint8`         | fixed  | 1 字节    |
+| `pyfory.uint16`        | fixed  | 2 字节    |
+| `pyfory.uint32`        | varint | 1-5 字节  |
+| `pyfory.uint64`        | varint | 1-10 字节 |
+| `pyfory.fixed_uint32`  | fixed  | 4 字节    |
+| `pyfory.fixed_uint64`  | fixed  | 8 字节    |
+| `pyfory.tagged_uint64` | tagged | 1-9 字节  |
+| `pyfory.float32`       | fixed  | 4 字节    |
+| `pyfory.float64`       | fixed  | 8 字节    |
 
 **何时使用：**
 
@@ -454,11 +454,11 @@ class User:
 
 ### 默认值汇总
 
-| 选项       | Native 模式默认值                                 | Xlang 模式默认值 |
-| ---------- | -------------------------------------------------- | ---------------- |
-| `nullable` | `str`/数值类型为 `False`，其余对象通常可空         | `False`          |
-| `ref`      | `True`（`str` 和数值类型除外）                    | `False`          |
-| `dynamic`  | `True`（数值/str/time 类型除外）                  | `False`（具体类型） |
+| 选项       | Native 模式默认值                          | Xlang 模式默认值    |
+| ---------- | ------------------------------------------ | ------------------- |
+| `nullable` | `str`/数值类型为 `False`，其余对象通常可空 | `False`             |
+| `ref`      | `True`（`str` 和数值类型除外）             | `False`             |
+| `dynamic`  | `True`（数值/str/time 类型除外）           | `False`（具体类型） |
 
 ## 最佳实践
 
@@ -471,19 +471,19 @@ class User:
 
 ## 选项速查
 
-| 配置                                           | 说明                                  |
-| ---------------------------------------------- | ------------------------------------- |
-| `pyfory.field(id=N)`                           | 字段 tag ID，减少元信息开销           |
-| `pyfory.field(nullable=True)`                  | 标记字段可空                          |
-| `pyfory.field(ref=True)`                       | 启用引用跟踪                          |
-| `pyfory.field(ignore=True)`                    | 将字段排除在序列化之外                |
-| `pyfory.field(dynamic=True)`                   | 强制写入类型信息                      |
-| `pyfory.field(dynamic=False)`                  | 跳过类型信息（按声明类型处理）        |
-| `Optional[T]`                                  | 可空字段类型提示                      |
-| `pyfory.int32`, `pyfory.int64`                 | 有符号整数（varint 编码）             |
-| `pyfory.uint32`, `pyfory.uint64`               | 无符号整数（varint 编码）             |
-| `pyfory.fixed_uint32`, `pyfory.fixed_uint64`   | 定长无符号整数                        |
-| `pyfory.tagged_uint64`                         | uint64 的 tagged 编码                 |
+| 配置                                         | 说明                           |
+| -------------------------------------------- | ------------------------------ |
+| `pyfory.field(id=N)`                         | 字段 tag ID，减少元信息开销    |
+| `pyfory.field(nullable=True)`                | 标记字段可空                   |
+| `pyfory.field(ref=True)`                     | 启用引用跟踪                   |
+| `pyfory.field(ignore=True)`                  | 将字段排除在序列化之外         |
+| `pyfory.field(dynamic=True)`                 | 强制写入类型信息               |
+| `pyfory.field(dynamic=False)`                | 跳过类型信息（按声明类型处理） |
+| `Optional[T]`                                | 可空字段类型提示               |
+| `pyfory.int32`, `pyfory.int64`               | 有符号整数（varint 编码）      |
+| `pyfory.uint32`, `pyfory.uint64`             | 无符号整数（varint 编码）      |
+| `pyfory.fixed_uint32`, `pyfory.fixed_uint64` | 定长无符号整数                 |
+| `pyfory.tagged_uint64`                       | uint64 的 tagged 编码          |
 
 ## 相关主题
 

@@ -55,12 +55,12 @@ Enterprise-grade security and compatibility:
 
 Apache Fory™ implements multiple binary protocols optimized for different scenarios:
 
-| Protocol                                                                  | Use Case                       | Key Features                                           |
-| ------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
+| Protocol                                                                | Use Case                       | Key Features                                           |
+| ----------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
 | **[Xlang Serialization](../specification/xlang_serialization_spec.md)** | Cross-language object exchange | Automatic serialization, references, polymorphism      |
 | **[Java Serialization](../specification/java_serialization_spec.md)**   | High-performance Java-only     | Drop-in JDK serialization replacement, 100x faster     |
 | **[Row Format](../specification/row_format_spec.md)**                   | Analytics and data processing  | Zero-copy random access, Arrow compatibility           |
-| **Python Native**                                                         | Python-specific serialization  | Pickle/cloudpickle replacement with better performance |
+| **Python Native**                                                       | Python-specific serialization  | Pickle/cloudpickle replacement with better performance |
 
 All protocols share the same optimized codebase, allowing improvements in one protocol to benefit others.
 
@@ -68,21 +68,21 @@ All protocols share the same optimized codebase, allowing improvements in one pr
 
 ### User Guides
 
-| Guide                            | Description                                | Source                                                                  | Website                                                                             |
-| -------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **Java Serialization**           | Comprehensive guide for Java serialization | [java_serialization_guide.md](../guide/java_serialization_guide.md)   | [📖 View](https://fory.apache.org/docs/guide/java_serialization)               |
+| Guide                            | Description                                | Source                                                                | Website                                                                             |
+| -------------------------------- | ------------------------------------------ | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Java Serialization**           | Comprehensive guide for Java serialization | [java_serialization_guide.md](../guide/java_serialization_guide.md)   | [📖 View](https://fory.apache.org/docs/guide/java_serialization)                    |
 | **Cross-Language Serialization** | Multi-language object exchange             | [xlang_serialization_guide.md](../guide/xlang_serialization_guide.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
 | **Row Format**                   | Zero-copy random access format             | [row_format_guide.md](../guide/row_format_guide.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
-| **Python**                       | Python-specific features and usage         | [python_guide.md](../guide/python_guide.md)                           | [📖 View](https://fory.apache.org/docs/guide/python_serialization)             |
-| **Rust**                         | Rust implementation and patterns           | [rust_guide.md](../guide/rust_guide.md)                               | [📖 View](https://fory.apache.org/docs/guide/rust_serialization)               |
-| **Scala**                        | Scala integration and best practices       | [scala_guide.md](../guide/scala_guide.md)                             | [📖 View](https://fory.apache.org/docs/guide/scala_serialization)              |
-| **GraalVM**                      | Native image support and AOT compilation   | [graalvm_guide.md](../guide/graalvm_guide.md)                         | [📖 View](https://fory.apache.org/docs/guide/graalvm_serialization)            |
-| **Development**                  | Building and contributing to Fory          | [DEVELOPMENT.md](../guide/DEVELOPMENT.md)                             | [📖 View](https://fory.apache.org/docs/guide/development)                      |
+| **Python**                       | Python-specific features and usage         | [python_guide.md](../guide/python_guide.md)                           | [📖 View](https://fory.apache.org/docs/guide/python_serialization)                  |
+| **Rust**                         | Rust implementation and patterns           | [rust_guide.md](../guide/rust_guide.md)                               | [📖 View](https://fory.apache.org/docs/guide/rust_serialization)                    |
+| **Scala**                        | Scala integration and best practices       | [scala_guide.md](../guide/scala_guide.md)                             | [📖 View](https://fory.apache.org/docs/guide/scala_serialization)                   |
+| **GraalVM**                      | Native image support and AOT compilation   | [graalvm_guide.md](../guide/graalvm_guide.md)                         | [📖 View](https://fory.apache.org/docs/guide/graalvm_serialization)                 |
+| **Development**                  | Building and contributing to Fory          | [DEVELOPMENT.md](../guide/DEVELOPMENT.md)                             | [📖 View](https://fory.apache.org/docs/guide/development)                           |
 
 ### Protocol Specifications
 
-| Specification           | Description                    | Source                                                                        | Website                                                                             |
-| ----------------------- | ------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Specification           | Description                    | Source                                                                      | Website                                                                             |
+| ----------------------- | ------------------------------ | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | **Xlang Serialization** | Cross-language binary protocol | [xlang_serialization_spec.md](../specification/xlang_serialization_spec.md) | [📖 View](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
 | **Java Serialization**  | Java-optimized protocol        | [java_serialization_spec.md](../specification/java_serialization_spec.md)   | [📖 View](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
 | **Row Format**          | Row-based binary format        | [row_format_spec.md](../specification/row_format_spec.md)                   | [📖 View](https://fory.apache.org/docs/specification/fory_row_format_spec)          |

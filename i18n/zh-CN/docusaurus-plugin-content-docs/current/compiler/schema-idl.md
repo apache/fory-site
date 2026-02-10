@@ -91,13 +91,13 @@ package com.example.models alias models_v1;
 
 语言映射：
 
-| 语言   | package 用法                        |
-| ------ | ----------------------------------- |
-| Java   | Java package                        |
-| Python | 模块名（`.` 转 `_`）                |
-| Go     | 包名（通常取最后一段）              |
-| Rust   | 模块名（`.` 转 `_`）                |
-| C++    | 命名空间（`.` 转 `::`）             |
+| 语言   | package 用法            |
+| ------ | ----------------------- |
+| Java   | Java package            |
+| Python | 模块名（`.` 转 `_`）    |
+| Go     | 包名（通常取最后一段）  |
+| Rust   | 模块名（`.` 转 `_`）    |
+| C++    | 命名空间（`.` 转 `::`） |
 
 ## 文件级选项
 
@@ -184,11 +184,11 @@ message Receipt {
 
 行为：
 
-| `java_outer_classname` | `java_multiple_files` | 结果                                       |
-| ---------------------- | --------------------- | ------------------------------------------ |
-| 未设置                 | 任意                  | 每个类型一个文件                            |
-| 已设置                 | `false`（默认）       | 单文件 + 内部类                             |
-| 已设置                 | `true`                | 强制拆分为多文件                            |
+| `java_outer_classname` | `java_multiple_files` | 结果             |
+| ---------------------- | --------------------- | ---------------- |
+| 未设置                 | 任意                  | 每个类型一个文件 |
+| 已设置                 | `false`（默认）       | 单文件 + 内部类  |
+| 已设置                 | `true`                | 强制拆分为多文件 |
 
 ### 多个选项组合
 
@@ -397,13 +397,13 @@ message Person {
 
 ### 各语言生成形态
 
-| 语言   | 嵌套类型形态                  |
-| ------ | ----------------------------- |
-| Java   | `Outer.Inner`                |
-| Python | `Outer.Inner`                |
-| Rust   | `outer::Inner`               |
-| C++    | `Outer::Inner`               |
-| Go     | `Outer_Inner`（默认）        |
+| 语言   | 嵌套类型形态          |
+| ------ | --------------------- |
+| Java   | `Outer.Inner`         |
+| Python | `Outer.Inner`         |
+| Rust   | `outer::Inner`        |
+| C++    | `Outer::Inner`        |
+| Go     | `Outer_Inner`（默认） |
 
 ### 嵌套规则
 
@@ -516,15 +516,15 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
 ### Primitive Types
 
-| 类型族        | 示例                                      |
-| ------------- | ----------------------------------------- |
-| 布尔          | `bool`                                    |
-| 整数          | `int8/int16/int32/int64`、`uint*`         |
-| 浮点          | `float32`、`float64`                      |
-| 字符串        | `string`                                  |
-| 字节数组      | `bytes`                                   |
-| 时间          | `date`、`timestamp`、`duration`           |
-| 动态类型      | `any`                                     |
+| 类型族   | 示例                              |
+| -------- | --------------------------------- |
+| 布尔     | `bool`                            |
+| 整数     | `int8/int16/int32/int64`、`uint*` |
+| 浮点     | `float32`、`float64`              |
+| 字符串   | `string`                          |
+| 字节数组 | `bytes`                           |
+| 时间     | `date`、`timestamp`、`duration`   |
+| 动态类型 | `any`                             |
 
 #### Boolean
 
