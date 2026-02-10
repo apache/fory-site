@@ -455,6 +455,6 @@ struct User {
 
 ## Related Topics
 
-- [Basic Serialization](basic-serialization.md) - Getting started with Fory serialization
-- [Schema Evolution](schema-evolution.md) - Compatible mode and schema evolution
-- [Cross-Language](cross-language.md) - Interoperability with Java, C++, Go, Python
+- [Basic Serialization](basic_serialization) - Getting started with Fory serialization
+- [Schema Evolution](schema_evolution) - Compatible mode and schema evolution
+- [Cross-Language](cross_language) - Interoperability with Java, C++, Go, Python

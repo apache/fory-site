@@ -1,7 +1,7 @@
 ---
 title: Reference Tracking
 sidebar_position: 45
-id: xlang_reference_tracking
+id: reference_tracking
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
