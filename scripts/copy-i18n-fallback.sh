@@ -17,8 +17,9 @@ copy_folder_to_zh() {
   if [ -d "$ROOT_DIR/docs/$folder_name" ]; then
     local current_target="$ZH_CN_DOCS/current/$folder_name"
     mkdir -p "$current_target"
-    cp -r "$ROOT_DIR/docs/$folder_name/." "$current_target/"
-    echo "  Copied docs/$folder_name -> current/$folder_name"
+    # Preserve translated files: only copy files that don't already exist.
+    rsync -a --ignore-existing "$ROOT_DIR/docs/$folder_name/" "$current_target/"
+    echo "  Synced missing docs/$folder_name -> current/$folder_name"
   fi
 
   # Copy versioned docs folder
@@ -28,8 +29,9 @@ copy_folder_to_zh() {
       version=$(basename "$version_dir")
       local version_target="$ZH_CN_DOCS/$version/$folder_name"
       mkdir -p "$version_target"
-      cp -r "$version_dir/$folder_name/." "$version_target/"
-      echo "  Copied versioned_docs/$version/$folder_name -> $version/$folder_name"
+      # Preserve translated files: only copy files that don't already exist.
+      rsync -a --ignore-existing "$version_dir/$folder_name/" "$version_target/"
+      echo "  Synced missing versioned_docs/$version/$folder_name -> $version/$folder_name"
     fi
   done
 }

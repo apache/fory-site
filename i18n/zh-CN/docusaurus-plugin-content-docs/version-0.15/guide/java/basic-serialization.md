@@ -1,5 +1,5 @@
 ---
-title: Basic Serialization
+title: 基础序列化
 sidebar_position: 2
 id: basic_serialization
 license: |
@@ -19,61 +19,61 @@ license: |
   limitations under the License.
 ---
 
-This page covers basic serialization patterns and Fory instance creation.
+本页介绍基本的序列化模式和 Fory 实例创建。
 
-## Creating Fory Instances
+## 创建 Fory 实例
 
-### Single-Thread Fory
+### 单线程 Fory
 
-For single-threaded applications:
+对于单线程应用程序：
 
 ```java
 Fory fory = Fory.builder()
   .withLanguage(Language.JAVA)
-  // enable reference tracking for shared/circular reference.
-  // Disable it will have better performance if no duplicate reference.
+  // 启用引用跟踪以支持共享/循环引用。
+  // 如果没有重复引用，禁用它会有更好的性能。
   .withRefTracking(false)
   .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
-  // enable type forward/backward compatibility
-  // disable it for small size and better performance.
+  // 启用类型前向/后向兼容性
+  // 禁用它以获得更小的大小和更好的性能。
   // .withCompatibleMode(CompatibleMode.COMPATIBLE)
-  // enable async multi-threaded compilation.
+  // 启用异步多线程编译。
   .withAsyncCompilation(true)
   .build();
 byte[] bytes = fory.serialize(object);
 System.out.println(fory.deserialize(bytes));
 ```
 
-### Thread-Safe Fory
+### 线程安全 Fory
 
-For multi-threaded applications:
+对于多线程应用程序：
 
 ```java
 ThreadSafeFory fory = Fory.builder()
   .withLanguage(Language.JAVA)
-  // enable reference tracking for shared/circular reference.
-  // Disable it will have better performance if no duplicate reference.
+  // 启用引用跟踪以支持共享/循环引用。
+  // 如果没有重复引用，禁用它会有更好的性能。
   .withRefTracking(false)
-  // compress int for smaller size
+  // 压缩 int 以获得更小的大小
   // .withIntCompressed(true)
-  // compress long for smaller size
+  // 压缩 long 以获得更小的大小
   // .withLongCompressed(true)
   .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
-  // enable type forward/backward compatibility
-  // disable it for small size and better performance.
+  // 启用类型前向/后向兼容性
+  // 禁用它以获得更小的大小和更好的性能。
   // .withCompatibleMode(CompatibleMode.COMPATIBLE)
-  // enable async multi-threaded compilation.
+  // 启用异步多线程编译。
   .withAsyncCompilation(true)
   .buildThreadSafeFory();
 byte[] bytes = fory.serialize(object);
 System.out.println(fory.deserialize(bytes));
 ```
 
-## Object Deep Copy
+## 对象深拷贝
 
-Fory provides efficient deep copy functionality:
+Fory 提供高效的深拷贝功能：
 
-### With Reference Tracking
+### 启用引用跟踪
 
 ```java
 Fory fory = Fory.builder().withRefCopy(true).build();
@@ -81,9 +81,9 @@ SomeClass a = xxx;
 SomeClass copied = fory.copy(a);
 ```
 
-### Without Reference Tracking (Better Performance)
+### 禁用引用跟踪（更好的性能）
 
-When disabled, deep copy will ignore circular and shared references. Same reference of an object graph will be copied into different objects in one `Fory#copy`:
+禁用时，深拷贝将忽略循环引用和共享引用。对象图的相同引用将在一次 `Fory#copy` 中被复制为不同的对象：
 
 ```java
 Fory fory = Fory.builder().withRefCopy(false).build();
@@ -91,47 +91,47 @@ SomeClass a = xxx;
 SomeClass copied = fory.copy(a);
 ```
 
-## Serialization APIs
+## 序列化 API
 
-### Basic Serialize/Deserialize
+### 基本序列化/反序列化
 
 ```java
-// Serialize object to byte array
+// 将对象序列化为字节数组
 byte[] bytes = fory.serialize(object);
 
-// Deserialize byte array to object
+// 将字节数组反序列化为对象
 Object obj = fory.deserialize(bytes);
 ```
 
-### Serialize/Deserialize with Type
+### 带类型的序列化/反序列化
 
 ```java
-// Serialize with explicit type
+// 使用显式类型序列化
 byte[] bytes = fory.serializeJavaObject(object);
 
-// Deserialize with expected type
+// 使用预期类型反序列化
 MyClass obj = fory.deserializeJavaObject(bytes, MyClass.class);
 ```
 
-### Serialize/Deserialize with Type Info
+### 带类型信息的序列化/反序列化
 
 ```java
-// Serialize with type information
+// 带类型信息序列化
 byte[] bytes = fory.serializeJavaObjectAndClass(object);
 
-// Deserialize with embedded type info
+// 使用嵌入的类型信息反序列化
 Object obj = fory.deserializeJavaObjectAndClass(bytes);
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Reuse Fory instances**: Creating Fory is expensive, always reuse instances
-2. **Use appropriate thread safety**: Choose between single-thread and thread-safe based on your needs
-3. **Register classes**: Register frequently used classes for better performance
-4. **Configure reference tracking**: Disable if you don't have circular/shared references
+1. **复用 Fory 实例**：创建 Fory 成本很高，始终复用实例
+2. **使用适当的线程安全性**：根据需要在单线程和线程安全之间选择
+3. **注册类**：注册常用类以获得更好的性能
+4. **配置引用跟踪**：如果没有循环/共享引用，请禁用它
 
-## Related Topics
+## 相关主题
 
-- [Configuration Options](configuration.md) - All ForyBuilder options
-- [Type Registration](type-registration.md) - Class registration
-- [Troubleshooting](troubleshooting.md) - Common API usage issues
+- [配置选项](configuration.md) - 所有 ForyBuilder 选项
+- [类型注册](type-registration.md) - 类注册
+- [故障排除](troubleshooting.md) - 常见 API 使用问题

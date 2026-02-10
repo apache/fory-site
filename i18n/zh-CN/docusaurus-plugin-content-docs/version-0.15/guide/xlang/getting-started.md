@@ -1,6 +1,6 @@
 ---
-title: Getting Started
-sidebar_position: 10
+title: 入门指南
+sidebar_position: 1
 id: xlang_getting_started
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,26 +19,26 @@ license: |
   limitations under the License.
 ---
 
-This guide covers installation and basic setup for cross-language serialization in all supported languages.
+本指南涵盖了所有支持语言的跨语言序列化安装和基本设置。
 
-## Installation
+## 安装
 
 ### Java
 
-**Maven:**
+**Maven：**
 
 ```xml
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>0.15.0</version>
+  <version>0.14.1</version>
 </dependency>
 ```
 
-**Gradle:**
+**Gradle：**
 
 ```gradle
-implementation 'org.apache.fory:fory-core:0.15.0'
+implementation 'org.apache.fory:fory-core:0.14.1'
 ```
 
 ### Python
@@ -57,7 +57,7 @@ go get github.com/apache/fory/go/fory
 
 ```toml
 [dependencies]
-fory = "0.13"
+fory = "0.14"
 ```
 
 ### JavaScript
@@ -68,11 +68,11 @@ npm install @apache-fory/fory
 
 ### C++
 
-Use Bazel or CMake to build from source. See [C++ Guide](../cpp/index.md) for details.
+使用 Bazel 或 CMake 从源代码构建。有关详细信息，请参阅 [C++ 指南](../cpp/index.md)。
 
-## Enable Cross-Language Mode
+## 启用跨语言模式
 
-Each language requires enabling xlang mode to ensure binary compatibility across languages.
+每种语言都需要启用 xlang 模式以确保跨语言的二进制兼容性。
 
 ### Java
 
@@ -81,8 +81,8 @@ import org.apache.fory.*;
 import org.apache.fory.config.*;
 
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)  // Enable cross-language mode
-    .withRefTracking(true)          // Optional: for circular references
+    .withLanguage(Language.XLANG)  // 启用跨语言模式
+    .withRefTracking(true)          // 可选：用于循环引用
     .build();
 ```
 
@@ -91,10 +91,10 @@ Fory fory = Fory.builder()
 ```python
 import pyfory
 
-# xlang mode is enabled by default
+# xlang 模式默认启用
 fory = pyfory.Fory()
 
-# Explicit configuration
+# 显式配置
 fory = pyfory.Fory(ref_tracking=True)
 ```
 
@@ -104,7 +104,7 @@ fory = pyfory.Fory(ref_tracking=True)
 import forygo "github.com/apache/fory/go/fory"
 
 fory := forygo.NewFory()
-// Or with reference tracking
+// 或启用引用跟踪
 fory := forygo.NewFory(true)
 ```
 
@@ -136,33 +136,33 @@ auto fory = Fory::builder()
     .build();
 ```
 
-## Type Registration
+## 类型注册
 
-Custom types must be registered with consistent names or IDs across all languages.
+自定义类型必须在所有语言中使用一致的名称或 ID 进行注册。
 
-### Register by Name (Recommended)
+### 按名称注册（推荐）
 
-Using string names is more flexible and less prone to conflicts:
+使用字符串名称更灵活，不易产生冲突：
 
-**Java:**
+**Java：**
 
 ```java
 fory.register(Person.class, "example.Person");
 ```
 
-**Python:**
+**Python：**
 
 ```python
 fory.register_type(Person, typename="example.Person")
 ```
 
-**Go:**
+**Go：**
 
 ```go
 fory.RegisterNamedType(Person{}, "example.Person")
 ```
 
-**Rust:**
+**Rust：**
 
 ```rust
 #[derive(Fory)]
@@ -173,7 +173,7 @@ struct Person {
 }
 ```
 
-**JavaScript:**
+**JavaScript：**
 
 ```javascript
 const description = Type.object("example.Person", {
@@ -183,49 +183,49 @@ const description = Type.object("example.Person", {
 fory.registerSerializer(description);
 ```
 
-**C++:**
+**C++：**
 
 ```cpp
 fory.register_struct<Person>("example.Person");
-// For enums, use register_enum:
+// 对于枚举，使用 register_enum：
 // fory.register_enum<Color>("example.Color");
 ```
 
-### Register by ID
+### 按 ID 注册
 
-Using numeric IDs is faster and produces smaller binary output:
+使用数字 ID 更快，生成的二进制输出更小：
 
-**Java:**
+**Java：**
 
 ```java
 fory.register(Person.class, 100);
 ```
 
-**Python:**
+**Python：**
 
 ```python
 fory.register_type(Person, type_id=100)
 ```
 
-**Go:**
+**Go：**
 
 ```go
 fory.Register(Person{}, 100)
 ```
 
-**C++:**
+**C++：**
 
 ```cpp
 fory.register_struct<Person>(100);
-// For enums, use register_enum:
+// 对于枚举，使用 register_enum：
 // fory.register_enum<Color>(101);
 ```
 
-## Hello World Example
+## Hello World 示例
 
-A complete example showing serialization in Java and deserialization in Python:
+一个完整的示例，展示了在 Java 中序列化并在 Python 中反序列化：
 
-### Java (Serializer)
+### Java（序列化器）
 
 ```java
 import org.apache.fory.*;
@@ -255,7 +255,7 @@ public class HelloWorld {
 }
 ```
 
-### Python (Deserializer)
+### Python（反序列化器）
 
 ```python
 import pyfory
@@ -274,19 +274,19 @@ with open("person.bin", "rb") as f:
 
 person = fory.deserialize(data)
 print(f"Name: {person.name}, Age: {person.age}")
-# Output: Name: Alice, Age: 30
+# 输出: Name: Alice, Age: 30
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Use consistent type names**: Ensure all languages use the same type name or ID
-2. **Enable reference tracking**: If your data has circular or shared references
-3. **Reuse Fory instances**: Creating Fory is expensive; reuse instances
-4. **Use type annotations**: In Python, use `pyfory.Int32Type` etc. for precise type mapping
-5. **Test cross-language**: Verify serialization works across all target languages
+1. **使用一致的类型名称**：确保所有语言使用相同的类型名称或 ID
+2. **启用引用跟踪**：如果数据包含循环引用或共享引用
+3. **重用 Fory 实例**：创建 Fory 的成本较高；应重用实例
+4. **使用类型注解**：在 Python 中，使用 `pyfory.Int32Type` 等进行精确类型映射
+5. **测试跨语言**：验证序列化在所有目标语言中都能正常工作
 
-## Next Steps
+## 后续步骤
 
-- [Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping) - Cross-language type mapping reference
-- [Serialization](serialization.md) - Detailed serialization examples
-- [Troubleshooting](troubleshooting.md) - Common issues and solutions
+- [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping) - 跨语言类型映射参考
+- [序列化](serialization.md) - 详细的序列化示例
+- [故障排查](troubleshooting.md) - 常见问题及解决方案

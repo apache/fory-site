@@ -1,5 +1,5 @@
 ---
-title: Kotlin Serialization Guide
+title: Kotlin 序列化指南
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,30 +19,30 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ Kotlin provides optimized serializers for Kotlin types, built on top of Fory Java. Most standard Kotlin types work out of the box with the default Fory Java implementation, while Fory Kotlin adds additional support for Kotlin-specific types.
+Apache Fory™ Kotlin 基于 Fory Java 构建，为 Kotlin 类型提供了优化的序列化器。大多数标准 Kotlin 类型可以直接使用默认的 Fory Java 实现，而 Fory Kotlin 则为 Kotlin 特有的类型提供了额外的支持。
 
-Supported types include:
+支持的类型包括：
 
-- `data class` serialization
-- Unsigned primitives: `UByte`, `UShort`, `UInt`, `ULong`
-- Unsigned arrays: `UByteArray`, `UShortArray`, `UIntArray`, `ULongArray`
-- Stdlib types: `Pair`, `Triple`, `Result`
-- Ranges: `IntRange`, `LongRange`, `CharRange`, and progressions
-- Collections: `ArrayDeque`, empty collections (`emptyList`, `emptyMap`, `emptySet`)
-- `kotlin.time.Duration`, `kotlin.text.Regex`, `kotlin.uuid.Uuid`
+- `data class` 序列化
+- 无符号原始类型：`UByte`、`UShort`、`UInt`、`ULong`
+- 无符号数组：`UByteArray`、`UShortArray`、`UIntArray`、`ULongArray`
+- 标准库类型：`Pair`、`Triple`、`Result`
+- 范围：`IntRange`、`LongRange`、`CharRange` 以及等差数列
+- 集合：`ArrayDeque`、空集合（`emptyList`、`emptyMap`、`emptySet`）
+- `kotlin.time.Duration`、`kotlin.text.Regex`、`kotlin.uuid.Uuid`
 
-## Features
+## 特性
 
-Fory Kotlin inherits all features from Fory Java, plus Kotlin-specific optimizations:
+Fory Kotlin 继承了 Fory Java 的所有特性，并增加了 Kotlin 特定的优化：
 
-- **High Performance**: JIT code generation, zero-copy, 20-170x faster than traditional serialization
-- **Kotlin Type Support**: Optimized serializers for data classes, unsigned types, ranges, and stdlib types
-- **Default Value Support**: Automatic handling of Kotlin data class default parameters during schema evolution
-- **Schema Evolution**: Forward/backward compatibility for class schema changes
+- **高性能**：JIT 代码生成、零拷贝，比传统序列化快 20-170 倍
+- **Kotlin 类型支持**：为数据类、无符号类型、范围和标准库类型提供优化的序列化器
+- **默认值支持**：在 schema 演化期间自动处理 Kotlin 数据类的默认参数
+- **Schema 演化**：支持类 schema 变更的前向/后向兼容性
 
-See [Java Features](../java/index.md#features) for complete feature list.
+完整特性列表请参阅 [Java 特性](../java/index.md#features)。
 
-## Installation
+## 安装
 
 ### Maven
 
@@ -50,17 +50,17 @@ See [Java Features](../java/index.md#features) for complete feature list.
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-kotlin</artifactId>
-  <version>0.15.0</version>
+  <version>0.14.1</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation("org.apache.fory:fory-kotlin:0.15.0")
+implementation("org.apache.fory:fory-kotlin:0.14.1")
 ```
 
-## Quick Start
+## 快速开始
 
 ```kotlin
 import org.apache.fory.Fory
@@ -71,15 +71,15 @@ data class Person(val name: String, val id: Long, val github: String)
 data class Point(val x: Int, val y: Int, val z: Int)
 
 fun main() {
-    // Create Fory instance (should be reused)
+    // 创建 Fory 实例（应该重用）
     val fory: ThreadSafeFory = Fory.builder()
         .requireClassRegistration(true)
         .buildThreadSafeFory()
 
-    // Register Kotlin serializers
+    // 注册 Kotlin 序列化器
     KotlinSerializers.registerSerializers(fory)
 
-    // Register your classes
+    // 注册你的类
     fory.register(Person::class.java)
     fory.register(Point::class.java)
 
@@ -89,20 +89,20 @@ fun main() {
 }
 ```
 
-## Built on Fory Java
+## 基于 Fory Java 构建
 
-Fory Kotlin is built on top of Fory Java. Most configuration options, features, and concepts from Fory Java apply directly to Kotlin. Refer to the Java documentation for:
+Fory Kotlin 基于 Fory Java 构建。Fory Java 的大多数配置选项、特性和概念直接适用于 Kotlin。请参阅 Java 文档了解：
 
-- [Configuration Options](../java/configuration.md) - All ForyBuilder options
-- [Basic Serialization](../java/basic-serialization.md) - Serialization patterns and APIs
-- [Type Registration](../java/type-registration.md) - Class registration and security
-- [Schema Evolution](../java/schema-evolution.md) - Forward/backward compatibility
-- [Custom Serializers](../java/custom-serializers.md) - Implement custom serializers
-- [Compression](../java/compression.md) - Int, long, and string compression
-- [Troubleshooting](../java/troubleshooting.md) - Common issues and solutions
+- [配置选项](../java/configuration.md) - 所有 ForyBuilder 选项
+- [基础序列化](../java/basic-serialization.md) - 序列化模式和 API
+- [类型注册](../java/type-registration.md) - 类注册和安全性
+- [Schema 演化](../java/schema-evolution.md) - 前向/后向兼容性
+- [自定义序列化器](../java/custom-serializers.md) - 实现自定义序列化器
+- [压缩](../java/compression.md) - Int、long 和字符串压缩
+- [故障排除](../java/troubleshooting.md) - 常见问题和解决方案
 
-## Kotlin-Specific Documentation
+## Kotlin 特定文档
 
-- [Fory Creation](fory-creation.md) - Kotlin-specific Fory setup requirements
-- [Type Serialization](type-serialization.md) - Serializing Kotlin types
-- [Default Values](default-values.md) - Kotlin data class default values support
+- [Fory 创建](fory-creation.md) - Kotlin 特定的 Fory 设置要求
+- [类型序列化](type-serialization.md) - 序列化 Kotlin 类型
+- [默认值](default-values.md) - Kotlin 数据类默认值支持

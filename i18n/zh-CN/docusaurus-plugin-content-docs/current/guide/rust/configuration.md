@@ -1,5 +1,5 @@
 ---
-title: Configuration
+title: 配置
 sidebar_position: 1
 id: configuration
 license: |
@@ -19,64 +19,64 @@ license: |
   limitations under the License.
 ---
 
-This page covers Fory configuration options and serialization modes.
+本页涵盖 Fory 配置选项和序列化模式。
 
-## Serialization Modes
+## 序列化模式
 
-Apache Fory™ supports two serialization modes:
+Apache Fory™ 支持两种序列化模式：
 
-### SchemaConsistent Mode (Default)
+### SchemaConsistent 模式（默认）
 
-Type declarations must match exactly between peers:
+类型声明必须在对等方之间完全匹配：
 
 ```rust
-let fory = Fory::default(); // SchemaConsistent by default
+let fory = Fory::default(); // 默认为 SchemaConsistent
 ```
 
-### Compatible Mode
+### Compatible 模式
 
-Allows independent schema evolution:
+允许独立的 schema 演化：
 
 ```rust
 let fory = Fory::default().compatible(true);
 ```
 
-## Configuration Options
+## 配置选项
 
-### Maximum Dynamic Object Nesting Depth
+### 最大动态对象嵌套深度
 
-Apache Fory™ provides protection against stack overflow from deeply nested dynamic objects during deserialization. By default, the maximum nesting depth is set to 5 levels for trait objects and containers.
+Apache Fory™ 提供针对反序列化期间深度嵌套动态对象导致的栈溢出保护。默认情况下，trait 对象和容器的最大嵌套深度设置为 5 层。
 
-**Default configuration:**
+**默认配置：**
 
 ```rust
 let fory = Fory::default(); // max_dyn_depth = 5
 ```
 
-**Custom depth limit:**
+**自定义深度限制：**
 
 ```rust
-let fory = Fory::default().max_dyn_depth(10); // Allow up to 10 levels
+let fory = Fory::default().max_dyn_depth(10); // 允许最多 10 层
 ```
 
-**When to adjust:**
+**何时调整：**
 
-- **Increase**: For legitimate deeply nested data structures
-- **Decrease**: For stricter security requirements or shallow data structures
+- **增加**：用于合法的深度嵌套数据结构
+- **减少**：用于更严格的安全要求或浅层数据结构
 
-**Protected types:**
+**受保护的类型：**
 
-- `Box<dyn Any>`, `Rc<dyn Any>`, `Arc<dyn Any>`
-- `Box<dyn Trait>`, `Rc<dyn Trait>`, `Arc<dyn Trait>` (trait objects)
-- `RcWeak<T>`, `ArcWeak<T>`
-- Collection types (Vec, HashMap, HashSet)
-- Nested struct types in Compatible mode
+- `Box<dyn Any>`、`Rc<dyn Any>`、`Arc<dyn Any>`
+- `Box<dyn Trait>`、`Rc<dyn Trait>`、`Arc<dyn Trait>`（trait 对象）
+- `RcWeak<T>`、`ArcWeak<T>`
+- 集合类型（Vec、HashMap、HashSet）
+- Compatible 模式下的嵌套结构体类型
 
-Note: Static data types (non-dynamic types) are secure by nature and not subject to depth limits, as their structure is known at compile time.
+注意：静态数据类型（非动态类型）本质上是安全的，不受深度限制约束，因为它们的结构在编译时就已知。
 
-### Cross-Language Mode
+### 跨语言模式
 
-Enable cross-language serialization:
+启用跨语言序列化：
 
 ```rust
 let fory = Fory::default()
@@ -84,42 +84,42 @@ let fory = Fory::default()
     .xlang(true);
 ```
 
-## Builder Pattern
+## 构建器模式
 
 ```rust
 use fory::Fory;
 
-// Default configuration
+// 默认配置
 let fory = Fory::default();
 
-// Compatible mode for schema evolution
+// 用于 schema 演化的兼容模式
 let fory = Fory::default().compatible(true);
 
-// Cross-language mode
+// 跨语言模式
 let fory = Fory::default()
     .compatible(true)
     .xlang(true);
 
-// Custom depth limit
+// 自定义深度限制
 let fory = Fory::default().max_dyn_depth(10);
 
-// Combined configuration
+// 组合配置
 let fory = Fory::default()
     .compatible(true)
     .xlang(true)
     .max_dyn_depth(10);
 ```
 
-## Configuration Summary
+## 配置摘要
 
-| Option               | Description                             | Default |
-| -------------------- | --------------------------------------- | ------- |
-| `compatible(bool)`   | Enable schema evolution                 | `false` |
-| `xlang(bool)`        | Enable cross-language mode              | `false` |
-| `max_dyn_depth(u32)` | Maximum nesting depth for dynamic types | `5`     |
+| 选项                 | 描述                   | 默认值  |
+| -------------------- | ---------------------- | ------- |
+| `compatible(bool)`   | 启用 schema 演化       | `false` |
+| `xlang(bool)`        | 启用跨语言模式         | `false` |
+| `max_dyn_depth(u32)` | 动态类型的最大嵌套深度 | `5`     |
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Using configured Fory
-- [Schema Evolution](schema-evolution.md) - Compatible mode details
-- [Cross-Language](cross-language.md) - XLANG mode
+- [基础序列化](basic-serialization.md) - 使用已配置的 Fory
+- [Schema 演化](schema-evolution.md) - Compatible 模式详情
+- [跨语言](cross-language.md) - XLANG 模式

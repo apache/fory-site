@@ -1,5 +1,5 @@
 ---
-title: Fory Creation
+title: Fory 创建
 sidebar_position: 1
 id: fory_creation
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers Kotlin-specific requirements for creating Fory instances.
+本页介绍创建 Fory 实例的 Kotlin 特定要求。
 
-## Basic Setup
+## 基本设置
 
-When using Fory for Kotlin serialization, register Kotlin serializers via `KotlinSerializers.registerSerializers(fory)`:
+在使用 Fory 进行 Kotlin 序列化时，通过 `KotlinSerializers.registerSerializers(fory)` 注册 Kotlin 序列化器：
 
 ```kotlin
 import org.apache.fory.Fory
@@ -33,15 +33,15 @@ val fory = Fory.builder()
     .requireClassRegistration(true)
     .build()
 
-// Register Kotlin serializers
+// 注册 Kotlin 序列化器
 KotlinSerializers.registerSerializers(fory)
 ```
 
-## Thread Safety
+## 线程安全
 
-Fory instance creation is not cheap. Instances should be shared between multiple serializations.
+Fory 实例的创建成本不低。实例应该在多次序列化之间共享。
 
-### Single-Thread Usage
+### 单线程使用
 
 ```kotlin
 import org.apache.fory.Fory
@@ -56,9 +56,9 @@ object ForyHolder {
 }
 ```
 
-### Multi-Thread Usage
+### 多线程使用
 
-For multi-threaded applications, use `ThreadSafeFory`:
+对于多线程应用程序，使用 `ThreadSafeFory`：
 
 ```kotlin
 import org.apache.fory.Fory
@@ -78,10 +78,10 @@ object ForyHolder {
 }
 ```
 
-### Using Builder Methods
+### 使用构建器方法
 
 ```kotlin
-// Thread-safe Fory
+// 线程安全的 Fory
 val fory: ThreadSafeFory = Fory.builder()
     .requireClassRegistration(true)
     .buildThreadSafeFory()
@@ -89,11 +89,11 @@ val fory: ThreadSafeFory = Fory.builder()
 KotlinSerializers.registerSerializers(fory)
 ```
 
-## Configuration Options
+## 配置选项
 
-All configuration options from Fory Java are available. See [Java Configuration Options](../java/configuration.md) for the complete list.
+Fory Java 的所有配置选项都可用。完整列表请参阅 [Java 配置选项](../java/configuration.md)。
 
-Common options for Kotlin:
+Kotlin 的常用选项：
 
 ```kotlin
 import org.apache.fory.Fory
@@ -101,13 +101,13 @@ import org.apache.fory.config.CompatibleMode
 import org.apache.fory.serializer.kotlin.KotlinSerializers
 
 val fory = Fory.builder()
-    // Enable reference tracking for circular references
+    // 启用循环引用的引用跟踪
     .withRefTracking(true)
-    // Enable schema evolution support
+    // 启用 schema 演化支持
     .withCompatibleMode(CompatibleMode.COMPATIBLE)
-    // Enable async compilation for better startup performance
+    // 启用异步编译以获得更好的启动性能
     .withAsyncCompilation(true)
-    // Compression options
+    // 压缩选项
     .withIntCompressed(true)
     .withLongCompressed(true)
     .build()

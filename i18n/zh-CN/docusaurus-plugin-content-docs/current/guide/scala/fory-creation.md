@@ -1,5 +1,5 @@
 ---
-title: Fory Creation
+title: Fory 创建
 sidebar_position: 1
 id: fory_creation
 license: |
@@ -19,14 +19,14 @@ license: |
   limitations under the License.
 ---
 
-This page covers Scala-specific requirements for creating Fory instances.
+本页介绍创建 Fory 实例的 Scala 特定要求。
 
-## Basic Setup
+## 基础设置
 
-When using Fory for Scala serialization, you must:
+使用 Fory 进行 Scala 序列化时，必须：
 
-1. Enable Scala optimization via `withScalaOptimizationEnabled(true)`
-2. Register Scala serializers via `ScalaSerializers.registerSerializers(fory)`
+1. 通过 `withScalaOptimizationEnabled(true)` 启用 Scala 优化
+2. 通过 `ScalaSerializers.registerSerializers(fory)` 注册 Scala 序列化器
 
 ```scala
 import org.apache.fory.Fory
@@ -36,19 +36,19 @@ val fory = Fory.builder()
   .withScalaOptimizationEnabled(true)
   .build()
 
-// Register optimized Fory serializers for Scala
+// 为 Scala 注册优化的 Fory 序列化器
 ScalaSerializers.registerSerializers(fory)
 ```
 
-## Registering Scala Internal Types
+## 注册 Scala 内部类型
 
-Depending on the object types you serialize, you may need to register some Scala internal types:
+根据序列化的对象类型，可能需要注册一些 Scala 内部类型：
 
 ```scala
 fory.register(Class.forName("scala.Enumeration.Val"))
 ```
 
-To avoid such registration, you can disable class registration:
+为避免这种注册，可以禁用类注册：
 
 ```scala
 val fory = Fory.builder()
@@ -57,11 +57,11 @@ val fory = Fory.builder()
   .build()
 ```
 
-> **Note**: Disabling class registration allows deserialization of unknown types. This is more flexible but may be insecure if the classes contain malicious code.
+> **注意**：禁用类注册允许反序列化未知类型。这更加灵活，但如果类包含恶意代码可能不安全。
 
-## Reference Tracking
+## 引用跟踪
 
-Circular references are common in Scala. Reference tracking should be enabled with `withRefTracking(true)`:
+循环引用在 Scala 中很常见。应该使用 `withRefTracking(true)` 启用引用跟踪：
 
 ```scala
 val fory = Fory.builder()
@@ -70,13 +70,13 @@ val fory = Fory.builder()
   .build()
 ```
 
-> **Note**: If you don't enable reference tracking, [StackOverflowError](https://github.com/apache/fory/issues/1032) may occur for some Scala versions when serializing Scala Enumeration.
+> **注意**：如果不启用引用跟踪，在某些 Scala 版本中序列化 Scala Enumeration 时可能会出现 [StackOverflowError](https://github.com/apache/fory/issues/1032)。
 
-## Thread Safety
+## 线程安全
 
-Fory instance creation is not cheap. Instances should be shared between multiple serializations.
+Fory 实例的创建成本不低。实例应该在多次序列化之间共享。
 
-### Single-Thread Usage
+### 单线程使用
 
 ```scala
 import org.apache.fory.Fory
@@ -93,9 +93,9 @@ object ForyHolder {
 }
 ```
 
-### Multi-Thread Usage
+### 多线程使用
 
-For multi-threaded applications, use `ThreadSafeFory`:
+对于多线程应用程序，使用 `ThreadSafeFory`：
 
 ```scala
 import org.apache.fory.ThreadSafeFory
@@ -114,11 +114,11 @@ object ForyHolder {
 }
 ```
 
-## Configuration Options
+## 配置选项
 
-All configuration options from Fory Java are available. See [Java Configuration Options](../java/configuration.md) for the complete list.
+Fory Java 的所有配置选项都可用。查看 [Java 配置选项](../java/configuration.md)获取完整列表。
 
-Common options for Scala:
+Scala 的常用选项：
 
 ```scala
 import org.apache.fory.Fory
@@ -127,11 +127,11 @@ import org.apache.fory.serializer.scala.ScalaSerializers
 
 val fory = Fory.builder()
   .withScalaOptimizationEnabled(true)
-  // Enable reference tracking for circular references
+  // 为循环引用启用引用跟踪
   .withRefTracking(true)
-  // Enable schema evolution support
+  // 启用 schema 演化支持
   .withCompatibleMode(CompatibleMode.COMPATIBLE)
-  // Enable async compilation for better startup performance
+  // 启用异步编译以获得更好的启动性能
   .withAsyncCompilation(true)
   .build()
 

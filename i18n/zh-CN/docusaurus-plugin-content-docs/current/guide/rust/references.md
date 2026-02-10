@@ -1,5 +1,5 @@
 ---
-title: Shared & Circular References
+title: 共享和循环引用
 sidebar_position: 5
 id: references
 license: |
@@ -19,17 +19,17 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ automatically tracks and preserves reference identity for shared objects using `Rc<T>` and `Arc<T>`.
+Apache Fory™ 使用 `Rc<T>` 和 `Arc<T>` 自动跟踪和保留共享对象的引用身份。
 
-## Shared References
+## 共享引用
 
-When the same object is referenced multiple times, Fory serializes it only once and uses reference IDs for subsequent occurrences. This ensures:
+当同一对象被多次引用时，Fory 仅序列化一次，并对后续出现使用引用 ID。这确保了：
 
-- **Space efficiency**: No data duplication in serialized output
-- **Reference identity preservation**: Deserialized objects maintain the same sharing relationships
-- **Circular reference support**: Use `RcWeak<T>` and `ArcWeak<T>` to break cycles
+- **空间效率**：序列化输出中无数据重复
+- **引用身份保留**：反序列化的对象保持相同的共享关系
+- **循环引用支持**：使用 `RcWeak<T>` 和 `ArcWeak<T>` 打破循环
 
-### Shared References with Rc
+### 使用 Rc 的共享引用
 
 ```rust
 use fory::Fory;
@@ -37,28 +37,28 @@ use std::rc::Rc;
 
 let fory = Fory::default();
 
-// Create a shared value
+// 创建共享值
 let shared = Rc::new(String::from("shared_value"));
 
-// Reference it multiple times
+// 多次引用它
 let data = vec![shared.clone(), shared.clone(), shared.clone()];
 
-// The shared value is serialized only once
+// 共享值仅序列化一次
 let bytes = fory.serialize(&data);
 let decoded: Vec<Rc<String>> = fory.deserialize(&bytes)?;
 
-// Verify reference identity is preserved
+// 验证引用身份被保留
 assert_eq!(decoded.len(), 3);
 assert_eq!(*decoded[0], "shared_value");
 
-// All three Rc pointers point to the same object
+// 所有三个 Rc 指针指向同一对象
 assert!(Rc::ptr_eq(&decoded[0], &decoded[1]));
 assert!(Rc::ptr_eq(&decoded[1], &decoded[2]));
 ```
 
-### Shared References with Arc
+### 使用 Arc 的共享引用
 
-For thread-safe shared references, use `Arc<T>`:
+对于线程安全的共享引用，使用 `Arc<T>`：
 
 ```rust
 use fory::Fory;
@@ -75,18 +75,18 @@ let decoded: Vec<Arc<String>> = fory.deserialize(&bytes)?;
 assert!(Arc::ptr_eq(&decoded[0], &decoded[1]));
 ```
 
-## Circular References with Weak Pointers
+## 使用弱指针的循环引用
 
-To serialize circular references like parent-child relationships or doubly-linked structures, use `RcWeak<T>` or `ArcWeak<T>` to break the cycle.
+要序列化类似父子关系或双向链表结构的循环引用，使用 `RcWeak<T>` 或 `ArcWeak<T>` 来打破循环。
 
-**How it works:**
+**工作原理：**
 
-- Weak pointers serialize as references to their target objects
-- If the strong pointer has been dropped, weak serializes as `Null`
-- Forward references (weak appearing before target) are resolved via callbacks
-- All clones of a weak pointer share the same internal cell for automatic updates
+- 弱指针序列化为对其目标对象的引用
+- 如果强指针已被丢弃，弱指针序列化为 `Null`
+- 前向引用（弱指针出现在目标之前）通过回调解析
+- 弱指针的所有克隆共享相同的内部单元以进行自动更新
 
-### Circular References with RcWeak
+### 使用 RcWeak 的循环引用
 
 ```rust
 use fory::{Fory, Error};
@@ -105,7 +105,7 @@ struct Node {
 let mut fory = Fory::default();
 fory.register::<Node>(2000);
 
-// Build a parent-child tree
+// 构建父子树
 let parent = Rc::new(RefCell::new(Node {
     value: 1,
     parent: RcWeak::new(),
@@ -127,11 +127,11 @@ let child2 = Rc::new(RefCell::new(Node {
 parent.borrow_mut().children.push(child1.clone());
 parent.borrow_mut().children.push(child2.clone());
 
-// Serialize and deserialize the circular structure
+// 序列化和反序列化循环结构
 let bytes = fory.serialize(&parent);
 let decoded: Rc<RefCell<Node>> = fory.deserialize(&bytes)?;
 
-// Verify the circular relationship
+// 验证循环关系
 assert_eq!(decoded.borrow().children.len(), 2);
 for child in &decoded.borrow().children {
     let upgraded_parent = child.borrow().parent.upgrade().unwrap();
@@ -139,7 +139,7 @@ for child in &decoded.borrow().children {
 }
 ```
 
-### Thread-Safe Circular Graphs with Arc
+### 使用 Arc 的线程安全循环图
 
 ```rust
 use fory::{Fory, Error};
@@ -188,26 +188,26 @@ for child in &decoded.lock().unwrap().children {
 }
 ```
 
-## Supported Smart Pointer Types
+## 支持的智能指针类型
 
-| Type         | Description                                         |
-| ------------ | --------------------------------------------------- |
-| `Rc<T>`      | Reference counting, shared refs tracked             |
-| `Arc<T>`     | Thread-safe reference counting, shared refs tracked |
-| `RcWeak<T>`  | Weak reference to `Rc<T>`, breaks circular refs     |
-| `ArcWeak<T>` | Weak reference to `Arc<T>`, breaks circular refs    |
-| `RefCell<T>` | Interior mutability with runtime borrow checking    |
-| `Mutex<T>`   | Thread-safe interior mutability                     |
+| 类型         | 描述                                 |
+| ------------ | ------------------------------------ |
+| `Rc<T>`      | 引用计数，跟踪共享引用               |
+| `Arc<T>`     | 线程安全引用计数，跟踪共享引用       |
+| `RcWeak<T>`  | 指向 `Rc<T>` 的弱引用，打破循环引用  |
+| `ArcWeak<T>` | 指向 `Arc<T>` 的弱引用，打破循环引用 |
+| `RefCell<T>` | 内部可变性，运行时借用检查           |
+| `Mutex<T>`   | 线程安全内部可变性                   |
 
-## Best Practices
+## 最佳实践
 
-1. **Use Rc/Arc for shared data**: Let Fory handle deduplication
-2. **Use weak pointers for cycles**: Prevent infinite recursion
-3. **Prefer Arc for thread-safe scenarios**: When data crosses thread boundaries
-4. **Combine with RefCell/Mutex**: For interior mutability
+1. **使用 Rc/Arc 共享数据**：让 Fory 处理去重
+2. **使用弱指针处理循环**：防止无限递归
+3. **对线程安全场景优先使用 Arc**：当数据跨越线程边界时
+4. **与 RefCell/Mutex 结合使用**：用于内部可变性
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Supported types
-- [Polymorphism](polymorphism.md) - Trait objects with Rc/Arc
-- [Configuration](configuration.md) - Reference tracking options
+- [基础序列化](basic-serialization.md) - 支持的类型
+- [多态](polymorphism.md) - 使用 Rc/Arc 的 Trait 对象
+- [配置](configuration.md) - 引用跟踪选项

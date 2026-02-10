@@ -1,5 +1,5 @@
 ---
-title: Struct Tags
+title: Struct 标签
 sidebar_position: 60
 id: struct_tags
 license: |
@@ -19,9 +19,12 @@ license: |
   limitations under the License.
 ---
 
+> 中文导读：本页介绍字段级序列化配置，包括字段 ID、可空控制、引用跟踪、忽略字段与动态类型控制等。
+> 建议在跨语言和兼容模式场景中优先显式配置字段 ID，并在需要时开启 ref/nullable 以保证行为一致。
+
 Fory Go uses struct tags to customize field-level serialization behavior. This allows fine-grained control over how individual fields are serialized.
 
-## Tag Syntax
+## 标签语法
 
 The general syntax for Fory struct tags:
 
@@ -33,9 +36,9 @@ type MyStruct struct {
 
 Multiple options are separated by commas (`,`).
 
-## Available Tags
+## 可用标签
 
-### Field ID
+### 字段 ID
 
 Use `id=N` to assign a numeric ID to a field for compact encoding:
 
@@ -59,7 +62,7 @@ type User struct {
 - IDs must be >= 0
 - If not specified, field name is used (larger payload)
 
-### Ignoring Fields
+### 忽略字段
 
 Use `-` to exclude a field from serialization:
 
@@ -73,7 +76,7 @@ type User struct {
 
 The `Password` field will not be included in serialized output and will remain at its zero value after deserialization.
 
-### Nullable
+### 可空控制
 
 Use `nullable` to control whether null flags are written for pointer fields:
 
@@ -93,7 +96,7 @@ type Record struct {
 - When `nullable=false`, serializing a nil value will cause an error
 - Default is `false` (no null flag written)
 
-### Reference Tracking
+### 引用跟踪
 
 Control per-field reference tracking for slices, maps, or pointer to struct fields:
 
@@ -282,7 +285,7 @@ err := f.RegisterStruct(BadStruct{}, 1)
 // Error: ErrKindInvalidTag
 ```
 
-## Best Practices
+## 最佳实践
 
 1. **Use `-` for sensitive data**: Passwords, tokens, internal state
 2. **Enable ref tracking for shared objects**: When the same pointer appears multiple times
@@ -328,7 +331,7 @@ type Session struct {
 }
 ```
 
-## Related Topics
+## 相关主题
 
 - [References](references.md)
 - [Basic Serialization](basic-serialization.md)

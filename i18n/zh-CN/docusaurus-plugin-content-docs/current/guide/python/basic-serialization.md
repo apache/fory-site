@@ -1,5 +1,5 @@
 ---
-title: Basic Serialization
+title: 基础序列化
 sidebar_position: 2
 id: basic_serialization
 license: |
@@ -19,31 +19,31 @@ license: |
   limitations under the License.
 ---
 
-This page covers basic serialization patterns in pyfory.
+本页介绍 pyfory 中的基础序列化模式。
 
-## Basic Object Serialization
+## 基础对象序列化
 
-Serialize and deserialize Python objects with a simple API:
+使用简单的 API 序列化和反序列化 Python 对象：
 
 ```python
 import pyfory
 
-# Create Fory instance
+# 创建 Fory 实例
 fory = pyfory.Fory(xlang=True)
 
-# Serialize any Python object
+# 序列化任何 Python 对象
 data = fory.dumps({"name": "Alice", "age": 30, "scores": [95, 87, 92]})
 
-# Deserialize back to Python object
+# 反序列化回 Python 对象
 obj = fory.loads(data)
 print(obj)  # {'name': 'Alice', 'age': 30, 'scores': [95, 87, 92]}
 ```
 
-**Note**: `dumps()`/`loads()` are aliases for `serialize()`/`deserialize()`. Both APIs are identical, use whichever feels more intuitive.
+**注意**：`dumps()`/`loads()` 是 `serialize()`/`deserialize()` 的别名。两个 API 完全相同，使用任何一个都可以。
 
-## Custom Class Serialization
+## 自定义类序列化
 
-Fory automatically handles dataclasses and custom types:
+Fory 自动处理 dataclass 和自定义类型：
 
 ```python
 import pyfory
@@ -57,7 +57,7 @@ class Person:
     scores: List[int]
     metadata: Dict[str, str]
 
-# Python mode - supports all Python types including dataclasses
+# Python 模式 - 支持所有 Python 类型，包括 dataclass
 fory = pyfory.Fory(xlang=False, ref=True)
 fory.register(Person)
 person = Person("Bob", 25, [88, 92, 85], {"team": "engineering"})
@@ -66,16 +66,16 @@ result = fory.deserialize(data)
 print(result)  # Person(name='Bob', age=25, ...)
 ```
 
-## Reference Tracking & Circular References
+## 引用跟踪和循环引用
 
-Handle shared references and circular dependencies safely:
+安全处理共享引用和循环依赖：
 
 ```python
 import pyfory
 
-f = pyfory.Fory(ref=True)  # Enable reference tracking
+f = pyfory.Fory(ref=True)  # 启用引用跟踪
 
-# Handle circular references safely
+# 安全处理循环引用
 class Node:
     def __init__(self, value):
         self.value = value
@@ -84,62 +84,62 @@ class Node:
 
 root = Node("root")
 child = Node("child")
-child.parent = root  # Circular reference
+child.parent = root  # 循环引用
 root.children.append(child)
 
-# Serializes without infinite recursion
+# 序列化不会导致无限递归
 data = f.serialize(root)
 result = f.deserialize(data)
-assert result.children[0].parent is result  # Reference preserved
+assert result.children[0].parent is result  # 引用被保留
 ```
 
-## API Reference
+## API 参考
 
-### Serialization Methods
+### 序列化方法
 
 ```python
-# Serialize to bytes
+# 序列化为字节
 data: bytes = fory.serialize(obj)
-data: bytes = fory.dumps(obj)  # Alias
+data: bytes = fory.dumps(obj)  # 别名
 
-# Deserialize from bytes
+# 从字节反序列化
 obj = fory.deserialize(data)
-obj = fory.loads(data)  # Alias
+obj = fory.loads(data)  # 别名
 ```
 
-### With Out-of-Band Buffers
+### 使用带外缓冲区
 
 ```python
-# Serialize with buffer callback
+# 使用缓冲区回调序列化
 buffer_objects = []
 data = fory.serialize(obj, buffer_callback=buffer_objects.append)
 
-# Deserialize with buffers
+# 使用缓冲区反序列化
 buffers = [obj.getbuffer() for obj in buffer_objects]
 obj = fory.deserialize(data, buffers=buffers)
 ```
 
-## Performance Tips
+## 性能提示
 
-1. **Disable `ref=True` if not needed**: Reference tracking has overhead
-2. **Use type_id instead of typename**: Integer IDs are faster than string names
-3. **Reuse Fory instances**: Create once, use many times
-4. **Enable Cython**: Make sure `ENABLE_FORY_CYTHON_SERIALIZATION=1`
+1. **如果不需要则禁用 `ref=True`**：引用跟踪有开销
+2. **使用 type_id 而不是 typename**：整数 ID 比字符串名称更快
+3. **重用 Fory 实例**：创建一次，多次使用
+4. **启用 Cython**：确保 `ENABLE_FORY_CYTHON_SERIALIZATION=1`
 
 ```python
-# Good: Reuse instance
+# 好：重用实例
 fory = pyfory.Fory()
 for obj in objects:
     data = fory.dumps(obj)
 
-# Bad: Create new instance each time
+# 坏：每次创建新实例
 for obj in objects:
-    fory = pyfory.Fory()  # Wasteful!
+    fory = pyfory.Fory()  # 浪费！
     data = fory.dumps(obj)
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Fory parameters
-- [Type Registration](type-registration.md) - Registration patterns
-- [Python Native Mode](python-native.md) - Functions and lambdas
+- [配置](configuration.md) - Fory 参数
+- [类型注册](type-registration.md) - 注册模式
+- [Python 原生模式](python-native.md) - 函数和 lambda

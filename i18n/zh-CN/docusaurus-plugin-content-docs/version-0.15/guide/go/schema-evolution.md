@@ -1,5 +1,5 @@
 ---
-title: Schema Evolution
+title: Schema 演进
 sidebar_position: 70
 id: schema_evolution
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Schema evolution allows your data structures to change over time while maintaining compatibility with previously serialized data. Fory Go supports this through compatible mode.
+Schema 演进允许数据结构在演进过程中仍与历史序列化数据保持兼容。Fory Go 通过兼容模式提供该能力。
 
-## Enabling Compatible Mode
+## 启用兼容模式
 
 Enable compatible mode when creating a Fory instance:
 
@@ -29,7 +29,7 @@ Enable compatible mode when creating a Fory instance:
 f := fory.New(fory.WithCompatible(true))
 ```
 
-## How It Works
+## 工作机制
 
 ### Without Compatible Mode (Default)
 
@@ -43,9 +43,9 @@ f := fory.New(fory.WithCompatible(true))
 - Supports adding, removing, and reordering fields
 - Enables forward and backward compatibility
 
-## Supported Schema Changes
+## 支持的 Schema 变更
 
-### Adding Fields
+### 新增字段
 
 New fields can be added; they receive zero values when deserializing old data:
 
@@ -79,7 +79,7 @@ f2.Deserialize(data, &userV2)
 // userV2.Email = "" (zero value)
 ```
 
-### Removing Fields
+### 删除字段
 
 Removed fields are skipped during deserialization:
 
@@ -116,7 +116,7 @@ f2.Deserialize(data, &configV2)
 // Debug field data is skipped
 ```
 
-### Reordering Fields
+### 字段重排
 
 Field order can change between versions:
 
@@ -170,7 +170,7 @@ type V2 struct {
 
 This is treated as removing `UserName` and adding `Username`, resulting in data loss.
 
-## Best Practices
+## 最佳实践
 
 ### 1. Use Compatible Mode for Persistent Data
 
@@ -333,7 +333,7 @@ func main() {
 }
 ```
 
-## Related Topics
+## 相关主题
 
 - [Configuration](configuration.md)
 - [Cross-Language Serialization](cross-language.md)

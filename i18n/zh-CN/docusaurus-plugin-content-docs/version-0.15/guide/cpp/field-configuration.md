@@ -1,5 +1,5 @@
 ---
-title: Field Configuration
+title: 字段配置
 sidebar_position: 5
 id: field_configuration
 license: |
@@ -19,9 +19,12 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to configure field-level metadata for serialization.
+> 中文导读：本页介绍字段级序列化配置，包括字段 ID、可空控制、引用跟踪、忽略字段与动态类型控制等。
+> 建议在跨语言和兼容模式场景中优先显式配置字段 ID，并在需要时开启 ref/nullable 以保证行为一致。
 
-## Overview
+本页说明如何配置序列化的字段级元信息。
+
+## 概述
 
 Apache Fory™ provides two ways to specify field-level metadata at compile time:
 
@@ -34,14 +37,14 @@ These enable:
 - **Nullability**: Mark pointer fields as nullable
 - **Reference Tracking**: Enable reference tracking for shared pointers
 
-## The fory::field Template
+## fory::field 模板
 
 ```cpp
 template <typename T, int16_t Id, typename... Options>
 class field;
 ```
 
-### Template Parameters
+### 模板参数
 
 | Parameter | Description                                      |
 | --------- | ------------------------------------------------ |
@@ -49,7 +52,7 @@ class field;
 | `Id`      | Field tag ID (int16_t) for compact serialization |
 | `Options` | Optional tags: `fory::nullable`, `fory::ref`     |
 
-### Basic Usage
+### 基本用法
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -74,7 +77,7 @@ std::string n = person.name;     // Implicit conversion
 int a = person.age.get();        // Explicit get()
 ```
 
-## Tag Types
+## 标签类型
 
 ### fory::nullable
 
@@ -293,7 +296,7 @@ The `FORY_FIELD_CONFIG` macro is the most powerful and flexible way to configure
 - **Compile-time verification**: Field names are verified against member pointers
 - **Cross-language compatibility**: Configure encoding to match other languages (Java, Rust, etc.)
 
-### Basic Syntax
+### 基本语法
 
 ```cpp
 FORY_FIELD_CONFIG(StructType,

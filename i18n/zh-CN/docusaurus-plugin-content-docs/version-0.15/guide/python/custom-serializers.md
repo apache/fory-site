@@ -1,5 +1,5 @@
 ---
-title: Custom Serializers
+title: 自定义序列化器
 sidebar_position: 4
 id: custom_serializers
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-Implement custom serialization logic for specialized types.
+为特殊类型实现自定义序列化逻辑。
 
-## Implementing Custom Serializers
+## 实现自定义序列化器
 
-Override `write/read` for Python mode, `xwrite/xread` for cross-language:
+为 Python 模式覆盖 `write/read`，为跨语言模式覆盖 `xwrite/xread`：
 
 ```python
 import pyfory
@@ -40,17 +40,17 @@ class FooSerializer(Serializer):
         super().__init__(fory, cls)
 
     def write(self, buffer, obj: Foo):
-        # Custom serialization logic
+        # 自定义序列化逻辑
         buffer.write_varint32(obj.f1)
         buffer.write_string(obj.f2)
 
     def read(self, buffer):
-        # Custom deserialization logic
+        # 自定义反序列化逻辑
         f1 = buffer.read_varint32()
         f2 = buffer.read_string()
         return Foo(f1, f2)
 
-    # For cross-language mode
+    # 用于跨语言模式
     def xwrite(self, buffer, obj: Foo):
         buffer.write_int32(obj.f1)
         buffer.write_string(obj.f2)
@@ -61,7 +61,7 @@ class FooSerializer(Serializer):
 f = pyfory.Fory()
 f.register(Foo, type_id=100, serializer=FooSerializer(f, Foo))
 
-# Now Foo uses your custom serializer
+# 现在 Foo 使用自定义序列化器
 data = f.dumps(Foo(42, "hello"))
 result = f.loads(data)
 print(result)  # Foo(f1=42, f2='hello')
@@ -69,78 +69,78 @@ print(result)  # Foo(f1=42, f2='hello')
 
 ## Buffer API
 
-### Write Methods
+### 写入方法
 
 ```python
-# Integers
+# 整数
 buffer.write_int8(value)
 buffer.write_int16(value)
 buffer.write_int32(value)
 buffer.write_int64(value)
 
-# Variable-length integers
+# 变长整数
 buffer.write_varint32(value)
 buffer.write_varint64(value)
 
-# Floating point
+# 浮点数
 buffer.write_float32(value)
 buffer.write_float64(value)
 
-# Strings and bytes
+# 字符串和字节
 buffer.write_string(value)
 buffer.write_bytes(value)
 
-# Boolean
+# 布尔值
 buffer.write_bool(value)
 ```
 
-### Read Methods
+### 读取方法
 
 ```python
-# Integers
+# 整数
 value = buffer.read_int8()
 value = buffer.read_int16()
 value = buffer.read_int32()
 value = buffer.read_int64()
 
-# Variable-length integers
+# 变长整数
 value = buffer.read_varint32()
 value = buffer.read_varint64()
 
-# Floating point
+# 浮点数
 value = buffer.read_float32()
 value = buffer.read_float64()
 
-# Strings and bytes
+# 字符串和字节
 value = buffer.read_string()
 value = buffer.read_bytes(length)
 
-# Boolean
+# 布尔值
 value = buffer.read_bool()
 ```
 
-## When to Use Custom Serializers
+## 何时使用自定义序列化器
 
-- External types from other packages
-- Types with special serialization requirements
-- Legacy data format compatibility
-- Performance-critical custom encoding
-- Types that don't work well with automatic serialization
+- 来自其他包的外部类型
+- 具有特殊序列化需求的类型
+- 旧数据格式兼容性
+- 性能关键的自定义编码
+- 自动序列化效果不好的类型
 
-## Registering Custom Serializers
+## 注册自定义序列化器
 
 ```python
 fory = pyfory.Fory()
 
-# Register with type_id
+# 使用 type_id 注册
 fory.register(MyClass, type_id=100, serializer=MySerializer(fory, MyClass))
 
-# Register with typename (for xlang)
+# 使用 typename 注册（用于 xlang）
 fory.register(MyClass, typename="com.example.MyClass", serializer=MySerializer(fory, MyClass))
 ```
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md) - Registration patterns
-- [Configuration](configuration.md) - Fory parameters
-- [Cross-Language](cross-language.md) - xwrite/xread for xlang
+- [类型注册](type-registration.md) - 注册模式
+- [配置](configuration.md) - Fory 参数
+- [跨语言](cross-language.md) - xlang 的 xwrite/xread

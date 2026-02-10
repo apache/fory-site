@@ -1,5 +1,5 @@
 ---
-title: Configuration
+title: 配置
 sidebar_position: 1
 id: configuration
 license: |
@@ -19,51 +19,51 @@ license: |
   limitations under the License.
 ---
 
-This page covers Fory configuration options and serialization modes.
+本页介绍 Fory 配置选项和序列化模式。
 
-## Serialization Modes
+## 序列化模式
 
-Apache Fory™ supports two serialization modes:
+Apache Fory™ 支持两种序列化模式：
 
-### SchemaConsistent Mode (Default)
+### SchemaConsistent 模式（默认）
 
-Type declarations must match exactly between peers:
+类型声明必须在通信双方完全匹配：
 
 ```cpp
-auto fory = Fory::builder().build(); // SchemaConsistent by default
+auto fory = Fory::builder().build(); // 默认为 SchemaConsistent
 ```
 
-### Compatible Mode
+### Compatible 模式
 
-Allows independent schema evolution:
+允许独立的 schema 演化：
 
 ```cpp
 auto fory = Fory::builder().compatible(true).build();
 ```
 
-## Builder Pattern
+## 构建器模式
 
-Use `ForyBuilder` to construct Fory instances with custom configuration:
+使用 `ForyBuilder` 构造具有自定义配置的 Fory 实例：
 
 ```cpp
 #include "fory/serialization/fory.h"
 
 using namespace fory::serialization;
 
-// Default configuration
+// 默认配置
 auto fory = Fory::builder().build();
 
-// Compatible mode for schema evolution
+// 用于 schema 演化的兼容模式
 auto fory = Fory::builder()
     .compatible(true)
     .build();
 
-// Cross-language mode
+// 跨语言模式
 auto fory = Fory::builder()
     .xlang(true)
     .build();
 
-// Full configuration
+// 完整配置
 auto fory = Fory::builder()
     .compatible(true)
     .xlang(true)
@@ -73,117 +73,117 @@ auto fory = Fory::builder()
     .build();
 ```
 
-## Configuration Options
+## 配置选项
 
 ### xlang(bool)
 
-Enable/disable cross-language (xlang) serialization mode.
+启用/禁用跨语言（xlang）序列化模式。
 
 ```cpp
 auto fory = Fory::builder()
-    .xlang(true)  // Enable cross-language compatibility
+    .xlang(true)  // 启用跨语言兼容性
     .build();
 ```
 
-When enabled, includes metadata for cross-language compatibility with Java, Python, Go, Rust, and JavaScript.
+启用后，包含用于与 Java、Python、Go、Rust 和 JavaScript 跨语言兼容的元数据。
 
-**Default:** `true`
+**默认值：** `true`
 
 ### compatible(bool)
 
-Enable/disable compatible mode for schema evolution.
+启用/禁用用于 schema 演化的兼容模式。
 
 ```cpp
 auto fory = Fory::builder()
-    .compatible(true)  // Enable schema evolution
+    .compatible(true)  // 启用 schema 演化
     .build();
 ```
 
-When enabled, supports reading data serialized with different schema versions.
+启用后，支持读取使用不同 schema 版本序列化的数据。
 
-**Default:** `false`
+**默认值：** `false`
 
 ### track_ref(bool)
 
-Enable/disable reference tracking for shared and circular references.
+启用/禁用共享引用和循环引用的引用跟踪。
 
 ```cpp
 auto fory = Fory::builder()
-    .track_ref(true)  // Enable reference tracking
+    .track_ref(true)  // 启用引用跟踪
     .build();
 ```
 
-When enabled, avoids duplicating shared objects and handles cycles.
+启用后，避免重复序列化共享对象并处理循环引用。
 
-**Default:** `true`
+**默认值：** `true`
 
 ### max_dyn_depth(uint32_t)
 
-Set maximum allowed nesting depth for dynamically-typed objects.
+设置动态类型对象的最大允许嵌套深度。
 
 ```cpp
 auto fory = Fory::builder()
-    .max_dyn_depth(10)  // Allow up to 10 levels
+    .max_dyn_depth(10)  // 允许最多 10 层
     .build();
 ```
 
-This limits the maximum depth for nested polymorphic object serialization (e.g., `shared_ptr<Base>`, `unique_ptr<Base>`). This prevents stack overflow from deeply nested structures in dynamic serialization scenarios.
+这限制了嵌套多态对象序列化的最大深度（例如 `shared_ptr<Base>`、`unique_ptr<Base>`）。防止深度嵌套结构在动态序列化场景中导致栈溢出。
 
-**Default:** `5`
+**默认值：** `5`
 
-**When to adjust:**
+**何时调整：**
 
-- **Increase**: For legitimate deeply nested data structures
-- **Decrease**: For stricter security requirements or shallow data structures
+- **增加**：对于合法的深度嵌套数据结构
+- **减少**：对于更严格的安全要求或浅层数据结构
 
 ### check_struct_version(bool)
 
-Enable/disable struct version checking.
+启用/禁用结构体版本检查。
 
 ```cpp
 auto fory = Fory::builder()
-    .check_struct_version(true)  // Enable version checking
+    .check_struct_version(true)  // 启用版本检查
     .build();
 ```
 
-When enabled, validates type hashes to detect schema mismatches.
+启用后，验证类型哈希以检测 schema 不匹配。
 
-**Default:** `false`
+**默认值：** `false`
 
-## Thread-Safe vs Single-Threaded
+## 线程安全 vs 单线程
 
-### Single-Threaded (Fastest)
-
-```cpp
-auto fory = Fory::builder()
-    .xlang(true)
-    .build();  // Returns Fory
-```
-
-Single-threaded `Fory` is the fastest option, but NOT thread-safe. Use one instance per thread.
-
-### Thread-Safe
+### 单线程（最快）
 
 ```cpp
 auto fory = Fory::builder()
     .xlang(true)
-    .build_thread_safe();  // Returns ThreadSafeFory
+    .build();  // 返回 Fory
 ```
 
-`ThreadSafeFory` uses a pool of Fory instances to provide thread-safe serialization. Slightly slower due to pool overhead, but safe to use from multiple threads concurrently.
+单线程 `Fory` 是最快的选项，但非线程安全。每个线程使用一个实例。
 
-## Configuration Summary
+### 线程安全
 
-| Option                       | Description                             | Default |
-| ---------------------------- | --------------------------------------- | ------- |
-| `xlang(bool)`                | Enable cross-language mode              | `true`  |
-| `compatible(bool)`           | Enable schema evolution                 | `false` |
-| `track_ref(bool)`            | Enable reference tracking               | `true`  |
-| `max_dyn_depth(uint32_t)`    | Maximum nesting depth for dynamic types | `5`     |
-| `check_struct_version(bool)` | Enable struct version checking          | `false` |
+```cpp
+auto fory = Fory::builder()
+    .xlang(true)
+    .build_thread_safe();  // 返回 ThreadSafeFory
+```
 
-## Related Topics
+`ThreadSafeFory` 使用 Fory 实例池提供线程安全的序列化。由于池开销略慢，但可以从多个线程并发安全使用。
 
-- [Basic Serialization](basic-serialization.md) - Using configured Fory
-- [Cross-Language](cross-language.md) - XLANG mode details
-- [Type Registration](type-registration.md) - Registering types
+## 配置摘要
+
+| 选项                         | 说明                   | 默认值  |
+| ---------------------------- | ---------------------- | ------- |
+| `xlang(bool)`                | 启用跨语言模式         | `true`  |
+| `compatible(bool)`           | 启用 schema 演化       | `false` |
+| `track_ref(bool)`            | 启用引用跟踪           | `true`  |
+| `max_dyn_depth(uint32_t)`    | 动态类型的最大嵌套深度 | `5`     |
+| `check_struct_version(bool)` | 启用结构体版本检查     | `false` |
+
+## 相关主题
+
+- [基础序列化](basic-serialization.md) - 使用配置的 Fory
+- [跨语言](cross-language.md) - XLANG 模式详情
+- [类型注册](type-registration.md) - 注册类型

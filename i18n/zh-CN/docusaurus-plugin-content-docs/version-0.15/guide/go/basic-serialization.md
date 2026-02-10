@@ -1,5 +1,5 @@
 ---
-title: Basic Serialization
+title: 基本序列化
 sidebar_position: 20
 id: basic_serialization
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This guide covers the core serialization APIs in Fory Go.
+本指南介绍 Fory Go 的核心序列化 API。
 
-## Creating a Fory Instance
+## 创建 Fory 实例
 
-Create a Fory instance and register your types before serialization:
+在序列化前先创建 Fory 实例并注册类型：
 
 ```go
 import "github.com/apache/fory/go/fory"
@@ -41,15 +41,15 @@ f.RegisterNamedStruct(User{}, "example.User")
 f.RegisterEnum(Color(0), 3)
 ```
 
-**Important**: The Fory instance should be reused across serialization calls. Creating a new instance involves allocating internal buffers, type caches, and resolvers, which is expensive. The default Fory instance is not thread-safe; for concurrent usage, use the thread-safe wrapper (see [Thread Safety](thread-safety.md)).
+**重要**：应在多次序列化调用间复用同一个 Fory 实例。创建新实例会分配内部缓冲区、类型缓存和解析器，开销较高。默认实例不是线程安全的；并发场景请使用线程安全封装（见 [线程安全](thread-safety.md)）。
 
-See [Type Registration](type-registration.md) for more details.
+更多内容请参考 [类型注册](type-registration.md)。
 
-## Core API
+## 核心 API
 
-### Serialize and Deserialize
+### Serialize 与 Deserialize
 
-The primary API for serialization:
+最主要的序列化接口：
 
 ```go
 // Serialize any value
@@ -66,16 +66,16 @@ if err != nil {
 }
 ```
 
-### Marshal and Unmarshal
+### Marshal 与 Unmarshal
 
-Aliases for `Serialize` and `Deserialize` (familiar to Go developers):
+`Serialize` 和 `Deserialize` 的别名（对 Go 开发者更熟悉）：
 
 ```go
 data, err := f.Marshal(value)
 err = f.Unmarshal(data, &result)
 ```
 
-## Serializing Primitives
+## 序列化基础类型
 
 ```go
 // Integers
@@ -99,9 +99,9 @@ var b bool
 f.Deserialize(data, &b)  // b = true
 ```
 
-## Serializing Collections
+## 序列化集合类型
 
-### Slices
+### Slice
 
 ```go
 // String slice
@@ -121,7 +121,7 @@ f.Deserialize(data, &intResult)
 // intResult = [1, 2, 3]
 ```
 
-### Maps
+### Map
 
 ```go
 // String to string map
@@ -141,11 +141,11 @@ f.Deserialize(data, &result2)
 // result2 = {"count": 42}
 ```
 
-## Serializing Structs
+## 序列化结构体
 
-### Basic Struct Serialization
+### 基础结构体序列化
 
-Only **exported fields** (starting with uppercase) are serialized:
+只有**导出字段**（首字母大写）会被序列化：
 
 ```go
 type User struct {
@@ -164,7 +164,7 @@ f.Deserialize(data, &result)
 // result.ID = 1, result.Name = "Alice", result.password = ""
 ```
 
-### Nested Structs
+### 嵌套结构体
 
 ```go
 type Address struct {
@@ -192,7 +192,7 @@ f.Deserialize(data, &result)
 // result.Address.City = "NYC"
 ```
 
-### Pointer Fields
+### 指针字段
 
 ```go
 type Node struct {
@@ -216,13 +216,13 @@ f.Deserialize(data, &result)
 // result.Child.Value = 2
 ```
 
-## Streaming API
+## 流式 API
 
-For scenarios where you want to control the buffer:
+当你希望自行管理缓冲区时可使用流式接口。
 
 ### SerializeTo
 
-Serialize to an existing buffer:
+序列化到现有缓冲区：
 
 ```go
 buf := fory.NewByteBuffer(nil)
@@ -237,7 +237,7 @@ data := buf.GetByteSlice(0, buf.WriterIndex())
 
 ### DeserializeFrom
 
-Deserialize from an existing buffer:
+从现有缓冲区反序列化：
 
 ```go
 buf := fory.NewByteBuffer(data)
@@ -247,9 +247,9 @@ f.DeserializeFrom(buf, &result1)
 f.DeserializeFrom(buf, &result2)
 ```
 
-## Generic API (Type-Safe)
+## 泛型 API（类型安全）
 
-Fory Go provides generic functions for type-safe serialization:
+Fory Go 提供了泛型函数用于类型安全的序列化：
 
 ```go
 import "github.com/apache/fory/go/fory"
@@ -268,15 +268,15 @@ var result User
 err = fory.Deserialize(f, data, &result)
 ```
 
-The generic API:
+泛型 API 的优势：
 
-- Infers type at compile time
-- Provides better type safety
-- May offer performance benefits
+- 在编译期推断类型
+- 提供更好的类型安全
+- 在某些场景下可获得性能收益
 
-## Error Handling
+## 错误处理
 
-Always check errors from serialization operations:
+务必检查序列化/反序列化返回的错误：
 
 ```go
 data, err := f.Serialize(value)
@@ -296,19 +296,19 @@ if err != nil {
 }
 ```
 
-Common error kinds:
+常见错误类型：
 
-- `ErrKindBufferOutOfBound`: Read/write beyond buffer bounds
-- `ErrKindTypeMismatch`: Type ID mismatch during deserialization
-- `ErrKindUnknownType`: Unknown type encountered
-- `ErrKindMaxDepthExceeded`: Recursion depth limit exceeded
-- `ErrKindHashMismatch`: Struct hash mismatch (schema changed)
+- `ErrKindBufferOutOfBound`：读写越界
+- `ErrKindTypeMismatch`：反序列化时类型 ID 不匹配
+- `ErrKindUnknownType`：遇到未知类型
+- `ErrKindMaxDepthExceeded`：超过递归深度限制
+- `ErrKindHashMismatch`：结构体哈希不一致（schema 已变更）
 
-See [Troubleshooting](troubleshooting.md) for error resolution.
+排查建议见 [故障排查](troubleshooting.md)。
 
-## Nil Handling
+## Nil 处理
 
-### Nil Pointers
+### Nil 指针
 
 ```go
 var ptr *User = nil
@@ -319,7 +319,7 @@ f.Deserialize(data, &result)
 // result = nil
 ```
 
-### Empty Collections
+### 空集合
 
 ```go
 // Nil slice
@@ -338,7 +338,7 @@ f.Deserialize(data, &result)
 // result = [] (empty, not nil)
 ```
 
-## Complete Example
+## 完整示例
 
 ```go
 package main
@@ -396,9 +396,9 @@ func main() {
 }
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
-- [Type Registration](type-registration.md)
-- [Supported Types](supported-types.md)
-- [References](references.md)
+- [配置](configuration.md)
+- [类型注册](type-registration.md)
+- [支持类型](supported-types.md)
+- [引用](references.md)

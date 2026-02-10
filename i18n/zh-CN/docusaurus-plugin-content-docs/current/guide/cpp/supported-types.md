@@ -1,6 +1,6 @@
 ---
-title: Supported Types
-sidebar_position: 6
+title: 支持的类型
+sidebar_position: 5
 id: supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,28 +19,28 @@ license: |
   limitations under the License.
 ---
 
-This page documents all types supported by Fory C++ serialization.
+本页记录 Fory C++ 序列化支持的所有类型。
 
-## Primitive Types
+## 基本类型
 
-All C++ primitive types are supported with efficient binary encoding:
+所有 C++ 基本类型都支持高效的二进制编码：
 
-| Type       | Size   | Fory TypeId | Notes                 |
-| ---------- | ------ | ----------- | --------------------- |
-| `bool`     | 1 byte | BOOL        | True/false            |
-| `int8_t`   | 1 byte | INT8        | Signed byte           |
-| `uint8_t`  | 1 byte | INT8        | Unsigned byte         |
-| `int16_t`  | 2 byte | INT16       | Signed short          |
-| `uint16_t` | 2 byte | INT16       | Unsigned short        |
-| `int32_t`  | 4 byte | INT32       | Signed integer        |
-| `uint32_t` | 4 byte | INT32       | Unsigned integer      |
-| `int64_t`  | 8 byte | INT64       | Signed long           |
-| `uint64_t` | 8 byte | INT64       | Unsigned long         |
-| `float`    | 4 byte | FLOAT32     | IEEE 754 single       |
-| `double`   | 8 byte | FLOAT64     | IEEE 754 double       |
-| `char`     | 1 byte | INT8        | Character (as signed) |
-| `char16_t` | 2 byte | INT16       | 16-bits characters    |
-| `char32_t` | 4 byte | INT32       | 32-bits characters    |
+| 类型       | 大小   | Fory TypeId | 说明               |
+| ---------- | ------ | ----------- | ------------------ |
+| `bool`     | 1 字节 | BOOL        | True/false         |
+| `int8_t`   | 1 字节 | INT8        | 有符号字节         |
+| `uint8_t`  | 1 字节 | INT8        | 无符号字节         |
+| `int16_t`  | 2 字节 | INT16       | 有符号短整型       |
+| `uint16_t` | 2 字节 | INT16       | 无符号短整型       |
+| `int32_t`  | 4 字节 | INT32       | 有符号整型         |
+| `uint32_t` | 4 字节 | INT32       | 无符号整型         |
+| `int64_t`  | 8 字节 | INT64       | 有符号长整型       |
+| `uint64_t` | 8 字节 | INT64       | 无符号长整型       |
+| `float`    | 4 字节 | FLOAT32     | IEEE 754 单精度    |
+| `double`   | 8 字节 | FLOAT64     | IEEE 754 双精度    |
+| `char`     | 1 字节 | INT8        | 字符（作为有符号） |
+| `char16_t` | 2 字节 | INT16       | 16 位字符          |
+| `char32_t` | 4 字节 | INT32       | 32 位字符          |
 
 ```cpp
 int32_t value = 42;
@@ -49,14 +49,14 @@ auto decoded = fory.deserialize<int32_t>(bytes).value();
 assert(value == decoded);
 ```
 
-## String Types
+## 字符串类型
 
-| Type               | Fory TypeId | Notes                    |
-| ------------------ | ----------- | ------------------------ |
-| `std::string`      | STRING      | UTF-8 encoded            |
-| `std::string_view` | STRING      | Zero-copy view (read)    |
-| `std::u16string`   | STRING      | UTF-16 (converted)       |
-| `binary`           | BINARY      | Raw bytes without length |
+| 类型               | Fory TypeId | 说明               |
+| ------------------ | ----------- | ------------------ |
+| `std::string`      | STRING      | UTF-8 编码         |
+| `std::string_view` | STRING      | 零拷贝视图（读取） |
+| `std::u16string`   | STRING      | UTF-16（转换）     |
+| `binary`           | BINARY      | 无长度的原始字节   |
 
 ```cpp
 std::string text = "Hello, World!";
@@ -65,18 +65,18 @@ auto decoded = fory.deserialize<std::string>(bytes).value();
 assert(text == decoded);
 ```
 
-## Collection Types
+## 集合类型
 
 ### Vector / List
 
-`std::vector<T>` for any serializable element type:
+`std::vector<T>` 支持任何可序列化的元素类型：
 
 ```cpp
 std::vector<int32_t> numbers{1, 2, 3, 4, 5};
 auto bytes = fory.serialize(numbers).value();
 auto decoded = fory.deserialize<std::vector<int32_t>>(bytes).value();
 
-// Nested vectors
+// 嵌套 vector
 std::vector<std::vector<std::string>> nested{
     {"a", "b"},
     {"c", "d", "e"}
@@ -85,7 +85,7 @@ std::vector<std::vector<std::string>> nested{
 
 ### Set
 
-`std::set<T>` and `std::unordered_set<T>`:
+`std::set<T>` 和 `std::unordered_set<T>`：
 
 ```cpp
 std::set<std::string> tags{"cpp", "serialization", "fory"};
@@ -97,7 +97,7 @@ std::unordered_set<int32_t> ids{1, 2, 3};
 
 ### Map
 
-`std::map<K, V>` and `std::unordered_map<K, V>`:
+`std::map<K, V>` 和 `std::unordered_map<K, V>`：
 
 ```cpp
 std::map<std::string, int32_t> scores{
@@ -107,18 +107,18 @@ std::map<std::string, int32_t> scores{
 auto bytes = fory.serialize(scores).value();
 auto decoded = fory.deserialize<std::map<std::string, int32_t>>(bytes).value();
 
-// Unordered map
+// 无序 map
 std::unordered_map<int32_t, std::string> lookup{
     {1, "one"},
     {2, "two"}
 };
 ```
 
-## Smart Pointers
+## 智能指针
 
 ### std::optional
 
-Nullable wrapper for any type:
+任何类型的可空包装：
 
 ```cpp
 std::optional<int32_t> maybe_value = 42;
@@ -131,7 +131,7 @@ assert(decoded.has_value() && *decoded == 42);
 
 ### std::shared_ptr
 
-Shared ownership with reference tracking:
+带引用跟踪的共享所有权：
 
 ```cpp
 auto shared = std::make_shared<Person>("Alice", 30);
@@ -140,15 +140,15 @@ auto bytes = fory.serialize(shared).value();
 auto decoded = fory.deserialize<std::shared_ptr<Person>>(bytes).value();
 ```
 
-**With reference tracking enabled (`track_ref(true)`):**
+**启用引用跟踪（`track_ref(true)`）时：**
 
-- Shared objects are serialized once
-- References to the same object are preserved
-- Circular references are handled automatically
+- 共享对象只序列化一次
+- 对同一对象的引用被保留
+- 循环引用自动处理
 
 ### std::unique_ptr
 
-Exclusive ownership:
+独占所有权：
 
 ```cpp
 auto unique = std::make_unique<Person>("Bob", 25);
@@ -157,9 +157,9 @@ auto bytes = fory.serialize(unique).value();
 auto decoded = fory.deserialize<std::unique_ptr<Person>>(bytes).value();
 ```
 
-## Variant Type
+## Variant 类型
 
-`std::variant<Ts...>` for type-safe unions:
+`std::variant<Ts...>` 用于类型安全的联合：
 
 ```cpp
 using MyVariant = std::variant<int32_t, std::string, double>;
@@ -175,7 +175,7 @@ assert(std::get<int32_t>(decoded) == 42);
 
 ### std::monostate
 
-Empty variant alternative:
+空 variant 替代：
 
 ```cpp
 using OptionalInt = std::variant<std::monostate, int32_t>;
@@ -184,11 +184,11 @@ OptionalInt empty = std::monostate{};
 OptionalInt value = 42;
 ```
 
-## Temporal Types
+## 时间类型
 
 ### Duration
 
-`std::chrono::nanoseconds`:
+`std::chrono::nanoseconds`：
 
 ```cpp
 using Duration = std::chrono::nanoseconds;
@@ -200,7 +200,7 @@ auto decoded = fory.deserialize<Duration>(bytes).value();
 
 ### Timestamp
 
-Point in time since Unix epoch:
+自 Unix 纪元以来的时间点：
 
 ```cpp
 using Timestamp = std::chrono::time_point<std::chrono::system_clock,
@@ -213,18 +213,18 @@ auto decoded = fory.deserialize<Timestamp>(bytes).value();
 
 ### LocalDate
 
-Days since Unix epoch:
+自 Unix 纪元以来的天数：
 
 ```cpp
-LocalDate date{18628};  // Days since 1970-01-01
+LocalDate date{18628};  // 自 1970-01-01 以来的天数
 
 auto bytes = fory.serialize(date).value();
 auto decoded = fory.deserialize<LocalDate>(bytes).value();
 ```
 
-## User-Defined Structs
+## 用户定义结构体
 
-Any struct can be made serializable with `FORY_STRUCT`:
+任何结构体都可以使用 `FORY_STRUCT` 进行序列化：
 
 ```cpp
 struct Point {
@@ -242,36 +242,36 @@ struct Line {
 FORY_STRUCT(Line, start, end, label);
 ```
 
-## Enum Types
+## 枚举类型
 
-Both scoped and unscoped enums are supported with `FORY_ENUM`:
+使用 `FORY_ENUM` 支持作用域和非作用域枚举：
 
 ```cpp
-// Scoped enum (C++11 enum class)
+// 作用域枚举（C++11 enum class）
 enum class Color { RED = 0, GREEN = 1, BLUE = 2 };
 
-// Unscoped enum with incontinuous values
+// 非连续值的非作用域枚举
 enum Priority : int32_t { LOW = -10, NORMAL = 0, HIGH = 10 };
 FORY_ENUM(Priority, LOW, NORMAL, HIGH);
 
-// Usage
+// 使用
 Color c = Color::GREEN;
 auto bytes = fory.serialize(c).value();
 auto decoded = fory.deserialize<Color>(bytes).value();
 ```
 
-## Unsupported Types
+## 不支持的类型
 
-Currently not supported:
+当前不支持：
 
-- Raw pointers (`T*`) - use smart pointers instead
-- `std::tuple<Ts...>` - use structs instead
-- `std::array<T, N>` - use `std::vector<T>` instead
-- Function pointers
-- References (`T&`, `const T&`) - by value only
+- 原始指针（`T*`）- 使用智能指针代替
+- `std::tuple<Ts...>` - 使用结构体代替
+- `std::array<T, N>` - 使用 `std::vector<T>` 代替
+- 函数指针
+- 引用（`T&`、`const T&`）- 仅支持按值传递
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Using these types
-- [Type Registration](type-registration.md) - Registering types
-- [Cross-Language](cross-language.md) - Cross-language compatibility
+- [基础序列化](basic-serialization.md) - 使用这些类型
+- [类型注册](type-registration.md) - 注册类型
+- [跨语言](cross-language.md) - 跨语言兼容性

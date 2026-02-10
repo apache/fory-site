@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: 故障排除
 sidebar_position: 11
 id: troubleshooting
 license: |
@@ -19,56 +19,56 @@ license: |
   limitations under the License.
 ---
 
-This page covers common issues and their solutions.
+本页介绍常见问题及其解决方案。
 
-## Class Inconsistency and Class Version Check
+## 类不一致和类版本检查
 
-If you create Fory without setting `CompatibleMode` to `org.apache.fory.config.CompatibleMode.COMPATIBLE`, and you get a strange serialization error, it may be caused by class inconsistency between the serialization peer and deserialization peer.
+如果你创建 Fory 时没有将 `CompatibleMode` 设置为 `org.apache.fory.config.CompatibleMode.COMPATIBLE`，并且遇到奇怪的序列化错误，这可能是由于序列化端和反序列化端之间的类不一致造成的。
 
-In such cases, you can invoke `ForyBuilder#withClassVersionCheck` to create Fory to validate it. If deserialization throws `org.apache.fory.exception.ClassNotCompatibleException`, it shows classes are inconsistent, and you should create Fory with `ForyBuilder#withCompatibleMode(CompatibleMode.COMPATIBLE)`.
+在这种情况下，你可以调用 `ForyBuilder#withClassVersionCheck` 来创建 Fory 以验证它。如果反序列化抛出 `org.apache.fory.exception.ClassNotCompatibleException`，则表示类不一致，你应该使用 `ForyBuilder#withCompatibleMode(CompatibleMode.COMPATIBLE)` 创建 Fory。
 
 ```java
-// Enable class version check to diagnose issues
+// 启用类版本检查以诊断问题
 Fory fory = Fory.builder()
   .withLanguage(Language.JAVA)
   .withClassVersionCheck(true)
   .build();
 
-// If ClassNotCompatibleException is thrown, use compatible mode
+// 如果抛出 ClassNotCompatibleException，使用兼容模式
 Fory fory = Fory.builder()
   .withLanguage(Language.JAVA)
   .withCompatibleMode(CompatibleMode.COMPATIBLE)
   .build();
 ```
 
-**Note**: `CompatibleMode.COMPATIBLE` has more performance and space cost. Do not set it by default if your classes are always consistent between serialization and deserialization.
+**注意**：`CompatibleMode.COMPATIBLE` 有更多的性能和空间成本。如果你的类在序列化和反序列化之间始终一致，请不要默认设置它。
 
-## Using Wrong API for Deserialization
+## 使用错误的反序列化 API
 
-Make sure you use the matching API pairs:
+确保使用匹配的 API 对：
 
-| Serialization API                  | Deserialization API                  |
+| 序列化 API                         | 反序列化 API                         |
 | ---------------------------------- | ------------------------------------ |
 | `Fory#serialize`                   | `Fory#deserialize`                   |
 | `Fory#serializeJavaObject`         | `Fory#deserializeJavaObject`         |
 | `Fory#serializeJavaObjectAndClass` | `Fory#deserializeJavaObjectAndClass` |
 
-**Wrong usage examples:**
+**错误使用示例：**
 
 ```java
-// ❌ Wrong: serialize with serialize, deserialize with deserializeJavaObject
+// ❌ 错误：使用 serialize 序列化，使用 deserializeJavaObject 反序列化
 byte[] bytes = fory.serialize(object);
-Object result = fory.deserializeJavaObject(bytes, MyClass.class);  // Wrong!
+Object result = fory.deserializeJavaObject(bytes, MyClass.class);  // 错误！
 
-// ❌ Wrong: serialize with serializeJavaObject, deserialize with deserialize
+// ❌ 错误：使用 serializeJavaObject 序列化，使用 deserialize 反序列化
 byte[] bytes = fory.serializeJavaObject(object);
-Object result = fory.deserialize(bytes);  // Wrong!
+Object result = fory.deserialize(bytes);  // 错误！
 ```
 
-**Correct usage:**
+**正确使用：**
 
 ```java
-// ✅ Correct: matching API pairs
+// ✅ 正确：匹配的 API 对
 byte[] bytes = fory.serialize(object);
 Object result = fory.deserialize(bytes);
 
@@ -79,9 +79,9 @@ byte[] bytes = fory.serializeJavaObjectAndClass(object);
 Object result = fory.deserializeJavaObjectAndClass(bytes);
 ```
 
-## Deserialize POJO into Another Type
+## 将 POJO 反序列化为另一种类型
 
-If you want to serialize one POJO and deserialize it into a different POJO type, you must use `CompatibleMode.COMPATIBLE`:
+如果你想序列化一个 POJO 并将其反序列化为另一个 POJO 类型，你必须使用 `CompatibleMode.COMPATIBLE`：
 
 ```java
 public class DeserializeIntoType {
@@ -112,25 +112,25 @@ public class DeserializeIntoType {
 }
 ```
 
-## Common Error Messages
+## 常见错误消息
 
 ### "Class not registered"
 
-**Cause**: Class registration is required but the class wasn't registered.
+**原因**：需要类注册，但类未注册。
 
-**Solution**: Register the class before serialization:
+**解决方案**：在序列化之前注册类：
 
 ```java
 fory.register(MyClass.class);
-// or with explicit ID
+// 或使用显式 ID
 fory.register(MyClass.class, 100);
 ```
 
 ### "ClassNotCompatibleException"
 
-**Cause**: Class schema differs between serialization and deserialization.
+**原因**：序列化和反序列化之间的类 schema 不同。
 
-**Solution**: Use compatible mode:
+**解决方案**：使用兼容模式：
 
 ```java
 Fory fory = Fory.builder()
@@ -140,33 +140,33 @@ Fory fory = Fory.builder()
 
 ### "Max depth exceeded"
 
-**Cause**: Object graph is too deep, possibly indicating a circular reference attack.
+**原因**：对象图太深，可能表示循环引用攻击。
 
-**Solution**: Increase max depth if legitimate, or check for malicious data:
+**解决方案**：如果是合法的，增加最大深度，或检查恶意数据：
 
 ```java
 Fory fory = Fory.builder()
-  .withMaxDepth(100)  // Increase from default 50
+  .withMaxDepth(100)  // 从默认的 50 增加
   .build();
 ```
 
 ### "Serializer not found"
 
-**Cause**: No serializer registered for the type.
+**原因**：未为该类型注册序列化器。
 
-**Solution**: Register a custom serializer:
+**解决方案**：注册自定义序列化器：
 
 ```java
 fory.registerSerializer(MyClass.class, new MyClassSerializer(fory));
 ```
 
-## Performance Issues
+## 性能问题
 
-### Slow Initial Serialization
+### 初始序列化慢
 
-**Cause**: JIT compilation happening on first serialization.
+**原因**：JIT 编译在第一次序列化时发生。
 
-**Solution**: Enable async compilation:
+**解决方案**：启用异步编译：
 
 ```java
 Fory fory = Fory.builder()
@@ -174,40 +174,40 @@ Fory fory = Fory.builder()
   .build();
 ```
 
-### High Memory Usage
+### 内存使用高
 
-**Cause**: Large object graphs or reference tracking overhead.
+**原因**：大对象图或引用跟踪开销。
 
-**Solutions**:
+**解决方案**：
 
-- Disable reference tracking if not needed: `.withRefTracking(false)`
-- Use custom memory allocator for pooling
-- Consider row format for large datasets
+- 如果不需要，禁用引用跟踪：`.withRefTracking(false)`
+- 使用自定义内存分配器进行池化
+- 考虑对大数据集使用行格式
 
-### Large Serialized Size
+### 序列化大小大
 
-**Cause**: Metadata overhead or uncompressed data.
+**原因**：元数据开销或未压缩的数据。
 
-**Solutions**:
+**解决方案**：
 
-- Enable compression: `.withIntCompressed(true)`, `.withLongCompressed(true)`
-- Use compatible mode only when needed
-- Register classes to avoid class name serialization
+- 启用压缩：`.withIntCompressed(true)`、`.withLongCompressed(true)`
+- 仅在需要时使用兼容模式
+- 注册类以避免类名序列化
 
-## Debugging Tips
+## 调试技巧
 
-1. **Enable class version check** to diagnose schema issues
-2. **Check API pairing** - ensure serialize/deserialize APIs match
-3. **Verify registration order** - must be consistent across peers
-4. **Enable logging** to see internal operations:
+1. **启用类版本检查**以诊断 schema 问题
+2. **检查 API 配对** - 确保序列化/反序列化 API 匹配
+3. **验证注册顺序** - 必须在各端之间保持一致
+4. **启用日志记录**以查看内部操作：
 
 ```java
 LoggerFactory.setLogLevel(LogLevel.DEBUG_LEVEL);
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration Options](configuration.md) - All ForyBuilder options
-- [Schema Evolution](schema-evolution.md) - Compatible mode details
-- [Type Registration](type-registration.md) - Registration best practices
-- [Migration Guide](migration.md) - Upgrading Fory versions
+- [配置选项](configuration.md) - 所有 ForyBuilder 选项
+- [Schema 演化](schema-evolution.md) - 兼容模式详情
+- [类型注册](type-registration.md) - 注册最佳实践
+- [迁移指南](migration.md) - 升级 Fory 版本

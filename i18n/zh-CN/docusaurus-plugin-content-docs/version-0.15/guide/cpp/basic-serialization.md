@@ -1,5 +1,5 @@
 ---
-title: Basic Serialization
+title: 基础序列化
 sidebar_position: 2
 id: basic_serialization
 license: |
@@ -19,20 +19,20 @@ license: |
   limitations under the License.
 ---
 
-This page covers basic object graph serialization and the core serialization APIs.
+本页介绍基础对象图序列化和核心序列化 API。
 
-## Object Graph Serialization
+## 对象图序列化
 
-Apache Fory™ provides automatic serialization of complex object graphs, preserving the structure and relationships between objects. The `FORY_STRUCT` macro generates efficient serialization code at compile time, eliminating runtime overhead.
+Apache Fory™ 提供复杂对象图的自动序列化，保留对象之间的结构和关系。`FORY_STRUCT` 宏在编译时生成高效的序列化代码，消除运行时开销。
 
-**Key capabilities:**
+**核心功能：**
 
-- Nested struct serialization with arbitrary depth
-- Collection types (vector, set, map)
-- Optional fields with `std::optional<T>`
-- Smart pointers (`std::shared_ptr`, `std::unique_ptr`)
-- Automatic handling of primitive types and strings
-- Efficient binary encoding with variable-length integers
+- 支持任意深度的嵌套结构体序列化
+- 集合类型（vector、set、map）
+- 使用 `std::optional<T>` 的可选字段
+- 智能指针（`std::shared_ptr`、`std::unique_ptr`）
+- 自动处理基本类型和字符串
+- 使用变长整数的高效二进制编码
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -41,7 +41,7 @@ Apache Fory™ provides automatic serialization of complex object graphs, preser
 
 using namespace fory::serialization;
 
-// Define structs
+// 定义结构体
 struct Address {
   std::string street;
   std::string city;
@@ -88,9 +88,9 @@ int main() {
 }
 ```
 
-## Serialization APIs
+## 序列化 API
 
-### Serialize to New Vector
+### 序列化到新 Vector
 
 ```cpp
 auto fory = Fory::builder().xlang(true).build();
@@ -98,86 +98,86 @@ fory.register_struct<MyStruct>(1);
 
 MyStruct obj{/* ... */};
 
-// Serialize - returns Result<std::vector<uint8_t>, Error>
+// 序列化 - 返回 Result<std::vector<uint8_t>, Error>
 auto result = fory.serialize(obj);
 if (result.ok()) {
   std::vector<uint8_t> bytes = std::move(result).value();
-  // Use bytes...
+  // 使用 bytes...
 } else {
-  // Handle error
+  // 处理错误
   std::cerr << result.error().to_string() << std::endl;
 }
 ```
 
-### Serialize to Existing Buffer
+### 序列化到现有缓冲区
 
 ```cpp
-// Serialize to existing Buffer (fastest path)
+// 序列化到现有 Buffer（最快路径）
 Buffer buffer;
 auto result = fory.serialize_to(buffer, obj);
 if (result.ok()) {
   size_t bytes_written = result.value();
-  // buffer now contains serialized data
+  // buffer 现在包含序列化数据
 }
 
-// Serialize to existing vector (zero-copy)
+// 序列化到现有 vector（零拷贝）
 std::vector<uint8_t> output;
 auto result = fory.serialize_to(output, obj);
 if (result.ok()) {
   size_t bytes_written = result.value();
-  // output now contains serialized data
+  // output 现在包含序列化数据
 }
 ```
 
-### Deserialize from Byte Array
+### 从字节数组反序列化
 
 ```cpp
-// Deserialize from raw pointer
+// 从原始指针反序列化
 auto result = fory.deserialize<MyStruct>(data_ptr, data_size);
 if (result.ok()) {
   MyStruct obj = std::move(result).value();
 }
 
-// Deserialize from vector
+// 从 vector 反序列化
 std::vector<uint8_t> data = /* ... */;
 auto result = fory.deserialize<MyStruct>(data);
 
-// Deserialize from Buffer (updates reader_index)
+// 从 Buffer 反序列化（更新 reader_index）
 Buffer buffer(data);
 auto result = fory.deserialize<MyStruct>(buffer);
 ```
 
-## Error Handling
+## 错误处理
 
-Fory uses a `Result<T, Error>` type for error handling:
+Fory 使用 `Result<T, Error>` 类型进行错误处理：
 
 ```cpp
 auto result = fory.serialize(obj);
 
-// Check if operation succeeded
+// 检查操作是否成功
 if (result.ok()) {
   auto value = std::move(result).value();
-  // Use value...
+  // 使用 value...
 } else {
   Error error = result.error();
   std::cerr << "Error: " << error.to_string() << std::endl;
 }
 
-// Or use FORY_TRY macro for early return
+// 或使用 FORY_TRY 宏进行提前返回
 FORY_TRY(bytes, fory.serialize(obj));
-// Use bytes directly...
+// 直接使用 bytes...
 ```
 
-Common error types:
+常见错误类型：
 
-- `Error::type_mismatch` - Type ID mismatch during deserialization
-- `Error::invalid_data` - Invalid or corrupted data
-- `Error::buffer_out_of_bound` - Buffer overflow/underflow
-- `Error::type_error` - Type registration error
+- `Error::type_mismatch` - 反序列化时类型 ID 不匹配
+- `Error::invalid_data` - 无效或损坏的数据
+- `Error::buffer_out_of_bound` - 缓冲区溢出/下溢
+- `Error::type_error` - 类型注册错误
 
-## The FORY_STRUCT Macro
+## FORY_STRUCT 宏
 
-The `FORY_STRUCT` macro registers a struct for serialization:
+`FORY_STRUCT` 宏用于注册结构体以进行序列化：
 
 ```cpp
 struct MyStruct {
@@ -186,25 +186,25 @@ struct MyStruct {
   std::vector<int32_t> z;
 };
 
-// Must be in the same namespace as the struct
+// 必须与结构体在同一命名空间中
 FORY_STRUCT(MyStruct, x, y, z);
 ```
 
-The macro:
+该宏：
 
-1. Generates compile-time field metadata
-2. Enables ADL (Argument-Dependent Lookup) for serialization
-3. Creates efficient serialization code via template specialization
+1. 生成编译时字段元数据
+2. 启用 ADL（参数依赖查找）进行序列化
+3. 通过模板特化创建高效的序列化代码
 
-**Requirements:**
+**要求：**
 
-- Must be placed in the same namespace as the struct (for ADL)
-- All listed fields must be serializable types
-- Field order in the macro determines serialization order
+- 必须放在与结构体相同的命名空间中（用于 ADL）
+- 所有列出的字段必须是可序列化类型
+- 宏中的字段顺序决定序列化顺序
 
-## Nested Structs
+## 嵌套结构体
 
-Nested structs are fully supported:
+完全支持嵌套结构体：
 
 ```cpp
 struct Inner {
@@ -218,21 +218,21 @@ struct Outer {
 };
 FORY_STRUCT(Outer, inner, label);
 
-// Both must be registered
+// 两者都必须注册
 fory.register_struct<Inner>(1);
 fory.register_struct<Outer>(2);
 ```
 
-## Performance Tips
+## 性能提示
 
-- **Buffer Reuse**: Use `serialize_to(buffer, obj)` with pre-allocated buffers
-- **Pre-registration**: Register all types before serialization starts
-- **Single-Threaded**: Use `build()` instead of `build_thread_safe()` when possible
-- **Disable Tracking**: Use `track_ref(false)` when references aren't needed
-- **Compact Encoding**: Variable-length encoding for space efficiency
+- **缓冲区复用**：使用 `serialize_to(buffer, obj)` 配合预分配的缓冲区
+- **预注册**：在序列化开始前注册所有类型
+- **单线程**：尽可能使用 `build()` 而不是 `build_thread_safe()`
+- **禁用跟踪**：当不需要引用跟踪时使用 `track_ref(false)`
+- **紧凑编码**：使用变长编码提高空间效率
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - Builder options
-- [Type Registration](type-registration.md) - Registering types
-- [Supported Types](supported-types.md) - All supported types
+- [配置](configuration.md) - 构建器选项
+- [类型注册](type-registration.md) - 注册类型
+- [支持的类型](supported-types.md) - 所有支持的类型

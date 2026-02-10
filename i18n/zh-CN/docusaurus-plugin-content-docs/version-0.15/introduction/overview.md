@@ -121,7 +121,6 @@ Apache Fory™ 实现了针对不同场景优化的多个二进制协议：
 | **行格式**       | 零拷贝随机访问格式      | [Java 行格式](https://github.com/apache/fory/blob/main/docs/guide/java/row-format.md) | [📖 查看](../guide/java/row-format.md) |
 | **Python**       | Python 特定功能和用法   | [Python 指南](https://github.com/apache/fory/blob/main/docs/guide/python/)            | [📖 查看](../guide/python)             |
 | **Rust**         | Rust 实现和模式         | [Rust 指南](https://github.com/apache/fory/blob/main/docs/guide/rust/)                | [📖 查看](../guide/rust)               |
-| **Go**           | Go 实现和用法           | [Go 指南](https://github.com/apache/fory/blob/main/docs/guide/go/)                    | [📖 查看](../guide/go)                 |
 | **Scala**        | Scala 集成和最佳实践    | [Scala 指南](https://github.com/apache/fory/blob/main/docs/guide/scala/)              | [📖 查看](../guide/scala)              |
 | **GraalVM**      | 原生镜像支持和 AOT 编译 | [GraalVM 指南](https://github.com/apache/fory/blob/main/docs/guide/graalvm_guide.md)  | [📖 查看](../guide/graalvm_guide.md)   |
 | **开发**         | 构建和贡献 Fory         | [开发指南](https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md)        | [📖 查看](../guide/DEVELOPMENT)        |

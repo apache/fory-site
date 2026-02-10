@@ -1,5 +1,5 @@
 ---
-title: Default Values
+title: 默认值
 sidebar_position: 3
 id: default_values
 license: |
@@ -19,55 +19,55 @@ license: |
   limitations under the License.
 ---
 
-Fory supports Scala class default values during deserialization when using compatible mode. This feature enables forward/backward compatibility when case classes or regular Scala classes have default parameters.
+Fory 在使用兼容模式时支持在反序列化期间使用 Scala 类默认值。此特性在 case 类或常规 Scala 类具有默认参数时支持前向/后向兼容性。
 
-## Overview
+## 概述
 
-When a Scala class has default parameters, the Scala compiler generates methods in the companion object (for case classes) or in the class itself (for regular Scala classes) like `apply$default$1`, `apply$default$2`, etc. that return the default values. Fory can detect these methods and use them when deserializing objects where certain fields are missing from the serialized data.
+当 Scala 类具有默认参数时，Scala 编译器会在伴生对象中（对于 case 类）或在类本身中（对于常规 Scala 类）生成诸如 `apply$default$1`、`apply$default$2` 等方法来返回默认值。Fory 可以检测这些方法，并在反序列化对象时，当某些字段在序列化数据中缺失时使用它们。
 
-## Supported Class Types
+## 支持的类类型
 
-Fory supports default values for:
+Fory 支持以下类型的默认值：
 
-- **Case classes** with default parameters
-- **Regular Scala classes** with default parameters in their primary constructor
-- **Nested case classes** with default parameters
+- 具有默认参数的 **Case 类**
+- 在主构造函数中具有默认参数的**常规 Scala 类**
+- 具有默认参数的**嵌套 case 类**
 
-## How It Works
+## 工作原理
 
-1. **Detection**: Fory detects if a class is a Scala class by checking for the presence of default value methods (`apply$default$N` or `$default$N`).
+1. **检测**：Fory 通过检查是否存在默认值方法（`apply$default$N` 或 `$default$N`）来检测类是否为 Scala 类。
 
-2. **Default Value Discovery**:
-   - For case classes: Fory scans the companion object for methods named `apply$default$1`, `apply$default$2`, etc.
-   - For regular Scala classes: Fory scans the class itself for methods named `$default$1`, `$default$2`, etc.
+2. **默认值发现**：
+   - 对于 case 类：Fory 扫描伴生对象中名为 `apply$default$1`、`apply$default$2` 等的方法。
+   - 对于常规 Scala 类：Fory 扫描类本身中名为 `$default$1`、`$default$2` 等的方法。
 
-3. **Field Mapping**: During deserialization, Fory identifies fields that exist in the target class but are missing from the serialized data.
+3. **字段映射**：在反序列化期间，Fory 识别目标类中存在但序列化数据中缺失的字段。
 
-4. **Value Application**: After reading all available fields from the serialized data, Fory applies default values to any missing fields.
+4. **值应用**：从序列化数据中读取所有可用字段后，Fory 将默认值应用于任何缺失的字段。
 
-## Usage
+## 使用方法
 
-This feature is automatically enabled when:
+当满足以下条件时，此特性会自动启用：
 
-- Compatible mode is enabled (`withCompatibleMode(CompatibleMode.COMPATIBLE)`)
-- The target class is detected as a Scala class with default values
-- A field is missing from the serialized data but exists in the target class
+- 启用兼容模式（`withCompatibleMode(CompatibleMode.COMPATIBLE)`）
+- 目标类被检测为具有默认值的 Scala 类
+- 序列化数据中缺少某个字段，但该字段存在于目标类中
 
-No additional configuration is required.
+无需额外配置。
 
-## Examples
+## 示例
 
-### Case Class with Default Values
+### 具有默认值的 Case 类
 
 ```scala
 import org.apache.fory.Fory
 import org.apache.fory.config.CompatibleMode
 import org.apache.fory.serializer.scala.ScalaSerializers
 
-// Class WITHOUT default values (for serialization)
+// 没有默认值的类（用于序列化）
 case class PersonV1(name: String)
 
-// Class WITH default values (for deserialization)
+// 有默认值的类（用于反序列化）
 case class PersonV2(name: String, age: Int = 25, city: String = "Unknown")
 
 val fory = Fory.builder()
@@ -77,25 +77,25 @@ val fory = Fory.builder()
 
 ScalaSerializers.registerSerializers(fory)
 
-// Serialize using class without default values
+// 使用没有默认值的类进行序列化
 val original = PersonV1("John")
 val serialized = fory.serialize(original)
 
-// Deserialize into class with default values
-// Missing fields will use defaults
+// 反序列化到有默认值的类
+// 缺失的字段将使用默认值
 val deserialized = fory.deserialize(serialized).asInstanceOf[PersonV2]
 // deserialized.name == "John"
-// deserialized.age == 25 (default)
-// deserialized.city == "Unknown" (default)
+// deserialized.age == 25（默认值）
+// deserialized.city == "Unknown"（默认值）
 ```
 
-### Regular Scala Class with Default Values
+### 具有默认值的常规 Scala 类
 
 ```scala
-// Class WITHOUT default values (for serialization)
+// 没有默认值的类（用于序列化）
 class EmployeeV1(val name: String)
 
-// Class WITH default values (for deserialization)
+// 有默认值的类（用于反序列化）
 class EmployeeV2(
   val name: String,
   val age: Int = 30,
@@ -109,26 +109,26 @@ val fory = Fory.builder()
 
 ScalaSerializers.registerSerializers(fory)
 
-// Serialize using class without default values
+// 使用没有默认值的类进行序列化
 val original = new EmployeeV1("Jane")
 val serialized = fory.serialize(original)
 
-// Deserialize into class with default values
+// 反序列化到有默认值的类
 val deserialized = fory.deserialize(serialized).asInstanceOf[EmployeeV2]
 // deserialized.name == "Jane"
-// deserialized.age == 30 (default)
-// deserialized.department == "Engineering" (default)
+// deserialized.age == 30（默认值）
+// deserialized.department == "Engineering"（默认值）
 ```
 
-### Complex Default Values
+### 复杂默认值
 
-Default values can be complex expressions:
+默认值可以是复杂表达式：
 
 ```scala
-// Class WITHOUT default values (for serialization)
+// 没有默认值的类（用于序列化）
 case class ConfigV1(name: String)
 
-// Class WITH default values (for deserialization)
+// 有默认值的类（用于反序列化）
 case class ConfigV2(
   name: String,
   settings: Map[String, String] = Map("default" -> "value"),
@@ -153,14 +153,14 @@ val deserialized = fory.deserialize(serialized).asInstanceOf[ConfigV2]
 // deserialized.enabled == true
 ```
 
-### Nested Case Classes
+### 嵌套 Case 类
 
 ```scala
 object Models {
-  // Class WITHOUT default values (for serialization)
+  // 没有默认值的类（用于序列化）
   case class PersonV1(name: String)
 
-  // Classes WITH default values (for deserialization)
+  // 有默认值的类（用于反序列化）
   case class Address(street: String, city: String = "DefaultCity")
   case class PersonV2(name: String, address: Address = Address("DefaultStreet"))
 }
@@ -180,7 +180,7 @@ val deserialized = fory.deserialize(serialized).asInstanceOf[Models.PersonV2]
 // deserialized.address == Address("DefaultStreet", "DefaultCity")
 ```
 
-## Related Topics
+## 相关主题
 
-- [Schema Evolution](../java/schema-evolution.md) - Forward/backward compatibility in Java
-- [Fory Creation](fory-creation.md) - Setting up Fory with compatible mode
+- [Schema 演化](../java/schema-evolution.md) - Java 中的前向/后向兼容性
+- [Fory 创建](fory-creation.md) - 使用兼容模式设置 Fory

@@ -1,5 +1,5 @@
 ---
-title: Type Serialization
+title: 类型序列化
 sidebar_position: 2
 id: type_serialization
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers serialization of Kotlin-specific types.
+本页介绍 Kotlin 特定类型的序列化。
 
-## Setup
+## 设置
 
-All examples assume the following setup:
+所有示例都假定以下设置：
 
 ```kotlin
 import org.apache.fory.Fory
@@ -36,7 +36,7 @@ val fory = Fory.builder()
 KotlinSerializers.registerSerializers(fory)
 ```
 
-## Data Class
+## 数据类
 
 ```kotlin
 data class Person(val name: String, val age: Int, val id: Long)
@@ -47,9 +47,9 @@ val p = Person("John", 30, 1L)
 println(fory.deserialize(fory.serialize(p)))
 ```
 
-## Unsigned Primitives
+## 无符号原始类型
 
-Kotlin unsigned types are fully supported:
+完全支持 Kotlin 无符号类型：
 
 ```kotlin
 val uByte: UByte = 255u
@@ -63,7 +63,7 @@ println(fory.deserialize(fory.serialize(uInt)))
 println(fory.deserialize(fory.serialize(uLong)))
 ```
 
-## Unsigned Arrays
+## 无符号数组
 
 ```kotlin
 val uByteArray = ubyteArrayOf(1u, 2u, 255u)
@@ -77,9 +77,9 @@ println(fory.deserialize(fory.serialize(uIntArray)).contentToString())
 println(fory.deserialize(fory.serialize(uLongArray)).contentToString())
 ```
 
-## Stdlib Types
+## 标准库类型
 
-### Pair and Triple
+### Pair 和 Triple
 
 ```kotlin
 val pair = Pair("key", 42)
@@ -99,7 +99,7 @@ println(fory.deserialize(fory.serialize(success)))
 println(fory.deserialize(fory.serialize(failure)))
 ```
 
-## Ranges and Progressions
+## 范围和等差数列
 
 ```kotlin
 val intRange = 1..10
@@ -110,7 +110,7 @@ println(fory.deserialize(fory.serialize(intRange)))
 println(fory.deserialize(fory.serialize(longRange)))
 println(fory.deserialize(fory.serialize(charRange)))
 
-// Progressions
+// 等差数列
 val intProgression = 1..10 step 2
 val longProgression = 1L..100L step 10
 
@@ -118,7 +118,7 @@ println(fory.deserialize(fory.serialize(intProgression)))
 println(fory.deserialize(fory.serialize(longProgression)))
 ```
 
-## Collections
+## 集合
 
 ### ArrayDeque
 
@@ -130,7 +130,7 @@ deque.addLast("last")
 println(fory.deserialize(fory.serialize(deque)))
 ```
 
-### Empty Collections
+### 空集合
 
 ```kotlin
 val emptyList = emptyList<String>()
@@ -162,7 +162,7 @@ val regex = Regex("[a-zA-Z]+")
 println(fory.deserialize(fory.serialize(regex)))
 ```
 
-## UUID (Kotlin 2.0+)
+## UUID（Kotlin 2.0+）
 
 ```kotlin
 import kotlin.uuid.Uuid
@@ -172,13 +172,13 @@ val uuid = Uuid.random()
 println(fory.deserialize(fory.serialize(uuid)))
 ```
 
-## Types Working Out of the Box
+## 开箱即用的类型
 
-The following types work with the default Fory Java implementation without needing `KotlinSerializers`:
+以下类型可以使用默认的 Fory Java 实现，无需使用 `KotlinSerializers`：
 
-- **Primitives**: `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double`
-- **String**: `String`
-- **Collections**: `ArrayList`, `HashMap`, `HashSet`, `LinkedHashSet`, `LinkedHashMap`
-- **Arrays**: `Array`, `BooleanArray`, `ByteArray`, `CharArray`, `DoubleArray`, `FloatArray`, `IntArray`, `LongArray`, `ShortArray`
+- **原始类型**：`Byte`、`Boolean`、`Int`、`Short`、`Long`、`Char`、`Float`、`Double`
+- **字符串**：`String`
+- **集合**：`ArrayList`、`HashMap`、`HashSet`、`LinkedHashSet`、`LinkedHashMap`
+- **数组**：`Array`、`BooleanArray`、`ByteArray`、`CharArray`、`DoubleArray`、`FloatArray`、`IntArray`、`LongArray`、`ShortArray`
 
-However, it's recommended to always call `KotlinSerializers.registerSerializers(fory)` to ensure all Kotlin types are properly supported.
+但是，建议始终调用 `KotlinSerializers.registerSerializers(fory)` 以确保正确支持所有 Kotlin 类型。

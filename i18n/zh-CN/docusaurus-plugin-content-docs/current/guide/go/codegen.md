@@ -1,5 +1,5 @@
 ---
-title: Code Generation
+title: 代码生成
 sidebar_position: 90
 id: codegen
 license: |
@@ -23,9 +23,9 @@ license: |
 Code generation is an **experimental** feature in Fory Go. The API and behavior may change in future releases. The reflection-based path remains the stable, recommended approach for most use cases.
 :::
 
-Fory Go provides optional ahead-of-time (AOT) code generation for performance-critical paths. This eliminates reflection overhead and provides compile-time type safety.
+Fory Go 为性能关键路径提供可选的 AOT 代码生成，可消除反射开销并提升编译期类型安全。
 
-## Why Code Generation?
+## 为什么使用代码生成？
 
 | Aspect      | Reflection-Based   | Code Generation        |
 | ----------- | ------------------ | ---------------------- |
@@ -47,7 +47,7 @@ Fory Go provides optional ahead-of-time (AOT) code generation for performance-cr
 - Dynamic typing is needed
 - Code generation complexity is undesirable
 
-## Installation
+## 安装
 
 Install the `fory` generator binary:
 
@@ -59,7 +59,7 @@ GO111MODULE=on go get -u github.com/apache/fory/go/fory/cmd/fory
 
 Ensure `$GOBIN` or `$GOPATH/bin` is in your `PATH`.
 
-## Basic Usage
+## 基本用法
 
 ### Step 1: Annotate Structs
 
@@ -104,7 +104,7 @@ go generate ./...
 
 This creates `models_fory_gen.go` with generated serializers.
 
-## Generated Code Structure
+## 生成代码结构
 
 The generator creates:
 
@@ -413,7 +413,7 @@ Run `go generate ./...` after struct changes.
 
 For libraries: yes. For applications: either works.
 
-## Related Topics
+## 相关主题
 
 - [Basic Serialization](basic-serialization.md)
 - [Configuration](configuration.md)

@@ -1,5 +1,5 @@
 ---
-title: Reference Tracking
+title: 引用跟踪
 sidebar_position: 45
 id: reference_tracking
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This page explains how Fory handles reference tracking for shared and circular references in cross-language serialization.
+本页说明 Fory 在跨语言序列化中如何处理共享引用与循环引用的引用跟踪。
 
-## Overview
+## 概述
 
 Reference tracking enables:
 
@@ -29,7 +29,7 @@ Reference tracking enables:
 - **Circular references**: Objects that reference themselves or form cycles
 - **Memory efficiency**: No duplicate data for repeated objects
 
-## Enabling Reference Tracking
+## 启用引用跟踪
 
 ### Java
 
@@ -68,7 +68,7 @@ let fory = Fory::builder()
     .build();
 ```
 
-## Wire Format
+## 线格式
 
 When reference tracking is enabled, nullable fields write a **ref flag byte** before the value:
 
@@ -84,7 +84,7 @@ Where `ref_flag` is:
 | `-2` (NOT_NULL_VALUE_FLAG) | Value is present, first occurrence                    |
 | `≥0`                       | Reference ID pointing to previously serialized object |
 
-## Reference Tracking vs Nullability
+## 引用跟踪与可空性
 
 These are **independent** concepts:
 
@@ -111,7 +111,7 @@ Fory fory = Fory.builder()
 
 By default, **most fields do not track references** even when global `refTracking=true`. Only specific pointer/smart pointer types track references by default.
 
-### Default Behavior by Language
+### 默认行为 by Language
 
 | Language | Default Ref Tracking | Types That Track Refs by Default  |
 | -------- | -------------------- | --------------------------------- |

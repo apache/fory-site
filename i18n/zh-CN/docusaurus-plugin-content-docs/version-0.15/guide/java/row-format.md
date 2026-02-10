@@ -1,6 +1,6 @@
 ---
-title: 行存格式
-sidebar_position: 5
+title: 行格式
+sidebar_position: 9
 id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,7 +19,19 @@ license: |
   limitations under the License.
 ---
 
-## Java
+Apache Fory™ 提供了一种随机访问行格式，能够在不完全反序列化的情况下从二进制数据中读取嵌套字段。当处理大对象且只需要部分数据访问时，这大大减少了开销。
+
+## 概述
+
+行格式是一种缓存友好的二进制随机访问格式，支持：
+
+- **零拷贝访问**：直接从二进制读取字段，无需分配对象
+- **部分反序列化**：只访问你需要的字段
+- **跳过序列化**：跳过不需要的字段的序列化
+- **跨语言兼容性**：在 Python、Java、C++ 和其他语言之间工作
+- **列格式转换**：可以自动转换为 Apache Arrow 列格式
+
+## 基本使用
 
 ```java
 public class Bar {
@@ -35,44 +47,76 @@ public class Foo {
 }
 
 RowEncoder<Foo> encoder = Encoders.bean(Foo.class);
+
+// 创建大型数据集
 Foo foo = new Foo();
 foo.f1 = 10;
-foo.f2 = IntStream.range(0, 1000000).boxed().collect(Collectors.toList());
-foo.f3 = IntStream.range(0, 1000000).boxed().collect(Collectors.toMap(i -> "k"+i, i->i));
-List<Bar> bars = new ArrayList<>(1000000);
-for (int i = 0; i < 1000000; i++) {
+foo.f2 = IntStream.range(0, 1_000_000).boxed().collect(Collectors.toList());
+foo.f3 = IntStream.range(0, 1_000_000).boxed().collect(Collectors.toMap(i -> "k" + i, i -> i));
+List<Bar> bars = new ArrayList<>(1_000_000);
+for (int i = 0; i < 1_000_000; i++) {
   Bar bar = new Bar();
-  bar.f1 = "s"+i;
+  bar.f1 = "s" + i;
   bar.f2 = LongStream.range(0, 10).boxed().collect(Collectors.toList());
   bars.add(bar);
 }
 foo.f4 = bars;
-// 可被 python 零拷贝读取
-BinaryRow binaryRow = encoder.toRow(foo);
-// 也可以是 python 生成的数据
-Foo newFoo = encoder.fromRow(binaryRow);
-// 零拷贝读取 List<Integer> f2
-BinaryArray binaryArray2 = binaryRow.getArray(1);
-// 零拷贝读取 List<Bar> f4
-BinaryArray binaryArray4 = binaryRow.getArray(3);
-// 零拷贝读取 `readList<Bar> f4` 的第 11 个元素
-BinaryRow barStruct = binaryArray4.getStruct(10);
 
-// 零拷贝读取 `readList<Bar> f4` 第 11 个元素的 f2 的第 6 个元素
-barStruct.getArray(1).getInt64(5);
+// 编码为行格式（跨语言兼容 Python/C++）
+BinaryRow binaryRow = encoder.toRow(foo);
+
+// 零拷贝随机访问，无需完全反序列化
+BinaryArray f2Array = binaryRow.getArray(1);              // 访问 f2 列表
+BinaryArray f4Array = binaryRow.getArray(3);              // 访问 f4 列表
+BinaryRow bar10 = f4Array.getStruct(10);                  // 访问第 11 个 Bar
+long value = bar10.getArray(1).getInt64(5);               // 访问 bar.f2 的第 6 个元素
+
+// 部分反序列化 - 只反序列化你需要的
 RowEncoder<Bar> barEncoder = Encoders.bean(Bar.class);
-// 只反序列化部分数据
-Bar newBar = barEncoder.fromRow(barStruct);
-Bar newBar2 = barEncoder.fromRow(binaryArray4.getStruct(20));
+Bar bar1 = barEncoder.fromRow(f4Array.getStruct(10));     // 只反序列化第 11 个 Bar
+Bar bar2 = barEncoder.fromRow(f4Array.getStruct(20));     // 只反序列化第 21 个 Bar
+
+// 需要时完全反序列化
+Foo newFoo = encoder.fromRow(binaryRow);
 ```
 
-## Python
+## 主要优势
+
+| 特性         | 描述                                   |
+| ------------ | -------------------------------------- |
+| 零拷贝访问   | 读取嵌套字段而无需反序列化整个对象     |
+| 内存效率     | 直接从磁盘内存映射大数据集             |
+| 跨语言       | Java、Python、C++ 之间的二进制格式兼容 |
+| 部分反序列化 | 只反序列化你需要的特定元素             |
+| 高性能       | 跳过不必要的数据解析用于分析工作负载   |
+
+## 何时使用行格式
+
+行格式适用于：
+
+- **分析工作负载**：当你只需要访问特定字段时
+- **大数据集**：当完全反序列化成本太高时
+- **内存映射文件**：处理大于 RAM 的数据
+- **数据管道**：无需完整对象重建即可处理数据
+- **跨语言数据共享**：当数据需要从多种语言访问时
+
+## 跨语言兼容性
+
+行格式在语言之间无缝工作。相同的二进制数据可以从以下语言访问：
+
+### Python
 
 ```python
+import pyfory
+import pyarrow as pa
+from dataclasses import dataclass
+from typing import List, Dict
+
 @dataclass
 class Bar:
     f1: str
     f2: List[pa.int64]
+
 @dataclass
 class Foo:
     f1: pa.int32
@@ -81,125 +125,59 @@ class Foo:
     f4: List[Bar]
 
 encoder = pyfory.encoder(Foo)
-foo = Foo(f1=10, f2=list(range(1000_000)),
-         f3={f"k{i}": i for i in range(1000_000)},
-         f4=[Bar(f1=f"s{i}", f2=list(range(10))) for i in range(1000_000)])
 binary: bytes = encoder.to_row(foo).to_bytes()
-print(f"start: {datetime.datetime.now()}")
+
+# 零拷贝访问
 foo_row = pyfory.RowData(encoder.schema, binary)
-print(foo_row.f2[100000], foo_row.f4[100000].f1, foo_row.f4[200000].f2[5])
-print(f"end: {datetime.datetime.now()}")
-
-binary = pickle.dumps(foo)
-print(f"pickle start: {datetime.datetime.now()}")
-new_foo = pickle.loads(binary)
-print(new_foo.f2[100000], new_foo.f4[100000].f1, new_foo.f4[200000].f2[5])
-print(f"pickle end: {datetime.datetime.now()}")
+print(foo_row.f2[100000])
+print(foo_row.f4[100000].f1)
 ```
 
-### Apache Arrow 支持
+### C++
 
-Fory Format 也支持与 Arrow Table/RecordBatch 的自动转换。
+```cpp
+#include "fory/encoder/row_encoder.h"
+#include "fory/row/writer.h"
 
-Java 示例：
+struct Bar {
+  std::string f1;
+  std::vector<int64_t> f2;
+};
 
-```java
-Schema schema = TypeInference.inferSchema(BeanA.class);
-ArrowWriter arrowWriter = ArrowUtils.createArrowWriter(schema);
-Encoder<BeanA> encoder = Encoders.rowEncoder(BeanA.class);
-for (int i = 0; i < 10; i++) {
-  BeanA beanA = BeanA.createBeanA(2);
-  arrowWriter.write(encoder.toRow(beanA));
-}
-return arrowWriter.finishAsRecordBatch();
+FORY_FIELD_INFO(Bar, f1, f2);
+
+struct Foo {
+  int32_t f1;
+  std::vector<int32_t> f2;
+  std::map<std::string, int32_t> f3;
+  std::vector<Bar> f4;
+};
+
+FORY_FIELD_INFO(Foo, f1, f2, f3, f4);
+
+fory::encoder::RowEncoder<Foo> encoder;
+encoder.Encode(foo);
+auto row = encoder.GetWriter().ToRow();
+
+// 零拷贝随机访问
+auto f2_array = row->GetArray(1);
+auto f4_array = row->GetArray(3);
+auto bar10 = f4_array->GetStruct(10);
+int64_t value = bar10->GetArray(1)->GetInt64(5);
+std::string str = bar10->GetString(0);
 ```
 
-## 支持接口与继承类型
+## 性能比较
 
-Fury 现已支持 Java `interface` 类型和子类（`extends`）类型的行格式映射，带来更动态和灵活的数据 schema。
+| 操作         | 对象格式           | 行格式             |
+| ------------ | ------------------ | ------------------ |
+| 完全反序列化 | 分配所有对象       | 零分配             |
+| 单字段访问   | 需要完全反序列化   | 直接偏移读取       |
+| 内存使用     | 完整对象图在内存中 | 仅访问的字段       |
+| 适用于       | 小对象，完全访问   | 大对象，选择性访问 |
 
-相关增强见 [#2243](https://github.com/apache/fury/pull/2243)、[#2250](https://github.com/apache/fury/pull/2250)、[#2256](https://github.com/apache/fury/pull/2256)。
+## 相关主题
 
-### 示例：接口类型的 RowEncoder 映射
-
-```java
-public interface Animal {
-  String speak();
-}
-
-public class Dog implements Animal {
-  public String name;
-
-  @Override
-  public String speak() {
-    return "Woof";
-  }
-}
-
-// 使用 RowEncoder 以接口类型编码和解码
-RowEncoder<Animal> encoder = Encoders.bean(Animal.class);
-Dog dog = new Dog();
-dog.name = "Bingo";
-BinaryRow row = encoder.toRow(dog);
-Animal decoded = encoder.fromRow(row);
-System.out.println(decoded.speak()); // Woof
-
-```
-
-### 示例：继承类型的 RowEncoder 映射
-
-```java
-public class Parent {
-    public String parentField;
-}
-
-public class Child extends Parent {
-    public String childField;
-}
-
-// 使用 RowEncoder 以父类类型编码和解码
-RowEncoder<Parent> encoder = Encoders.bean(Parent.class);
-Child child = new Child();
-child.parentField = "Hello";
-child.childField = "World";
-BinaryRow row = encoder.toRow(child);
-Parent decoded = encoder.fromRow(row);
-
-```
-
-Python 示例：
-
-```python
-import pyfory
-encoder = pyfory.encoder(Foo)
-encoder.to_arrow_record_batch([foo] * 10000)
-encoder.to_arrow_table([foo] * 10000)
-```
-
-C++ 示例：
-
-```c++
-std::shared_ptr<ArrowWriter> arrow_writer;
-EXPECT_TRUE(
-    ArrowWriter::Make(schema, ::arrow::default_memory_pool(), &arrow_writer)
-        .ok());
-for (auto &row : rows) {
-  EXPECT_TRUE(arrow_writer->Write(row).ok());
-}
-std::shared_ptr<::arrow::RecordBatch> record_batch;
-EXPECT_TRUE(arrow_writer->Finish(&record_batch).ok());
-EXPECT_TRUE(record_batch->Validate().ok());
-EXPECT_EQ(record_batch->num_columns(), schema->num_fields());
-EXPECT_EQ(record_batch->num_rows(), row_nums);
-```
-
-```java
-Schema schema = TypeInference.inferSchema(BeanA.class);
-ArrowWriter arrowWriter = ArrowUtils.createArrowWriter(schema);
-Encoder<BeanA> encoder = Encoders.rowEncoder(BeanA.class);
-for (int i = 0; i < 10; i++) {
-  BeanA beanA = BeanA.createBeanA(2);
-  arrowWriter.write(encoder.toRow(beanA));
-}
-return arrowWriter.finishAsRecordBatch();
-```
+- [跨语言序列化](cross-language.md) - XLANG 模式
+- [高级特性](advanced-features.md) - 零拷贝序列化
+- [行格式规范](https://fory.apache.org/docs/specification/row_format_spec) - 协议详情

@@ -1,5 +1,5 @@
 ---
-title: NumPy & Scientific Computing
+title: NumPy 与科学计算
 sidebar_position: 8
 id: numpy_integration
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-Fory natively supports numpy arrays with optimized serialization.
+Fory 原生支持 numpy 数组，提供优化的序列化。
 
-## NumPy Array Serialization
+## NumPy 数组序列化
 
-Large arrays use zero-copy when possible:
+大型数组在可能的情况下使用零拷贝：
 
 ```python
 import pyfory
@@ -31,7 +31,7 @@ import numpy as np
 
 f = pyfory.Fory()
 
-# Numpy arrays are supported natively
+# 原生支持 Numpy 数组
 arrays = {
     'matrix': np.random.rand(1000, 1000),
     'vector': np.arange(10000),
@@ -41,13 +41,13 @@ arrays = {
 data = f.serialize(arrays)
 result = f.deserialize(data)
 
-# Zero-copy for compatible array types
+# 对于兼容的数组类型使用零拷贝
 assert np.array_equal(arrays['matrix'], result['matrix'])
 ```
 
-## Pandas DataFrames
+## Pandas DataFrame
 
-Fory can serialize Pandas DataFrames efficiently:
+Fory 可以高效序列化 Pandas DataFrame：
 
 ```python
 import pyfory
@@ -68,9 +68,9 @@ result = f.deserialize(data)
 assert df.equals(result)
 ```
 
-## Zero-Copy with Out-of-Band Buffers
+## 使用带外缓冲区的零拷贝
 
-For maximum performance with large arrays, use out-of-band serialization:
+对于大型数组的最大性能，使用带外序列化：
 
 ```python
 import pyfory
@@ -78,10 +78,10 @@ import numpy as np
 
 f = pyfory.Fory(xlang=False, ref=False, strict=False)
 
-# Large array
+# 大型数组
 array = np.random.rand(10000, 1000)
 
-# Out-of-band for zero-copy
+# 带外零拷贝
 buffer_objects = []
 data = f.serialize(array, buffer_callback=buffer_objects.append)
 buffers = [obj.getbuffer() for obj in buffer_objects]
@@ -90,14 +90,14 @@ result = f.deserialize(data, buffers=buffers)
 assert np.array_equal(array, result)
 ```
 
-## Supported Array Types
+## 支持的数组类型
 
-- `np.ndarray` (all dtypes)
+- `np.ndarray`（所有 dtype）
 - `np.matrix`
-- Structured arrays
-- Record arrays
+- 结构化数组
+- 记录数组
 
-## Related Topics
+## 相关主题
 
-- [Out-of-Band Serialization](out-of-band.md) - Zero-copy buffers
-- [Basic Serialization](basic-serialization.md) - Standard usage
+- [带外序列化](out-of-band.md) - 零拷贝缓冲区
+- [基础序列化](basic-serialization.md) - 标准用法

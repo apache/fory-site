@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: 故障排查
 sidebar_position: 110
 id: troubleshooting
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This guide covers common issues and solutions when using Fory Go.
+本指南汇总了使用 Fory Go 时的常见问题与解决方案。
 
-## Error Types
+## 错误类型
 
 Fory Go uses typed errors with specific error kinds:
 
@@ -36,7 +36,7 @@ func (e Error) Kind() ErrorKind { return e.kind }
 func (e Error) Error() string   { return e.message }
 ```
 
-### Error Kinds
+### 错误种类
 
 | Kind                           | Value | Description                     |
 | ------------------------------ | ----- | ------------------------------- |
@@ -52,7 +52,7 @@ func (e Error) Error() string   { return e.message }
 | `ErrKindHashMismatch`          | 9     | Struct hash mismatch            |
 | `ErrKindInvalidTag`            | 10    | Invalid fory struct tag         |
 
-## Common Errors and Solutions
+## 常见错误与解决方案
 
 ### ErrKindUnknownType
 
@@ -440,7 +440,7 @@ If you encounter issues not covered here:
 3. **Create minimal reproduction**: Isolate the problem
 4. **Report the issue**: Include Go version, Fory version, and minimal code
 
-## Related Topics
+## 相关主题
 
 - [Configuration](configuration.md)
 - [Cross-Language Serialization](cross-language.md)
