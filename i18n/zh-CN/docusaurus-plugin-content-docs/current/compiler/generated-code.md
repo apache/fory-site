@@ -19,20 +19,18 @@ license: |
   limitations under the License.
 ---
 
-> 中文导读：本文档为 Fory 编译器/协议规范文档的中文译稿。为避免改变规范语义，代码片段、类型名、协议字段名保持英文，说明性文字优先翻译为中文。
+本文档说明各目标语言的代码生成结果与结构。
 
-本文档说明各目标语言的生成代码结构。
+Fory IDL 生成的类型遵循宿主语言习惯，可直接作为领域对象使用。生成代码同时包含 `to/from bytes` 辅助方法和类型注册辅助逻辑。
 
-Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and registration helpers.
+## 参考 Schema
 
-## Reference Schemas
+下面示例基于两个真实 schema：
 
-The examples below use two real schemas:
+1. `addressbook.fdl`（显式类型 ID）
+2. `auto_id.fdl`（未显式声明类型 ID）
 
-1. `addressbook.fdl` (explicit type IDs)
-2. `auto_id.fdl` (no explicit type IDs)
-
-### `addressbook.fdl` (excerpt)
+### `addressbook.fdl`（节选）
 
 ```protobuf
 package addressbook;
@@ -79,7 +77,7 @@ message AddressBook [id=103] {
 }
 ```
 
-### `auto_id.fdl` (excerpt)
+### `auto_id.fdl`（节选）
 
 ```protobuf
 package auto_id;
@@ -114,17 +112,17 @@ union Wrapper {
 
 ## Java
 
-### Output Layout
+### 输出布局
 
-For `package addressbook`, Java output is generated under:
+对于 `package addressbook`，Java 输出通常位于：
 
 - `<java_out>/addressbook/`
-- Type files: `AddressBook.java`, `Person.java`, `Dog.java`, `Cat.java`, `Animal.java`
-- Registration helper: `AddressbookForyRegistration.java`
+- 类型文件：`AddressBook.java`、`Person.java`、`Dog.java`、`Cat.java`、`Animal.java`
+- 注册辅助类：`AddressbookForyRegistration.java`
 
-### Type Generation
+### 类型生成
 
-Messages generate Java classes with `@ForyField`, default constructors, getters/setters, and byte helpers:
+message 会生成带 `@ForyField`、默认构造器、getter/setter 以及字节辅助方法的 Java 类：
 
 ```java
 public class Person {
@@ -156,7 +154,7 @@ public class Person {
 }
 ```
 
-Unions generate classes extending `org.apache.fory.type.union.Union`:
+union 会生成继承 `org.apache.fory.type.union.Union` 的类：
 
 ```java
 public final class Animal extends Union {
@@ -177,9 +175,9 @@ public final class Animal extends Union {
 }
 ```
 
-### Registration
+### 注册
 
-Generated registration helper:
+生成的注册辅助方法：
 
 ```java
 public static void register(Fory fory) {
@@ -194,7 +192,7 @@ public static void register(Fory fory) {
 }
 ```
 
-For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs (for example from `auto_id.fdl`):
+对于未显式 `[id=...]` 的 schema，注册代码会使用计算得到的数值 ID（例如 `auto_id.fdl`）：
 
 ```java
 resolver.register(Status.class, 1124725126L);
@@ -204,7 +202,7 @@ resolver.registerUnion(Envelope.Detail.class, 1609214087L, new org.apache.fory.s
 resolver.register(Envelope.Payload.class, 2862577837L);
 ```
 
-If `option enable_auto_type_id = false;` is set, registration uses namespace and type name:
+若设置 `option enable_auto_type_id = false;`，则按命名空间与类型名注册：
 
 ```java
 resolver.register(Config.class, "myapp.models", "Config");
@@ -215,7 +213,7 @@ resolver.registerUnion(
     new org.apache.fory.serializer.UnionSerializer(fory, Holder.class));
 ```
 
-### Usage
+### 使用示例
 
 ```java
 Person person = new Person();
@@ -228,15 +226,15 @@ Person restored = Person.fromBytes(data);
 
 ## Python
 
-### Output Layout
+### 输出布局
 
-Python output is one module per schema file, for example:
+Python 每个 schema 文件生成一个模块，例如：
 
 - `<python_out>/addressbook.py`
 
-### Type Generation
+### 类型生成
 
-Unions generate a case enum plus a `Union` subclass with typed helpers:
+union 生成 case 枚举与 `Union` 子类，并提供类型化辅助方法：
 
 ```python
 class AnimalCase(Enum):
@@ -255,7 +253,7 @@ class Animal(Union):
     def set_dog(self, v: Dog) -> None: ...
 ```
 
-Messages generate `@pyfory.dataclass` types, and nested types stay nested:
+message 生成 `@pyfory.dataclass` 类型，嵌套类型保持嵌套：
 
 ```python
 @pyfory.dataclass
@@ -279,9 +277,9 @@ class Person:
     def from_bytes(cls, data: bytes) -> "Person": ...
 ```
 
-### Registration
+### 注册
 
-Generated registration function:
+生成注册函数：
 
 ```python
 def register_addressbook_types(fory: pyfory.Fory):
@@ -294,7 +292,7 @@ def register_addressbook_types(fory: pyfory.Fory):
     fory.register_type(AddressBook, type_id=103)
 ```
 
-For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
+未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
 
 ```python
 fory.register_type(Status, type_id=1124725126)
@@ -304,7 +302,7 @@ fory.register_union(Envelope.Detail, type_id=1609214087, serializer=Envelope.Det
 fory.register_type(Envelope.Payload, type_id=2862577837)
 ```
 
-If `option enable_auto_type_id = false;` is set:
+若设置 `option enable_auto_type_id = false;`：
 
 ```python
 fory.register_type(Config, namespace="myapp.models", typename="Config")
@@ -316,7 +314,7 @@ fory.register_union(
 )
 ```
 
-### Usage
+### 使用示例
 
 ```python
 person = Person(name="Alice", pet=Animal.dog(Dog(name="Rex", bark_volume=10)))
@@ -327,15 +325,15 @@ restored = Person.from_bytes(data)
 
 ## Rust
 
-### Output Layout
+### 输出布局
 
-Rust output is one module file per schema, for example:
+Rust 每个 schema 生成一个模块文件，例如：
 
 - `<rust_out>/addressbook.rs`
 
-### Type Generation
+### 类型生成
 
-Unions map to Rust enums with `#[fory(id = ...)]` case attributes:
+union 映射为 Rust enum，并用 `#[fory(id = ...)]` 声明 case ID：
 
 ```rust
 #[derive(ForyObject, Debug, Clone, PartialEq)]
@@ -347,7 +345,7 @@ pub enum Animal {
 }
 ```
 
-Nested types generate nested modules:
+嵌套类型生成嵌套 module：
 
 ```rust
 pub mod person {
@@ -370,7 +368,7 @@ pub mod person {
 }
 ```
 
-Messages derive `ForyObject` and include `to_bytes`/`from_bytes` helpers:
+message 会 `derive(ForyObject)` 并生成 `to_bytes`/`from_bytes`：
 
 ```rust
 #[derive(ForyObject, Debug, Clone, PartialEq, Default)]
@@ -384,9 +382,9 @@ pub struct Person {
 }
 ```
 
-### Registration
+### 注册
 
-Generated registration function:
+生成注册函数：
 
 ```rust
 pub fn register_types(fory: &mut Fory) -> Result<(), fory::Error> {
@@ -401,7 +399,7 @@ pub fn register_types(fory: &mut Fory) -> Result<(), fory::Error> {
 }
 ```
 
-For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
+未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
 
 ```rust
 fory.register::<Status>(1124725126)?;
@@ -411,14 +409,14 @@ fory.register_union::<envelope::Detail>(1609214087)?;
 fory.register::<envelope::Payload>(2862577837)?;
 ```
 
-If `option enable_auto_type_id = false;` is set:
+若设置 `option enable_auto_type_id = false;`：
 
 ```rust
 fory.register_by_namespace::<Config>("myapp.models", "Config")?;
 fory.register_union_by_namespace::<Holder>("myapp.models", "Holder")?;
 ```
 
-### Usage
+### 使用示例
 
 ```rust
 let person = Person {
@@ -433,15 +431,15 @@ let restored = Person::from_bytes(&bytes)?;
 
 ## C++
 
-### Output Layout
+### 输出布局
 
-C++ output is one header per schema file, for example:
+C++ 每个 schema 文件生成一个头文件，例如：
 
 - `<cpp_out>/addressbook.h`
 
-### Type Generation
+### 类型生成
 
-Messages generate `final` classes with typed accessors and byte helpers:
+message 会生成 `final` 类，并包含类型化访问器与字节辅助方法：
 
 ```cpp
 class Person final {
@@ -467,7 +465,7 @@ class Person final {
 };
 ```
 
-Optional message fields generate `has_xxx`, `mutable_xxx`, and `clear_xxx` APIs:
+可选 message 字段会生成 `has_xxx`、`mutable_xxx`、`clear_xxx` API：
 
 ```cpp
 class Envelope final {
@@ -487,7 +485,7 @@ class Envelope final {
 };
 ```
 
-Unions generate `std::variant` wrappers:
+union 会生成基于 `std::variant` 的封装：
 
 ```cpp
 class Animal final {
@@ -517,11 +515,11 @@ class Animal final {
 };
 ```
 
-Generated headers also include `FORY_UNION`, `FORY_FIELD_CONFIG`, `FORY_ENUM`, and `FORY_STRUCT` macros for serialization metadata.
+生成头文件还会包含 `FORY_UNION`、`FORY_FIELD_CONFIG`、`FORY_ENUM`、`FORY_STRUCT` 等序列化元信息宏。
 
-### Registration
+### 注册
 
-Generated registration function:
+生成注册函数：
 
 ```cpp
 inline void register_types(fory::serialization::BaseFory& fory) {
@@ -535,7 +533,7 @@ inline void register_types(fory::serialization::BaseFory& fory) {
 }
 ```
 
-For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
+未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
 
 ```cpp
 fory.register_enum<Status>(1124725126);
@@ -545,14 +543,14 @@ fory.register_union<Envelope::Detail>(1609214087);
 fory.register_struct<Envelope::Payload>(2862577837);
 ```
 
-If `option enable_auto_type_id = false;` is set:
+若设置 `option enable_auto_type_id = false;`：
 
 ```cpp
 fory.register_struct<Config>("myapp.models", "Config");
 fory.register_union<Holder>("myapp.models", "Holder");
 ```
 
-### Usage
+### 使用示例
 
 ```cpp
 addressbook::Person person;
@@ -565,17 +563,17 @@ auto restored = addressbook::Person::from_bytes(bytes.value());
 
 ## Go
 
-### Output Layout
+### 输出布局
 
-Go output path depends on schema options and `--go_out`.
+Go 输出路径受 schema 选项与 `--go_out` 共同影响。
 
-For `addressbook.fdl`, `go_package` is configured and generated output follows the configured import path/package (for example under your `--go_out` root).
+对于 `addressbook.fdl`，若配置了 `go_package`，生成结果会遵循对应 import path/package（位于 `--go_out` 根目录下）。
 
-Without `go_package`, output uses the requested `--go_out` directory and package-derived file naming.
+若未配置 `go_package`，则使用 `--go_out` 指定目录，并按 package 规则生成文件名与包名。
 
-### Type Generation
+### 类型生成
 
-Nested types use underscore naming by default (`Person_PhoneType`, `Person_PhoneNumber`):
+嵌套类型默认使用下划线命名（`Person_PhoneType`、`Person_PhoneNumber`）：
 
 ```go
 type Person_PhoneType int32
@@ -592,7 +590,7 @@ type Person_PhoneNumber struct {
 }
 ```
 
-Messages generate structs with `fory` tags and byte helpers:
+message 会生成带 `fory` tag 的 struct 与字节辅助方法：
 
 ```go
 type Person struct {
@@ -606,7 +604,7 @@ func (m *Person) ToBytes() ([]byte, error) { ... }
 func (m *Person) FromBytes(data []byte) error { ... }
 ```
 
-Unions generate typed case structs with constructors/accessors/visitor APIs:
+union 会生成 case struct，并提供构造器/访问器/visitor API：
 
 ```go
 type AnimalCase uint32
@@ -624,9 +622,9 @@ func (u Animal) AsDog() (*Dog, bool) { ... }
 func (u Animal) Visit(visitor AnimalVisitor) error { ... }
 ```
 
-### Registration
+### 注册
 
-Generated registration function:
+生成注册函数：
 
 ```go
 func RegisterTypes(f *fory.Fory) error {
@@ -646,7 +644,7 @@ func RegisterTypes(f *fory.Fory) error {
 }
 ```
 
-For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
+未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
 
 ```go
 if err := f.RegisterEnum(Status(0), 1124725126); err != nil { ... }
@@ -656,20 +654,20 @@ if err := f.RegisterUnion(Envelope_Detail{}, 1609214087, fory.NewUnionSerializer
 if err := f.RegisterStruct(Envelope_Payload{}, 2862577837); err != nil { ... }
 ```
 
-If `option enable_auto_type_id = false;` is set:
+若设置 `option enable_auto_type_id = false;`：
 
 ```go
 if err := f.RegisterNamedStruct(Config{}, "myapp.models.Config"); err != nil { ... }
 if err := f.RegisterNamedUnion(Holder{}, "myapp.models.Holder", fory.NewUnionSerializer(...)); err != nil { ... }
 ```
 
-`go_nested_type_style` controls nested type naming:
+`go_nested_type_style` 可控制嵌套类型命名风格：
 
 ```protobuf
 option go_nested_type_style = "camelcase";
 ```
 
-### Usage
+### 使用示例
 
 ```go
 person := &Person{
@@ -687,30 +685,30 @@ if err := restored.FromBytes(data); err != nil {
 }
 ```
 
-## Cross-Language Notes
+## 跨语言说明
 
-### Type ID Behavior
+### 类型 ID 行为
 
-- Explicit `[id=...]` values are used directly in generated registration.
-- When type IDs are omitted, generated code uses computed numeric IDs (see `auto_id.*` outputs).
-- If `option enable_auto_type_id = false;` is set, generated registration uses namespace/type-name APIs instead of numeric IDs.
+- 显式 `[id=...]` 会直接用于生成注册代码。
+- 未声明类型 ID 时，生成代码会使用计算得到的数值 ID（参见 `auto_id.*` 输出）。
+- 若设置 `option enable_auto_type_id = false;`，则生成代码改为使用 namespace/type-name 注册 API，而非数值 ID。
 
-### Nested Type Shape
+### 嵌套类型形态
 
-| Language | Nested type form               |
-| -------- | ------------------------------ |
-| Java     | `Person.PhoneNumber`           |
-| Python   | `Person.PhoneNumber`           |
-| Rust     | `person::PhoneNumber`          |
-| C++      | `Person::PhoneNumber`          |
-| Go       | `Person_PhoneNumber` (default) |
+| 语言   | 嵌套类型形式                 |
+| ------ | ---------------------------- |
+| Java   | `Person.PhoneNumber`         |
+| Python | `Person.PhoneNumber`         |
+| Rust   | `person::PhoneNumber`        |
+| C++    | `Person::PhoneNumber`        |
+| Go     | `Person_PhoneNumber`（默认） |
 
-### Byte Helper Naming
+### 字节辅助方法命名
 
-| Language | Helpers                   |
-| -------- | ------------------------- |
-| Java     | `toBytes` / `fromBytes`   |
-| Python   | `to_bytes` / `from_bytes` |
-| Rust     | `to_bytes` / `from_bytes` |
-| C++      | `to_bytes` / `from_bytes` |
-| Go       | `ToBytes` / `FromBytes`   |
+| 语言   | 辅助方法名称              |
+| ------ | ------------------------- |
+| Java   | `toBytes` / `fromBytes`   |
+| Python | `to_bytes` / `from_bytes` |
+| Rust   | `to_bytes` / `from_bytes` |
+| C++    | `to_bytes` / `from_bytes` |
+| Go     | `ToBytes` / `FromBytes`   |

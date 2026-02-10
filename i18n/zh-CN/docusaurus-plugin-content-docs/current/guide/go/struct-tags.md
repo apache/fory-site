@@ -19,14 +19,11 @@ license: |
   limitations under the License.
 ---
 
-> 中文导读：本页介绍字段级序列化配置，包括字段 ID、可空控制、引用跟踪、忽略字段与动态类型控制等。
-> 建议在跨语言和兼容模式场景中优先显式配置字段 ID，并在需要时开启 ref/nullable 以保证行为一致。
-
-Fory Go uses struct tags to customize field-level serialization behavior. This allows fine-grained control over how individual fields are serialized.
+Fory Go 通过 struct tag 自定义字段级序列化行为，从而精细控制每个字段如何序列化。
 
 ## 标签语法
 
-The general syntax for Fory struct tags:
+Fory struct tag 的通用格式如下：
 
 ```go
 type MyStruct struct {
@@ -34,13 +31,13 @@ type MyStruct struct {
 }
 ```
 
-Multiple options are separated by commas (`,`).
+多个选项使用逗号（`,`）分隔。
 
 ## 可用标签
 
 ### 字段 ID
 
-Use `id=N` to assign a numeric ID to a field for compact encoding:
+使用 `id=N` 为字段分配数值 ID，以获得更紧凑编码：
 
 ```go
 type User struct {
@@ -50,21 +47,21 @@ type User struct {
 }
 ```
 
-**Benefits**:
+**收益：**
 
-- Smaller serialized size (numeric IDs vs field names)
-- Faster serialization/deserialization
-- Required for optimal cross-language compatibility
+- 序列化体积更小（数值 ID 替代字段名）
+- 序列化/反序列化更快
+- 跨语言兼容场景下更推荐
 
-**Notes**:
+**注意：**
 
-- IDs must be unique within a struct
-- IDs must be >= 0
-- If not specified, field name is used (larger payload)
+- 同一 struct 内 ID 必须唯一
+- ID 必须 `>= 0`
+- 未指定时使用字段名（payload 更大）
 
 ### 忽略字段
 
-Use `-` to exclude a field from serialization:
+使用 `-` 将字段排除在序列化之外：
 
 ```go
 type User struct {
@@ -74,11 +71,11 @@ type User struct {
 }
 ```
 
-The `Password` field will not be included in serialized output and will remain at its zero value after deserialization.
+`Password` 不会进入序列化结果，反序列化后将保持该类型零值。
 
 ### 可空控制
 
-Use `nullable` to control whether null flags are written for pointer fields:
+使用 `nullable` 控制是否为指针字段写入 null 标记：
 
 ```go
 type Record struct {
@@ -90,15 +87,15 @@ type Record struct {
 }
 ```
 
-**Notes**:
+**注意：**
 
-- Only applies to pointer, slice, and map fields
-- When `nullable=false`, serializing a nil value will cause an error
-- Default is `false` (no null flag written)
+- 仅适用于指针、slice、map 字段
+- `nullable=false` 时，序列化 nil 会报错
+- 默认是 `false`（不写 null 标记）
 
 ### 引用跟踪
 
-Control per-field reference tracking for slices, maps, or pointer to struct fields:
+可为 slice、map、或“指向 struct 的指针字段”设置字段级引用跟踪：
 
 ```go
 type Container struct {
@@ -110,22 +107,22 @@ type Container struct {
 }
 ```
 
-**Notes**:
+**注意：**
 
-- Applies to slices, maps, and pointer to struct fields
-- Pointer to primitive types (e.g., `*int`, `*string`) cannot use this tag
-- Default is `ref=false` (no reference tracking)
-- When global `WithTrackRef(false)` is set, field ref tags are ignored
-- When global `WithTrackRef(true)` is set, use `ref=false` to disable for specific fields
+- 适用于 slice、map 与“指向 struct 的指针字段”
+- 指向原生类型的指针（如 `*int`、`*string`）不能使用该标签
+- 默认 `ref=false`（不开启引用跟踪）
+- 全局 `WithTrackRef(false)` 时，字段级 ref 标签会被忽略
+- 全局 `WithTrackRef(true)` 时，可用 `ref=false` 对单字段禁用
 
-**Use cases**:
+**适用场景：**
 
-- Enable for fields that may be circular or shared
-- Disable for fields that are always unique (optimization)
+- 可能出现共享或循环引用的字段
+- 可明确唯一的字段可禁用（性能优化）
 
-### Encoding
+### 编码控制
 
-Use `encoding` to control how numeric fields are encoded:
+使用 `encoding` 控制数值字段编码方式：
 
 ```go
 type Metrics struct {
@@ -140,24 +137,24 @@ type Metrics struct {
 }
 ```
 
-**Supported encodings**:
+**支持编码：**
 
-| Type     | Options                     | Default  |
+| 类型     | 可选值                      | 默认值   |
 | -------- | --------------------------- | -------- |
-| `int32`  | `varint`, `fixed`           | `varint` |
-| `uint32` | `varint`, `fixed`           | `varint` |
-| `int64`  | `varint`, `fixed`, `tagged` | `varint` |
-| `uint64` | `varint`, `fixed`, `tagged` | `varint` |
+| `int32`  | `varint`、`fixed`           | `varint` |
+| `uint32` | `varint`、`fixed`           | `varint` |
+| `int64`  | `varint`、`fixed`、`tagged` | `varint` |
+| `uint64` | `varint`、`fixed`、`tagged` | `varint` |
 
-**When to use**:
+**何时使用：**
 
-- `varint`: Best for values that are often small (default)
-- `fixed`: Best for values that use full range (e.g., timestamps, hashes)
-- `tagged`: When type information needs to be preserved
+- `varint`：适合小值居多（默认）
+- `fixed`：适合接近全值域分布（如时间戳、哈希）
+- `tagged`：适合需保留类型信息的场景
 
-**Shorthand for int32/uint32**:
+**int32/uint32 简写：**
 
-Use `compress` as a convenience tag for int32/uint32 fields:
+对 int32/uint32 字段可使用 `compress` 作为便捷标签：
 
 ```go
 type Data struct {
@@ -166,9 +163,9 @@ type Data struct {
 }
 ```
 
-## Combining Tags
+## 组合标签
 
-Multiple tags can be combined using comma separator:
+多个标签可使用逗号组合：
 
 ```go
 type Document struct {
@@ -178,9 +175,9 @@ type Document struct {
 }
 ```
 
-## Integration with Other Tags
+## 与其他标签共存
 
-Fory tags coexist with other struct tags:
+Fory 标签可与其他 struct tag 并存：
 
 ```go
 type User struct {
@@ -190,11 +187,11 @@ type User struct {
 }
 ```
 
-Each tag namespace is independent.
+各标签命名空间互不影响。
 
-## Field Visibility
+## 字段可见性
 
-Only **exported fields** (starting with uppercase) are considered:
+仅处理**导出字段**（首字母大写）：
 
 ```go
 type User struct {
@@ -204,26 +201,26 @@ type User struct {
 }
 ```
 
-Unexported fields are always ignored, regardless of tags.
+未导出字段始终忽略，与是否配置 tag 无关。
 
-## Field Ordering
+## 字段顺序
 
-Fields are serialized in a consistent order based on:
+字段会按稳定顺序序列化，依据：
 
-1. Field name (alphabetically in snake_case)
-2. Field type
+1. 字段名（snake_case 字典序）
+2. 字段类型
 
-This ensures cross-language compatibility where field order matters.
+这可保证跨语言场景下的字段顺序一致性。
 
-## Struct Hash
+## Struct 哈希
 
-Fory computes a hash of struct fields for version checking:
+Fory 会基于 struct 字段计算哈希用于版本校验：
 
-- Hash includes field names and types
-- Hash is written to serialized data
-- Mismatch triggers `ErrKindHashMismatch`
+- 哈希包含字段名与字段类型
+- 哈希会写入序列化数据
+- 不匹配会触发 `ErrKindHashMismatch`
 
-Struct field changes affect the hash:
+结构字段变更会影响哈希：
 
 ```go
 // These produce different hashes
@@ -236,9 +233,9 @@ type V2 struct {
 }
 ```
 
-## Examples
+## 示例
 
-### API Response Struct
+### API 响应结构
 
 ```go
 type APIResponse struct {
@@ -249,7 +246,7 @@ type APIResponse struct {
 }
 ```
 
-### Caching with Shared References
+### 带共享引用的缓存结构
 
 ```go
 type CacheEntry struct {
@@ -260,7 +257,7 @@ type CacheEntry struct {
 }
 ```
 
-### Document with Circular References
+### 带循环引用的文档结构
 
 ```go
 type Document struct {
@@ -271,9 +268,9 @@ type Document struct {
 }
 ```
 
-## Tag Parsing Errors
+## 标签解析错误
 
-Invalid tags produce errors during registration:
+注册阶段若标签非法会报错：
 
 ```go
 type BadStruct struct {
@@ -287,15 +284,15 @@ err := f.RegisterStruct(BadStruct{}, 1)
 
 ## 最佳实践
 
-1. **Use `-` for sensitive data**: Passwords, tokens, internal state
-2. **Enable ref tracking for shared objects**: When the same pointer appears multiple times
-3. **Disable ref tracking for simple fields**: Optimization when you know the field is unique
-4. **Keep names consistent**: Cross-language names should match
-5. **Document tag usage**: Especially for non-obvious configurations
+1. **敏感字段使用 `-`**：如密码、令牌、内部状态
+2. **共享对象启用 ref**：同一指针可能多次出现时开启
+3. **简单唯一字段禁用 ref**：可做性能优化
+4. **保持命名一致**：跨语言字段名应保持稳定
+5. **记录标签意图**：非显式配置建议补充注释说明
 
-## Common Patterns
+## 常见模式
 
-### Ignoring Computed Fields
+### 忽略计算字段
 
 ```go
 type Rectangle struct {
@@ -309,7 +306,7 @@ func (r *Rectangle) ComputeArea() {
 }
 ```
 
-### Circular Structure with Parent
+### 带父指针的循环结构
 
 ```go
 type TreeNode struct {
@@ -319,7 +316,7 @@ type TreeNode struct {
 }
 ```
 
-### Mixed Serialization Needs
+### 混合序列化需求
 
 ```go
 type Session struct {
@@ -333,6 +330,6 @@ type Session struct {
 
 ## 相关主题
 
-- [References](references.md)
-- [Basic Serialization](basic-serialization.md)
-- [Schema Evolution](schema-evolution.md)
+- [引用](references.md)
+- [基础序列化](basic-serialization.md)
+- [Schema 演进](schema-evolution.md)

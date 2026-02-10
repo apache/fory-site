@@ -55,12 +55,12 @@ Apache Fory™ 通过先进的优化技术提供卓越性能：
 
 Apache Fory™ 实现了针对不同场景优化的多个二进制协议：
 
-| 协议                                                                      | 使用场景               | 核心特性                                     |
-| ------------------------------------------------------------------------- | ---------------------- | -------------------------------------------- |
-| **[跨语言序列化](../specification/xlang_serialization_spec.md)**        | 跨语言对象交换         | 自动序列化、引用、多态                       |
-| **[Java 序列化](../specification/java_serialization_spec.md)**          | 高性能 Java 专用       | JDK 序列化的直接替代，快 100 倍              |
-| **[行格式](../specification/row_format_spec.md)**                       | 分析和数据处理         | 零拷贝随机访问、Arrow 兼容                   |
-| **Python 原生**                                                           | Python 专用序列化      | Pickle/cloudpickle 替代，性能更好            |
+| 协议                                                             | 使用场景          | 核心特性                          |
+| ---------------------------------------------------------------- | ----------------- | --------------------------------- |
+| **[跨语言序列化](../specification/xlang_serialization_spec.md)** | 跨语言对象交换    | 自动序列化、引用、多态            |
+| **[Java 序列化](../specification/java_serialization_spec.md)**   | 高性能 Java 专用  | JDK 序列化的直接替代，快 100 倍   |
+| **[行格式](../specification/row_format_spec.md)**                | 分析和数据处理    | 零拷贝随机访问、Arrow 兼容        |
+| **Python 原生**                                                  | Python 专用序列化 | Pickle/cloudpickle 替代，性能更好 |
 
 所有协议共享相同的优化代码库，一个协议的改进可以惠及其他协议。
 
@@ -68,25 +68,25 @@ Apache Fory™ 实现了针对不同场景优化的多个二进制协议：
 
 ### 用户指南
 
-| 指南                   | 描述                              | 源文件                                                          | 网站                                                                                |
-| ---------------------- | --------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **Java 序列化**        | Java 序列化综合指南               | [java_serialization_guide.md](../guide/java_serialization_guide.md)                             | [📖 查看](https://fory.apache.org/docs/guide/java_serialization)                                  |
-| **跨语言序列化**       | 多语言对象交换                    | [xlang_serialization_guide.md](../guide/xlang_serialization_guide.md)                           | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec)                                 |
-| **行格式**             | 零拷贝随机访问格式                | [row_format_guide.md](../guide/row_format_guide.md)                      | [📖 查看](https://fory.apache.org/docs/specification/fory_row_format_spec)                       |
-| **Python**             | Python 特定功能和用法             | [python_guide.md](../guide/python_guide.md)                         | [📖 查看](https://fory.apache.org/docs/guide/python_serialization)                                |
-| **Rust**               | Rust 实现和模式                   | [rust_guide.md](../guide/rust_guide.md)                             | [📖 查看](https://fory.apache.org/docs/guide/rust_serialization)                                  |
-| **Scala**              | Scala 集成和最佳实践              | [scala_guide.md](../guide/scala_guide.md)                           | [📖 查看](https://fory.apache.org/docs/guide/scala_serialization)                                 |
-| **GraalVM**            | 原生镜像支持和 AOT 编译           | [graalvm_guide.md](../guide/graalvm_guide.md)                       | [📖 查看](https://fory.apache.org/docs/guide/graalvm_serialization)                         |
-| **开发**               | 构建和贡献 Fory                   | [DEVELOPMENT.md](../guide/DEVELOPMENT.md)                             | [📖 查看](https://fory.apache.org/docs/guide/development)                           |
+| 指南             | 描述                    | 源文件                                                                | 网站                                                                                |
+| ---------------- | ----------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Java 序列化**  | Java 序列化综合指南     | [java_serialization_guide.md](../guide/java_serialization_guide.md)   | [📖 查看](https://fory.apache.org/docs/guide/java_serialization)                    |
+| **跨语言序列化** | 多语言对象交换          | [xlang_serialization_guide.md](../guide/xlang_serialization_guide.md) | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| **行格式**       | 零拷贝随机访问格式      | [row_format_guide.md](../guide/row_format_guide.md)                   | [📖 查看](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
+| **Python**       | Python 特定功能和用法   | [python_guide.md](../guide/python_guide.md)                           | [📖 查看](https://fory.apache.org/docs/guide/python_serialization)                  |
+| **Rust**         | Rust 实现和模式         | [rust_guide.md](../guide/rust_guide.md)                               | [📖 查看](https://fory.apache.org/docs/guide/rust_serialization)                    |
+| **Scala**        | Scala 集成和最佳实践    | [scala_guide.md](../guide/scala_guide.md)                             | [📖 查看](https://fory.apache.org/docs/guide/scala_serialization)                   |
+| **GraalVM**      | 原生镜像支持和 AOT 编译 | [graalvm_guide.md](../guide/graalvm_guide.md)                         | [📖 查看](https://fory.apache.org/docs/guide/graalvm_serialization)                 |
+| **开发**         | 构建和贡献 Fory         | [DEVELOPMENT.md](../guide/DEVELOPMENT.md)                             | [📖 查看](https://fory.apache.org/docs/guide/development)                           |
 
 ### 协议规范
 
-| 规范                   | 描述                     | 源文件                                                                        | 网站                                                                                |
-| ---------------------- | ------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **跨语言序列化**       | 跨语言二进制协议         | [xlang_serialization_spec.md](../specification/xlang_serialization_spec.md) | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
-| **Java 序列化**        | Java 优化协议            | [java_serialization_spec.md](../specification/java_serialization_spec.md)   | [📖 查看](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
-| **行格式**             | 基于行的二进制格式       | [row_format_spec.md](../specification/row_format_spec.md)                   | [📖 查看](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
-| **类型映射**           | 跨语言类型转换           | [xlang_type_mapping.md](../specification/xlang_type_mapping.md)             | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| 规范             | 描述               | 源文件                                                                      | 网站                                                                                |
+| ---------------- | ------------------ | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **跨语言序列化** | 跨语言二进制协议   | [xlang_serialization_spec.md](../specification/xlang_serialization_spec.md) | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
+| **Java 序列化**  | Java 优化协议      | [java_serialization_spec.md](../specification/java_serialization_spec.md)   | [📖 查看](https://fory.apache.org/docs/specification/fory_java_serialization_spec)  |
+| **行格式**       | 基于行的二进制格式 | [row_format_spec.md](../specification/row_format_spec.md)                   | [📖 查看](https://fory.apache.org/docs/specification/fory_row_format_spec)          |
+| **类型映射**     | 跨语言类型转换     | [xlang_type_mapping.md](../specification/xlang_type_mapping.md)             | [📖 查看](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) |
 
 ## 兼容性
 

@@ -33,12 +33,12 @@ f := fory.New()
 
 默认设置：
 
-| Option     | Default | Description                    |
-| ---------- | ------- | ------------------------------ |
-| TrackRef   | false   | 关闭引用跟踪                   |
-| MaxDepth   | 20      | 最大嵌套深度                   |
-| IsXlang    | false   | 关闭跨语言模式                 |
-| Compatible | false   | 关闭 Schema 演进兼容模式       |
+| Option     | Default | Description              |
+| ---------- | ------- | ------------------------ |
+| TrackRef   | false   | 关闭引用跟踪             |
+| MaxDepth   | 20      | 最大嵌套深度             |
+| IsXlang    | false   | 关闭跨语言模式           |
+| Compatible | false   | 关闭 Schema 演进兼容模式 |
 
 ### 通过选项配置
 

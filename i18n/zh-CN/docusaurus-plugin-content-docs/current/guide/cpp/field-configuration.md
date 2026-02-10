@@ -19,25 +19,22 @@ license: |
   limitations under the License.
 ---
 
-> 中文导读：本页介绍字段级序列化配置，包括字段 ID、可空控制、引用跟踪、忽略字段与动态类型控制等。
-> 建议在跨语言和兼容模式场景中优先显式配置字段 ID，并在需要时开启 ref/nullable 以保证行为一致。
-
-本页说明如何配置序列化的字段级元信息。
+本页说明如何在 C++ 中配置序列化字段级元信息。
 
 ## 概述
 
-Apache Fory™ provides two ways to specify field-level metadata at compile time:
+Apache Fory™ 在编译期提供两种字段元信息配置方式：
 
-1. **`fory::field<>` template** - Inline metadata in struct definition
-2. **`FORY_FIELD_TAGS` macro** - Non-invasive metadata added separately
+1. **`fory::field<>` 模板**：在 struct 定义中内联声明元信息
+2. **`FORY_FIELD_TAGS` 宏**：在 struct 外部附加元信息（非侵入）
 
-These enable:
+这些机制可用于：
 
-- **Tag IDs**: Assign compact numeric IDs for schema evolution
-- **Nullability**: Mark pointer fields as nullable
-- **Reference Tracking**: Enable reference tracking for shared pointers
+- **Tag ID**：为 schema 演进分配紧凑数值 ID
+- **可空控制**：将指针字段标记为可空
+- **引用跟踪**：为共享指针启用引用跟踪
 
-## fory::field 模板
+## `fory::field` 模板
 
 ```cpp
 template <typename T, int16_t Id, typename... Options>
@@ -46,11 +43,11 @@ class field;
 
 ### 模板参数
 
-| Parameter | Description                                      |
-| --------- | ------------------------------------------------ |
-| `T`       | The underlying field type                        |
-| `Id`      | Field tag ID (int16_t) for compact serialization |
-| `Options` | Optional tags: `fory::nullable`, `fory::ref`     |
+| 参数      | 说明                                       |
+| --------- | ------------------------------------------ |
+| `T`       | 底层字段类型                               |
+| `Id`      | 字段 tag ID（`int16_t`），用于紧凑序列化   |
+| `Options` | 可选标签：`fory::nullable`、`fory::ref` 等 |
 
 ### 基本用法
 
@@ -67,7 +64,7 @@ struct Person {
 FORY_STRUCT(Person, name, age, nickname);
 ```
 
-The `fory::field<>` wrapper is transparent - you can use it like the underlying type:
+`fory::field<>` 是透明包装，可像底层类型一样使用：
 
 ```cpp
 Person person;
@@ -79,9 +76,9 @@ int a = person.age.get();        // Explicit get()
 
 ## 标签类型
 
-### fory::nullable
+### `fory::nullable`
 
-Marks a smart pointer field as nullable (can be `nullptr`):
+将智能指针字段标记为可空（可为 `nullptr`）：
 
 ```cpp
 struct Node {
@@ -91,9 +88,9 @@ struct Node {
 FORY_STRUCT(Node, name, next);
 ```
 
-**Valid for:** `std::shared_ptr<T>`, `std::unique_ptr<T>`
+**适用类型：** `std::shared_ptr<T>`、`std::unique_ptr<T>`
 
-**Note:** For nullable primitives or strings, use `std::optional<T>` instead:
+**说明：** 对原生值类型或字符串的可空语义，请使用 `std::optional<T>`：
 
 ```cpp
 // Correct: use std::optional for nullable primitives
@@ -103,19 +100,19 @@ fory::field<std::optional<int32_t>, 0> optional_value;
 // fory::field<int32_t, 0, fory::nullable> value;  // Compile error!
 ```
 
-### fory::not_null
+### `fory::not_null`
 
-Explicitly marks a pointer field as non-nullable. This is the default for smart pointers, but can be used for documentation:
+显式声明指针字段不可空。虽然这是智能指针的默认行为，但可用于增强可读性：
 
 ```cpp
 fory::field<std::shared_ptr<Data>, 0, fory::not_null> data;  // Must not be nullptr
 ```
 
-**Valid for:** `std::shared_ptr<T>`, `std::unique_ptr<T>`
+**适用类型：** `std::shared_ptr<T>`、`std::unique_ptr<T>`
 
-### fory::ref
+### `fory::ref`
 
-Enables reference tracking for shared pointer fields. When multiple fields reference the same object, it will be serialized once and shared:
+为共享指针字段启用引用跟踪。多个字段引用同一对象时，仅序列化一次并保持共享关系：
 
 ```cpp
 struct Graph {
@@ -126,27 +123,27 @@ struct Graph {
 FORY_STRUCT(Graph, name, left, right);
 ```
 
-**Valid for:** `std::shared_ptr<T>` only (requires shared ownership)
+**适用类型：** 仅 `std::shared_ptr<T>`（需要共享所有权）
 
-### Combining Tags
+### 组合标签
 
-Multiple tags can be combined for shared pointers:
+共享指针可组合多个标签：
 
 ```cpp
 // Nullable + ref tracking
 fory::field<std::shared_ptr<Node>, 0, fory::nullable, fory::ref> link;
 ```
 
-## Type Rules
+## 类型规则
 
-| Type                 | Allowed Options   | Nullability                        |
-| -------------------- | ----------------- | ---------------------------------- |
-| Primitives, strings  | None              | Use `std::optional<T>` if nullable |
-| `std::optional<T>`   | None              | Inherently nullable                |
-| `std::shared_ptr<T>` | `nullable`, `ref` | Non-null by default                |
-| `std::unique_ptr<T>` | `nullable`        | Non-null by default                |
+| 类型                 | 可用选项          | 可空语义                          |
+| -------------------- | ----------------- | --------------------------------- |
+| 原生类型、字符串     | 无                | 若需可空请使用 `std::optional<T>` |
+| `std::optional<T>`   | 无                | 天然可空                          |
+| `std::shared_ptr<T>` | `nullable`、`ref` | 默认不可空                        |
+| `std::unique_ptr<T>` | `nullable`        | 默认不可空                        |
 
-## Complete Example
+## 完整示例
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -191,9 +188,9 @@ int main() {
 }
 ```
 
-## Compile-Time Validation
+## 编译期校验
 
-Invalid configurations are caught at compile time:
+非法配置会在编译期报错：
 
 ```cpp
 // Error: nullable and not_null are mutually exclusive
@@ -209,9 +206,9 @@ fory::field<std::unique_ptr<int>, 0, fory::ref> bad3;
 fory::field<std::optional<int>, 0, fory::nullable> bad4;
 ```
 
-## Backwards Compatibility
+## 向后兼容
 
-Existing structs without `fory::field<>` wrappers continue to work:
+未使用 `fory::field<>` 包装的旧 struct 仍可正常工作：
 
 ```cpp
 // Old style - still works
@@ -229,15 +226,15 @@ struct ModernPerson {
 FORY_STRUCT(ModernPerson, name, age);
 ```
 
-## FORY_FIELD_TAGS Macro
+## `FORY_FIELD_TAGS` 宏
 
-The `FORY_FIELD_TAGS` macro provides a non-invasive way to add field metadata without modifying struct definitions. This is useful for:
+`FORY_FIELD_TAGS` 提供了一种非侵入式方案：无需修改 struct 定义即可附加字段元信息。适用场景：
 
-- **Third-party types**: Add metadata to types you don't own
-- **Clean structs**: Keep struct definitions as pure C++
-- **Isolated dependencies**: Confine Fory headers to serialization config files
+- **第三方类型**：为非自有类型添加元信息
+- **纯净结构定义**：保持 struct 仅包含标准 C++ 类型
+- **依赖隔离**：将 Fory 头文件限制在序列化配置文件中
 
-### Usage
+### 用法
 
 ```cpp
 // user_types.h - NO fory headers needed!
@@ -268,33 +265,33 @@ FORY_FIELD_TAGS(Document,
 )
 ```
 
-### FORY_FIELD_TAGS Options
+### `FORY_FIELD_TAGS` 选项
 
-| Field Type           | Valid Combinations                                                                       |
+| 字段类型             | 合法组合                                                                                 |
 | -------------------- | ---------------------------------------------------------------------------------------- |
-| Primitives, strings  | `(field, id)` only                                                                       |
-| `std::optional<T>`   | `(field, id)` only                                                                       |
-| `std::shared_ptr<T>` | `(field, id)`, `(field, id, nullable)`, `(field, id, ref)`, `(field, id, nullable, ref)` |
-| `std::unique_ptr<T>` | `(field, id)`, `(field, id, nullable)`                                                   |
+| 原生类型、字符串     | 仅 `(field, id)`                                                                         |
+| `std::optional<T>`   | 仅 `(field, id)`                                                                         |
+| `std::shared_ptr<T>` | `(field, id)`、`(field, id, nullable)`、`(field, id, ref)`、`(field, id, nullable, ref)` |
+| `std::unique_ptr<T>` | `(field, id)`、`(field, id, nullable)`                                                   |
 
-### API Comparison
+### API 对比
 
-| Aspect                  | `fory::field<>` Wrapper  | `FORY_FIELD_TAGS` Macro |
-| ----------------------- | ------------------------ | ----------------------- |
-| **Struct definition**   | Modified (wrapped types) | Unchanged (pure C++)    |
-| **IDE support**         | Template noise           | Excellent (clean types) |
-| **Third-party classes** | Not supported            | Supported               |
-| **Header dependencies** | Required everywhere      | Isolated to config      |
-| **Migration effort**    | High (change all fields) | Low (add one macro)     |
+| 维度           | `fory::field<>` 包装     | `FORY_FIELD_TAGS` 宏   |
+| -------------- | ------------------------ | ---------------------- |
+| **结构定义**   | 需要改动（包装字段类型） | 无需改动（保持纯 C++） |
+| **IDE 体验**   | 有模板噪音               | 更清晰（原生字段类型） |
+| **第三方类型** | 不支持                   | 支持                   |
+| **头文件依赖** | 各处都需要               | 可集中在配置文件       |
+| **迁移成本**   | 高（修改全部字段）       | 低（新增一个宏）       |
 
-## FORY_FIELD_CONFIG Macro
+## `FORY_FIELD_CONFIG` 宏
 
-The `FORY_FIELD_CONFIG` macro is the most powerful and flexible way to configure field-level serialization. It provides:
+`FORY_FIELD_CONFIG` 是更强、更灵活的字段配置方式，提供：
 
-- **Builder pattern API**: Fluent, chainable configuration with `F(id).option1().option2()`
-- **Encoding control**: Specify how unsigned integers are encoded (varint, fixed, tagged)
-- **Compile-time verification**: Field names are verified against member pointers
-- **Cross-language compatibility**: Configure encoding to match other languages (Java, Rust, etc.)
+- **Builder 风格 API**：链式配置 `F(id).option1().option2()`
+- **编码控制**：指定无符号整数编码（varint、fixed、tagged）
+- **编译期校验**：通过成员指针校验字段名
+- **跨语言兼容**：按 Java、Rust 等语言期望配置编码
 
 ### 基本语法
 
@@ -308,9 +305,9 @@ FORY_FIELD_CONFIG(StructType,
 );
 ```
 
-### The F() Builder
+### `F()` Builder
 
-The `fory::F(id)` factory creates a `FieldMeta` object that supports method chaining:
+`fory::F(id)` 工厂函数会创建支持链式调用的 `FieldMeta` 对象：
 
 ```cpp
 fory::F(0)                    // Create with field ID 0
@@ -323,7 +320,7 @@ fory::F(0)                    // Create with field ID 0
     .compress(false)          // Disable compression
 ```
 
-**Tip:** To use `F()` without the `fory::` prefix, add a using declaration:
+**提示：** 若希望省略 `fory::` 前缀，可添加 `using` 声明：
 
 ```cpp
 using fory::F;
@@ -334,19 +331,19 @@ FORY_FIELD_CONFIG(MyStruct,
 );
 ```
 
-### Encoding Options for Unsigned Integers
+### 无符号整数编码选项
 
-For `uint32_t` and `uint64_t` fields, you can specify the wire encoding:
+对于 `uint32_t` 与 `uint64_t` 字段，可显式指定线格式编码：
 
-| Method      | Type ID       | Description                                    | Use Case                              |
-| ----------- | ------------- | ---------------------------------------------- | ------------------------------------- |
-| `.varint()` | VAR_UINT32/64 | Variable-length encoding (1-5 or 1-10 bytes)   | Values typically small                |
-| `.fixed()`  | UINT32/64     | Fixed-size encoding (always 4 or 8 bytes)      | Values uniformly distributed          |
-| `.tagged()` | TAGGED_UINT64 | Tagged hybrid encoding with size hint (uint64) | Mixed small and large values (uint64) |
+| 方法        | Type ID       | 说明                              | 适用场景                 |
+| ----------- | ------------- | --------------------------------- | ------------------------ |
+| `.varint()` | VAR_UINT32/64 | 变长编码（1-5 或 1-10 字节）      | 数值通常较小             |
+| `.fixed()`  | UINT32/64     | 定长编码（固定 4 或 8 字节）      | 数值分布较均匀           |
+| `.tagged()` | TAGGED_UINT64 | 带大小提示的混合编码（仅 uint64） | 小值与大值混合（uint64） |
 
-**Note:** `uint8_t` and `uint16_t` always use fixed encoding (UINT8, UINT16).
+**说明：** `uint8_t` 与 `uint16_t` 始终使用定长编码（UINT8、UINT16）。
 
-### Complete Example
+### 完整示例
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -411,11 +408,11 @@ int main() {
 }
 ```
 
-### Cross-Language Compatibility
+### 跨语言兼容
 
-When serializing data to be read by other languages, use `FORY_FIELD_CONFIG` to match their encoding expectations:
+当序列化数据会被其他语言读取时，建议通过 `FORY_FIELD_CONFIG` 显式匹配目标语言编码约定。
 
-**Java Compatibility:**
+**Java 兼容示例：**
 
 ```cpp
 // Java uses these type IDs for unsigned integers:
@@ -446,9 +443,9 @@ FORY_FIELD_CONFIG(JavaCompatible,
 );
 ```
 
-### Schema Evolution with FORY_FIELD_CONFIG
+### 使用 `FORY_FIELD_CONFIG` 做 Schema 演进
 
-In compatible mode, fields can have different nullability between sender and receiver:
+在兼容模式下，发送端和接收端可以对字段使用不同可空策略：
 
 ```cpp
 // Version 1: All fields non-nullable
@@ -476,32 +473,32 @@ FORY_FIELD_CONFIG(DataV2,
 );
 ```
 
-### FORY_FIELD_CONFIG Options Reference
+### `FORY_FIELD_CONFIG` 选项速查
 
-| Method           | Description                                 | Valid For                  |
-| ---------------- | ------------------------------------------- | -------------------------- |
-| `.nullable()`    | Mark field as nullable                      | Smart pointers, primitives |
-| `.ref()`         | Enable reference tracking                   | `std::shared_ptr` only     |
-| `.monomorphic()` | Mark pointer as always pointing to one type | Smart pointers             |
-| `.varint()`      | Use variable-length encoding                | `uint32_t`, `uint64_t`     |
-| `.fixed()`       | Use fixed-size encoding                     | `uint32_t`, `uint64_t`     |
-| `.tagged()`      | Use tagged hybrid encoding                  | `uint64_t` only            |
-| `.compress(v)`   | Enable/disable field compression            | All types                  |
+| 方法             | 说明                     | 适用范围               |
+| ---------------- | ------------------------ | ---------------------- |
+| `.nullable()`    | 将字段标记为可空         | 智能指针、可空值类型   |
+| `.ref()`         | 启用引用跟踪             | 仅 `std::shared_ptr`   |
+| `.monomorphic()` | 标记指针始终指向单一类型 | 智能指针               |
+| `.varint()`      | 变长编码                 | `uint32_t`、`uint64_t` |
+| `.fixed()`       | 定长编码                 | `uint32_t`、`uint64_t` |
+| `.tagged()`      | tagged 混合编码          | 仅 `uint64_t`          |
+| `.compress(v)`   | 启用/禁用字段压缩        | 所有类型               |
 
-### Comparing Field Configuration Macros
+### 字段配置方案对比
 
-| Feature                 | `fory::field<>`       | `FORY_FIELD_TAGS` | `FORY_FIELD_CONFIG`       |
-| ----------------------- | --------------------- | ----------------- | ------------------------- |
-| **Struct modification** | Required (wrap types) | None              | None                      |
-| **Encoding control**    | No                    | No                | Yes (varint/fixed/tagged) |
-| **Builder pattern**     | No                    | No                | Yes                       |
-| **Compile-time verify** | Yes                   | Limited           | Yes (member pointers)     |
-| **Cross-lang compat**   | Limited               | Limited           | Full                      |
-| **Recommended for**     | Simple structs        | Third-party types | Complex/xlang structs     |
+| 特性                | `fory::field<>`    | `FORY_FIELD_TAGS` | `FORY_FIELD_CONFIG`       |
+| ------------------- | ------------------ | ----------------- | ------------------------- |
+| **需要修改 struct** | 是（包装字段类型） | 否                | 否                        |
+| **编码控制**        | 否                 | 否                | 是（varint/fixed/tagged） |
+| **Builder 风格**    | 否                 | 否                | 是                        |
+| **编译期校验**      | 是                 | 有限              | 是（成员指针校验）        |
+| **跨语言兼容能力**  | 有限               | 有限              | 完整                      |
+| **推荐场景**        | 简单结构体         | 第三方类型        | 复杂/跨语言结构体         |
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md) - Registering types with FORY_STRUCT
-- [Schema Evolution](schema-evolution.md) - Using tag IDs for schema evolution
-- [Configuration](configuration.md) - Enabling reference tracking globally
-- [Cross-Language](cross-language.md) - Interoperability with Java, Rust, Python
+- [类型注册](type-registration.md) - 使用 FORY_STRUCT 注册类型
+- [Schema 演进](schema-evolution.md) - 基于 tag ID 的演进策略
+- [配置](configuration.md) - 全局启用引用跟踪等选项
+- [跨语言](cross-language.md) - 与 Java、Rust、Python 的互操作
