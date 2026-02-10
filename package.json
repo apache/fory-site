@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "download-avatars": "node ./scripts/download_avatars/script.js",
-    "docusaurus": "docusaurus",
+    "docusaurus": "bash ./scripts/docusaurus-with-i18n.sh",
     "start": "docusaurus start --host 0.0.0.0",
     "start-en": "docusaurus start --locale en-US --host 0.0.0.0",
     "start-zh": "docusaurus start --locale zh-CN --host 0.0.0.0",
