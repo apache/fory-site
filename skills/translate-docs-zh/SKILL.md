@@ -25,18 +25,22 @@ Translate documentation into Simplified Chinese and keep existing Chinese docs a
 Map source and target paths with these rules:
 
 1. Current docs:
+
 - Source: `docs/<subpath>.md`
 - Target: `i18n/zh-CN/docusaurus-plugin-content-docs/current/<subpath>.md`
 
 2. Versioned docs:
+
 - Source: `versioned_docs/version-X/<subpath>.md`
 - Target: `i18n/zh-CN/docusaurus-plugin-content-docs/version-X/<subpath>.md`
 
 3. Category labels:
+
 - Source: `docs/**/_category_.json`
 - Target: `i18n/zh-CN/docusaurus-plugin-content-docs/**/_category_.json`
 
 4. Sidebar top-level label i18n keys:
+
 - Target: `i18n/zh-CN/docusaurus-plugin-content-docs/current.json`
 - Optional version keys: `i18n/zh-CN/docusaurus-plugin-content-docs/version-*.json`
 
@@ -74,17 +78,21 @@ Otherwise classify as `translated`.
 
 1. Find source changes since last Chinese update baseline.
 2. Prefer this baseline method:
+
 - `zh_last_commit = git log -1 --format=%H -- <zh_file>`
 - `git diff --unified=0 <zh_last_commit>..HEAD -- <source_file>`
+
 3. If no source diff, keep Chinese file unchanged.
 4. If source diff exists, decide update strategy:
 
 Use **partial update** when all are true:
+
 - Changes are local and limited.
 - Document structure mostly unchanged.
 - No widespread terminology shifts.
 
 Use **full rewrite** when any is true:
+
 - Large structural edits (section reordering/splitting/merging).
 - Significant rewrite of core semantics.
 - Many scattered edits across the document.
@@ -99,8 +107,10 @@ Use **full rewrite** when any is true:
 2. Keep terminology consistent across files.
 3. Avoid awkward literal phrases (for example avoid unnatural jargon calques).
 4. Keep technical precision:
+
 - Distinguish encoding format vs transport framework concepts.
 - Keep units, ranges, and bit layouts exact.
+
 5. Preserve examples and command behavior exactly.
 
 ## Validation Checklist
@@ -108,20 +118,25 @@ Use **full rewrite** when any is true:
 Run checks after edits:
 
 1. Placeholder cleanup:
+
 - `rg -n "中文导读|中文章节导读" i18n/zh-CN -S`
 
 2. Markdown integrity:
+
 - Ensure code fences are balanced.
 - Ensure tables render (pipes/alignment valid).
 - Ensure frontmatter remains valid YAML.
 
 3. MDX safety:
+
 - Avoid standalone lines that MDX may parse as ESM (`import ...`, `export ...`) in prose.
 
 4. Link/anchor sanity:
+
 - Preserve existing inbound anchors where possible.
 
 5. Optional build verification (recommended):
+
 - `npm run build -- --locale zh-CN`
 
 ## Decision Heuristics for Rewrite vs Patch
