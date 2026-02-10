@@ -296,6 +296,6 @@ FORY_FIELD_CONFIG(Zoo,
 
 ## Related Topics
 
-- [Field Nullability](field_nullability) - Controlling null handling for fields
-- [Field Reference Tracking](reference_tracking) - Managing shared/circular references
-- [Type Mapping](../../specification/xlang_type_mapping) - Cross-language type compatibility
+- [Field Nullability](field-nullability.md) - Controlling null handling for fields
+- [Field Reference Tracking](field-reference-tracking.md) - Managing shared/circular references
+- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type compatibility

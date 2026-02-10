@@ -184,7 +184,7 @@ FORY_FIELD_CONFIG(Zoo,
 );
 ```
 
-See [Field Configuration](field_configuration) for complete details on `fory::nullable`, `fory::ref`, and other field-level options
+See [Field Configuration](field-configuration.md) for complete details on `fory::nullable`, `fory::ref`, and other field-level options
 
 ## std::unique_ptr Polymorphism
 
@@ -247,7 +247,7 @@ assert(dynamic_cast<Dog*>(decoded.registry["pet1"].get()) != nullptr);
 ## Reference Tracking
 
 Reference tracking for `std::shared_ptr` works the same with polymorphic types.
-See [Supported Types](supported_types) for details and examples.
+See [Supported Types](supported-types.md) for details and examples.
 
 ## Nested Polymorphism Depth Limit
 
@@ -321,7 +321,7 @@ struct Pet {
 FORY_STRUCT(Pet, primary, optional);
 ```
 
-See [Field Configuration](field_configuration) for more details.
+See [Field Configuration](field-configuration.md) for more details.
 
 ## Combining Polymorphism with Other Features
 
@@ -473,8 +473,8 @@ if (!decoded_result.ok()) {
 
 ## Related Topics
 
-- [Type Registration](type_registration) - Registering types for serialization
-- [Field Configuration](field_configuration) - Field-level metadata and options
-- [Supported Types](supported_types) - Smart pointers and collections
-- [Configuration](configuration) - `max_dyn_depth` and other settings
-- [Basic Serialization](basic_serialization) - Core serialization concepts
+- [Type Registration](type-registration.md) - Registering types for serialization
+- [Field Configuration](field-configuration.md) - Field-level metadata and options
+- [Supported Types](supported-types.md) - Smart pointers and collections
+- [Configuration](configuration.md) - `max_dyn_depth` and other settings
+- [Basic Serialization](basic-serialization.md) - Core serialization concepts
