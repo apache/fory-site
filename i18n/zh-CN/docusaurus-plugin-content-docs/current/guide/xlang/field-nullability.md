@@ -1,7 +1,7 @@
 ---
 title: Field Nullability
 sidebar_position: 40
-id: xlang_field_nullability
+id: field_nullability
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

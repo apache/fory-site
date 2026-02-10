@@ -365,7 +365,7 @@ static MyType read_data(ReadContext &ctx) {
 
 ## Related Topics
 
-- [Type Registration](type-registration.md) - Registering serializers
-- [Basic Serialization](basic-serialization.md) - Using FORY_STRUCT macro
-- [Schema Evolution](schema-evolution.md) - Compatible mode
-- [Cross-Language](cross-language.md) - Cross-language serialization
+- [Type Registration](type_registration) - Registering serializers
+- [Basic Serialization](basic_serialization) - Using FORY_STRUCT macro
+- [Schema Evolution](schema_evolution) - Compatible mode
+- [Cross-Language](cross_language) - Cross-language serialization
