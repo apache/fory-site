@@ -234,7 +234,7 @@ import "domain/order.fdl";
 
 ### 路径解析
 
-import 解析顺序：
+导入解析顺序：
 
 1. 导入者文件所在目录
 2. 命令行 `-I/--proto_path/--import_path` 指定目录（按给定顺序）
