@@ -9,7 +9,13 @@
 .cache-loader
 
 # Generated i18n specification folders (copied by prebuild script)
+# Keep fallback-generated specification folders ignored by default.
 i18n/zh-CN/docusaurus-plugin-content-docs/*/specification/
+# Explicitly track manually translated specification docs for current and latest release.
+!i18n/zh-CN/docusaurus-plugin-content-docs/current/specification/
+!i18n/zh-CN/docusaurus-plugin-content-docs/current/specification/*.md
+!i18n/zh-CN/docusaurus-plugin-content-docs/version-0.15/specification/
+!i18n/zh-CN/docusaurus-plugin-content-docs/version-0.15/specification/*.md
 
 # Misc
 .DS_Store
