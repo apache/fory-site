@@ -1,0 +1,54 @@
+{
+  "link.title.Community": {
+    "message": "Community",
+    "description": "The title of the footer links column with title=Community in the footer"
+  },
+  "link.title.Docs": {
+    "message": "Docs",
+    "description": "The title of the footer links column with title=Docs in the footer"
+  },
+  "link.title.Repositories": {
+    "message": "Repositories",
+    "description": "The title of the footer links column with title=Repositories in the footer"
+  },
+  "link.item.label.Mailing list": {
+    "message": "Mailing list",
+    "description": "The label of footer link with label=Mailing list linking to https://lists.apache.org/list.html?dev@fory.apache.org"
+  },
+  "link.item.label.Slack": {
+    "message": "Slack",
+    "description": "The label of footer link with label=Slack linking to https://join.slack.com/t/fory-project/shared_invite/zt-1u8soj4qc-ieYEu7ciHOqA2mo47llS8A"
+  },
+  "link.item.label.Twitter": {
+    "message": "Twitter",
+    "description": "The label of footer link with label=Twitter linking to https://twitter.com/ApacheFory"
+  },
+  "link.item.label.Install": {
+    "message": "Install",
+    "description": "The label of footer link with label=Install linking to /docs/start/install"
+  },
+  "link.item.label.Usage": {
+    "message": "Usage",
+    "description": "The label of footer link with label=Usage linking to /docs/start/usage"
+  },
+  "link.item.label.Benchmark": {
+    "message": "Benchmark",
+    "description": "The label of footer link with label=Benchmark linking to /docs/introduction/benchmark"
+  },
+  "link.item.label.Fory": {
+    "message": "Apache Fory™",
+    "description": "The label of footer link with label=Fory linking to https://github.com/apache/fory"
+  },
+  "link.item.label.Website": {
+    "message": "Website",
+    "description": "The label of footer link with label=Website linking to https://github.com/apache/fory-site"
+  },
+  "copyright": {
+    "message": "<div>\n      <p> Copyright © 2025 The Apache Software Foundation, Licensed under the Apache License, Version 2.0. <br/>\n        Apache Fory, Fory, Apache, the Apache Logo and the Apache Fory logo are either registered trademarks or trademarks of the Apache Software Foundation in the United States and/or other countries.\n      </p>\n      </div>",
+    "description": "The footer copyright"
+  },
+  "logo.alt": {
+    "message": "Apache Incubator logo",
+    "description": "The alt text of footer logo"
+  }
+}
