@@ -30,7 +30,7 @@ github:
     rebase: false
   protected_branches:
     main: {}
-    # deploy: {}
+    deploy: {}
 
 publish:
   whoami: deploy
