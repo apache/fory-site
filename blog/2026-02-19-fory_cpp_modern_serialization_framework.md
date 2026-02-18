@@ -10,7 +10,7 @@ tags: [fory, cpp, serialization, cross-language]
 - 🐙 GitHub: https://github.com/apache/fory
 - 📚 Docs: https://fory.apache.org/docs/guide/cpp
 
-![Apache Fory Logo](https://fory.apache.org/img/navbar-logo.png)
+<img src="/img/fory-logo-light.png" width="50%"/>
 
 ---
 
