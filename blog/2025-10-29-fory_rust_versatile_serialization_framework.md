@@ -10,7 +10,7 @@ tags: [fory, rust]
 - 🐙 GitHub: https://github.com/apache/fory
 - 📦 Crate: https://crates.io/crates/fory
 
-![Apache Fory Logo](https://fory.apache.org/img/navbar-logo.png)
+<img src="/img/fory-logo-light.png" width="50%"/>
 
 ---
 
