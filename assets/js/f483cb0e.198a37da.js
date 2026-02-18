@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[3088],{2235:s=>{s.exports=JSON.parse('{"label":"asf","permalink":"/blog/tags/asf","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
