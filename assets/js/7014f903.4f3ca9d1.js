@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[69008],{46284:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/fory","page":1,"postsPerPage":10,"totalPages":2,"totalCount":15,"nextPage":"/blog/tags/fory/page/2","blogDescription":"Blog","blogTitle":"Blog"}')}}]);

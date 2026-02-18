@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[74959],{31874:s=>{s.exports=JSON.parse('{"label":"cross-language","permalink":"/blog/tags/cross-language","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
