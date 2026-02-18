@@ -18,7 +18,7 @@
 <li>🐙 GitHub: <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory</a></li>
 <li>📚 Docs: <a href="https://fory.apache.org/docs/guide/cpp" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/guide/cpp</a></li>
 </ul>
-<p><img loading="lazy" src="https://fory.apache.org/img/navbar-logo.png" alt="Apache Fory Logo" class="img_ev3q"></p>
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%">
 <hr>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-c-serialization-problem">The C++ Serialization Problem<a href="https://fory.apache.org/blog/fory_cpp_blazing_fast_serialization_framework#the-c-serialization-problem" class="hash-link" aria-label="Direct link to The C++ Serialization Problem" title="Direct link to The C++ Serialization Problem">​</a></h2>
 <p>Every C++ developer working in a polyglot environment eventually hits the same wall. Existing options force a painful choice:</p>
@@ -755,7 +755,7 @@ schema above, generated code looks like:</p>
 <li>🐙 GitHub: <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory</a></li>
 <li>📦 Crate: <a href="https://crates.io/crates/fory" target="_blank" rel="noopener noreferrer">https://crates.io/crates/fory</a></li>
 </ul>
-<p><img loading="lazy" src="https://fory.apache.org/img/navbar-logo.png" alt="Apache Fory Logo" class="img_ev3q"></p>
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%">
 <hr>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-serialization-dilemma">The Serialization Dilemma<a href="https://fory.apache.org/blog/fory_rust_versatile_serialization_framework#the-serialization-dilemma" class="hash-link" aria-label="Direct link to The Serialization Dilemma" title="Direct link to The Serialization Dilemma">​</a></h2>
 <p>Every backend engineer has faced this moment: your application needs to serialize complex data structures such as nested objects, circular references, polymorphic types, and you're forced to choose between three bad options:</p>
