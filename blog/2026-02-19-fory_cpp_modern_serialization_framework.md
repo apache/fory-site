@@ -150,6 +150,42 @@ assert(v2.name == "Alice" && v2.email == "");  // Default for missing field
 
 In compatible mode, fields are matched by name rather than position. New fields receive C++ default values when missing; removed fields are safely skipped. This enables rolling upgrades and independent service deployments without any serialization errors.
 
+### Row Format: Zero-Copy Analytics
+
+Beyond object graph serialization, Apache Fory C++ implements a **row-based binary format** designed for analytics workloads. The row format stores data in a contiguous memory layout with a null bitmap, fixed-size slots for primitives, and a variable-length section for strings and nested objects. This enables **O(1) random field access by index** — you can read a single field from a large struct without touching the rest of the data.
+
+This is particularly valuable in data pipelines and OLAP workloads where only a small subset of fields are queried per record:
+
+```cpp
+#include "fory/encoder/row_encoder.h"
+using namespace fory::row::encoder;
+
+struct SensorReading {
+  int32_t sensor_id; double temperature; std::string location;
+  FORY_STRUCT(SensorReading, sensor_id, temperature, location);
+};
+
+RowEncoder<SensorReading> encoder;
+encoder.encode({42, 23.5, "rack-B"});
+auto row = encoder.get_writer().to_row();
+
+// Read any field in O(1) — no deserialization of unused fields
+int32_t id    = row->get_int32(0);
+double  temp  = row->get_double(1);
+auto    loc   = row->get_string(2);
+```
+
+For zero-copy access into an existing buffer (e.g., from a memory-mapped file or network receive buffer), Fory can point a `Row` directly at the memory without copying:
+
+```cpp
+auto src = encoder.get_writer().to_row();
+fory::row::Row view(src->schema());
+view.point_to(src->buffer(), src->base_offset(), src->size_bytes());  // Zero-copy view
+int32_t id = view.get_int32(0);  // Reads directly from the original buffer
+```
+
+Use the row format for analytics, OLAP-style workloads, and partial field access. Use object graph serialization for full object round-trips with references and polymorphism.
+
 ---
 
 ## Installation
@@ -266,44 +302,6 @@ auto fory = Fory::builder().build_thread_safe();
 fory.register_struct<MyType>(1);  // Register all types before sharing
 std::thread t([&]() { fory.serialize(obj); });  // Safe to call concurrently
 ```
-
----
-
-## Row Format: Zero-Copy Analytics
-
-Beyond object graph serialization, Apache Fory C++ implements a **row-based binary format** designed for analytics workloads. The row format stores data in a contiguous memory layout with a null bitmap, fixed-size slots for primitives, and a variable-length section for strings and nested objects. This enables **O(1) random field access by index** — you can read a single field from a large struct without touching the rest of the data.
-
-This is particularly valuable in data pipelines and OLAP workloads where only a small subset of fields are queried per record:
-
-```cpp
-#include "fory/encoder/row_encoder.h"
-using namespace fory::row::encoder;
-
-struct SensorReading {
-  int32_t sensor_id; double temperature; std::string location;
-  FORY_STRUCT(SensorReading, sensor_id, temperature, location);
-};
-
-RowEncoder<SensorReading> encoder;
-encoder.encode({42, 23.5, "rack-B"});
-auto row = encoder.get_writer().to_row();
-
-// Read any field in O(1) — no deserialization of unused fields
-int32_t id    = row->get_int32(0);
-double  temp  = row->get_double(1);
-auto    loc   = row->get_string(2);
-```
-
-For zero-copy access into an existing buffer (e.g., from a memory-mapped file or network receive buffer), Fory can point a `Row` directly at the memory without copying:
-
-```cpp
-auto src = encoder.get_writer().to_row();
-fory::row::Row view(src->schema());
-view.point_to(src->buffer(), src->base_offset(), src->size_bytes());  // Zero-copy view
-int32_t id = view.get_int32(0);  // Reads directly from the original buffer
-```
-
-Use the row format for analytics, OLAP-style workloads, and partial field access. Use object graph serialization for full object round-trips with references and polymorphism.
 
 ---
 
