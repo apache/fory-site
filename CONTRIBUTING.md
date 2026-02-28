@@ -16,6 +16,10 @@ Apache Fory's website consists of static pages hosted at https://github.com/apac
 
 Create an issue with [this form](https://github.com/apache/fory-site/issues/new/choose).
 
+## Automated Duplicate Detection
+
+This repository uses automated duplicate detection. If your issue is flagged as a potential duplicate, please review the similar issues linked in the bot comment before continuing.
+
 ## How to update doc
 
 All updates about docs for [guide](https://github.com/apache/fory/tree/main/docs/guide) and [specification](https://github.com/apache/fory/tree/main/docs/specification) will be synced from [docs in fory repo](https://github.com/apache/fory/tree/main/docs) to this site repo automatically.
