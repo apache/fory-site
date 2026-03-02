@@ -658,7 +658,7 @@
         <category label="rust" term="rust"/>
     </entry>
     <entry>
-        <title type="html"><![CDATA[🦀 Fory v0.13.1 发布：Rust 类型演进新纪元 - 枚举变体与元组的灵活进化]]></title>
+        <title type="html"><![CDATA[🦀 Fory v0.13.1 发布：Rust 类型演进新范式 - 枚举变体与元组的灵活进化]]></title>
         <id>https://fory.apache.org/zh-CN/blog/fory_0_13_1_release</id>
         <link href="https://fory.apache.org/zh-CN/blog/fory_0_13_1_release"/>
         <updated>2025-11-06T00:00:00.000Z</updated>
@@ -1472,95 +1472,95 @@
         <category label="fory" term="fory"/>
     </entry>
     <entry>
-        <title type="html"><![CDATA[Apache Fory™ Graduates to Top-Level Apache Project]]></title>
+        <title type="html"><![CDATA[Apache Fory™ 从 Apache 孵化器毕业，成为 Apache 顶级项目]]></title>
         <id>https://fory.apache.org/zh-CN/blog/apache-fory-graduated</id>
         <link href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated"/>
         <updated>2025-07-18T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Hello, everyone! I'm pleased to announce that Apache Fory™ has graduated from the Apache Incubator to become a Top-Level Project (TLP) of the Apache Software Foundation, signifying its technical maturity and sustainable open-source governance under the Apache Way.]]></summary>
-        <content type="html"><![CDATA[<p><strong>Hello, everyone! I'm pleased to announce that <a href="https://fory.apache.org/" target="_blank" rel="noopener noreferrer">Apache Fory™</a> has graduated from the <a href="https://incubator.apache.org/" target="_blank" rel="noopener noreferrer">Apache Incubator</a> to become a Top-Level Project (TLP) of <a href="https://apache.org/" target="_blank" rel="noopener noreferrer">the Apache Software Foundation</a>, signifying its technical maturity and sustainable open-source governance under the Apache Way.</strong></p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-is-apache-fory">What is Apache Fory?<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#what-is-apache-fory" class="hash-link" aria-label="What is Apache Fory?的直接链接" title="What is Apache Fory?的直接链接">​</a></h2>
-<p><strong>Apache Fory</strong> is a blazingly-fast multi-language serialization framework that revolutionizes data exchange between systems and languages. By leveraging <strong>JIT compilation</strong> and <strong>zero-copy techniques</strong>, Fory delivers up to <strong>170x faster performance</strong> compared to other serialization frameworkds while being extremely easy to use.</p>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="key-features">Key Features:<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#key-features" class="hash-link" aria-label="Key Features:的直接链接" title="Key Features:的直接链接">​</a></h3>
+        <summary type="html"><![CDATA[大家好！Apache Fory 团队很高兴宣布，Apache Fory™ 已从 Apache Incubator 正式毕业，成为 Apache Software Foundation 的 Top-Level Project（TLP）。这标志着项目在技术成熟度与可持续开源治理方面，已达到 Apache Way 的要求。]]></summary>
+        <content type="html"><![CDATA[<p><strong>大家好！Apache Fory 团队很高兴宣布，<a href="https://fory.apache.org/" target="_blank" rel="noopener noreferrer">Apache Fory™</a> 已从 <a href="https://incubator.apache.org/" target="_blank" rel="noopener noreferrer">Apache Incubator</a> 正式毕业，成为 <a href="https://apache.org/" target="_blank" rel="noopener noreferrer">Apache Software Foundation</a> 的 Top-Level Project（TLP）。这标志着项目在技术成熟度与可持续开源治理方面，已达到 Apache Way 的要求。</strong></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="什么是-apache-fory">什么是 Apache Fory？<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E4%BB%80%E4%B9%88%E6%98%AF-apache-fory" class="hash-link" aria-label="什么是 Apache Fory？的直接链接" title="什么是 Apache Fory？的直接链接">​</a></h2>
+<p><strong>Apache Fory</strong> 是一个超高速的多语言序列化框架，面向系统与语言之间的数据交换场景。通过结合 <strong>JIT compilation</strong> 与 <strong>zero-copy</strong> 技术，Fory 在易用性很高的前提下，相比其他序列化框架可实现最高 <strong>170 倍</strong>的性能提升。</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="核心特性">核心特性<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7" class="hash-link" aria-label="核心特性的直接链接" title="核心特性的直接链接">​</a></h3>
 <ul>
-<li>🌐 <strong>Cross-language serialization</strong>: Java, Python, C++, Go, JavaScript, Rust, Scala, Kotlin</li>
-<li>⚡️ <strong>Zero-copy optimization</strong>: Minimizes memory overhead for large datasets</li>
-<li>🔄 <strong>Schema evolution</strong>: Forward/backward compatibility for evolving data structures</li>
-<li>🔒 <strong>Security-first</strong>: Class registration prevents deserialization vulnerabilities</li>
-<li>📦 <strong>Multiple protocols</strong>: Object graph, Row format, and Java-compatible modes</li>
+<li>🌐 <strong>跨语言序列化</strong>：Java、Python、C++、Go、JavaScript、Rust、Scala、Kotlin</li>
+<li>⚡️ <strong>零拷贝优化</strong>：面向大规模数据集，尽可能降低内存开销</li>
+<li>🔄 <strong>Schema 演进</strong>：支持前向/后向兼容，适应数据结构持续演化</li>
+<li>🔒 <strong>安全优先</strong>：通过类注册机制降低反序列化漏洞风险</li>
+<li>📦 <strong>多协议支持</strong>：对象图、Row format 与 Java-compatible 等模式</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="quick-start">Quick Start<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#quick-start" class="hash-link" aria-label="Quick Start的直接链接" title="Quick Start的直接链接">​</a></h3>
-<p>Java serialization example:</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="快速开始">快速开始<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B" class="hash-link" aria-label="快速开始的直接链接" title="快速开始的直接链接">​</a></h3>
+<p>Java 序列化示例：</p>
 <div class="language-java codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-java codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token class-name">Fory</span><span class="token plain"> fory </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token class-name">Fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">builder</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">build</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">register</span><span class="token punctuation" style="color:#393A34">(</span><span class="token class-name">DataModel</span><span class="token punctuation" style="color:#393A34">.</span><span class="token keyword" style="color:#00009f">class</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token class-name">DataModel</span><span class="token plain"> obj </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token keyword" style="color:#00009f">new</span><span class="token plain"> </span><span class="token class-name">DataModel</span><span class="token punctuation" style="color:#393A34">(</span><span class="token comment" style="color:#999988;font-style:italic">/*...*/</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">byte</span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">]</span><span class="token plain"> bytes </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">serialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">obj</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token class-name">DataModel</span><span class="token plain"> restored </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">(</span><span class="token class-name">DataModel</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"> fory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">deserialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">bytes</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>Python serialization example</p>
+<p>Python 序列化示例：</p>
 <div class="language-python codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-python codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">from</span><span class="token plain"> dataclasses </span><span class="token keyword" style="color:#00009f">import</span><span class="token plain"> dataclass</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">import</span><span class="token plain"> pyfory</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">class</span><span class="token plain"> </span><span class="token class-name">Foo</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    name</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">str</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    age</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> </span><span class="token builtin">int</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">pyfory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">register</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">Foo</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token builtin">bytes</span><span class="token plain"> </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> pyfory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">serialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">Foo</span><span class="token punctuation" style="color:#393A34">(</span><span class="token string" style="color:#e3116c">"Shawn"</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">30</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain">  </span><span class="token comment" style="color:#999988;font-style:italic"># Ultra-fast encoding</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">restored </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> pyfory</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">deserialize</span><span class="token punctuation" style="color:#393A34">(</span><span class="token builtin">bytes</span><span class="token punctuation" style="color:#393A34">)</span><span class="token plain">  </span><span class="token comment" style="color:#999988;font-style:italic"># Instant decoding</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-incubation-journey">The Incubation Journey<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#the-incubation-journey" class="hash-link" aria-label="The Incubation Journey的直接链接" title="The Incubation Journey的直接链接">​</a></h2>
-<p>Since entering the Apache Incubator in December 2023, Fory has achieved significant milestones.</p>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="community-growth">Community Growth<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#community-growth" class="hash-link" aria-label="Community Growth的直接链接" title="Community Growth的直接链接">​</a></h3>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="孵化历程">孵化历程<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E5%AD%B5%E5%8C%96%E5%8E%86%E7%A8%8B" class="hash-link" aria-label="孵化历程的直接链接" title="孵化历程的直接��链接">​</a></h2>
+<p>自 2023 年 12 月进入 Apache 孵化器以来，Fory 在社区与技术层面都取得了显著进展。</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="社区成长">社区成长<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E7%A4%BE%E5%8C%BA%E6%88%90%E9%95%BF" class="hash-link" aria-label="社区成长的直接链接" title="社区成长的直接链接">​</a></h3>
 <ul>
-<li>👥 90+ contributors</li>
-<li>🔧 6 new committers added, with 1 promoted to PPMC</li>
-<li>🤝 Diverse adoption across fintech, e-commerce, and cloud</li>
+<li>👥 90+ 位贡献者</li>
+<li>🔧 新增 6 位 committer，其中 1 位晋升为 PPMC</li>
+<li>🤝 在金融、电商与云场景中实现多元化落地</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="technical-progress">Technical Progress<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#technical-progress" class="hash-link" aria-label="Technical Progress的直接链接" title="Technical Progress的直接链接">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="技术进展">技术进展<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E6%8A%80%E6%9C%AF%E8%BF%9B%E5%B1%95" class="hash-link" aria-label="技术进展的直接链接" title="技术进展的直接链接">​</a></h3>
 <ul>
-<li>🚀 14 ASF-compliant releases (0.5.0 to 0.11.2)</li>
-<li>🔄 4 release managers ensuring sustainable operations</li>
-<li>™ Trademark resolution: Successful rename from Fury → Fory</li>
-<li>✅ Maturity validation: Full compliance with ASF graduation requirements</li>
+<li>🚀 发布 14 个符合 ASF 规范的版本（0.5.0 到 0.11.2）</li>
+<li>🔄 4 位 release manager 保障可持续发布运作</li>
+<li>™ 商标问题已完成处置：Fury → Fory 更名成功落地</li>
+<li>✅ 成熟度验证：满足 ASF 毕业要求并完成评估</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="apache-way-adoption">Apache Way Adoption<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#apache-way-adoption" class="hash-link" aria-label="Apache Way Adoption的直接链接" title="Apache Way Adoption的直接链接">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="apache-way-落地">Apache Way 落地<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#apache-way-%E8%90%BD%E5%9C%B0" class="hash-link" aria-label="Apache Way 落地的直接链接" title="Apache Way 落地的直接链接">​</a></h3>
 <ul>
-<li>📬 100% public discussions on dev@ mailing lists</li>
-<li>🗳️ Consensus-driven decisions through formal voting</li>
-<li>🌐 Complete infrastructure migration to Fory namespace</li>
+<li>📬 100% 在 dev@ 邮件列表公开讨论</li>
+<li>🗳️ 通过正式投票推进共识决策</li>
+<li>🌐 基础设施完整迁移至 Fory 命名空间</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-graduation-matters">Why Graduation Matters<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#why-graduation-matters" class="hash-link" aria-label="Why Graduation Matters的直接链接" title="Why Graduation Matters的直接链接">​</a></h2>
-<p>Graduation signifies that Fory has demonstrated:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="为什么毕业很重要">为什么毕业很重要<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%95%E4%B8%9A%E5%BE%88%E9%87%8D%E8%A6%81" class="hash-link" aria-label="为什么毕业很重要的直接链接" title="为什么毕业很重要的直接链接">​</a></h2>
+<p>毕业意味着 Fory 已证明：</p>
 <ul>
-<li>Sustainable governance with diverse PMC leadership</li>
-<li>Enterprise-ready stability through rigorous releases</li>
-<li>Community independence with no vendor dominance</li>
-<li>ASF policy compliance including security and licensing</li>
+<li>具备可持续治理能力，且 PMC 组成多元</li>
+<li>通过严格发布流程具备企业级稳定性</li>
+<li>社区可独立运作，不受单一厂商主导</li>
+<li>完整满足 ASF 在安全、许可与治理方面的规范</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-next">What's Next<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#whats-next" class="hash-link" aria-label="What's Next的直接链接" title="What's Next的直接链接">​</a></h2>
-<p>As a Top-Level Project, Fory's roadmap includes:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="下一步计划">下一步计划<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E4%B8%8B%E4%B8%80%E6%AD%A5%E8%AE%A1%E5%88%92" class="hash-link" aria-label="下一步计划的直接链接" title="下一步计划的直接链接">​</a></h2>
+<p>成为 Top-Level Project 后，Fory 的路线图包括：</p>
 <ul>
-<li>Enhanced Capabilities<!-- -->
+<li>能力增强<!-- -->
 <ul>
-<li>Improved schema evolution for cross-language compatibility</li>
-<li>Producation ready support for Rust/C++ serialization</li>
-<li>Optimize Pyfory Performance continuously and provide drop-in replacement support for pickle</li>
+<li>持续强化跨语言兼容场景下的 Schema 演进能力</li>
+<li>推进 Rust/C++ 序列化的生产级支持</li>
+<li>持续优化 Pyfory 性能，并增强对 pickle 的 drop-in replacement 能力</li>
 </ul>
 </li>
-<li>Ecosystem Integration<!-- -->
+<li>生态集成<!-- -->
 <ul>
 <li>GRPC Integration</li>
 <li>Protobuf Migration Tool</li>
 </ul>
 </li>
-<li>Community Growth<!-- -->
+<li>社区成长<!-- -->
 <ul>
-<li>Comprehensive user documentation</li>
-<li>Structured mentorship program for new contributors</li>
-<li>Production case studies with early adopters</li>
+<li>更完善的用户文档体系</li>
+<li>面向新贡献者的结构化导师机制</li>
+<li>与早期采用者共建生产实践案例</li>
 </ul>
 </li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="get-involved">Get Involved<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#get-involved" class="hash-link" aria-label="Get Involved的直接链接" title="Get Involved的直接链接">​</a></h2>
-<p>Experience Fory's performance:</p>
-<p>Java:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="参与方式">参与方式<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E5%8F%82%E4%B8%8E%E6%96%B9%E5%BC%8F" class="hash-link" aria-label="参与方式的直接链接" title="参与方式的直接链接">​</a></h2>
+<p>体验 Fory 的性能：</p>
+<p>Java：</p>
 <div class="language-xml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-xml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">dependency</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">groupId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain">org.apache.fory</span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">groupId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">artifactId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain">fory-core</span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">artifactId</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token tag punctuation" style="color:#393A34">&lt;</span><span class="token tag" style="color:#00009f">version</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain">0.11.2</span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">version</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token tag punctuation" style="color:#393A34">&lt;/</span><span class="token tag" style="color:#00009f">dependency</span><span class="token tag punctuation" style="color:#393A34">&gt;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>Python:</p>
+<p>Python：</p>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">pip </span><span class="token function" style="color:#d73a49">install</span><span class="token plain"> pyfory</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>Join our community:</p>
+<p>加入我们的社区：</p>
 <ul>
 <li>🌐 Website: <a href="https://fory.apache.org/" target="_blank" rel="noopener noreferrer">https://fory.apache.org</a></li>
 <li>💬 Slack: <a href="https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw" target="_blank" rel="noopener noreferrer">fory-project.slack.com</a></li>
 <li>📧 Mailing list: <a href="mailto:dev@fory.apache.org" target="_blank" rel="noopener noreferrer">dev@fory.apache.org</a></li>
 <li>🐙 GitHub: <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory</a></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="acknowledgements">Acknowledgements<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#acknowledgements" class="hash-link" aria-label="Acknowledgements的直接链接" title="Acknowledgements的直接链接">​</a></h2>
-<p>The PMC Members of the Fory project are listed as follows, with big thanks to their significant contributions:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="致谢">致谢<a href="https://fory.apache.org/zh-CN/blog/apache-fory-graduated#%E8%87%B4%E8%B0%A2" class="hash-link" aria-label="致谢的直接链接" title="致谢的直接链接">​</a></h2>
+<p>Fory 项目的 PMC 成员如下，感谢他们做出的关键贡献：</p>
 <ul>
 <li><a href="https://github.com/chaokunyang" target="_blank" rel="noopener noreferrer">Shawn Yang (Chair)</a></li>
 <li><a href="https://github.com/tisonkun" target="_blank" rel="noopener noreferrer">tison</a></li>
@@ -1573,7 +1573,7 @@
 <li>liyu</li>
 <li><a href="https://github.com/eolivelli" target="_blank" rel="noopener noreferrer">eolivelli</a></li>
 </ul>
-<p>Big thanks to all contributors who submitted code, reported issues, and improved documentation. This achievement belongs to the entire Apache Fory community!</p>]]></content>
+<p>同时也感谢所有提交代码、反馈问题、改进文档的贡献者。这项里程碑属于整个 Apache Fory 社区！</p>]]></content>
         <author>
             <name>杨朝坤</name>
             <uri>https://github.com/chaokunyang</uri>
@@ -1917,49 +1917,49 @@
         <category label="fory" term="fory"/>
     </entry>
     <entry>
-        <title type="html"><![CDATA[Important Announcement - Apache Fury is Now Apache Fory]]></title>
+        <title type="html"><![CDATA[重要公告 - Apache Fury 现已更名为 Apache Fory]]></title>
         <id>https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory</id>
         <link href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory"/>
         <updated>2025-06-06T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Apache Fory Logo]]></summary>
         <content type="html"><![CDATA[<p><img loading="lazy" src="https://fory.apache.org/img/navbar-logo.png" alt="Apache Fory Logo" class="img_ev3q"><br>
-<!-- -->Our new identity: Fast Serialization Framework <strong>FOR Y</strong>ou</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="announcement">Announcement<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#announcement" class="hash-link" aria-label="Announcement的直接链接" title="Announcement的直接链接">​</a></h2>
-<p><strong>The Apache Fury team is now officially announcing that Apache Fury has been renamed to Apache Fory</strong>, effective immediately. This transition impacts all project components including code repositories, package names, documentation, and communication channels.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-this-change-is-necessary">Why This Change Is Necessary<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#why-this-change-is-necessary" class="hash-link" aria-label="Why This Change Is Necessary的直接链接" title="Why This Change Is Necessary的直接链接">​</a></h2>
-<p>This transition is required to resolve naming conflicts identified by the ASF Brand Management. Following massive discussions and a formal vote, this change ensures compliance with ASF's guidelines.</p>
-<p>The new name "Fory" preserves phonetic similarity to "Fury" while establishing a distinct identity aligned with ASF standards.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="technical-changes-and-impact">Technical Changes and Impact<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#technical-changes-and-impact" class="hash-link" aria-label="Technical Changes and Impact的直接链接" title="Technical Changes and Impact的直接链接">​</a></h2>
-<p>This transition requires updates across the ecosystem:</p>
+<!-- -->我们的新身份：Fast Serialization Framework <strong>FOR Y</strong>ou</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="公告">公告<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E5%85%AC%E5%91%8A" class="hash-link" aria-label="公告的直接链接" title="公告的直接链接">​</a></h2>
+<p><strong>Apache Fury 团队现正式宣布，Apache Fury 已即日起更名为 Apache Fory</strong>。此次变更将影响项目的全部组成部分，包括代码仓库、包名、文档与沟通渠道。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="为什么需要这次更名">为什么需要这次更名<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%BF%99%E6%AC%A1%E6%9B%B4%E5%90%8D" class="hash-link" aria-label="为什么需要这次更名的直接链接" title="为什么需要这次更名的直接链接">​</a></h2>
+<p>此次更名是为了解决 ASF Brand Management 识别出的命名冲突问题。经过大规模讨论与正式投票后，该调整可确保项目符合 ASF 品牌与命名规范。</p>
+<p>新名称 “Fory” 在发音上与 “Fury” 保持接近，同时建立了符合 ASF 标准的独立身份。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="技术变更与影响">技术变更与影响<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E6%8A%80%E6%9C%AF%E5%8F%98%E6%9B%B4%E4%B8%8E%E5%BD%B1%E5%93%8D" class="hash-link" aria-label="技术变更与影响的直接链接" title="技术变更与影响的直接链接">​</a></h2>
+<p>此次更名需要在整个生态中完成更新：</p>
 <ul>
-<li><strong>Java packages</strong> migrated from <code>org.apache.fury</code> to <code>org.apache.fory</code></li>
-<li><strong>Class names</strong> migrated from <code>XXXFury/FuryXXX</code> to <code>XXXFory/ForyXXX</code></li>
-<li><strong>GitHub repositories</strong> renamed to <code>apache/fory</code> (code) and <code>apache/fory-site</code> (website)</li>
-<li><strong>Downstream integrations</strong> (Quarkus-Fury, Camel-Fury) require dependency updates</li>
-<li><strong>Mailing lists</strong> transition to <code>@fory.apache.org</code></li>
+<li><strong>Java 包名</strong> 从 <code>org.apache.fury</code> 迁移到 <code>org.apache.fory</code></li>
+<li><strong>类名</strong> 从 <code>XXXFury/FuryXXX</code> 迁移到 <code>XXXFory/ForyXXX</code></li>
+<li><strong>GitHub 仓库</strong> 更名为 <code>apache/fory</code>（代码）和 <code>apache/fory-site</code>（网站）</li>
+<li><strong>下游集成</strong>（Quarkus-Fury、Camel-Fury）需要更新依赖</li>
+<li><strong>邮件列表</strong> 迁移到 <code>@fory.apache.org</code></li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="migration-support">Migration Support<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#migration-support" class="hash-link" aria-label="Migration Support的直接链接" title="Migration Support的直接链接">​</a></h2>
-<p>To facilitate this transition:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="迁移支持">迁移支持<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E8%BF%81%E7%A7%BB%E6%94%AF%E6%8C%81" class="hash-link" aria-label="迁移支持的直接链接" title="迁移支持的直接链接">​</a></h2>
+<p>为便于大家完成迁移：</p>
 <ul>
-<li>Existing Apache Fury release document remains intact at <a href="https://fory.apache.org/docs/0.10/docs/introduction/" target="_blank" rel="noopener noreferrer">v0.10 document</a></li>
-<li>Critical URL redirects in place</li>
+<li>现有 Apache Fury 版本文档仍保留在 <a href="https://fory.apache.org/docs/0.10/docs/introduction/" target="_blank" rel="noopener noreferrer">v0.10 document</a></li>
+<li>关键 URL 已配置重定向</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-fory">Why "Fory"?<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#why-fory" class="hash-link" aria-label="Why &quot;Fory&quot;?的直接链接" title="Why &quot;Fory&quot;?的直接链接">​</a></h2>
-<p>The name was chosen by prioritizing:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="为什么是-fory">为什么是 “Fory”？<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF-fory" class="hash-link" aria-label="为什么是 “Fory”？的直接链接" title="为什么是 “Fory”？的直接链接">​</a></h2>
+<p>这个名称的选择优先考虑了以下因素：</p>
 <ul>
-<li>Phonetic similarity to "Fury"</li>
-<li>No existing trademark conflicts</li>
-<li>Preservation of our technical identity</li>
-<li>Short, memorable, and globally pronounceable</li>
+<li>与 “Fury” 发音相近</li>
+<li>无现有商标冲突</li>
+<li>延续项目的技术身份</li>
+<li>简短、易记、便于全球用户发音</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="our-commitment">Our Commitment<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#our-commitment" class="hash-link" aria-label="Our Commitment的直接链接" title="Our Commitment的直接链接">​</a></h2>
-<p>We recognize the burden this places on our users, especially those with deep integrations. Please know:</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="我们的承诺">我们的承诺<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E6%88%91%E4%BB%AC%E7%9A%84%E6%89%BF%E8%AF%BA" class="hash-link" aria-label="我们的承诺的直接链接" title="我们的承诺的直接链接">​</a></h2>
+<p>我们理解这次变更会给用户带来迁移成本，尤其是已经深度集成的使用者。请相信：</p>
 <ul>
-<li>All existing issues and PRs have been migrated</li>
-<li>Performance benchmarks remain consistently superior</li>
-<li>Release cycles continue uninterrupted</li>
+<li>所有历史 issue 与 PR 已完成迁移</li>
+<li>性能基准优势将继续保持</li>
+<li>版本发布节奏不会中断</li>
 </ul>
-<p>This rename represents our commitment to respecting intellectual property while maintaining technical excellence. We're grateful for your patience and continued trust as we navigate this transition together.</p>]]></content>
+<p>此次更名体现了我们在尊重知识产权前提下，坚持技术卓越的承诺。感谢大家在这个过渡过程中的耐心与信任。</p>]]></content>
         <author>
             <name>杨朝坤</name>
             <uri>https://github.com/chaokunyang</uri>
