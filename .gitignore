@@ -30,3 +30,6 @@ yarn-error.log*
 
 # ignore yarn.lock
 yarn.lock
+
+tasks/
+ignored/
