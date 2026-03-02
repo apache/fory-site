@@ -5,12 +5,10 @@ authors: [chaokunyang]
 tags: [fury]
 ---
 
-![Apache Fory Logo](https://fory.apache.org/img/navbar-logo.png)  
-我们的新身份：Fast Serialization Framework **FOR Y**ou
-
-## 公告
-
 **Apache Fury 团队现正式宣布，Apache Fury 已即日起更名为 Apache Fory**。此次变更将影响项目的全部组成部分，包括代码仓库、包名、文档与沟通渠道。
+
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%"/>
+我们的新身份：Fast Serialization Framework **FOR Y**ou
 
 ## 为什么需要这次更名
 
