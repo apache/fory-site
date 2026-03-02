@@ -5,12 +5,10 @@ authors: [chaokunyang]
 tags: [fury]
 ---
 
-![Apache Fory Logo](https://fory.apache.org/img/navbar-logo.png)  
-Our new identity: Fast Serialization Framework **FOR Y**ou
-
-## Announcement
-
 **The Apache Fury team is now officially announcing that Apache Fury has been renamed to Apache Fory**, effective immediately. This transition impacts all project components including code repositories, package names, documentation, and communication channels.
+
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%"/>
+Our new identity: Fast Serialization Framework **FOR Y**ou
 
 ## Why This Change Is Necessary
 
