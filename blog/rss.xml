@@ -1851,11 +1851,10 @@ schema above, generated code looks like:</p>
             <link>https://fory.apache.org/blog/fury_renamed_to_fory</link>
             <guid>https://fory.apache.org/blog/fury_renamed_to_fory</guid>
             <pubDate>Fri, 06 Jun 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[Apache Fory Logo]]></description>
-            <content:encoded><![CDATA[<p><img loading="lazy" src="https://fory.apache.org/img/navbar-logo.png" alt="Apache Fory Logo" class="img_ev3q"><br>
-<!-- -->Our new identity: Fast Serialization Framework <strong>FOR Y</strong>ou</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="announcement">Announcement<a href="https://fory.apache.org/blog/fury_renamed_to_fory#announcement" class="hash-link" aria-label="Direct link to Announcement" title="Direct link to Announcement">​</a></h2>
-<p><strong>The Apache Fury team is now officially announcing that Apache Fury has been renamed to Apache Fory</strong>, effective immediately. This transition impacts all project components including code repositories, package names, documentation, and communication channels.</p>
+            <description><![CDATA[The Apache Fury team is now officially announcing that Apache Fury has been renamed to Apache Fory, effective immediately. This transition impacts all project components including code repositories, package names, documentation, and communication channels.]]></description>
+            <content:encoded><![CDATA[<p><strong>The Apache Fury team is now officially announcing that Apache Fury has been renamed to Apache Fory</strong>, effective immediately. This transition impacts all project components including code repositories, package names, documentation, and communication channels.</p>
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%">
+<p>Our new identity: Fast Serialization Framework <strong>FOR Y</strong>ou</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-this-change-is-necessary">Why This Change Is Necessary<a href="https://fory.apache.org/blog/fury_renamed_to_fory#why-this-change-is-necessary" class="hash-link" aria-label="Direct link to Why This Change Is Necessary" title="Direct link to Why This Change Is Necessary">​</a></h2>
 <p>This transition is required to resolve naming conflicts identified by the ASF Brand Management. Following massive discussions and a formal vote, this change ensures compliance with ASF's guidelines.</p>
 <p>The new name "Fory" preserves phonetic similarity to "Fury" while establishing a distinct identity aligned with ASF standards.</p>

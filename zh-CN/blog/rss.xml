@@ -1858,11 +1858,10 @@
             <link>https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory</link>
             <guid>https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory</guid>
             <pubDate>Fri, 06 Jun 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[Apache Fory Logo]]></description>
-            <content:encoded><![CDATA[<p><img loading="lazy" src="https://fory.apache.org/img/navbar-logo.png" alt="Apache Fory Logo" class="img_ev3q"><br>
-<!-- -->我们的新身份：Fast Serialization Framework <strong>FOR Y</strong>ou</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="公告">公告<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E5%85%AC%E5%91%8A" class="hash-link" aria-label="公告的直接链接" title="公告的直接链接">​</a></h2>
-<p><strong>Apache Fury 团队现正式宣布，Apache Fury 已即日起更名为 Apache Fory</strong>。此次变更将影响项目的全部组成部分，包括代码仓库、包名、文档与沟通渠道。</p>
+            <description><![CDATA[Apache Fury 团队现正式宣布，Apache Fury 已即日起更名为 Apache Fory。此次变更将影响项目的全部组成部分，包括代码仓库、包名、文档与沟通渠道。]]></description>
+            <content:encoded><![CDATA[<p><strong>Apache Fury 团队现正式宣布，Apache Fury 已即日起更名为 Apache Fory</strong>。此次变更将影响项目的全部组成部分，包括代码仓库、包名、文档与沟通渠道。</p>
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%">
+<p>我们的新身份：Fast Serialization Framework <strong>FOR Y</strong>ou</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="为什么需要这次更名">为什么需要这次更名<a href="https://fory.apache.org/zh-CN/blog/fury_renamed_to_fory#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E8%BF%99%E6%AC%A1%E6%9B%B4%E5%90%8D" class="hash-link" aria-label="为什么需要这次更名的直接链接" title="为什么需要这次更名的直接链接">​</a></h2>
 <p>此次更名是为了解决 ASF Brand Management 识别出的命名冲突问题。经过大规模讨论与正式投票后，该调整可确保项目符合 ASF 品牌与命名规范。</p>
 <p>新名称 “Fory” 在发音上与 “Fury” 保持接近，同时建立了符合 ASF 标准的独立身份。</p>
