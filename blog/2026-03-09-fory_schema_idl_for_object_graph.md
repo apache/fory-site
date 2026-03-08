@@ -21,7 +21,7 @@ Most existing serialization IDLs model data as value trees: flat messages with n
 
 1. **Shared and Circular References**: If two fields refer to the same logical object, Protocol Buffers and FlatBuffers do not preserve that shared identity in the schema or on the wire. Parent pointers, DAGs, and cycles have no schema-level representation, so they fall back to manual ID fields and application-side reconstruction.
 
-2. **Polymorphism**: Protobuf `oneof` and FlatBuffers `union` are inline alternatives embedded in an enclosing message, not reusable standalone schema types. Protobuf `Any` supports open-ended polymorphism, but only for messages and with `type.googleapis.com/...` URLs. FlatBuffers has no equivalent.
+2. **Polymorphism**: Protobuf `oneof` and FlatBuffers `union` are inline alternatives embedded in an enclosing message, not reusable standalone schema types. Protobuf `Any` supports open-ended polymorphism, but only for messages and via a type URL. FlatBuffers has no equivalent.
 
 3. **Generated Types as Domain Models**: FlatBuffers APIs are primarily buffer-access wrappers. Protobuf generates transport-first types in many languages, so users often add a conversion layer to get back to idiomatic domain objects. The schema defines the wire format, but not the application model.
 
@@ -129,7 +129,7 @@ At runtime, `payload` can hold dynamic values supported by Fory — other genera
 | C#       | `object Payload`        |
 | Swift    | `var payload: Any`      |
 
-This gives you protobuf `Any`-like flexibility, but in the generated Fory model and without requiring `type.googleapis.com/...` type URLs in the schema surface.
+This gives you protobuf `Any`-like flexibility, but in the generated Fory model and without requiring protobuf-style type URLs in the schema surface.
 
 The three features above — `ref`, `union`/`any`, and idiomatic generated code — make Fory IDL an object-graph-first schema language. Schema evolution is a separate concern, but it completes the production story:
 
