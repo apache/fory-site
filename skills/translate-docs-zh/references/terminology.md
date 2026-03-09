@@ -37,6 +37,9 @@ Use these terms consistently across all translated docs.
 | runtime              | 运行时            |                                                                                           |
 | codegen              | 代码生成          |                                                                                           |
 | cross-language       | 跨语言            |                                                                                           |
+| object graph         | 对象图            | Use for graph-shaped data models with identity, shared refs, or cycles.                   |
+| domain object        | 领域对象          | Use for generated host-language models used directly in application code.                 |
+| sum type             | 和类型            | Prefer when describing `union`-style algebraic variants across languages.                 |
 
 ## Terms to Avoid (Unless User Explicitly Requests)
 
