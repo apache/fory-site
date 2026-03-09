@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[51592],{10823:e=>{e.exports=JSON.parse('{"label":"codegen","permalink":"/blog/tags/codegen","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
