@@ -9,7 +9,7 @@
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en-US</language>
         <item>
-            <title><![CDATA[Apache Fory™ Schema IDL: The First Serialization IDL for Object Graphs — Idiomatic Types, Polymorphism, Shared Refs, Schema Evolution, and API Ergonomics]]></title>
+            <title><![CDATA[Apache Fory™ Schema IDL: Serialization IDL for Object Graphs and Generated API Ergonomics]]></title>
             <link>https://fory.apache.org/blog/fory_schema_idl_for_object_graph</link>
             <guid>https://fory.apache.org/blog/fory_schema_idl_for_object_graph</guid>
             <pubDate>Mon, 09 Mar 2026 00:00:00 GMT</pubDate>
