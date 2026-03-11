@@ -2,11 +2,147 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fory.apache.org/blog</id>
     <title>Apache Fory™ Blog</title>
-    <updated>2026-03-09T00:00:00.000Z</updated>
+    <updated>2026-03-11T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fory.apache.org/blog"/>
     <subtitle>Apache Fory™ Blog</subtitle>
     <icon>https://fory.apache.org/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Extend Protobuf/FlatBuffers Schema IDL with Shared/Circular Reference Support]]></title>
+        <id>https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs</id>
+        <link href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs"/>
+        <updated>2026-03-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[TL;DR: If you already have .proto or .fbs schemas and you want shared/circular reference support, with the Fory compiler you can keep those schemas, add a small set of Fory options, then foryc generates idiomatic native models across Fory-supported languages, so you can serialize object graphs without manual *_id link reconstruction or rewriting your entire schema into Fory Schema.]]></summary>
+        <content type="html"><![CDATA[<p><strong>TL;DR</strong>: If you already have <code>.proto</code> or <code>.fbs</code> schemas and you want shared/circular reference support, with the Fory compiler you can keep those schemas, add a small set of Fory options, then <code>foryc</code> generates idiomatic native models across Fory-supported languages, so you can serialize object graphs without manual <code>*_id</code> link reconstruction or rewriting your entire schema into Fory Schema.</p>
+<ul>
+<li>GitHub: <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory</a></li>
+<li>Compiler docs: <a href="https://fory.apache.org/docs/compiler" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler</a></li>
+<li>Install: <code>pip install fory-compiler</code></li>
+</ul>
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%">
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-gap-in-protobuf-and-flatbuffers-schemas">The Gap in Protobuf and FlatBuffers Schemas<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#the-gap-in-protobuf-and-flatbuffers-schemas" class="hash-link" aria-label="Direct link to The Gap in Protobuf and FlatBuffers Schemas" title="Direct link to The Gap in Protobuf and FlatBuffers Schemas">​</a></h2>
+<p>Many production models are object graphs, not pure value trees:</p>
+<ul>
+<li>Parent pointers (<code>child.parent</code>)</li>
+<li>Shared nodes (two edges pointing to the same object)</li>
+<li>Cycles (A -&gt; B -&gt; A)</li>
+</ul>
+<p>In plain protobuf or FlatBuffers schema design, these relationships are usually represented indirectly with manual ID links (<code>parent_id</code>, <code>child_ids</code>) and rebuilt in application code after decode.</p>
+<p>Apache Fory adds schema-level reference tracking so these graph semantics can be declared directly in protobuf/FlatBuffers source via Fory options.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="keep-proto-and-fbs-add-graph-semantics">Keep <code>.proto</code> and <code>.fbs</code>, Add Graph Semantics<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#keep-proto-and-fbs-add-graph-semantics" class="hash-link" aria-label="Direct link to keep-proto-and-fbs-add-graph-semantics" title="Direct link to keep-proto-and-fbs-add-graph-semantics">​</a></h2>
+<p>You do not need to rewrite everything into <code>.fdl</code> first.</p>
+<ul>
+<li>For protobuf input, use <code>(fory).ref</code>, <code>(fory).weak_ref</code>, and related options.</li>
+<li>For FlatBuffers input, use <code>fory_ref:true</code>, <code>fory_weak_ref:true</code>, and related attributes.</li>
+<li>Compile with <code>foryc</code>.</li>
+<li>Get Fory-generated models and Fory wire format.</li>
+</ul>
+<p>Important: this path reuses schema syntax and structure, but serialization output is Fory binary protocol, not protobuf/FlatBuffers wire compatibility.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="protobuf-from-id-workarounds-to-ref">Protobuf: From ID Workarounds to <code>ref</code><a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#protobuf-from-id-workarounds-to-ref" class="hash-link" aria-label="Direct link to protobuf-from-id-workarounds-to-ref" title="Direct link to protobuf-from-id-workarounds-to-ref">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="protobuf-style-workaround-value-tree-oriented">Protobuf-style workaround (value-tree oriented)<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#protobuf-style-workaround-value-tree-oriented" class="hash-link" aria-label="Direct link to Protobuf-style workaround (value-tree oriented)" title="Direct link to Protobuf-style workaround (value-tree oriented)">​</a></h3>
+<div class="language-protobuf codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-protobuf codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">message</span><span class="token plain"> </span><span class="token class-name">TreeNode</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token builtin">string</span><span class="token plain"> id </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">1</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token builtin">string</span><span class="token plain"> parent_id </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">2</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token keyword" style="color:#00009f">repeated</span><span class="token plain"> </span><span class="token builtin">string</span><span class="token plain"> child_ids </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">3</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="protobuf--fory-options-graph-semantics">Protobuf + Fory options (graph semantics)<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#protobuf--fory-options-graph-semantics" class="hash-link" aria-label="Direct link to Protobuf + Fory options (graph semantics)" title="Direct link to Protobuf + Fory options (graph semantics)">​</a></h3>
+<div class="language-protobuf codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-protobuf codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">syntax</span><span class="token plain"> </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">"proto3"</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">message</span><span class="token plain"> </span><span class="token class-name">TreeNode</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token positional-class-name class-name">TreeNode</span><span class="token plain"> parent </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">1</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">weak_ref </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">true</span><span class="token punctuation" style="color:#393A34">]</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token keyword" style="color:#00009f">repeated</span><span class="token plain"> </span><span class="token positional-class-name class-name">TreeNode</span><span class="token plain"> children </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">2</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">ref </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">true</span><span class="token punctuation" style="color:#393A34">]</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>What this means:</p>
+<ul>
+<li><code>weak_ref = true</code> implies ref tracking and generates weak-pointer semantics where relevant (for example C++/Rust).</li>
+<li>For <code>repeated</code> fields, <code>(fory).ref = true</code> applies to list elements.</li>
+<li>For <code>map&lt;K, V&gt;</code>, <code>(fory).ref = true</code> applies to map values.</li>
+</ul>
+<p>You can also tune Rust pointer flavor:</p>
+<div class="language-protobuf codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-protobuf codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">message</span><span class="token plain"> </span><span class="token class-name">Graph</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token positional-class-name class-name">Node</span><span class="token plain"> root </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">1</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">ref </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">true</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">thread_safe_pointer </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">false</span><span class="token punctuation" style="color:#393A34">]</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="flatbuffers-add-fory_ref-attributes">FlatBuffers: Add <code>fory_ref</code> Attributes<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#flatbuffers-add-fory_ref-attributes" class="hash-link" aria-label="Direct link to flatbuffers-add-fory_ref-attributes" title="Direct link to flatbuffers-add-fory_ref-attributes">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="flatbuffers-schema-with-fory-reference-attributes">FlatBuffers schema with Fory reference attributes<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#flatbuffers-schema-with-fory-reference-attributes" class="hash-link" aria-label="Direct link to FlatBuffers schema with Fory reference attributes" title="Direct link to FlatBuffers schema with Fory reference attributes">​</a></h3>
+<div class="language-fbs codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-fbs codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">namespace demo;</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">table Node {</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  parent: Node (fory_weak_ref: true);</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  children: [Node] (fory_ref: true);</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  cached: Node (fory_ref: true, fory_thread_safe_pointer: false);</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Semantics:</p>
+<ul>
+<li><code>fory_weak_ref:true</code> implies reference tracking.</li>
+<li><code>fory_thread_safe_pointer</code> affects pointer flavor on ref-tracked fields.</li>
+<li>For list fields, <code>fory_ref:true</code> applies to elements.</li>
+</ul>
+<p>FlatBuffers input is translated into Fory IR, then normal Fory codegen runs. The generated API surface is native objects (not FlatBuffers <code>ByteBuffer</code>-wrapper APIs).</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="inspect-before-you-commit">Inspect Before You Commit<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#inspect-before-you-commit" class="hash-link" aria-label="Direct link to Inspect Before You Commit" title="Direct link to Inspect Before You Commit">​</a></h2>
+<p>You can inspect how <code>.proto</code> or <code>.fbs</code> is translated:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic"># Protobuf to translated Fory schema</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">foryc schema.proto --emit-fdl</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># FlatBuffers to translated Fory schema</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">foryc schema.fbs --emit-fdl --emit-fdl-path ./translated</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Then generate code:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">foryc schema.proto </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--java_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./java/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--python_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./python/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--go_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./go/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--rust_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./rust/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--cpp_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./cpp/gen</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>This is the migration-friendly loop:</p>
+<ol>
+<li>Keep existing schema files.</li>
+<li>Add only Fory reference options where graph semantics are required.</li>
+<li>Inspect translated <code>.fdl</code>.</li>
+<li>Generate and run roundtrip tests.</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-you-get-after-generation">What You Get After Generation<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#what-you-get-after-generation" class="hash-link" aria-label="Direct link to What You Get After Generation" title="Direct link to What You Get After Generation">​</a></h2>
+<p>With Fory codegen, you get native language models and reference-aware serialization behavior:</p>
+<ul>
+<li>Java: POJOs/records with Fory metadata</li>
+<li>Python: dataclasses + registration helpers</li>
+<li>Go: structs with tags</li>
+<li>Rust: native structs with ref-pointer mapping</li>
+<li>C++: native classes/structs with shared/weak pointer mapping</li>
+<li>C#, Swift, and more: idiomatic generated models</li>
+</ul>
+<p>For object-graph-heavy workflows, this removes a common layer of manual ID-link hydration code.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="behavioral-boundaries-to-keep-in-mind">Behavioral Boundaries to Keep in Mind<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#behavioral-boundaries-to-keep-in-mind" class="hash-link" aria-label="Direct link to Behavioral Boundaries to Keep in Mind" title="Direct link to Behavioral Boundaries to Keep in Mind">​</a></h2>
+<ol>
+<li>
+<p>This is not protobuf or FlatBuffers wire compatibility.
+The schema frontend is reused, but bytes on the wire are Fory protocol.</p>
+</li>
+<li>
+<p>Protobuf unknown-field behavior is different.
+Protobuf preserves unknown fields; Fory does not preserve protobuf unknown-field payloads.</p>
+</li>
+<li>
+<p>Reference tracking should be explicit and minimal.
+Use <code>ref</code>/<code>weak_ref</code> for true shared/cyclic parts of the graph, not for all fields.</p>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="practical-migration-pattern">Practical Migration Pattern<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#practical-migration-pattern" class="hash-link" aria-label="Direct link to Practical Migration Pattern" title="Direct link to Practical Migration Pattern">​</a></h2>
+<p>If you already run protobuf or FlatBuffers in production:</p>
+<ol>
+<li>Keep package/namespace names stable.</li>
+<li>Add Fory reference options only to graph-shaped fields.</li>
+<li>Generate code with <code>foryc</code> and run roundtrip tests.</li>
+<li>Migrate internal object-heavy paths first.</li>
+<li>Keep external protobuf/gRPC boundaries as-is when needed.</li>
+</ol>
+<p>This lets you adopt graph semantics incrementally without a full schema rewrite.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="conclusion">Conclusion<a href="https://fory.apache.org/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#conclusion" class="hash-link" aria-label="Direct link to Conclusion" title="Direct link to Conclusion">​</a></h2>
+<p>Protobuf and FlatBuffers schema files can be a starting point for Fory graph-aware serialization, not a blocker.</p>
+<p>By adding a small set of Fory extension options (<code>ref</code>, <code>weak_ref</code>, pointer-style hints), you can express shared identity and circular links directly in existing <code>.proto</code>/<code>.fbs</code> sources, generate native models, and remove manual object-link reconstruction code in object-graph-heavy systems.</p>
+<p>If your data model is a graph, make that graph explicit in the schema.</p>
+<p><strong>Get started:</strong></p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">pip </span><span class="token function" style="color:#d73a49">install</span><span class="token plain"> fory-compiler</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">foryc </span><span class="token parameter variable" style="color:#36acaa">--help</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>References:</strong></p>
+<ul>
+<li>Object-graph Schema IDL reference article: <a href="https://fory.apache.org/blog/fory_schema_idl_for_object_graph" target="_blank" rel="noopener noreferrer">https://fory.apache.org/blog/fory_schema_idl_for_object_graph</a></li>
+<li>Protobuf IDL support: <a href="https://fory.apache.org/docs/compiler/protobuf_idl_support" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/protobuf_idl_support</a></li>
+<li>FlatBuffers IDL support: <a href="https://fory.apache.org/docs/compiler/flatbuffers_idl" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/flatbuffers_idl</a></li>
+<li>Schema syntax (<code>ref</code>, <code>optional</code>, <code>union</code>): <a href="https://fory.apache.org/docs/compiler/syntax" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/syntax</a></li>
+<li>Generated code overview: <a href="https://fory.apache.org/docs/compiler/generated_code" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/generated_code</a></li>
+</ul>]]></content>
+        <author>
+            <name>Shawn Yang</name>
+            <uri>https://github.com/chaokunyang</uri>
+        </author>
+        <category label="fory" term="fory"/>
+        <category label="protobuf" term="protobuf"/>
+        <category label="flatbuffers" term="flatbuffers"/>
+        <category label="idl" term="idl"/>
+        <category label="serialization" term="serialization"/>
+        <category label="references" term="references"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Apache Fory™ Schema IDL: Serialization IDL for Object Graphs and Generated API Ergonomics]]></title>
         <id>https://fory.apache.org/blog/fory_schema_idl_for_object_graph</id>
@@ -2214,32 +2350,6 @@ schema above, generated code looks like:</p>
         <author>
             <name>Pan Li</name>
             <uri>https://github.com/pandalee99</uri>
-        </author>
-        <category label="fury" term="fury"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Fury v0.10.2 Released]]></title>
-        <id>https://fory.apache.org/blog/fury_0_10_2_release</id>
-        <link href="https://fory.apache.org/blog/fury_0_10_2_release"/>
-        <updated>2025-05-06T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[The Apache Fury team is pleased to announce the 0.10.2 release. This is a minor release that includes 6 PR from 2 distinct contributors. See the Install Page to learn how to get the libraries for your platform.]]></summary>
-        <content type="html"><![CDATA[<p>The Apache Fury team is pleased to announce the 0.10.2 release. This is a minor release that includes <a href="https://github.com/apache/fury/compare/v0.10.1...v0.10.2" target="_blank" rel="noopener noreferrer">6 PR</a> from 2 distinct contributors. See the <a href="https://fury.apache.org/docs/docs/start/install" target="_blank" rel="noopener noreferrer">Install</a> Page to learn how to get the libraries for your platform.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="features">Features<a href="https://fory.apache.org/blog/fury_0_10_2_release#features" class="hash-link" aria-label="Direct link to Features" title="Direct link to Features">​</a></h2>
-<ul>
-<li>feat(kotlin): add kotlin ci by @pandalee99 in <a href="https://github.com/apache/fury/pull/2176" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2176</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="bug-fix">Bug Fix<a href="https://fory.apache.org/blog/fury_0_10_2_release#bug-fix" class="hash-link" aria-label="Direct link to Bug Fix" title="Direct link to Bug Fix">​</a></h2>
-<ul>
-<li>fix(java): fix DisallowedList calculate hash in Windows by @chaokunyang in <a href="https://github.com/apache/fury/pull/2142" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2142</a></li>
-<li>fix(java): fix fury logger log exception by @chaokunyang in <a href="https://github.com/apache/fury/pull/2153" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2153</a></li>
-<li>fix(java): fix nested chunk map serialization error when generics exists by @chaokunyang in <a href="https://github.com/apache/fury/pull/2162" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2162</a></li>
-<li>fix(java): fix nested map chunk serialization codegen by @chaokunyang in <a href="https://github.com/apache/fury/pull/2172" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2172</a></li>
-<li>fix(kotlin): fix kotlin compile error by @chaokunyang in <a href="https://github.com/apache/fury/pull/2173" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2173</a></li>
-</ul>
-<p><strong>Full Changelog</strong>: <a href="https://github.com/apache/fury/compare/v0.10.1...v0.10.2" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/compare/v0.10.1...v0.10.2</a></p>]]></content>
-        <author>
-            <name>Liangliang Sui</name>
-            <uri>https://github.com/LiangliangSui</uri>
         </author>
         <category label="fury" term="fury"/>
     </entry>

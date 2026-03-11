@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[15774],{60398:s=>{s.exports=JSON.parse('{"label":"flatbuffers","permalink":"/blog/tags/flatbuffers","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

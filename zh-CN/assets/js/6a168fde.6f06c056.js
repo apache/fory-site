@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[67737],{56770:s=>{s.exports=JSON.parse('{"label":"protobuf","permalink":"/zh-CN/blog/tags/protobuf","allTagsPath":"/zh-CN/blog/tags","count":1,"unlisted":false}')}}]);

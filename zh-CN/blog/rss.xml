@@ -4,10 +4,142 @@
         <title>Apache Fory™ Blog</title>
         <link>https://fory.apache.org/zh-CN/blog</link>
         <description>Apache Fory™ Blog</description>
-        <lastBuildDate>Mon, 09 Mar 2026 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 11 Mar 2026 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>zh-CN</language>
+        <item>
+            <title><![CDATA[为 Protobuf/FlatBuffers Schema IDL 增加共享/循环引用支持]]></title>
+            <link>https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs</link>
+            <guid>https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs</guid>
+            <pubDate>Wed, 11 Mar 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[TL;DR：如果你已经有 .proto 或 .fbs Schema，并且希望支持共享/循环引用，那么使用 Fory 编译器时你可以保留这些 Schema，只需添加一小组 Fory 选项，再通过 foryc 生成 Fory 支持语言中的原生习惯模型，随后即可序列化对象图，无需手工通过 *_id 重建关联，也无需把整份 Schema 重写为 Fory Schema。]]></description>
+            <content:encoded><![CDATA[<p><strong>TL;DR</strong>：如果你已经有 <code>.proto</code> 或 <code>.fbs</code> Schema，并且希望支持共享/循环引用，那么使用 Fory 编译器时你可以保留这些 Schema，只需添加一小组 Fory 选项，再通过 <code>foryc</code> 生成 Fory 支持语言中的原生习惯模型，随后即可序列化对象图，无需手工通过 <code>*_id</code> 重建关联，也无需把整份 Schema 重写为 Fory Schema。</p>
+<ul>
+<li>GitHub: <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer">https://github.com/apache/fory</a></li>
+<li>编译器文档: <a href="https://fory.apache.org/docs/compiler" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler</a></li>
+<li>安装: <code>pip install fory-compiler</code></li>
+</ul>
+<img src="https://fory.apache.org/img/fory-logo-light.png" width="50%">
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="protobuf-与-flatbuffers-schema-的缺口">Protobuf 与 FlatBuffers Schema 的缺口<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#protobuf-%E4%B8%8E-flatbuffers-schema-%E7%9A%84%E7%BC%BA%E5%8F%A3" class="hash-link" aria-label="Protobuf 与 FlatBuffers Schema 的缺口的直接链接" title="Protobuf 与 FlatBuffers Schema 的缺口的直接链接">​</a></h2>
+<p>很多生产模型本质上是对象图，而不是纯树结构：</p>
+<ul>
+<li>父指针（<code>child.parent</code>）</li>
+<li>共享节点（两条边指向同一个对象）</li>
+<li>循环（A -&gt; B -&gt; A）</li>
+</ul>
+<p>在原生 protobuf 或 FlatBuffers Schema 设计中，这类关系通常只能通过手工 ID 链接（<code>parent_id</code>、<code>child_ids</code>）间接表示，并在解码后由应用代码重建对象关系。</p>
+<p>Apache Fory 增加了 Schema 级引用跟踪能力，可以通过 Fory 选项在 protobuf/FlatBuffers 源文件中直接声明这类对象图语义。</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="保留-proto-与-fbs补充对象图语义">保留 <code>.proto</code> 与 <code>.fbs</code>，补充对象图语义<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#%E4%BF%9D%E7%95%99-proto-%E4%B8%8E-fbs%E8%A1%A5%E5%85%85%E5%AF%B9%E8%B1%A1%E5%9B%BE%E8%AF%AD%E4%B9%89" class="hash-link" aria-label="保留-proto-与-fbs补充对象图语义的直接链接" title="保留-proto-与-fbs补充对象图语义的直接链接">​</a></h2>
+<p>你不需要先把所有内容重写为 <code>.fdl</code>。</p>
+<ul>
+<li>对 protobuf 输入，使用 <code>(fory).ref</code>、<code>(fory).weak_ref</code> 等选项。</li>
+<li>对 FlatBuffers 输入，使用 <code>fory_ref:true</code>、<code>fory_weak_ref:true</code> 等属性。</li>
+<li>使用 <code>foryc</code> 编译。</li>
+<li>生成 Fory 模型并使用 Fory 编码格式。</li>
+</ul>
+<p>重要说明：这个路径复用了 Schema 的语法与结构，但序列化输出是 Fory 二进制协议，不与 protobuf/FlatBuffers 编码格式兼容。</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="protobuf从-id-变通到-ref">Protobuf：从 ID 变通到 <code>ref</code><a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#protobuf%E4%BB%8E-id-%E5%8F%98%E9%80%9A%E5%88%B0-ref" class="hash-link" aria-label="protobuf从-id-变通到-ref的直接链接" title="protobuf从-id-变通到-ref的直接链接">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="protobuf-风格变通面向值树">Protobuf 风格变通（面向值树）<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#protobuf-%E9%A3%8E%E6%A0%BC%E5%8F%98%E9%80%9A%E9%9D%A2%E5%90%91%E5%80%BC%E6%A0%91" class="hash-link" aria-label="Protobuf 风格变通（面向值树）的直接链接" title="Protobuf 风格变通（面向值树）的直��接链接">​</a></h3>
+<div class="language-protobuf codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-protobuf codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">message</span><span class="token plain"> </span><span class="token class-name">TreeNode</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token builtin">string</span><span class="token plain"> id </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">1</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token builtin">string</span><span class="token plain"> parent_id </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">2</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token keyword" style="color:#00009f">repeated</span><span class="token plain"> </span><span class="token builtin">string</span><span class="token plain"> child_ids </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">3</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="protobuf--fory-选项对象图语义">Protobuf + Fory 选项（对象图语义）<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#protobuf--fory-%E9%80%89%E9%A1%B9%E5%AF%B9%E8%B1%A1%E5%9B%BE%E8%AF%AD%E4%B9%89" class="hash-link" aria-label="Protobuf + Fory 选项（对象图语义）的直接链接" title="Protobuf + Fory 选项（对象图语义）的直接链接">​</a></h3>
+<div class="language-protobuf codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-protobuf codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">syntax</span><span class="token plain"> </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">"proto3"</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">message</span><span class="token plain"> </span><span class="token class-name">TreeNode</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token positional-class-name class-name">TreeNode</span><span class="token plain"> parent </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">1</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">weak_ref </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">true</span><span class="token punctuation" style="color:#393A34">]</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token keyword" style="color:#00009f">repeated</span><span class="token plain"> </span><span class="token positional-class-name class-name">TreeNode</span><span class="token plain"> children </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">2</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">ref </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">true</span><span class="token punctuation" style="color:#393A34">]</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>含义如下：</p>
+<ul>
+<li><code>weak_ref = true</code> 隐含启用引用跟踪，并在相关语言中生成弱指针语义（例如 C++/Rust）。</li>
+<li>对 <code>repeated</code> 字段，<code>(fory).ref = true</code> 作用于列表元素。</li>
+<li>对 <code>map&lt;K, V&gt;</code>，<code>(fory).ref = true</code> 作用于 map 的 value。</li>
+</ul>
+<p>你还可以调节 Rust 指针风格：</p>
+<div class="language-protobuf codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-protobuf codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">message</span><span class="token plain"> </span><span class="token class-name">Graph</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token positional-class-name class-name">Node</span><span class="token plain"> root </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">1</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">[</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">ref </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">true</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fory</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">thread_safe_pointer </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">false</span><span class="token punctuation" style="color:#393A34">]</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="flatbuffers添加-fory_ref-属性">FlatBuffers：添加 <code>fory_ref</code> 属性<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#flatbuffers%E6%B7%BB%E5%8A%A0-fory_ref-%E5%B1%9E%E6%80%A7" class="hash-link" aria-label="flatbuffers添加-fory_ref-属性的直接链接" title="flatbuffers添加-fory_ref-属性的直接链接">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="带-fory-引用属性的-flatbuffers-schema">带 Fory 引用属性的 FlatBuffers Schema<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#%E5%B8%A6-fory-%E5%BC%95%E7%94%A8%E5%B1%9E%E6%80%A7%E7%9A%84-flatbuffers-schema" class="hash-link" aria-label="带 Fory 引用属性的 FlatBuffers Schema的直接链接" title="带 Fory 引用属性的 FlatBuffers Schema的直接链接">​</a></h3>
+<div class="language-fbs codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-fbs codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">namespace demo;</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">table Node {</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  parent: Node (fory_weak_ref: true);</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  children: [Node] (fory_ref: true);</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  cached: Node (fory_ref: true, fory_thread_safe_pointer: false);</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>语义：</p>
+<ul>
+<li><code>fory_weak_ref:true</code> 隐含启用引用跟踪。</li>
+<li><code>fory_thread_safe_pointer</code> 会影响启用引用跟踪字段的指针风格。</li>
+<li>对列表字段，<code>fory_ref:true</code> 作用于元素。</li>
+</ul>
+<p>FlatBuffers 输入会先被翻译为 Fory IR，再走标准 Fory 代码生成流程。生成后的 API 是原生对象模型（不是 FlatBuffers <code>ByteBuffer</code> 包装器 API）。</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="在提交前先检查翻译结果">在提交前先检查翻译结果<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#%E5%9C%A8%E6%8F%90%E4%BA%A4%E5%89%8D%E5%85%88%E6%A3%80%E6%9F%A5%E7%BF%BB%E8%AF%91%E7%BB%93%E6%9E%9C" class="hash-link" aria-label="在提交前先检查翻译结果的直接链接" title="在提交前先检查翻译结果的直接链接">​</a></h2>
+<p>你可以先检查 <code>.proto</code> 或 <code>.fbs</code> 被翻译后的结果：</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic"># Protobuf to translated Fory schema</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">foryc schema.proto --emit-fdl</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># FlatBuffers to translated Fory schema</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">foryc schema.fbs --emit-fdl --emit-fdl-path ./translated</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>然后生成代码：</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">foryc schema.proto </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--java_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./java/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--python_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./python/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--go_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./go/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--rust_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./rust/gen </span><span class="token punctuation" style="color:#393A34">\</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token parameter variable" style="color:#36acaa">--cpp_out</span><span class="token operator" style="color:#393A34">=</span><span class="token plain">./cpp/gen</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>这是一个对迁移友好的闭环：</p>
+<ol>
+<li>保留已有 Schema 文件。</li>
+<li>只在需要对象图语义的字段上添加 Fory 引用选项。</li>
+<li>检查翻译后的 <code>.fdl</code>。</li>
+<li>生成代码并执行 roundtrip 测试。</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="代码生成后你能得到什么">代码生成后你能得到什么<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E5%90%8E%E4%BD%A0%E8%83%BD%E5%BE%97%E5%88%B0%E4%BB%80%E4%B9%88" class="hash-link" aria-label="代码生成后你能得到什么的直接链接" title="代码生成后你能得到什么的直接链接">​</a></h2>
+<p>使用 Fory 代码生成后，你会得到原生语言模型和具备引用感知能力的序列化行为：</p>
+<ul>
+<li>Java：带 Fory 元数据的 POJO/record</li>
+<li>Python：dataclass + 注册辅助方法</li>
+<li>Go：带 tag 的 struct</li>
+<li>Rust：带引用指针映射的原生 struct</li>
+<li>C++：带 shared/weak pointer 映射的原生 class/struct</li>
+<li>C#、Swift 等：符合语言习惯的生成模型</li>
+</ul>
+<p>对于对象图密集的业务流程，这可以移除常见的手工 ID 链接回填逻辑。</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="需要注意的行为边界">需要注意的行为边界<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E8%A1%8C%E4%B8%BA%E8%BE%B9%E7%95%8C" class="hash-link" aria-label="需要注意的行为边界的直接链接" title="需要注意的行为边界的直接链接">​</a></h2>
+<ol>
+<li>
+<p>这不是 protobuf 或 FlatBuffers 编码格式兼容。
+它复用了 Schema 前端，但线上字节是 Fory 协议。</p>
+</li>
+<li>
+<p>Protobuf unknown-field 行为不同。
+Protobuf 会保留 unknown fields；Fory 不会保留 protobuf unknown-field 载荷。</p>
+</li>
+<li>
+<p>引用跟踪应当显式且最小化使用。
+<code>ref</code>/<code>weak_ref</code> 应用于真正共享或成环的对象图部分，而不是所有字段都开启。</p>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="实际迁移模式">实际迁移模式<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#%E5%AE%9E%E9%99%85%E8%BF%81%E7%A7%BB%E6%A8%A1%E5%BC%8F" class="hash-link" aria-label="实际迁移模式的直接链接" title="实际迁移模式的直接链接">​</a></h2>
+<p>如果你已经在生产环境运行 protobuf 或 FlatBuffers：</p>
+<ol>
+<li>保持 package/namespace 名称稳定。</li>
+<li>只在图结构字段上添加 Fory 引用选项。</li>
+<li>用 <code>foryc</code> 生成代码并运行 roundtrip 测试。</li>
+<li>先迁移内部对象密集路径。</li>
+<li>在需要时保持外部 protobuf/gRPC 边界不变。</li>
+</ol>
+<p>这样你就可以渐进式引入对象图语义，而不用一次性重写全部 Schema。</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="总结">总结<a href="https://fory.apache.org/zh-CN/blog/extend_protobuf_flatbuffers_with_shared_circular_refs#%E6%80%BB%E7%BB%93" class="hash-link" aria-label="总结的直接链接" title="总结的直接链接">​</a></h2>
+<p>Protobuf 和 FlatBuffers Schema 文件可以成为 Fory 对象图感知序列化的起点，而不是阻碍。</p>
+<p>通过补充一组小而明确的 Fory 扩展选项（<code>ref</code>、<code>weak_ref</code>、指针风格提示），你可以在已有 <code>.proto</code>/<code>.fbs</code> 源文件中直接表达共享身份和循环链接，生成原生模型，并移除对象图密集系统中手工重建对象关系的代码。</p>
+<p>如果你的数据模型本质是图，就应在 Schema 里把图语义显式表达出来。</p>
+<p><strong>快速开始：</strong></p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">pip </span><span class="token function" style="color:#d73a49">install</span><span class="token plain"> fory-compiler</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">foryc </span><span class="token parameter variable" style="color:#36acaa">--help</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><strong>参考资料：</strong></p>
+<ul>
+<li>对象图 Schema IDL 参考文章: <a href="https://fory.apache.org/blog/fory_schema_idl_for_object_graph" target="_blank" rel="noopener noreferrer">https://fory.apache.org/blog/fory_schema_idl_for_object_graph</a></li>
+<li>Protobuf IDL 支持: <a href="https://fory.apache.org/docs/compiler/protobuf_idl_support" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/protobuf_idl_support</a></li>
+<li>FlatBuffers IDL 支持: <a href="https://fory.apache.org/docs/compiler/flatbuffers_idl" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/flatbuffers_idl</a></li>
+<li>Schema 语法（<code>ref</code>、<code>optional</code>、<code>union</code>）: <a href="https://fory.apache.org/docs/compiler/syntax" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/syntax</a></li>
+<li>代码生成总览: <a href="https://fory.apache.org/docs/compiler/generated_code" target="_blank" rel="noopener noreferrer">https://fory.apache.org/docs/compiler/generated_code</a></li>
+</ul>]]></content:encoded>
+            <category>fory</category>
+            <category>protobuf</category>
+            <category>flatbuffers</category>
+            <category>idl</category>
+            <category>serialization</category>
+            <category>references</category>
+        </item>
         <item>
             <title><![CDATA[Apache Fory™ Schema IDL：面向对象图序列化的 IDL，支持原生类型、多态、共享引用]]></title>
             <link>https://fory.apache.org/zh-CN/blog/fory_schema_idl_for_object_graph</link>
@@ -2147,28 +2279,6 @@
 <li>chore(javascript): remove nodejs 12 support by @chaokunyang in <a href="https://github.com/apache/fury/pull/2233" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2233</a></li>
 </ul>
 <p><strong>完整更新日志</strong>：<a href="https://github.com/apache/fury/compare/v0.10.2...v0.10.3-rc2" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/compare/v0.10.2...v0.10.3-rc2</a></p>]]></content:encoded>
-            <category>fury</category>
-        </item>
-        <item>
-            <title><![CDATA[Fury v0.10.2 发布]]></title>
-            <link>https://fory.apache.org/zh-CN/blog/fury_0_10_2_release</link>
-            <guid>https://fory.apache.org/zh-CN/blog/fury_0_10_2_release</guid>
-            <pubDate>Tue, 06 May 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[Apache Fury 团队很高兴宣布 0.10.2 版本发布。 这是一个小版本，包含来自 2 位贡献者的6 PR。 请参阅Install页面了解如何获取适用于你平台的库。]]></description>
-            <content:encoded><![CDATA[<p>Apache Fury 团队很高兴宣布 0.10.2 版本发布。 这是一个小版本，包含来自 2 位贡献者的<a href="https://github.com/apache/fury/compare/v0.10.1...v0.10.2" target="_blank" rel="noopener noreferrer">6 PR</a>。 请参阅<a href="https://fury.apache.org/docs/docs/start/install" target="_blank" rel="noopener noreferrer">Install</a>页面了解如何获取适用于你平台的库。</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="功能特性">功能特性<a href="https://fory.apache.org/zh-CN/blog/fury_0_10_2_release#%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7" class="hash-link" aria-label="功能特性的直接链接" title="功能特性的直接链接">​</a></h2>
-<ul>
-<li>feat(kotlin): add kotlin ci by @pandalee99 in <a href="https://github.com/apache/fury/pull/2176" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2176</a></li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="缺陷修复">缺陷修复<a href="https://fory.apache.org/zh-CN/blog/fury_0_10_2_release#%E7%BC%BA%E9%99%B7%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="缺陷修复的直接链接" title="缺陷修复的直接链接">​</a></h2>
-<ul>
-<li>fix(java): fix DisallowedList calculate hash in Windows by @chaokunyang in <a href="https://github.com/apache/fury/pull/2142" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2142</a></li>
-<li>fix(java): fix fury logger log exception by @chaokunyang in <a href="https://github.com/apache/fury/pull/2153" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2153</a></li>
-<li>fix(java): fix nested chunk map serialization error when generics exists by @chaokunyang in <a href="https://github.com/apache/fury/pull/2162" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2162</a></li>
-<li>fix(java): fix nested map chunk serialization codegen by @chaokunyang in <a href="https://github.com/apache/fury/pull/2172" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2172</a></li>
-<li>fix(kotlin): fix kotlin compile error by @chaokunyang in <a href="https://github.com/apache/fury/pull/2173" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/pull/2173</a></li>
-</ul>
-<p><strong>完整更新日志</strong>：<a href="https://github.com/apache/fury/compare/v0.10.1...v0.10.2" target="_blank" rel="noopener noreferrer">https://github.com/apache/fury/compare/v0.10.1...v0.10.2</a></p>]]></content:encoded>
             <category>fury</category>
         </item>
     </channel>
