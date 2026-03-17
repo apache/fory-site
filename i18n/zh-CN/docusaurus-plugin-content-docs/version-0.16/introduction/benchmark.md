@@ -39,6 +39,36 @@ sidebar_position: 2
 
 注意：结果取决于硬件、数据集和实现版本。有关如何自行运行性能测试的信息，请参阅 Fory Rust Benchmark 指南：https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
 
+## C++ 性能测试
+
+Fory C++ 在性能方面相较 Protobuf C++ 序列化框架具有竞争力。
+
+<img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
+
+## Go 性能测试
+
+Fory Go 在单对象和列表两类工作负载下，相较 Protobuf 与 Msgpack 展现出较强的性能表现。
+
+<img src="/img/blog/fory_0_16_0_release/go_benchmark_combined.png" width="90%"/>
+
+注意：结果取决于硬件、数据集和实现版本。详细信息请参见 Go benchmark 报告： https://fory.apache.org/docs/benchmarks/go/
+
+## C# 性能测试
+
+Fory C# 在强类型对象的序列化和反序列化场景下，相较 Protobuf 与 Msgpack 展现出较强的性能表现。
+
+<img src="/img/blog/fory_0_16_0_release/csharp_benchmark_combined.png" width="90%"/>
+
+注意：结果取决于硬件和运行时版本。详细信息请参见 C# benchmark 报告： https://fory.apache.org/docs/benchmarks/csharp/
+
+## Swift 性能测试
+
+Fory Swift 在标量对象和列表两类工作负载下，相较 Protobuf 与 Msgpack 展现出较强的性能表现。
+
+<img src="/img/blog/fory_0_16_0_release/swift_benchmark_combined.png" width="90%"/>
+
+注意：结果取决于硬件和运行时版本。详细信息请参见 Swift benchmark 报告： https://fory.apache.org/docs/benchmarks/swift/
+
 ## JavaScript 性能测试
 
 <img width="33%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />

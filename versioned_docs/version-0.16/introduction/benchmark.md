@@ -53,6 +53,36 @@ Fory C++ demonstrates competitive performance compared to Protobuf C++ serializa
 
 <img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
 
+## Go Benchmark
+
+Fory Go demonstrates strong performance compared to Protobuf and Msgpack across
+single-object and list workloads.
+
+<img src="/img/blog/fory_0_16_0_release/go_benchmark_combined.png" width="90%"/>
+
+Note: Results depend on hardware, dataset, and implementation versions. See the
+Go benchmark report for details: https://fory.apache.org/docs/benchmarks/go/
+
+## C# Benchmark
+
+Fory C# demonstrates strong performance compared to Protobuf and Msgpack across
+typed object serialization and deserialization workloads.
+
+<img src="/img/blog/fory_0_16_0_release/csharp_benchmark_combined.png" width="90%"/>
+
+Note: Results depend on hardware and runtime versions. See the C# benchmark
+report for details: https://fory.apache.org/docs/benchmarks/csharp/
+
+## Swift Benchmark
+
+Fory Swift demonstrates strong performance compared to Protobuf and Msgpack
+across both scalar-object and list workloads.
+
+<img src="/img/blog/fory_0_16_0_release/swift_benchmark_combined.png" width="90%"/>
+
+Note: Results depend on hardware and runtime versions. See the Swift benchmark
+report for details: https://fory.apache.org/docs/benchmarks/swift/
+
 ## JavaScript Benchmark
 
 <img width="50%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
