@@ -59,7 +59,7 @@ include(FetchContent)
 FetchContent_Declare(
     fory
     GIT_REPOSITORY https://github.com/apache/fory.git
-    GIT_TAG        v0.16.0
+    GIT_TAG        v0.15.0
     SOURCE_SUBDIR  cpp
 )
 FetchContent_MakeAvailable(fory)
@@ -93,7 +93,7 @@ bazel_dep(name = "fory", version = "0.16.0")
 git_override(
     module_name = "fory",
     remote = "https://github.com/apache/fory.git",
-    commit = "v0.16.0",  # Or use a specific commit hash for reproducibility
+    commit = "v0.15.0",  # Or use a specific commit hash for reproducibility
 )
 ```
 

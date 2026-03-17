@@ -43,7 +43,7 @@ Reference the single `Apache.Fory` package. It includes the runtime and the sour
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Apache.Fory" Version="0.1.0" />
+  <PackageReference Include="Apache.Fory" Version="0.16.0" />
 </ItemGroup>
 ```
 
@@ -99,6 +99,6 @@ User decoded = fory.Deserialize<User>(payload);
 
 ## Related Resources
 
-- [Cross-language serialization specification](../../specification/xlang_serialization_spec)
-- [Cross-language guide](../xlang)
+- [Cross-language serialization specification](../../specification/xlang_serialization_spec.md)
+- [Cross-language guide](../xlang/index.md)
 - [C# source directory](https://github.com/apache/fory/tree/main/csharp)
