@@ -1,6 +1,12 @@
 ---
 name: translate-docs-zh
-description: Translate Apache Fory docs into Simplified Chinese and maintain existing Chinese translations by diffing English source changes. Use when asked to translate docs, sync i18n/zh-CN content, remove placeholder Chinese-intro notices, or update already-translated files after English docs changed. Strict rule: do NOT use any external translation service, API, website, or translation CLI tool; translation must be done directly by Codex.
+description: >-
+  Translate Apache Fory docs into Simplified Chinese and maintain existing
+  Chinese translations by diffing English source changes. Use when asked to
+  translate docs, sync i18n/zh-CN content, remove placeholder Chinese-intro
+  notices, or update already-translated files after English docs changed.
+  Strict rule: do NOT use any external translation service, API, website, or
+  translation CLI tool; translation must be done directly by Codex.
 ---
 
 # Translate Docs (zh-CN)
