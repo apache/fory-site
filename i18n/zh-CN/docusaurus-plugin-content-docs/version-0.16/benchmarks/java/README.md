@@ -2,9 +2,9 @@
 
 ## 系统环境
 
-- Operation System：4.9.151-015.x86_64
-- CPU：Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
-- Byte Order：Little Endian
+- 操作系统：4.9.151-015.x86_64
+- 处理器：Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+- 字节序：Little Endian
 - L1d cache： 32K
 - L1i cache：32K
 - L2 cache： 1024K
@@ -50,7 +50,7 @@ public class Struct {
 }
 ```
 
-### MediaContent
+### MediaContent 基准
 
 MEDIA_CONTENT 来自 [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java).
 
@@ -140,7 +140,7 @@ SAMPLE 来自 [kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/mas
 
 ## 基准数据
 
-### Java Serialization
+### Java Serialization 基准
 
 | Benchmark              | objectType    | bufferType   | references | Fory           | ForyMetaShared  | Kryo           | Fst           | Hession       | Jdk           | Protostuff    |
 | ---------------------- | ------------- | ------------ | ---------- | -------------- | --------------- | -------------- | ------------- | ------------- | ------------- | ------------- |

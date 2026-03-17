@@ -19,38 +19,38 @@ license: |
   limitations under the License.
 ---
 
-自定义序列化器允许你精确控制类型的序列化与反序列化过程。 This is useful for types that require special handling, optimization, or cross-language compatibility.
+自定义序列化器允许你精确控制类型的序列化与反序列化过程。这非常适合需要特殊处理、额外优化或跨语言兼容的类型。
 
 ## 何时使用自定义序列化器
 
-- **Special encoding**: Types that need a specific binary format
-- **Third-party types**: Types from external libraries that Fory doesn't handle automatically
-- **Optimization**: When you can serialize more efficiently than the default reflection-based approach
-- **Cross-language compatibility**: When you need precise control over the binary format for interoperability
+- **特殊编码格式**：类型需要固定或定制的二进制格式
+- **第三方类型**：类型来自外部库，Fory 无法自动处理
+- **性能优化**：你能比默认的反射方案实现更高效的编码
+- **跨语言兼容**：你需要精确控制二进制布局来保证互操作
 
-## ExtensionSerializer 接口
+## `ExtensionSerializer` 接口
 
-Custom serializers implement the `ExtensionSerializer` interface:
+自定义序列化器需要实现 `ExtensionSerializer` 接口：
 
 ```go
 type ExtensionSerializer interface {
-    // WriteData serializes the value to the buffer.
-    // Only write the data - Fory handles type info and references.
-    // Use ctx.Buffer() to access the ByteBuffer.
-    // Use ctx.SetError() to report errors.
+    // WriteData 将值写入缓冲区。
+    // 这里只负责写入数据本身，类型信息和引用由 Fory 处理。
+    // 使用 ctx.Buffer() 获取 ByteBuffer。
+    // 使用 ctx.SetError() 报告错误。
     WriteData(ctx *WriteContext, value reflect.Value)
 
-    // ReadData deserializes the value from the buffer into the provided value.
-    // Only read the data - Fory handles type info and references.
-    // Use ctx.Buffer() to access the ByteBuffer.
-    // Use ctx.SetError() to report errors.
+    // ReadData 从缓冲区读取值并写入到提供的目标中。
+    // 这里只负责读取数据本身，类型信息和引用由 Fory 处理。
+    // 使用 ctx.Buffer() 获取 ByteBuffer。
+    // 使用 ctx.SetError() 报告错误。
     ReadData(ctx *ReadContext, value reflect.Value)
 }
 ```
 
 ## 基础示例
 
-Here's a simple custom serializer for a type with an integer field:
+下面是一个仅包含整数字段的简单自定义序列化器：
 
 ```go
 import (
@@ -74,63 +74,63 @@ func (s *MyExtSerializer) ReadData(ctx *fory.ReadContext, value reflect.Value) {
     value.Set(reflect.ValueOf(MyExt{Id: id}))
 }
 
-// Register the custom serializer
+// 注册自定义序列化器
 f := fory.New()
 err := f.RegisterExtension(MyExt{}, 100, &MyExtSerializer{})
 ```
 
 ## Context 方法
 
-The `WriteContext` and `ReadContext` provide access to serialization resources:
+`WriteContext` 和 `ReadContext` 提供了访问序列化资源的能力：
 
-| Method           | Description                                    |
-| ---------------- | ---------------------------------------------- |
-| `Buffer()`       | Returns the `*ByteBuffer` for reading/writing  |
-| `Err()`          | Returns `*Error` for deferred error checking   |
-| `SetError(err)`  | Sets an error on the context                   |
-| `HasError()`     | Returns true if an error has been set          |
-| `TypeResolver()` | Returns the type resolver for nested types     |
-| `RefResolver()`  | Returns the reference resolver for ref support |
+| 方法 | 说明 |
+| --- | --- |
+| `Buffer()` | 返回用于读写的 `*ByteBuffer` |
+| `Err()` | 返回 `*Error`，用于延迟错误检查 |
+| `SetError(err)` | 在上下文中记录错误 |
+| `HasError()` | 判断上下文中是否已记录错误 |
+| `TypeResolver()` | 返回嵌套类型使用的类型解析器 |
+| `RefResolver()` | 返回引用跟踪使用的解析器 |
 
 ## ByteBuffer 方法
 
-The `ByteBuffer` provides methods for reading and writing primitive types:
+`ByteBuffer` 提供了一组读取和写入原始类型的方法。
 
 ### 写入方法
 
-| Method                     | Description                                   |
-| -------------------------- | --------------------------------------------- |
-| `WriteBool(v bool)`        | Write a boolean                               |
-| `WriteInt8(v int8)`        | Write a signed 8-bit integer                  |
-| `WriteInt16(v int16)`      | Write a signed 16-bit integer                 |
-| `WriteInt32(v int32)`      | Write a signed 32-bit integer                 |
-| `WriteInt64(v int64)`      | Write a signed 64-bit integer                 |
-| `WriteFloat32(v float32)`  | Write a 32-bit float                          |
-| `WriteFloat64(v float64)`  | Write a 64-bit float                          |
-| `WriteVarint32(v int32)`   | Write a variable-length signed 32-bit integer |
-| `WriteVarint64(v int64)`   | Write a variable-length signed 64-bit integer |
-| `WriteBinary(data []byte)` | Write raw bytes                               |
+| 方法 | 说明 |
+| --- | --- |
+| `WriteBool(v bool)` | 写入布尔值 |
+| `WriteInt8(v int8)` | 写入有符号 8 位整数 |
+| `WriteInt16(v int16)` | 写入有符号 16 位整数 |
+| `WriteInt32(v int32)` | 写入有符号 32 位整数 |
+| `WriteInt64(v int64)` | 写入有符号 64 位整数 |
+| `WriteFloat32(v float32)` | 写入 32 位浮点数 |
+| `WriteFloat64(v float64)` | 写入 64 位浮点数 |
+| `WriteVarint32(v int32)` | 写入变长有符号 32 位整数 |
+| `WriteVarint64(v int64)` | 写入变长有符号 64 位整数 |
+| `WriteBinary(data []byte)` | 写入原始字节 |
 
 ### 读取方法
 
-All read methods take an `*Error` parameter for deferred error checking:
+所有读取方法都接收一个 `*Error` 参数，用于延迟错误检查：
 
-| Method                                      | Description                                  |
-| ------------------------------------------- | -------------------------------------------- |
-| `ReadBool(err *Error) bool`                 | Read a boolean                               |
-| `ReadInt8(err *Error) int8`                 | Read a signed 8-bit integer                  |
-| `ReadInt16(err *Error) int16`               | Read a signed 16-bit integer                 |
-| `ReadInt32(err *Error) int32`               | Read a signed 32-bit integer                 |
-| `ReadInt64(err *Error) int64`               | Read a signed 64-bit integer                 |
-| `ReadFloat32(err *Error) float32`           | Read a 32-bit float                          |
-| `ReadFloat64(err *Error) float64`           | Read a 64-bit float                          |
-| `ReadVarint32(err *Error) int32`            | Read a variable-length signed 32-bit integer |
-| `ReadVarint64(err *Error) int64`            | Read a variable-length signed 64-bit integer |
-| `ReadBinary(length int, err *Error) []byte` | Read raw bytes of specified length           |
+| 方法 | 说明 |
+| --- | --- |
+| `ReadBool(err *Error) bool` | 读取布尔值 |
+| `ReadInt8(err *Error) int8` | 读取有符号 8 位整数 |
+| `ReadInt16(err *Error) int16` | 读取有符号 16 位整数 |
+| `ReadInt32(err *Error) int32` | 读取有符号 32 位整数 |
+| `ReadInt64(err *Error) int64` | 读取有符号 64 位整数 |
+| `ReadFloat32(err *Error) float32` | 读取 32 位浮点数 |
+| `ReadFloat64(err *Error) float64` | 读取 64 位浮点数 |
+| `ReadVarint32(err *Error) int32` | 读取变长有符号 32 位整数 |
+| `ReadVarint64(err *Error) int64` | 读取变长有符号 64 位整数 |
+| `ReadBinary(length int, err *Error) []byte` | 读取指定长度的原始字节 |
 
-## Complex Type Example
+## 复杂类型示例
 
-A custom serializer for a type with multiple fields:
+下面展示一个包含多个字段的自定义序列化器：
 
 ```go
 type Point3D struct {
@@ -146,7 +146,7 @@ func (s *Point3DSerializer) WriteData(ctx *fory.WriteContext, value reflect.Valu
     buf.WriteFloat64(p.X)
     buf.WriteFloat64(p.Y)
     buf.WriteFloat64(p.Z)
-    // Write string as length + bytes
+    // 字符串写为“长度 + 内容字节”
     labelBytes := []byte(p.Label)
     buf.WriteVarint32(int32(len(labelBytes)))
     buf.WriteBinary(labelBytes)
@@ -172,9 +172,9 @@ f := fory.New()
 f.RegisterExtension(Point3D{}, 101, &Point3DSerializer{})
 ```
 
-## Handling Pointers
+## 处理指针
 
-When your type contains pointers, handle nil values explicitly:
+如果类型中包含指针，需要显式处理 `nil`：
 
 ```go
 type OptionalValue struct {
@@ -187,9 +187,9 @@ func (s *OptionalValueSerializer) WriteData(ctx *fory.WriteContext, value reflec
     ov := value.Interface().(OptionalValue)
     buf := ctx.Buffer()
     if ov.Value == nil {
-        buf.WriteBool(false) // nil flag
+        buf.WriteBool(false) // nil 标记
     } else {
-        buf.WriteBool(true) // not nil
+        buf.WriteBool(true) // 非 nil
         buf.WriteInt64(*ov.Value)
     }
 }
@@ -207,9 +207,9 @@ func (s *OptionalValueSerializer) ReadData(ctx *fory.ReadContext, value reflect.
 }
 ```
 
-## Error Handling
+## 错误处理
 
-Use `ctx.SetError()` to report errors:
+通过 `ctx.SetError()` 报告错误：
 
 ```go
 func (s *MySerializer) ReadData(ctx *fory.ReadContext, value reflect.Value) {
@@ -222,24 +222,24 @@ func (s *MySerializer) ReadData(ctx *fory.ReadContext, value reflect.Value) {
         ctx.SetError(fory.DeserializationErrorf("unsupported version: %d", version))
         return
     }
-    // Continue reading...
+    // 继续读取后续字段
     value.Set(reflect.ValueOf(result))
 }
 ```
 
-## Registration Options
+## 注册方式
 
-### Register by ID
+### 按 ID 注册
 
-More compact serialization, requires ID coordination across languages:
+这种方式序列化更紧凑，但要求跨语言间协调好 ID：
 
 ```go
 f.RegisterExtension(MyType{}, 100, &MySerializer{})
 ```
 
-### Register by Name
+### 按名称注册
 
-More flexible but more serialization cost, type name included in serialized data:
+这种方式更灵活，但序列化开销更大，因为类型名会写入数据中：
 
 ```go
 f.RegisterNamedExtension(MyType{}, "myapp.MyType", &MySerializer{})
@@ -247,16 +247,16 @@ f.RegisterNamedExtension(MyType{}, "myapp.MyType", &MySerializer{})
 
 ## 最佳实践
 
-1. **Keep it simple**: Only serialize what you need
-2. **Use variable-length integers**: `WriteVarint32`/`WriteVarint64` for integers that are often small
-3. **Handle nil explicitly**: Check for nil pointers and slices
-4. **Version your format**: Consider adding a version byte for future compatibility
-5. **Test round-trips**: Always verify that `Read(Write(value)) == value`
-6. **Match read/write order**: Read fields in exactly the same order you write them
-7. **Check errors**: Use `ctx.HasError()` after reading to handle errors gracefully
-8. **Deploy before use**: Always deploy the registered serializer to all services before sending data serialized with it. If a service receives data for an unregistered serializer, deserialization will fail
+1. 保持格式简单，只序列化真正需要的数据。
+2. 小整数优先使用 `WriteVarint32` / `WriteVarint64`。
+3. 指针和 slice 等可空值要显式处理。
+4. 可以考虑增加版本字节，为将来格式演进留出空间。
+5. 始终验证往返正确性，即 `Read(Write(value)) == value`。
+6. 读取顺序必须与写入顺序完全一致。
+7. 读取阶段要结合 `ctx.HasError()` 做错误检查。
+8. 在发送使用自定义序列化器的数据前，确保所有服务都已完成对应注册。
 
-## Testing Custom Serializers
+## 测试自定义序列化器
 
 ```go
 func TestMySerializer(t *testing.T) {
@@ -280,6 +280,6 @@ func TestMySerializer(t *testing.T) {
 
 ## 相关主题
 
-- [Type Registration](type-registration.md)
-- [Supported Types](supported-types.md)
-- [Cross-Language Serialization](cross-language.md)
+- [类型注册](type-registration.md)
+- [支持类型](supported-types.md)
+- [跨语言序列化](cross-language.md)

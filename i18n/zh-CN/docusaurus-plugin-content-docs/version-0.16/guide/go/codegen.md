@@ -19,37 +19,37 @@ license: |
   limitations under the License.
 ---
 
-:::warning Experimental Feature
-Code generation is an **experimental** feature in Fory Go. The API and behavior may change in future releases. The reflection-based path remains the stable, recommended approach for most use cases.
+:::warning 实验性特性
+代码生成在 Fory Go 中仍属于**实验性**能力。未来版本中，API 和行为都可能发生变化。对于大多数场景，基于反射的路径仍然是更稳定、也更推荐的方案。
 :::
 
-Fory Go 为性能关键路径提供可选的 AOT 代码生成，可消除反射开销并提升编译期类型安全。
+Fory Go 为性能敏感路径提供可选的 AOT 代码生成能力，可以消除反射开销，并提升编译期类型安全。
 
-## 为什么使用代码生成？
+## 为什么使用代码生成
 
-| Aspect      | Reflection-Based   | Code Generation        |
-| ----------- | ------------------ | ---------------------- |
-| Setup       | Zero configuration | Requires `go generate` |
-| Performance | Good               | Better (no reflection) |
-| Type Safety | Runtime            | Compile-time           |
-| Maintenance | Automatic          | Requires regeneration  |
+| 维度 | 基于反射 | 代码生成 |
+| --- | --- | --- |
+| 接入成本 | 零配置 | 需要 `go generate` |
+| 性能 | 较好 | 更好（无反射） |
+| 类型安全 | 运行时 | 编译期 |
+| 维护成本 | 自动 | 需要重新生成 |
 
-**Use code generation when**:
+适合使用代码生成的场景：
 
-- Maximum performance is required
-- Compile-time type safety is important
-- Hot paths are performance-critical
+- 需要极致性能
+- 希望在编译期获得更强的类型校验
+- 热路径对延迟非常敏感
 
-**Use reflection when**:
+适合继续使用反射的场景：
 
-- Simple setup is preferred
-- Types change frequently
-- Dynamic typing is needed
-- Code generation complexity is undesirable
+- 更看重简单接入
+- 类型经常变化
+- 需要动态类型能力
+- 不希望增加代码生成链路
 
 ## 安装
 
-Install the `fory` generator binary:
+安装 `fory` 代码生成器：
 
 ```bash
 go install github.com/apache/fory/go/fory/cmd/fory@latest
@@ -57,13 +57,13 @@ go install github.com/apache/fory/go/fory/cmd/fory@latest
 GO111MODULE=on go get -u github.com/apache/fory/go/fory/cmd/fory
 ```
 
-Ensure `$GOBIN` or `$GOPATH/bin` is in your `PATH`.
+确保 `$GOBIN` 或 `$GOPATH/bin` 已加入 `PATH`。
 
 ## 基本用法
 
-### Step 1: Annotate Structs
+### 步骤 1：标注结构体
 
-Add the `//fory:generate` comment above structs:
+在需要生成序列化器的结构体上方添加 `//fory:generate` 注释：
 
 ```go
 package models
@@ -82,50 +82,50 @@ type Order struct {
 }
 ```
 
-### Step 2: Add Go Generate Directive
+### 步骤 2：添加 `go generate` 指令
 
-Add a `go:generate` directive (once per file or package):
+为文件或包添加 `go:generate` 指令：
 
 ```go
 //go:generate fory -file models.go
 ```
 
-Or for the entire package:
+如果希望对整个包生成：
 
 ```go
 //go:generate fory -pkg .
 ```
 
-### Step 3: Run Code Generation
+### 步骤 3：运行代码生成
 
 ```bash
 go generate ./...
 ```
 
-This creates `models_fory_gen.go` with generated serializers.
+执行后会生成 `models_fory_gen.go`，其中包含对应的序列化器实现。
 
-## 生成代码结构
+## 生成代码的结构
 
-The generator creates:
+生成器通常会产出以下内容。
 
-### Type Snapshot
+### 类型快照
 
-A compile-time check to detect struct changes:
+用于在编译期检测结构体定义是否已变更：
 
 ```go
-// Snapshot of User's underlying type at generation time
+// 生成时的 User 类型快照
 type _User_expected struct {
     ID   int64
     Name string
 }
 
-// Compile-time check: fails if User no longer matches
+// 编译期校验：如果 User 结构已变化，这里会报错
 var _ = func(x User) { _ = _User_expected(x) }
 ```
 
-### Serializer Implementation
+### 序列化器实现
 
-Strongly-typed serialization methods:
+使用强类型方法直接读写字段：
 
 ```go
 type User_ForyGenSerializer struct{}
@@ -143,9 +143,9 @@ func (User_ForyGenSerializer) ReadTyped(f *fory.Fory, buf *fory.ByteBuffer, v *U
 }
 ```
 
-### Auto-Registration
+### 自动注册
 
-Serializers are registered in `init()`:
+生成代码会在 `init()` 中自动注册序列化器：
 
 ```go
 func init() {
@@ -153,81 +153,73 @@ func init() {
 }
 ```
 
-## Command-Line Options
+## 命令行选项
 
-### File-Based Generation
-
-Generate for a specific file:
+### 按文件生成
 
 ```bash
 fory -file models.go
 ```
 
-### Package-Based Generation
-
-Generate for a package:
+### 按包生成
 
 ```bash
 fory -pkg ./models
 ```
 
-### Explicit Types (Legacy)
-
-Specify types explicitly:
+### 显式指定类型（旧用法）
 
 ```bash
 fory -pkg ./models -type "User,Order"
 ```
 
-### Force Regeneration
-
-Force regeneration even if up-to-date:
+### 强制重新生成
 
 ```bash
 fory --force -file models.go
 ```
 
-## When to Regenerate
+## 何时需要重新生成
 
-Regenerate when any of these change:
+出现以下任一变化时，都应重新生成：
 
-- Field additions, removals, or renames
-- Field type changes
-- Struct tag changes
-- New structs with `//fory:generate`
+- 字段新增、删除或重命名
+- 字段类型变化
+- 结构体 tag 变化
+- 新增带 `//fory:generate` 的结构体
 
-### Automatic Detection
+### 自动检测
 
-Fory includes a compile-time guard:
+Fory 内置了编译期保护：
 
 ```go
-// If struct changed, this fails to compile
+// 如果结构体定义变了，这里会在编译时报错
 var _ = func(x User) { _ = _User_expected(x) }
 ```
 
-If you forget to regenerate, the build fails with a clear message.
+如果忘了重新生成，构建会给出明确错误信息。
 
-### Auto-Retry
+### 自动重试
 
-When invoked via `go generate`, the generator detects stale code and retries:
+当通过 `go generate` 调用时，生成器会在发现产物过期后自动重试：
 
-1. Detects compile error from guard
-2. Removes stale generated file
-3. Regenerates fresh code
+1. 先通过编译期保护检测到错误
+2. 删除陈旧的生成文件
+3. 重新生成最新代码
 
-## Supported Types
+## 支持的类型
 
-Code generation supports:
+代码生成当前支持：
 
-- All primitive types (`bool`, `int*`, `uint*`, `float*`, `string`)
-- Slices of primitives and structs
-- Maps with supported key/value types
-- Nested structs (must also be generated)
-- Pointers to structs
+- 所有基础类型（`bool`、`int*`、`uint*`、`float*`、`string`）
+- 基础类型和结构体的 slice
+- 键值类型受支持的 map
+- 嵌套结构体（嵌套结构体本身也需要生成）
+- 指向结构体的指针
 
-### Nested Structs
+### 嵌套结构体
 
-All nested structs must also have `//fory:generate`:
+所有嵌套结构体也必须带上 `//fory:generate`：
 
 ```go
 //fory:generate
@@ -239,15 +231,15 @@ type Address struct {
 //fory:generate
 type Person struct {
     Name    string
-    Address Address  // Address must also be generated
+    Address Address // Address 也必须生成
 }
 ```
 
-## CI/CD Integration
+## CI/CD 集成
 
-### Check In Generated Code
+### 提交生成代码
 
-**Recommended for libraries**:
+**更适合类库项目**：
 
 ```bash
 go generate ./...
@@ -255,12 +247,12 @@ git add *_fory_gen.go
 git commit -m "Regenerate Fory serializers"
 ```
 
-**Pros**: Consumers can build without generator; reproducible builds
-**Cons**: Larger diffs; must remember to regenerate
+优点：使用方无需安装生成器即可构建，且构建结果更可复现。  
+缺点：diff 会更大，而且需要记得在结构体变更后重新生成。
 
-### Generate in Pipeline
+### 在流水线中生成
 
-**Recommended for applications**:
+**更适合应用项目**：
 
 ```yaml
 steps:
@@ -269,14 +261,14 @@ steps:
   - run: go build ./...
 ```
 
-## Usage with Generated Code
+## 使用生成代码
 
-Generated code integrates transparently:
+生成代码会自动接入运行时，无需额外改业务代码：
 
 ```go
 f := fory.New()
 
-// Fory automatically uses generated serializer if available
+// 如果存在生成序列化器，Fory 会自动使用
 user := &User{ID: 1, Name: "Alice"}
 data, _ := f.Serialize(user)
 
@@ -284,94 +276,94 @@ var result User
 f.Deserialize(data, &result)
 ```
 
-No code changes needed - registration happens in `init()`.
+不需要手动注册，生成代码会在 `init()` 中自动完成。
 
-## Mixing Generated and Non-Generated
+## 混用生成与非生成类型
 
-You can mix approaches:
+两种方式可以混用：
 
 ```go
 //fory:generate
 type HotPathStruct struct {
-    // Performance-critical, use codegen
+    // 热路径结构体，适合使用代码生成
 }
 
 type ColdPathStruct struct {
-    // Not annotated, uses reflection
+    // 未标注，继续走反射路径
 }
 ```
 
-## Limitations
+## 限制
 
-### Experimental Status
+### 实验性状态
 
-- API may change
-- Not all edge cases tested
-- May have undiscovered bugs
+- API 仍可能变化
+- 还没有覆盖全部边界情况
+- 可能仍存在未发现的问题
 
-### Not Supported
+### 暂不支持
 
-- Interface fields (dynamic types)
-- Recursive types without pointers
-- Private (unexported) fields
-- Custom serializers
+- 接口字段（动态类型）
+- 无指针的递归类型
+- 私有（未导出）字段
+- 自定义序列化器
 
-### Reflection Fallback
+### 反射回退
 
-If codegen fails, Fory falls back to reflection:
+如果找不到生成序列化器，Fory 会自动回退到反射路径：
 
 ```go
-// If User_ForyGenSerializer not found, uses reflection
+// 如果没有找到 User_ForyGenSerializer，就会走反射
 f.Serialize(&User{})
 ```
 
-## Troubleshooting
+## 故障排查
 
-### "fory: command not found"
+### `"fory: command not found"` 报错
 
-Ensure the binary is in PATH:
+确认生成器二进制已在 `PATH` 中：
 
 ```bash
 export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
-### Compile Error After Struct Change
+### 结构体变化后编译报错
 
-Regenerate:
+重新生成：
 
 ```bash
 go generate ./...
 ```
 
-Or force:
+必要时也可以强制生成：
 
 ```bash
 fory --force -file yourfile.go
 ```
 
-### Generated Code Out of Sync
+### 生成代码不同步
 
-The compile-time guard catches this:
+编译期保护通常会给出类似错误：
 
-```
+```text
 cannot use x (variable of type User) as type _User_expected in argument
 ```
 
-Run `go generate` to fix.
+执行 `go generate` 后即可修复。
 
-## Example Project Structure
+## 示例项目结构
 
-```
+```text
 myproject/
 ├── models/
-│   ├── models.go           # Struct definitions
-│   ├── models_fory_gen.go  # Generated code
-│   └── generate.go         # go:generate directive
+│   ├── models.go           # 结构体定义
+│   ├── models_fory_gen.go  # 生成代码
+│   └── generate.go         # go:generate 指令
 ├── main.go
 └── go.mod
 ```
 
-**models/generate.go**:
+**`models/generate.go` 示例**：
 
 ```go
 package models
@@ -379,7 +371,7 @@ package models
 //go:generate fory -pkg .
 ```
 
-**models/models.go**:
+**`models/models.go` 示例**：
 
 ```go
 package models
@@ -393,28 +385,28 @@ type User struct {
 
 ## FAQ
 
-### Is codegen required?
+### 代码生成是必须的吗？
 
-No. Reflection-based serialization works without code generation.
+不是。即使完全不使用代码生成，基于反射的序列化也能正常工作。
 
-### Does generated code work across Go versions?
+### 生成代码能跨 Go 版本工作吗？
 
-Yes. Generated code is plain Go with no version-specific features.
+可以。生成产物就是普通 Go 代码，不依赖特定版本特性。
 
-### Can I mix generated and non-generated types?
+### 生成类型和非生成类型可以混用吗？
 
-Yes. Fory automatically uses generated serializers when available.
+可以。只要生成序列化器存在，Fory 就会自动优先使用。
 
-### How do I update generated code?
+### 如何更新生成代码？
 
-Run `go generate ./...` after struct changes.
+在结构体变化后执行 `go generate ./...`。
 
-### Should I commit generated files?
+### 生成文件应该提交到仓库吗？
 
-For libraries: yes. For applications: either works.
+类库项目建议提交；应用项目两种做法都可以。
 
 ## 相关主题
 
-- [Basic Serialization](basic-serialization.md)
-- [Configuration](configuration.md)
-- [Troubleshooting](troubleshooting.md)
+- [基础序列化](basic-serialization.md)
+- [配置](configuration.md)
+- [故障排查](troubleshooting.md)

@@ -235,7 +235,7 @@ f.SerializeTo(buf, value2)
 data := buf.GetByteSlice(0, buf.WriterIndex())
 ```
 
-### DeserializeFrom
+### DeserializeFrom：从 Reader 反序列化
 
 从现有缓冲区反序列化：
 

@@ -19,17 +19,17 @@ license: |
   limitations under the License.
 ---
 
-本指南汇总了使用 Fory Go 时的常见问题与解决方案。
+本指南汇总使用 Fory Go 时的常见问题与解决方案。
 
 ## 错误类型
 
-Fory Go uses typed errors with specific error kinds:
+Fory Go 使用带错误种类的强类型错误：
 
 ```go
 type Error struct {
     kind    ErrorKind
     message string
-    // Additional context fields
+    // 额外上下文字段
 }
 
 func (e Error) Kind() ErrorKind { return e.kind }
@@ -38,230 +38,229 @@ func (e Error) Error() string   { return e.message }
 
 ### 错误种类
 
-| Kind                           | Value | Description                     |
-| ------------------------------ | ----- | ------------------------------- |
-| `ErrKindOK`                    | 0     | No error                        |
-| `ErrKindBufferOutOfBound`      | 1     | Read/write beyond buffer bounds |
-| `ErrKindTypeMismatch`          | 2     | Type ID mismatch                |
-| `ErrKindUnknownType`           | 3     | Unknown type encountered        |
-| `ErrKindSerializationFailed`   | 4     | General serialization failure   |
-| `ErrKindDeserializationFailed` | 5     | General deserialization failure |
-| `ErrKindMaxDepthExceeded`      | 6     | Recursion depth limit exceeded  |
-| `ErrKindNilPointer`            | 7     | Unexpected nil pointer          |
-| `ErrKindInvalidRefId`          | 8     | Invalid reference ID            |
-| `ErrKindHashMismatch`          | 9     | Struct hash mismatch            |
-| `ErrKindInvalidTag`            | 10    | Invalid fory struct tag         |
+| Kind | 值 | 说明 |
+| --- | --- | --- |
+| `ErrKindOK` | 0 | 无错误 |
+| `ErrKindBufferOutOfBound` | 1 | 读写越过缓冲区边界 |
+| `ErrKindTypeMismatch` | 2 | Type ID 不匹配 |
+| `ErrKindUnknownType` | 3 | 遇到未知类型 |
+| `ErrKindSerializationFailed` | 4 | 通用序列化失败 |
+| `ErrKindDeserializationFailed` | 5 | 通用反序列化失败 |
+| `ErrKindMaxDepthExceeded` | 6 | 递归深度超过限制 |
+| `ErrKindNilPointer` | 7 | 意外的空指针 |
+| `ErrKindInvalidRefId` | 8 | 非法引用 ID |
+| `ErrKindHashMismatch` | 9 | 结构体 hash 不匹配 |
+| `ErrKindInvalidTag` | 10 | 非法 `fory` 结构体 tag |
 
 ## 常见错误与解决方案
 
-### ErrKindUnknownType
+### `ErrKindUnknownType`：未知类型
 
-**Error**: `unknown type encountered`
+**错误**：`unknown type encountered`
 
-**Cause**: Type not registered before serialization/deserialization.
+**原因**：序列化或反序列化前未注册类型。
 
-**Solution**:
+**解决方式**：
 
 ```go
 f := fory.New()
 
-// Register type before use
+// 使用前先注册类型
 f.RegisterStruct(User{}, 1)
 
-// Now serialization works
+// 之后即可正常序列化
 data, _ := f.Serialize(&User{ID: 1})
 ```
 
-### ErrKindTypeMismatch
+### `ErrKindTypeMismatch`：类型不匹配
 
-**Error**: `type mismatch: expected X, got Y`
+**错误**：`type mismatch: expected X, got Y`
 
-**Cause**: Serialized data has different type than expected.
+**原因**：序列化数据中的类型与接收端期望的类型不一致。
 
-**Solutions**:
+**解决方式**：
 
-1. **Use correct target type**:
+1. 使用正确的目标类型：
 
 ```go
-// Wrong: Deserializing User into Order
+// 错误：把 User 数据反序列化到 Order
 var order Order
-f.Deserialize(userData, &order)  // Error!
+f.Deserialize(userData, &order)
 
-// Correct
+// 正确
 var user User
 f.Deserialize(userData, &user)
 ```
 
-2. **Ensure consistent registration**:
+2. 保证注册信息一致：
 
 ```go
-// Serializer
+// 序列化端
 f1 := fory.New()
 f1.RegisterStruct(User{}, 1)
 
-// Deserializer - must use same ID
+// 反序列化端，必须使用相同 ID
 f2 := fory.New()
-f2.RegisterStruct(User{}, 1)  // Same ID!
+f2.RegisterStruct(User{}, 1)
 ```
 
-### ErrKindHashMismatch
+### `ErrKindHashMismatch`：结构体 hash 不匹配
 
-**Error**: `hash X is not consistent with Y for type Z`
+**错误**：`hash X is not consistent with Y for type Z`
 
-**Cause**: Struct definition changed between serialization and deserialization.
+**原因**：序列化端和反序列化端使用的结构体定义不一致。
 
-**Solutions**:
+**解决方式**：
 
-1. **Enable compatible mode**:
+1. 开启兼容模式：
 
 ```go
 f := fory.New(fory.WithCompatible(true))
 ```
 
-2. **Ensure struct definitions match**:
+2. 确保结构体定义一致：
 
 ```go
-// Both serializer and deserializer must have same struct
+// 两端必须使用相同结构体定义
 type User struct {
     ID   int64
     Name string
 }
 ```
 
-3. **Regenerate codegen** (if using):
+3. 如果使用代码生成，重新生成产物：
 
 ```bash
 go generate ./...
 ```
 
-### ErrKindMaxDepthExceeded
+### `ErrKindMaxDepthExceeded`：超过最大深度
 
-**Error**: `max depth exceeded`
+**错误**：`max depth exceeded`
 
-**Cause**: Data nesting exceeds maximum depth limit.
+**原因**：数据嵌套层级超过了最大深度限制。
 
-**Possible causes**:
+**常见成因**：
 
-- Deeply nested data structures exceeding the default limit (20)
-- Unintended circular references without reference tracking enabled
-- **Malicious data**: Attackers may craft deeply nested payloads to cause resource exhaustion
+- 深层嵌套数据超过默认限制（20）
+- 未开启引用跟踪时意外出现循环引用
+- **恶意数据**：攻击者可能构造极深嵌套载荷，导致资源耗尽
 
-**Solutions**:
+**解决方式**：
 
-1. **Increase max depth** (default is 20):
+1. 提高最大深度限制（默认值为 20）：
 
 ```go
 f := fory.New(fory.WithMaxDepth(50))
 ```
 
-2. **Enable reference tracking** (for circular data):
+2. 对循环数据启用引用跟踪：
 
 ```go
 f := fory.New(fory.WithTrackRef(true))
 ```
 
-3. **Check for unintended circular references** in your data.
+3. 检查数据中是否存在意外循环引用。
 
-4. **Validate untrusted data**: When deserializing data from untrusted sources, do not blindly increase max depth. Consider validating input size and structure before deserialization.
+4. 处理不可信输入时不要盲目调大深度限制，应先校验输入大小与结构。
 
-### ErrKindBufferOutOfBound
+### `ErrKindBufferOutOfBound`：缓冲区越界
 
-**Error**: `buffer out of bound: offset=X, need=Y, size=Z`
+**错误**：`buffer out of bound: offset=X, need=Y, size=Z`
 
-**Cause**: Reading beyond available data.
+**原因**：读取超出了现有数据长度。
 
-**Solutions**:
+**解决方式**：
 
-1. **Ensure complete data transfer**:
+1. 确保传输的是完整数据：
 
 ```go
-// Wrong: Truncated data
+// 错误：数据被截断
 data := fullData[:100]
-f.Deserialize(data, &target)  // Error if data was larger
+f.Deserialize(data, &target)
 
-// Correct: Use full data
+// 正确：使用完整数据
 f.Deserialize(fullData, &target)
 ```
 
-2. **Check for data corruption**: Verify data integrity during transmission.
+2. 检查传输过程中是否出现数据损坏。
 
-### ErrKindInvalidRefId
+### `ErrKindInvalidRefId`：非法引用 ID
 
-**Error**: `invalid reference ID`
+**错误**：`invalid reference ID`
 
-**Cause**: Reference to non-existent object in serialized data.
+**原因**：序列化数据中引用了不存在或未知的对象。
 
-**Solutions**:
+**解决方式**：
 
-1. **Ensure reference tracking consistency**:
+1. 确保序列化端与反序列化端的引用跟踪配置一致：
 
 ```go
-// Serializer and deserializer must have same setting
 f1 := fory.New(fory.WithTrackRef(true))
-f2 := fory.New(fory.WithTrackRef(true))  // Must match!
+f2 := fory.New(fory.WithTrackRef(true)) // 必须一致
 ```
 
-2. **Check for data corruption**.
+2. 检查数据是否损坏。
 
-### ErrKindInvalidTag
+### `ErrKindInvalidTag`：非法 struct tag
 
-**Error**: `invalid fory struct tag`
+**错误**：`invalid fory struct tag`
 
-**Cause**: Invalid struct tag configuration.
+**原因**：结构体 tag 配置非法。
 
-**Common causes**:
+**常见成因**：
 
-1. **Invalid tag ID**: ID must be >= -1
+1. 非法 tag ID：ID 必须大于等于 `-1`
 
 ```go
-// Wrong: negative ID (other than -1)
+// 错误：非法负数 ID（-1 以外）
 type Bad struct {
     Field int `fory:"id=-5"`
 }
 
-// Correct
+// 正确
 type Good struct {
     Field int `fory:"id=0"`
 }
 ```
 
-2. **Duplicate tag IDs**: Each field must have a unique ID within the struct
+2. 重复 tag ID：同一结构体中的字段 ID 必须唯一
 
 ```go
-// Wrong: duplicate IDs
+// 错误：ID 冲突
 type Bad struct {
     Field1 int `fory:"id=0"`
-    Field2 int `fory:"id=0"`  // Duplicate!
+    Field2 int `fory:"id=0"`
 }
 
-// Correct
+// 正确
 type Good struct {
     Field1 int `fory:"id=0"`
     Field2 int `fory:"id=1"`
 }
 ```
 
-## Cross-Language Issues
+## 跨语言问题
 
-### Field Order Mismatch
+### 字段顺序不一致
 
-**Symptom**: Data deserializes but fields have wrong values.
+**现象**：能够反序列化，但字段值落到了错误的位置。
 
-**Cause**: Different field ordering between languages. In non-compatible mode, fields are sorted by their snake_case names. CamelCase field names (e.g., `FirstName`) are converted to snake_case (e.g., `first_name`) for sorting.
+**原因**：不同语言的字段排序规则不一致。非兼容模式下，字段会按 snake_case 名称排序。比如 `FirstName` 会先转换为 `first_name` 再参与排序。
 
-**Solutions**:
+**解决方式**：
 
-1. **Ensure converted snake_case names are consistent**: Field names across languages must produce the same snake_case ordering:
+1. 确保转换后的 snake_case 名称一致：
 
 ```go
 type User struct {
-    FirstName string  // Go: FirstName -> first_name
-    LastName  string  // Go: LastName -> last_name
-    // Sorted alphabetically by snake_case: first_name, last_name
+    FirstName string // Go: FirstName -> first_name
+    LastName  string // Go: LastName -> last_name
+    // 最终按 snake_case 的字典序排序：first_name, last_name
 }
 ```
 
-2. **Use field IDs for consistent ordering**: Field IDs (non-negative integers) act as aliases for field names, used for both sorting and field matching during deserialization:
+2. 使用字段 ID 保证顺序一致。字段 ID（非负整数）会同时参与排序和反序列化匹配：
 
 ```go
 type User struct {
@@ -270,99 +269,96 @@ type User struct {
 }
 ```
 
-Ensure the same field IDs are used across all languages for corresponding fields.
+对应字段在所有语言里都应使用相同的字段 ID。
 
-### Name Registration Mismatch
+### 名称注册不一致
 
-**Symptom**: `unknown type` in other languages.
+**现象**：其他语言反序列化时报 `unknown type`。
 
-**Solution**: Use identical names:
+**解决方式**：保证注册名称完全一致：
 
 ```go
 // Go
 f.RegisterNamedStruct(User{}, "example.User")
 
-// Java - must match exactly
+// Java，必须完全一致
 fory.register(User.class, "example.User");
 
 // Python
 fory.register(User, typename="example.User")
 ```
 
-## Performance Issues
+## 性能问题
 
-### Slow Serialization
+### 序列化速度慢
 
-**Possible causes**:
+**可能原因**：
 
-1. **Large object graphs**: Reduce data size or serialize incrementally.
-
-2. **Excessive reference tracking**: Disable if not needed:
+1. 对象图太大：减少数据规模或改为增量序列化。
+2. 引用跟踪过多：如果不需要，可以关闭。
 
 ```go
 f := fory.New(fory.WithTrackRef(false))
 ```
 
-3. **Deep nesting**: Flatten data structures where possible.
+3. 嵌套过深：尽量压平数据结构。
 
-### High Memory Usage
+### 内存占用高
 
-**Possible causes**:
+**可能原因**：
 
-1. **Large serialized data**: Process in chunks.
-
-2. **Reference tracking overhead**: Disable if not needed.
-
-3. **Buffer not released**: Reuse buffers:
+1. 单次序列化数据过大：改为分块处理。
+2. 引用跟踪有额外开销：若不需要可关闭。
+3. Buffer 没有被复用：可手动复用缓冲区。
 
 ```go
 buf := fory.NewByteBuffer(nil)
 f.SerializeTo(buf, value)
-// Process data
-buf.Reset()  // Reuse for next serialization
+// 处理数据
+buf.Reset() // 为下一次序列化复用
 ```
 
-### Thread Contention
+### 线程争用
 
-**Symptom**: Slowdown under concurrent load.
+**现象**：并发压力下出现明显变慢。
 
-**Solutions**:
+**解决方式**：
 
-1. **Use per-goroutine instances** for hot paths:
+1. 热路径使用每 goroutine 一个实例：
 
 ```go
 func worker() {
-    f := fory.New()  // Each worker has own instance
+    f := fory.New() // 每个 worker 自己持有实例
     for task := range tasks {
         f.Serialize(task)
     }
 }
 ```
 
-2. **Profile pool usage** with thread-safe wrapper.
+2. 配合线程安全封装做性能分析，观察对象池使用情况。
 
-## Debugging Techniques
+## 调试技巧
 
-### Enable Debug Output
+### 启用调试输出
 
-Set environment variable:
+设置环境变量：
 
 ```bash
 ENABLE_FORY_DEBUG_OUTPUT=1 go test ./...
 ```
 
-### Inspect Serialized Data
+### 检查序列化结果
 
 ```go
 data, _ := f.Serialize(value)
 fmt.Printf("Serialized %d bytes\n", len(data))
-fmt.Printf("Header: %x\n", data[:4])  // Magic + flags
+fmt.Printf("Header: %x\n", data[:4]) // Magic + flags
 ```
 
-### Check Type Registration
+### 检查类型注册
 
 ```go
-// Verify type is registered
+// 验证类型是否注册成功
 f := fory.New()
 err := f.RegisterStruct(User{}, 1)
 if err != nil {
@@ -370,12 +366,12 @@ if err != nil {
 }
 ```
 
-### Compare Struct Hashes
+### 对比结构体 hash
 
-If getting hash mismatch, compare struct definitions:
+如果遇到 hash mismatch，可以先打印结构体定义做对比：
 
 ```go
-// Print struct info for debugging
+// 打印结构体字段信息用于调试
 t := reflect.TypeOf(User{})
 for i := 0; i < t.NumField(); i++ {
     f := t.Field(i)
@@ -383,9 +379,9 @@ for i := 0; i < t.NumField(); i++ {
 }
 ```
 
-## Testing Tips
+## 测试建议
 
-### Test Round-Trip
+### 往返测试
 
 ```go
 func TestRoundTrip(t *testing.T) {
@@ -406,14 +402,14 @@ func TestRoundTrip(t *testing.T) {
 }
 ```
 
-### Test Cross-Language
+### 跨语言测试
 
 ```bash
 cd java/fory-core
 FORY_GO_JAVA_CI=1 mvn test -Dtest=org.apache.fory.xlang.GoXlangTest
 ```
 
-### Test Schema Evolution
+### Schema 演进测试
 
 ```go
 func TestSchemaEvolution(t *testing.T) {
@@ -431,18 +427,18 @@ func TestSchemaEvolution(t *testing.T) {
 }
 ```
 
-## Getting Help
+## 获取帮助
 
-If you encounter issues not covered here:
+如果问题不在本文覆盖范围内：
 
-1. **Check GitHub Issues**: [github.com/apache/fory/issues](https://github.com/apache/fory/issues)
-2. **Enable debug output**: `ENABLE_FORY_DEBUG_OUTPUT=1`
-3. **Create minimal reproduction**: Isolate the problem
-4. **Report the issue**: Include Go version, Fory version, and minimal code
+1. 先查看 [GitHub Issues](https://github.com/apache/fory/issues)。
+2. 开启调试输出：`ENABLE_FORY_DEBUG_OUTPUT=1`。
+3. 尽量构造最小复现用例。
+4. 提交 issue 时附带 Go 版本、Fory 版本和最小复现代码。
 
 ## 相关主题
 
-- [Configuration](configuration.md)
-- [Cross-Language Serialization](cross-language.md)
-- [Schema Evolution](schema-evolution.md)
-- [Thread Safety](thread-safety.md)
+- [配置](configuration.md)
+- [跨语言序列化](cross-language.md)
+- [Schema 演进](schema-evolution.md)
+- [线程安全](thread-safety.md)

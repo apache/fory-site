@@ -116,7 +116,7 @@ union Wrapper {
 
 对于 `package addressbook`，Java 输出通常位于：
 
-- `<java_out>/addressbook/`
+- Java 输出目录：`<java_out>/addressbook/`
 - 类型文件：`AddressBook.java`、`Person.java`、`Dog.java`、`Cat.java`、`Animal.java`
 - 注册辅助类：`AddressbookForyRegistration.java`
 
@@ -230,7 +230,7 @@ Person restored = Person.fromBytes(data);
 
 Python 每个 schema 文件生成一个模块，例如：
 
-- `<python_out>/addressbook.py`
+- Python 输出文件：`<python_out>/addressbook.py`
 
 ### 类型生成
 
@@ -329,7 +329,7 @@ restored = Person.from_bytes(data)
 
 Rust 每个 schema 生成一个模块文件，例如：
 
-- `<rust_out>/addressbook.rs`
+- Rust 输出文件：`<rust_out>/addressbook.rs`
 
 ### 类型生成
 
@@ -435,7 +435,7 @@ let restored = Person::from_bytes(&bytes)?;
 
 C++ 每个 schema 文件生成一个头文件，例如：
 
-- `<cpp_out>/addressbook.h`
+- C++ 输出文件：`<cpp_out>/addressbook.h`
 
 ### 类型生成
 

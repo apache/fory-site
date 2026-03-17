@@ -362,7 +362,7 @@ generated/
 </build>
 ```
 
-### Gradle (Java/Kotlin)
+### Gradle 构建（Java/Kotlin）
 
 在 `build.gradle` 中添加：
 
@@ -384,7 +384,7 @@ sourceSets {
 }
 ```
 
-### Python (setuptools)
+### Python 构建（setuptools）
 
 在 `setup.py` 或 `pyproject.toml` 中加入生成步骤：
 
@@ -409,7 +409,7 @@ setup(
 )
 ```
 
-### Go (`go generate`)
+### Go 构建（`go generate`）
 
 在 Go 文件中添加：
 
@@ -595,7 +595,7 @@ message User [id=100] {
 
 ## 故障排查
 
-### Command Not Found
+### 找不到命令
 
 ```
 foryc: command not found
@@ -609,7 +609,7 @@ pip install -e ./compiler
 export PATH=$PATH:~/.local/bin
 ```
 
-### Permission Denied
+### 权限不足
 
 ```
 Permission denied: ./generated

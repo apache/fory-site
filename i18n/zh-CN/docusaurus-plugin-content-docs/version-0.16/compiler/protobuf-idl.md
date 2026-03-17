@@ -64,7 +64,7 @@ Fory 的 gRPC 支持仍在持续开发中。当前生产级 gRPC 工作流里，
 
 ### Package 与文件级选项
 
-**Protocol Buffers**
+**协议缓冲（Protocol Buffers / Protobuf）**
 
 ```protobuf
 syntax = "proto3";
@@ -83,7 +83,7 @@ Fory 使用统一 package 命名空间做跨语言注册。语言特定的包路
 
 ### Message 与 Enum 定义
 
-**Protocol Buffers**
+**协议缓冲（Protocol Buffers / Protobuf）**
 
 ```protobuf
 message User {
@@ -129,7 +129,7 @@ enum Status [id=102] {
 
 protobuf 的 `oneof` 会被翻译为嵌套 Fory `union`，并增加一个可选字段指向该 union。
 
-**Protocol Buffers**
+**协议缓冲（Protocol Buffers / Protobuf）**
 
 ```protobuf
 message Event {
@@ -161,9 +161,9 @@ message Event {
 
 支持 protobuf import。常见 well-known types 会直接映射：
 
-- `google.protobuf.Timestamp` -> `timestamp`
-- `google.protobuf.Duration` -> `duration`
-- `google.protobuf.Any` -> `any`
+- `google.protobuf.Timestamp` -> `timestamp` 类型
+- `google.protobuf.Duration` -> `duration` 类型
+- `google.protobuf.Any` -> `any` 类型
 
 ## 类型映射要点
 

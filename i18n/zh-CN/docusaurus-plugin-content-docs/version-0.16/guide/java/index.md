@@ -134,7 +134,7 @@ public class Example {
 
 Fory 提供多种线程安全序列化选项：
 
-### ThreadLocalFory
+### ThreadLocalFory：线程本地实例
 
 使用线程本地存储为每个线程维护独立的 Fory 实例：
 
@@ -149,7 +149,7 @@ byte[] bytes = fory.serialize(object);
 System.out.println(fory.deserialize(bytes));
 ```
 
-### ThreadSafeForyPool
+### ThreadSafeForyPool：线程安全对象池
 
 对于虚拟线程或不适合使用线程本地存储的环境，使用 `buildThreadSafeForyPool`：
 

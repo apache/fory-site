@@ -75,10 +75,10 @@
 
 ![Samplelist Benchmark](benchmark_samplelist.png)
 
-### Mediacontent
+### `MediaContent` 基准
 
 ![Mediacontent Benchmark](benchmark_mediacontent.png)
 
-### Mediacontentlist
+### `MediaContentList` 基准
 
 ![Mediacontentlist Benchmark](benchmark_mediacontentlist.png)

@@ -81,10 +81,10 @@ struct MyStruct {
 
 使用调试钩子编译后，调用这些函数以插入自定义回调：
 
-- `set_before_write_field_func`
-- `set_after_write_field_func`
-- `set_before_read_field_func`
-- `set_after_read_field_func`
+- 写字段前钩子：`set_before_write_field_func`
+- 写字段后钩子：`set_after_write_field_func`
+- 读字段前钩子：`set_before_read_field_func`
+- 读字段后钩子：`set_after_read_field_func`
 
 当你想要恢复默认值时，使用 `reset_struct_debug_hooks()`。
 
@@ -143,9 +143,9 @@ cargo test --features tests
 
 优先使用 `fory_core::error::Error` 上的静态构造函数：
 
-- `Error::type_mismatch`
-- `Error::invalid_data`
-- `Error::unknown`
+- 类型不匹配错误：`Error::type_mismatch`
+- 非法数据错误：`Error::invalid_data`
+- 未知错误：`Error::unknown`
 
 这样可以保持诊断的一致性，并使选择性 panic 正确工作。
 

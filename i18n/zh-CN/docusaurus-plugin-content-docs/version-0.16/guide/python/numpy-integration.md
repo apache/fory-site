@@ -45,7 +45,7 @@ result = f.deserialize(data)
 assert np.array_equal(arrays['matrix'], result['matrix'])
 ```
 
-## Pandas DataFrame
+## Pandas DataFrame 数据帧
 
 Fory 可以高效序列化 Pandas DataFrame：
 

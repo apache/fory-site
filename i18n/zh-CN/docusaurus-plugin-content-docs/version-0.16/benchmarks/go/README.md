@@ -5,7 +5,7 @@
 ## 系统信息
 
 - **OS**: Darwin 24.6.0
-- **Architecture**: arm64
+- **架构**：arm64
 - **Python**: 3.10.8
 
 ## 性能图表

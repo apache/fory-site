@@ -27,7 +27,7 @@ python benchmark_report.py --log-file cargo_bench.log --output-dir=report_output
 
 ![Company](company.png)
 
-**ecommerce_data**
+**ecommerce_data 数据集**
 
 ![Ecommerce Data](ecommerce_data.png)
 
@@ -43,7 +43,7 @@ python benchmark_report.py --log-file cargo_bench.log --output-dir=report_output
 
 ![Simple Map](simple_map.png)
 
-**simple_struct**
+**simple_struct 数据集**
 
 ![Simple Struct](simple_struct.png)
 

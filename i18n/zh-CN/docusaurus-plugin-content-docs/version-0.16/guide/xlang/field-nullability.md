@@ -23,69 +23,69 @@ license: |
 
 ## 默认行为
 
-In xlang mode, **fields are non-nullable by default**. This means:
+在 xlang 模式下，**字段默认都是不可空的**。这意味着：
 
-- Values must always be present (non-null)
-- No null flag byte is written for the field
-- Serialization is more compact
+- 字段值必须始终存在，不能为 null
+- 不会为该字段额外写入 null 标记字节
+- 序列化结果更紧凑
 
-The following types are nullable by default:
+以下类型默认是可空的：
 
-- `Optional<T>` (Java, C++)
-- Java boxed types (`Integer`, `Long`, `Double`, etc.)
-- Go pointer types (`*int32`, `*string`, etc.)
+- Java 和 C++ 可空包装类型：`Optional<T>`
+- Java 装箱类型（`Integer`、`Long`、`Double` 等）
+- Go 指针类型（`*int32`、`*string` 等）
 - Rust `Option<T>`
-- Python `Optional[T]`
+- Python 类型提示：`Optional[T]`
 
-| Field Type                                 | Default Nullable | Null Flag Written |
-| ------------------------------------------ | ---------------- | ----------------- |
-| Primitives (`int`, `bool`, `float`, etc.)  | No               | No                |
-| `String`                                   | No               | No                |
-| `List<T>`, `Map<K,V>`, `Set<T>`            | No               | No                |
-| Custom structs                             | No               | No                |
-| Enums                                      | No               | No                |
-| Java boxed types (`Integer`, `Long`, etc.) | Yes              | Yes               |
-| Go pointer types (`*int32`, `*string`)     | Yes              | Yes               |
-| `Optional<T>` / `Option<T>`                | Yes              | Yes               |
+| 字段类型 | 默认可空 | 是否写入 null 标记 |
+| --- | --- | --- |
+| 基础类型（`int`、`bool`、`float` 等） | 否 | 否 |
+| `String` | 否 | 否 |
+| `List<T>`、`Map<K,V>`、`Set<T>` | 否 | 否 |
+| 自定义结构体 | 否 | 否 |
+| 枚举 | 否 | 否 |
+| Java 装箱类型（`Integer`、`Long` 等） | 是 | 是 |
+| Go 指针类型（`*int32`、`*string`） | 是 | 是 |
+| `Optional<T>` / `Option<T>` | 是 | 是 |
 
-## 线格式
+## 编码格式
 
-The nullable flag controls whether a **null flag byte** is written before the field value:
+字段是否可空决定了值前面是否需要写入 **null 标记字节**：
 
+```text
+不可空字段: [value data]
+可空字段:   [null_flag] [value data if not null]
 ```
-Non-nullable field: [value data]
-Nullable field:     [null_flag] [value data if not null]
-```
 
-Where `null_flag` is:
+其中 `null_flag` 的含义如下：
 
-- `-1` (NULL_FLAG): Value is null
-- `-2` (NOT_NULL_VALUE_FLAG): Value is present
+- `-1`（`NULL_FLAG`）：值为 null
+- `-2`（`NOT_NULL_VALUE_FLAG`）：值存在
 
 ## 可空性与引用跟踪
 
-These are related but distinct concepts:
+这两个概念相关，但并不相同：
 
-| Concept                | Purpose                              | Flag Values                                 |
-| ---------------------- | ------------------------------------ | ------------------------------------------- |
-| **Nullable**           | Allow null values for a field        | `-1` (null), `-2` (not null)                |
-| **Reference Tracking** | Deduplicate shared object references | `-1` (null), `-2` (not null), `≥0` (ref ID) |
+| 概念 | 目的 | 标记值 |
+| --- | --- | --- |
+| **可空性** | 允许字段值为 null | `-1`（null）、`-2`（非 null） |
+| **引用跟踪** | 对共享引用做去重 | `-1`（null）、`-2`（非 null）、`≥0`（引用 ID） |
 
-Key differences:
+关键区别：
 
-- **Nullable only**: Writes `-1` or `-2` flag, no reference deduplication
-- **Reference tracking**: Extends nullable semantics with reference IDs (`≥0`) for previously seen objects
-- Both use the same flag byte position—ref tracking is a superset of nullable
+- **仅可空**：只会写入 `-1` 或 `-2`，不会去重共享引用。
+- **引用跟踪**：在可空语义之上增加引用 ID（`≥0`），用于表示已出现过的对象。
+- 二者占用的是同一个标记字节位置，引用跟踪可以理解为可空机制的超集。
 
-When `refTracking=true`, the null flag byte doubles as a ref flag:
+当 `refTracking=true` 时，这个标记字节会同时承担引用标记的职责：
 
+```text
+ref_flag = -1  -> null 值
+ref_flag = -2  -> 新对象（第一次出现）
+ref_flag >= 0  -> 指向索引为 ref_flag 的已序列化对象
 ```
-ref_flag = -1  → null value
-ref_flag = -2  → new object (first occurrence)
-ref_flag >= 0  → reference to object at index ref_flag
-```
 
-For detailed reference tracking behavior, see [Reference Tracking](field-reference-tracking.md).
+更详细的引用跟踪行为可参考 [Reference Tracking](field-reference-tracking.md)。
 
 ## 各语言示例
 
@@ -93,17 +93,17 @@ For detailed reference tracking behavior, see [Reference Tracking](field-referen
 
 ```java
 public class Person {
-    // Non-nullable by default in xlang mode
-    String name;           // Must not be null
-    int age;              // Primitive, always non-nullable
-    List<String> tags;    // Must not be null
+    // xlang 模式下默认不可空
+    String name;        // 不能为 null
+    int age;            // 基础类型，始终不可空
+    List<String> tags;  // 不能为 null
 
-    // Explicitly nullable
+    // 显式声明为可空
     @ForyField(nullable = true)
-    String nickname;      // Can be null
+    String nickname;    // 可以为 null
 
-    // Optional wrapper - nullable by default
-    Optional<String> bio; // Can be empty/null
+    // Optional 包装类型默认可空
+    Optional<String> bio; // 可以为空
 }
 
 Fory fory = Fory.builder()
@@ -121,14 +121,14 @@ import pyfory
 
 @dataclass
 class Person:
-    # Non-nullable by default
-    name: str              # Must have a value
-    age: pyfory.int32      # Primitive
-    tags: List[str]        # Must not be None
+    # 默认不可空
+    name: str
+    age: pyfory.int32
+    tags: List[str]
 
-    # Optional makes it nullable
-    nickname: Optional[str] = None  # Can be None
-    bio: Optional[str] = None       # Can be None
+    # Optional 表示可空
+    nickname: Optional[str] = None
+    bio: Optional[str] = None
 
 fory = pyfory.Fory(xlang=True)
 fory.register_type(Person, typename="example.Person")
@@ -137,19 +137,18 @@ fory.register_type(Person, typename="example.Person")
 ### Rust
 
 ```rust
-use fory::Fory;
+use fory::{Fory, ForyObject};
 
-#[derive(Fory)]
-#[tag("example.Person")]
+#[derive(ForyObject)]
 struct Person {
-    // Non-nullable by default
+    // 默认不可空
     name: String,
     age: i32,
     tags: Vec<String>,
 
-    // Option<T> is nullable
-    nickname: Option<String>,  // Can be None
-    bio: Option<String>,       // Can be None
+    // Option<T> 默认可空
+    nickname: Option<String>,
+    bio: Option<String>,
 }
 ```
 
@@ -157,95 +156,95 @@ struct Person {
 
 ```go
 type Person struct {
-    // Non-nullable by default
+    // 默认不可空
     Name string
     Age  int32
     Tags []string
 
-    // Pointer types for nullable fields
-    Nickname *string  // Can be nil
-    Bio      *string  // Can be nil
+    // 指针类型可表示可空字段
+    Nickname *string
+    Bio      *string
 }
 
-fory := forygo.NewFory()
-fory.RegisterTagType("example.Person", Person{})
+fory := forygo.NewFory(forygo.WithXlang(true))
+fory.RegisterNamedStruct(Person{}, "example.Person")
 ```
 
 ### C++
 
 ```cpp
 struct Person {
-    // Non-nullable by default
+    // 默认不可空
     std::string name;
     int32_t age;
     std::vector<std::string> tags;
 
-    // std::optional for nullable
+    // 使用 std::optional 表示可空
     std::optional<std::string> nickname;
     std::optional<std::string> bio;
 };
 FORY_STRUCT(Person, name, age, tags, nickname, bio);
 ```
 
-## Customizing Nullability
+## 自定义可空性
 
-### Java: @ForyField Annotation
+### Java：`@ForyField` 注解
 
 ```java
 public class Config {
     @ForyField(nullable = true)
-    String optionalSetting;  // Explicitly nullable
+    String optionalSetting;  // 显式可空
 
     @ForyField(nullable = false)
-    String requiredSetting;  // Explicitly non-nullable (default)
+    String requiredSetting;  // 显式不可空（也是默认行为）
 }
 ```
 
-### C++: fory::field Wrapper
+### C++：`fory::field` 包装器
 
 ```cpp
 struct Config {
-    // Explicitly mark as nullable
+    // 显式声明为可空
     fory::field<std::string, 1, fory::nullable<true>> optional_setting;
 
-    // Explicitly mark as non-nullable (default)
+    // 显式声明为不可空
     fory::field<std::string, 2, fory::nullable<false>> required_setting;
 };
 FORY_STRUCT(Config, optional_setting, required_setting);
 ```
 
-## Null Value Handling
+## null 值处理
 
-When a non-nullable field receives a null value:
+当不可空字段收到 null 值时，各语言的表现通常如下：
 
-| Language | Behavior                                             |
-| -------- | ---------------------------------------------------- |
-| Java     | Throws `NullPointerException` or serialization error |
-| Python   | Raises `TypeError` or serialization error            |
-| Rust     | Compile-time error (non-Option types can't be None)  |
-| Go       | Zero value is used (empty string, 0, etc.)           |
-| C++      | Default-constructed value or undefined behavior      |
+| 语言 | 行为 |
+| --- | --- |
+| Java | 抛出 `NullPointerException` 或序列化错误 |
+| Python | 抛出 `TypeError` 或序列化错误 |
+| Rust | 编译期就不允许把 `None` 赋给非 `Option` 字段 |
+| Go | 使用零值（空字符串、0 等） |
+| C++ | 使用默认构造值，或出现未定义行为 |
 
-## Schema Compatibility
+## Schema 兼容性
 
-The nullable flag is part of the struct schema fingerprint. Changing a field's nullability is a **breaking change** that will cause schema version mismatch errors.
+可空标记是结构体 Schema 指纹的一部分。修改字段的可空性属于**破坏性变更**，会导致 Schema 版本不匹配。
 
+```text
+Schema A: { name: String (不可空) }
+Schema B: { name: String (可空) }
+// 两者的指纹不同，因此不兼容
 ```
-Schema A: { name: String (non-nullable) }
-Schema B: { name: String (nullable) }
-// These have different fingerprints and are incompatible
-```
 
-## Best Practices
+## 最佳实践
 
-1. **Use non-nullable by default**: Only make fields nullable when null is a valid semantic value
-2. **Use Optional/Option wrappers**: Instead of raw types with nullable annotation
-3. **Be consistent across languages**: Use the same nullability for corresponding fields
-4. **Document nullable fields**: Make it clear which fields can be null in your API
+1. 默认优先使用不可空字段，只在 null 具有明确语义时再声明为可空。
+2. 优先使用 `Optional<T>` / `Option<T>` 这类包装类型，而不是原始类型加注解。
+3. 跨语言字段要保持一致的可空语义。
+4. 在 API 或文档中明确说明哪些字段允许为 null。
 
-## See Also
+## 相关主题
 
-- [Reference Tracking](field-reference-tracking.md) - Shared and circular reference handling
-- [Serialization](serialization.md) - Basic cross-language serialization
-- [Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping) - Cross-language type mapping reference
-- [Xlang Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) - Binary protocol details
+- [Reference Tracking](field-reference-tracking.md) - 共享引用与循环引用处理
+- [Serialization](serialization.md) - 跨语言序列化基础
+- [Type Mapping](../../specification/xlang_type_mapping.md) - 跨语言类型映射
+- [Xlang Specification](../../specification/xlang_serialization_spec.md) - 二进制协议细节

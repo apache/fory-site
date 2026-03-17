@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-## GraalVM Native Image
+## GraalVM Native Image 支持
 
 GraalVM `native image` 提前将 Java 代码编译为本地可执行文件，从而实现更快的启动速度和更低的内存使用。但是，本地镜像不支持运行时 JIT 编译或反射，除非进行显式配置。
 
@@ -181,7 +181,7 @@ public class ThreadSafeExample {
 
 ## 故障排除
 
-### "Type is instantiated reflectively but was never registered"
+### `"Type is instantiated reflectively but was never registered"` 报错
 
 如果您看到此错误：
 

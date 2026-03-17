@@ -119,7 +119,7 @@ assert_eq!(value, decoded);
 
 Compatible 模式通过变体类型编码（2 位）实现强大的 schema 演化：
 
-- `0b0` = Unit，`0b1` = Unnamed，`0b10` = Named
+- 变体编码：`0b0` = Unit，`0b1` = Unnamed，`0b10` = Named
 
 ```rust
 use fory::{Fory, ForyObject};

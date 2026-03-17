@@ -66,9 +66,9 @@ let fory = Fory::default().max_dyn_depth(10); // 允许最多 10 层
 
 **受保护的类型：**
 
-- `Box<dyn Any>`、`Rc<dyn Any>`、`Arc<dyn Any>`
+- 动态 Any 容器：`Box<dyn Any>`、`Rc<dyn Any>`、`Arc<dyn Any>`
 - `Box<dyn Trait>`、`Rc<dyn Trait>`、`Arc<dyn Trait>`（trait 对象）
-- `RcWeak<T>`、`ArcWeak<T>`
+- 弱引用类型：`RcWeak<T>`、`ArcWeak<T>`
 - 集合类型（Vec、HashMap、HashSet）
 - Compatible 模式下的嵌套结构体类型
 

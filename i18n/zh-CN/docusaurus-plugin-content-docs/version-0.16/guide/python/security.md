@@ -71,11 +71,11 @@ else:
         fory.register(model_class, type_id=100 + idx)
 ```
 
-## DeserializationPolicy
+## DeserializationPolicy 反序列化策略
 
 当需要 `strict=False` 时（例如，反序列化函数/lambda），使用 `DeserializationPolicy` 在反序列化期间实现细粒度的安全控制。
 
-**为什么使用 DeserializationPolicy？**
+**为什么使用 DeserializationPolicy 反序列化策略？**
 
 - 阻止危险的类/模块（例如，`subprocess.Popen`）
 - 在调用前拦截和验证 `__reduce__` 可调用对象

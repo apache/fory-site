@@ -26,13 +26,13 @@ python benchmark_report.py --json-file build/benchmark_results.json --output-dir
 
 ## 基准图表
 
-### Mediacontent
+### Mediacontent 基准
 
 <p align="center">
 <img src="mediacontent.png" width="90%" />
 </p>
 
-### Mediacontentlist
+### Mediacontentlist 基准
 
 <p align="center">
 <img src="mediacontentlist.png" width="90%" />

@@ -89,7 +89,7 @@ auto fory = Fory::builder()
 
 **默认值：** `true`
 
-### compatible(bool)
+### compatible(bool)：兼容模式
 
 启用/禁用用于 schema 演化的兼容模式。
 
@@ -103,7 +103,7 @@ auto fory = Fory::builder()
 
 **默认值：** `false`
 
-### track_ref(bool)
+### track_ref(bool)：引用跟踪
 
 启用/禁用共享引用和循环引用的引用跟踪。
 
@@ -117,7 +117,7 @@ auto fory = Fory::builder()
 
 **默认值：** `true`
 
-### max_dyn_depth(uint32_t)
+### max_dyn_depth(uint32_t)：动态嵌套深度
 
 设置动态类型对象的最大允许嵌套深度。
 
@@ -136,7 +136,7 @@ auto fory = Fory::builder()
 - **增加**：对于合法的深度嵌套数据结构
 - **减少**：对于更严格的安全要求或浅层数据结构
 
-### check_struct_version(bool)
+### check_struct_version(bool)：检查结构体版本
 
 启用/禁用结构体版本检查。
 

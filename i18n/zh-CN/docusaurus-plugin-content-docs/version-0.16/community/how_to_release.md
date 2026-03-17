@@ -19,7 +19,7 @@ id: how_to_release
 此发布过程在 Ubuntu 系统中运行，需要以下几个环境依赖：
 
 - JDK 1.8+
-- Apache Maven 3.x+
+- Apache Maven 3.x+ 版本
 - Python 3.8
 - GnuPG 2.x
 - Git

@@ -114,7 +114,7 @@ public class DeserializeIntoType {
 
 ## 常见错误消息
 
-### "Class not registered"
+### `"Class not registered"` 报错
 
 **原因**：需要类注册，但类未注册。
 
@@ -126,7 +126,7 @@ fory.register(MyClass.class);
 fory.register(MyClass.class, 100);
 ```
 
-### "ClassNotCompatibleException"
+### `"ClassNotCompatibleException"` 报错
 
 **原因**：序列化和反序列化之间的类 schema 不同。
 
@@ -138,7 +138,7 @@ Fory fory = Fory.builder()
   .build();
 ```
 
-### "Max depth exceeded"
+### `"Max depth exceeded"` 报错
 
 **原因**：对象图太深，可能表示循环引用攻击。
 
@@ -150,7 +150,7 @@ Fory fory = Fory.builder()
   .build();
 ```
 
-### "Serializer not found"
+### `"Serializer not found"` 报错
 
 **原因**：未为该类型注册序列化器。
 

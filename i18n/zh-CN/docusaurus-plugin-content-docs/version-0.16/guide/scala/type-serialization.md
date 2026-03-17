@@ -113,7 +113,7 @@ fory.register(classOf[Color])
 println(fory.deserialize(fory.serialize(Color.Green)))
 ```
 
-### Scala 2 Enumeration
+### Scala 2 枚举类型（Enumeration）
 
 ```scala
 object ColorEnum extends Enumeration {

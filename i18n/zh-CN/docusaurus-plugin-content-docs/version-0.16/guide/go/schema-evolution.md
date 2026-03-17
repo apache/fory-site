@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-Schema 演进允许数据结构在演进过程中仍与历史序列化数据保持兼容。Fory Go 通过兼容模式提供该能力。
+Schema 演进允许数据结构变化后仍然能与历史序列化数据兼容。Fory Go 通过兼容模式提供这一能力。
 
 ## 启用兼容模式
 
-Enable compatible mode when creating a Fory instance:
+创建 `Fory` 实例时开启兼容模式：
 
 ```go
 f := fory.New(fory.WithCompatible(true))
@@ -31,181 +31,181 @@ f := fory.New(fory.WithCompatible(true))
 
 ## 工作机制
 
-### Without Compatible Mode (Default)
+### 不启用兼容模式（默认）
 
-- Compact serialization without metadata
-- Struct hash is checked during deserialization
-- Any schema change causes `ErrKindHashMismatch`
+- 使用更紧凑的序列化格式，不写入额外元信息
+- 反序列化时会校验结构体 hash
+- 任何 Schema 变化都可能触发 `ErrKindHashMismatch`
 
-### With Compatible Mode
+### 启用兼容模式
 
-- Type metadata is written to serialized data
-- Supports adding, removing, and reordering fields
-- Enables forward and backward compatibility
+- 会将类型元信息写入序列化结果
+- 支持新增、删除、重排字段
+- 同时支持前向和后向兼容
 
 ## 支持的 Schema 变更
 
 ### 新增字段
 
-New fields can be added; they receive zero values when deserializing old data:
+可以新增字段。旧数据反序列化到新结构体时，新字段会得到零值：
 
 ```go
-// Version 1
+// 版本 1
 type UserV1 struct {
     ID   int64
     Name string
 }
 
-// Version 2 (added Email)
+// 版本 2（新增 Email）
 type UserV2 struct {
     ID    int64
     Name  string
-    Email string  // New field
+    Email string // 新字段
 }
 
 f := fory.New(fory.WithCompatible(true))
 f.RegisterStruct(UserV1{}, 1)
 
-// Serialize with V1
+// 用 V1 序列化
 userV1 := &UserV1{ID: 1, Name: "Alice"}
 data, _ := f.Serialize(userV1)
 
-// Deserialize with V2
+// 用 V2 反序列化
 f2 := fory.New(fory.WithCompatible(true))
 f2.RegisterStruct(UserV2{}, 1)
 
 var userV2 UserV2
 f2.Deserialize(data, &userV2)
-// userV2.Email = "" (zero value)
+// userV2.Email == ""（零值）
 ```
 
 ### 删除字段
 
-Removed fields are skipped during deserialization:
+删除字段后，反序列化会自动跳过旧数据中对应的内容：
 
 ```go
-// Version 1
+// 版本 1
 type ConfigV1 struct {
-    Host     string
-    Port     int32
-    Timeout  int64
-    Debug    bool  // Will be removed
+    Host    string
+    Port    int32
+    Timeout int64
+    Debug   bool // 之后会被删除
 }
 
-// Version 2 (removed Debug)
+// 版本 2（删除 Debug）
 type ConfigV2 struct {
     Host    string
     Port    int32
     Timeout int64
-    // Debug field removed
+    // Debug 字段已删除
 }
 
 f := fory.New(fory.WithCompatible(true))
 f.RegisterStruct(ConfigV1{}, 1)
 
-// Serialize with V1
+// 用 V1 序列化
 config := &ConfigV1{Host: "localhost", Port: 8080, Timeout: 30, Debug: true}
 data, _ := f.Serialize(config)
 
-// Deserialize with V2
+// 用 V2 反序列化
 f2 := fory.New(fory.WithCompatible(true))
 f2.RegisterStruct(ConfigV2{}, 1)
 
 var configV2 ConfigV2
 f2.Deserialize(data, &configV2)
-// Debug field data is skipped
+// Debug 对应的数据会被跳过
 ```
 
 ### 字段重排
 
-Field order can change between versions:
+字段顺序可以在版本之间变化：
 
 ```go
-// Version 1
+// 版本 1
 type PersonV1 struct {
     FirstName string
     LastName  string
     Age       int32
 }
 
-// Version 2 (reordered)
+// 版本 2（字段顺序调整）
 type PersonV2 struct {
-    Age       int32   // Moved up
+    Age       int32  // 提前
     LastName  string
-    FirstName string  // Moved down
+    FirstName string // 后移
 }
 ```
 
-Compatible mode handles this automatically by matching fields by name.
+兼容模式会按字段名匹配，因此这类变化可自动处理。
 
-## Incompatible Changes
+## 不兼容的变更
 
-Some changes are NOT supported, even in compatible mode:
+即使开启兼容模式，以下变化依然不受支持。
 
-### Type Changes
+### 字段类型变化
 
 ```go
-// NOT SUPPORTED
+// 不支持
 type V1 struct {
-    Value int32  // int32
+    Value int32
 }
 
 type V2 struct {
-    Value string  // Changed to string - INCOMPATIBLE
+    Value string // 从 int32 改为 string，不兼容
 }
 ```
 
-### Renaming Fields
+### 字段重命名
 
 ```go
-// NOT SUPPORTED (treated as remove + add)
+// 不支持，会被视为“删除旧字段 + 新增新字段”
 type V1 struct {
     UserName string
 }
 
 type V2 struct {
-    Username string  // Different name - NOT a rename
+    Username string // 名称不同，不会被当作重命名
 }
 ```
 
-This is treated as removing `UserName` and adding `Username`, resulting in data loss.
+这会被解释为删除 `UserName` 并新增 `Username`，因此旧数据无法自动迁移到新字段。
 
 ## 最佳实践
 
-### 1. Use Compatible Mode for Persistent Data
+### 1. 持久化数据默认开启兼容模式
 
 ```go
-// For data stored in databases, files, or caches
+// 用于数据库、文件、缓存等持久化场景
 f := fory.New(fory.WithCompatible(true))
 ```
 
-### 2. Provide Default Values
+### 2. 为新增字段提供默认值
 
 ```go
 type ConfigV2 struct {
     Host    string
     Port    int32
     Timeout int64
-    Retries int32  // New field
+    Retries int32 // 新字段
 }
 
 func NewConfigV2() *ConfigV2 {
     return &ConfigV2{
-        Retries: 3,  // Default value
+        Retries: 3, // 默认值
     }
 }
 
-// After deserialize, apply defaults
+// 反序列化后补齐默认值
 if config.Retries == 0 {
     config.Retries = 3
 }
 ```
 
-## Cross-Language Schema Evolution
+## 跨语言 Schema 演进
 
-Schema evolution works across languages:
+Schema 演进同样适用于跨语言场景。
 
-### Go (Producer)
+### Go（生产者）
 
 ```go
 type MessageV1 struct {
@@ -218,13 +218,13 @@ f.RegisterStruct(MessageV1{}, 1)
 data, _ := f.Serialize(&MessageV1{ID: 1, Content: "Hello"})
 ```
 
-### Java (Consumer with newer schema)
+### Java（使用更新 Schema 的消费者）
 
 ```java
 public class Message {
     long id;
     String content;
-    String author;  // New field in Java
+    String author; // Java 侧新增字段
 }
 
 Fory fory = Fory.builder()
@@ -233,55 +233,55 @@ Fory fory = Fory.builder()
     .build();
 fory.register(Message.class, 1);
 Message msg = fory.deserialize(data, Message.class);
-// msg.author will be null
+// msg.author 会是 null
 ```
 
-## Performance Considerations
+## 性能考量
 
-Compatible mode mainly affects serialized size:
+兼容模式主要影响序列化后的体积：
 
-| Aspect             | Schema Consistent | Compatible Mode                                          |
-| ------------------ | ----------------- | -------------------------------------------------------- |
-| Serialized Size    | Smaller           | Larger (includes metadata, especially without field IDs) |
-| Speed              | Fast              | Similar (metadata is just memcpy)                        |
-| Schema Flexibility | None              | Full                                                     |
+| 方面 | Schema 一致模式 | 兼容模式 |
+| --- | --- | --- |
+| 序列化大小 | 更小 | 更大（会携带元信息，未使用字段 ID 时尤其明显） |
+| 速度 | 很快 | 接近一致（元信息处理基本是 memcpy） |
+| Schema 灵活性 | 无 | 完整支持 |
 
-**Note**: Using field IDs (`fory:"id=N"`) reduces metadata size in compatible mode.
+注意：使用字段 ID（`fory:"id=N"`）可以显著降低兼容模式下的元信息开销。
 
-**Recommendation**: Use compatible mode for:
+建议在以下场景使用兼容模式：
 
-- Persistent storage
-- Cross-service communication
-- Long-lived caches
+- 持久化存储
+- 服务间通信
+- 生命周期较长的缓存
 
-Use schema consistent mode for:
+以下场景可以继续使用 Schema 一致模式：
 
-- In-memory operations
-- Same-version communication
-- Minimum serialized size
+- 纯内存内操作
+- 同版本之间的通信
+- 追求最小序列化体积
 
-## Error Handling
+## 错误处理
 
-### Hash Mismatch (Schema Consistent Mode)
+### Hash 不匹配（Schema 一致模式）
 
 ```go
-f := fory.New()  // Compatible mode disabled
+f := fory.New() // 兼容模式关闭
 
-// Schema changed without compatible mode
+// Schema 已变化，但仍用一致模式读取旧数据
 err := f.Deserialize(oldData, &newStruct)
-// Error: ErrKindHashMismatch
+// 错误：ErrKindHashMismatch
 ```
 
-### Unknown Fields
+### 未知字段
 
-In compatible mode, unknown fields are skipped silently. To detect them:
+在兼容模式下，未知字段会被自动跳过。如果你想检测它们：
 
 ```go
-// Currently, Fory skips unknown fields automatically
-// No explicit API for detecting unknown fields
+// 当前 Fory 会自动跳过未知字段
+// 暂无显式 API 用于枚举这些字段
 ```
 
-## Complete Example
+## 完整示例
 
 ```go
 package main
@@ -291,24 +291,24 @@ import (
     "github.com/apache/fory/go/fory"
 )
 
-// V1: Initial schema
+// V1：初始 Schema
 type ProductV1 struct {
     ID    int64
     Name  string
     Price float64
 }
 
-// V2: Added fields
+// V2：新增字段
 type ProductV2 struct {
     ID          int64
     Name        string
     Price       float64
-    Description string  // New
-    InStock     bool    // New
+    Description string // 新增
+    InStock     bool   // 新增
 }
 
 func main() {
-    // Serialize with V1
+    // 用 V1 序列化
     f1 := fory.New(fory.WithCompatible(true))
     f1.RegisterStruct(ProductV1{}, 1)
 
@@ -316,7 +316,7 @@ func main() {
     data, _ := f1.Serialize(product)
     fmt.Printf("V1 serialized: %d bytes\n", len(data))
 
-    // Deserialize with V2
+    // 用 V2 反序列化
     f2 := fory.New(fory.WithCompatible(true))
     f2.RegisterStruct(ProductV2{}, 1)
 
@@ -328,13 +328,13 @@ func main() {
     fmt.Printf("ID: %d\n", productV2.ID)
     fmt.Printf("Name: %s\n", productV2.Name)
     fmt.Printf("Price: %.2f\n", productV2.Price)
-    fmt.Printf("Description: %q (zero value)\n", productV2.Description)
-    fmt.Printf("InStock: %v (zero value)\n", productV2.InStock)
+    fmt.Printf("Description: %q（零值）\n", productV2.Description)
+    fmt.Printf("InStock: %v（零值）\n", productV2.InStock)
 }
 ```
 
 ## 相关主题
 
-- [Configuration](configuration.md)
-- [Cross-Language Serialization](cross-language.md)
-- [Troubleshooting](troubleshooting.md)
+- [配置](configuration.md)
+- [跨语言序列化](cross-language.md)
+- [故障排查](troubleshooting.md)

@@ -129,7 +129,7 @@ auto decoded = fory.deserialize<std::optional<int32_t>>(bytes).value();
 assert(decoded.has_value() && *decoded == 42);
 ```
 
-### std::shared_ptr
+### std::shared_ptr：共享指针
 
 带引用跟踪的共享所有权：
 
@@ -146,7 +146,7 @@ auto decoded = fory.deserialize<std::shared_ptr<Person>>(bytes).value();
 - 对同一对象的引用被保留
 - 循环引用自动处理
 
-### std::unique_ptr
+### std::unique_ptr：独占指针
 
 独占所有权：
 
@@ -173,7 +173,7 @@ auto decoded = fory.deserialize<MyVariant>(bytes).value();
 assert(std::get<int32_t>(decoded) == 42);
 ```
 
-### std::monostate
+### std::monostate：空状态占位
 
 空 variant 替代：
 
@@ -188,7 +188,7 @@ OptionalInt value = 42;
 
 ### Duration
 
-`std::chrono::nanoseconds`：
+`std::chrono::nanoseconds` 类型：
 
 ```cpp
 using Duration = std::chrono::nanoseconds;

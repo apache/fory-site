@@ -110,7 +110,7 @@ assert_eq!(prefs.values().get(0), "en");
 | 内存使用     | 内存中的完整对象图 | 仅已访问字段在内存中 |
 | 适用于       | 小对象，完整访问   | 大对象，选择性访问   |
 
-## ForyRow vs ForyObject
+## ForyRow 与 ForyObject 对比
 
 | 功能     | `#[derive(ForyRow)]` | `#[derive(ForyObject)]` |
 | -------- | -------------------- | ----------------------- |

@@ -65,7 +65,7 @@ git checkout -b docs/add-java-demo
 
 - git add .
 
-- git commit -a -m "docs: add java demo and related docs" 。
+- 例如可执行 `git commit -a -m "docs: add java demo and related docs"`。
 
 ### Step4：合并修改
 

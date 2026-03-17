@@ -67,7 +67,7 @@ fory.getClassResolver().setClassChecker(
   (classResolver, className) -> className.startsWith("org.example."));
 ```
 
-### AllowListChecker
+### AllowListChecker：允许列表校验器
 
 Fory 提供了 `org.apache.fory.resolver.AllowListChecker`，这是一个基于允许/禁止列表的检查器，用于简化类检查机制的自定义：
 

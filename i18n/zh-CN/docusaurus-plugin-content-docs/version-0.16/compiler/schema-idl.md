@@ -307,7 +307,7 @@ enum Status {
 ### 语言映射
 
 - Java：`enum`
-- Python：`IntEnum`
+- Python：使用 `IntEnum`
 - Go：`type + const`
 - Rust：`repr(i32)` 枚举
 - C++：`enum class`
@@ -343,7 +343,7 @@ message User [id=100] {
 ### 语言映射
 
 - Java：类 / record（按选项）
-- Python：dataclass
+- Python：使用 dataclass
 - Go：struct
 - Rust：struct
 - C++：class/struct + 宏元信息
@@ -510,11 +510,11 @@ message Graph {
 - 不应复用已删除字段号（建议使用 `reserved`）
 - 建议预留编号区间以便演进
 
-## Type System {#type-system}
+## 类型系统 {#type-system}
 
 Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
-### Primitive Types
+### 基础类型
 
 | 类型族   | 示例                              |
 | -------- | --------------------------------- |
@@ -530,11 +530,11 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
 `bool` 表示布尔值。
 
-#### Integer Types
+#### 整数类型
 
 支持有符号/无符号与不同位宽。跨语言场景建议明确编码策略并保持字段语义稳定。
 
-#### Integer Encoding Variants
+#### 整数编码变体
 
 常见编码：
 
@@ -542,7 +542,7 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 - `fixed`：固定长度，性能稳定
 - `tagged`：混合编码（特定类型可用）
 
-#### Floating-Point Types
+#### 浮点类型
 
 - `float32`
 - `float64`
@@ -555,7 +555,7 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
 `bytes` 用于原始二进制载荷。
 
-#### Temporal Types
+#### 时间类型
 
 ##### Date
 
@@ -579,7 +579,7 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
 支持跨文件 import 和限定名引用。
 
-### Collection Types
+### 集合类型
 
 #### List (`list`)
 
@@ -600,7 +600,7 @@ map<K, V>
 - `K` 一般应为可稳定比较的标量类型
 - `V` 可为任意支持类型
 
-### Type Compatibility Matrix
+### 类型兼容矩阵
 
 跨语言建议：
 
@@ -608,7 +608,7 @@ map<K, V>
 - 尽量避免平台相关宽度/语义差异
 - 对整数编码与可空语义显式声明
 
-### Best Practices
+### 最佳实践
 
 1. 优先使用显式字段号与稳定命名
 2. 需要可空就显式 `optional`

@@ -29,7 +29,7 @@ Apache Fory™ Kotlin 基于 Fory Java 构建，为 Kotlin 类型提供了优化
 - 标准库类型：`Pair`、`Triple`、`Result`
 - 范围：`IntRange`、`LongRange`、`CharRange` 以及等差数列
 - 集合：`ArrayDeque`、空集合（`emptyList`、`emptyMap`、`emptySet`）
-- `kotlin.time.Duration`、`kotlin.text.Regex`、`kotlin.uuid.Uuid`
+- 其他 Kotlin 标准库类型：`kotlin.time.Duration`、`kotlin.text.Regex`、`kotlin.uuid.Uuid`
 
 ## 特性
 

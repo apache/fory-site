@@ -4,7 +4,7 @@ title: Apache Fory™ 使用
 sidebar_position: 1
 ---
 
-本章节演示不同编程语言使用 Apache Fory™ 进行序列化。
+本章节演示如何在不同编程语言中使用 Apache Fory™ 进行序列化。
 
 ## Java 序列化
 
@@ -16,15 +16,13 @@ import io.fory.*;
 public class Example {
   public static void main(String[] args) {
     SomeClass object = new SomeClass();
-    // Note that Fory instances should be reused between
-    // multiple serializations of different objects.
+    // 注意：Fory 实例应该被复用，而不是每次序列化前都重新创建
     Fory fory = Fory.builder().withLanguage(Language.JAVA)
-      // Allow to deserialize objects unknown types,
-      // more flexible but less secure.
+      // 允许反序列化未注册类型，灵活性更高，但安全性更低
       // .requireClassRegistration(false)
       .build();
-    // Registering types can reduce class name serialization overhead, but not mandatory.
-    // If secure mode enabled, all custom types must be registered.
+    // 注册类型可以减少类名序列化开销，但不是强制要求
+    // 如果开启安全模式，所有自定义类型都必须注册
     fory.register(SomeClass.class);
     byte[] bytes = fory.serialize(object);
     System.out.println(fory.deserialize(bytes));
@@ -32,18 +30,18 @@ public class Example {
 }
 ```
 
-## Scala序列化
+## Scala 序列化
 
-````scala
+```scala
 import org.apache.fory.Fory
 import org.apache.fory.serializer.scala.ScalaSerializers
 
 case class Person(name: String, id: Long, github: String)
-case class Point(x : Int, y : Int, z : Int)
+case class Point(x: Int, y: Int, z: Int)
 
 object ScalaExample {
   val fory: Fory = Fory.builder().withScalaOptimizationEnabled(true).build()
-  // Register optimized fory serializers for scala
+  // 注册 Scala 优化序列化器
   ScalaSerializers.registerSerializers(fory)
   fory.register(classOf[Person])
   fory.register(classOf[Point])
@@ -54,18 +52,20 @@ object ScalaExample {
     println(fory.deserialize(fory.serialize(Point(1, 2, 3))))
   }
 }
+```
 
-## Kotlin序列化
+## Kotlin 序列化
+
 ```kotlin
 import org.apache.fory.Fory
 import org.apache.fory.ThreadSafeFory
 import org.apache.fory.serializer.kotlin.KotlinSerializers
 
 data class Person(val name: String, val id: Long, val github: String)
-data class Point(val x : Int, val y : Int, val z : Int)
+data class Point(val x: Int, val y: Int, val z: Int)
 
 fun main(args: Array<String>) {
-    // 注意: 下面的Fory初始化代码应该只执行一次，而不是在每次序列化前都运行
+    // 注意：下面的 Fory 初始化代码应该只执行一次，而不是每次序列化前都运行
     val fory: ThreadSafeFory = Fory.builder().requireClassRegistration(true).buildThreadSafeFory()
     KotlinSerializers.registerSerializers(fory)
     fory.register(Person::class.java)
@@ -75,7 +75,7 @@ fun main(args: Array<String>) {
     println(fory.deserialize(fory.serialize(p)))
     println(fory.deserialize(fory.serialize(Point(1, 2, 3))))
 }
-````
+```
 
 ## 跨语言序列化
 
@@ -108,9 +108,8 @@ public class ReferenceExample {
       .withRefTracking(true).build();
     fory.register(SomeClass.class, "example.SomeClass");
     byte[] bytes = fory.serialize(createObject());
-    // bytes can be data serialized by other languages.
+    // bytes 可以被其他语言生成或消费
     System.out.println(fory.deserialize(bytes));
-    ;
   }
 }
 ```
@@ -132,42 +131,47 @@ obj = SomeClass()
 obj.f2 = {"k1": "v1", "k2": "v2"}
 obj.f1, obj.f3 = obj, obj.f2
 data = fory.serialize(obj)
-# bytes can be data serialized by other languages.
+# bytes 可以被其他语言生成或消费
 print(fory.deserialize(data))
 ```
 
-### Golangs
+### Go
 
 ```go
 package main
 
 import (
- "fmt"
- forygo "github.com/apache/fory/go/fory"
+    "fmt"
+    forygo "github.com/apache/fory/go/fory"
 )
 
 func main() {
- type SomeClass struct {
-  F1 *SomeClass
-  F2 map[string]string
-  F3 map[string]string
- }
- fory := forygo.NewFory(true)
- if err := fory.RegisterTagType("example.SomeClass", SomeClass{}); err != nil {
-  panic(err)
- }
- value := &SomeClass{F2: map[string]string{"k1": "v1", "k2": "v2"}}
- value.F3 = value.F2
- value.F1 = value
- bytes, err := fory.Marshal(value)
- if err != nil {
- }
- var newValue interface{}
- // bytes can be data serialized by other languages.
- if err := fory.Unmarshal(bytes, &newValue); err != nil {
-  panic(err)
- }
- fmt.Println(newValue)
+    type SomeClass struct {
+        F1 *SomeClass
+        F2 map[string]string
+        F3 map[string]string
+    }
+
+    fory := forygo.NewFory(true)
+    if err := fory.RegisterTagType("example.SomeClass", SomeClass{}); err != nil {
+        panic(err)
+    }
+
+    value := &SomeClass{F2: map[string]string{"k1": "v1", "k2": "v2"}}
+    value.F3 = value.F2
+    value.F1 = value
+
+    bytes, err := fory.Marshal(value)
+    if err != nil {
+        panic(err)
+    }
+
+    var newValue interface{}
+    // bytes 可以被其他语言生成或消费
+    if err := fory.Unmarshal(bytes, &newValue); err != nil {
+        panic(err)
+    }
+    fmt.Println(newValue)
 }
 ```
 
@@ -177,16 +181,18 @@ func main() {
 import Fory, { Type } from "@apache-fory/fory";
 
 /**
- * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit, ensure that the version of Node is 20 or above.
- * Experimental feature, installation success cannot be guaranteed at this moment
- * If you are unable to install the module, replace it with `const hps = null;`
- **/
+ * @apache-fory/hps 使用 v8 的 fast-calls-api，可被 JIT 直接调用，
+ * 因此要求 Node 版本至少为 20。
+ * 该特性仍是实验性的，当前不保证一定能安装成功。
+ * 如果模块无法安装，可替换为 `const hps = null;`
+ */
 import hps from "@apache-fory/hps";
 
-// Now we describe data structures using JSON, but in the future, we will use more ways.
+// 当前使用 JSON 方式描述数据结构，未来会提供更多描述方式。
 const description = Type.object("example.foo", {
   foo: Type.string(),
 });
+
 const fory = new Fory({ hps });
 const { serialize, deserialize } = fory.registerSerializer(description);
 const input = serialize({ foo: "hello fory" });
@@ -215,7 +221,7 @@ struct Person {
 }
 
 fn main() {
-    let penson = Person {
+    let person = Person {
         name: "hello".to_string(),
         age: 12,
         pets: vec![
@@ -229,8 +235,8 @@ fn main() {
             },
         ],
     };
-    let bin = to_buffer(&penson);
+    let bin = to_buffer(&person);
     let obj: Person = from_buffer(&bin).expect("should success");
-    assert_eq!(obj, penson);
+    assert_eq!(obj, person);
 }
 ```

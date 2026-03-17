@@ -23,15 +23,15 @@ license: |
 
 ## 何时使用自定义序列化器
 
-- External types from third-party libraries
-- Types with special serialization requirements
-- Legacy data format compatibility
-- Performance-critical custom encoding
-- Cross-language interoperability with custom protocols
+- 第三方库中的外部类型
+- 具有特殊序列化要求的类型
+- 需要兼容历史数据格式的类型
+- 性能敏感场景下的自定义编码
+- 需要自定义协议的跨语言互操作类型
 
 ## 实现 Serializer 模板
 
-To create a custom serializer, specialize the `Serializer` template for your type within the `fory::serialization` namespace:
+要创建自定义序列化器，需要在 `fory::serialization` 命名空间内为你的类型特化 `Serializer` 模板：
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -125,9 +125,9 @@ struct Serializer<MyExt> {
 } // namespace fory
 ```
 
-## Required Methods
+## 必需方法
 
-A custom serializer must implement these static methods:
+自定义序列化器必须实现以下静态方法：
 
 | Method                | Purpose                                         |
 | --------------------- | ----------------------------------------------- |
@@ -139,11 +139,11 @@ A custom serializer must implement these static methods:
 | `read_data_generic`   | Deserialize data with generics support          |
 | `read_with_type_info` | Deserialize with pre-resolved TypeInfo          |
 
-The `type_id` constant should be set to `TypeId::EXT` for custom extension types.
+对于自定义扩展类型，`type_id` 常量应设置为 `TypeId::EXT`。
 
-## Registering Custom Serializers
+## 注册自定义序列化器
 
-Register your custom serializer with Fory before use:
+在使用前，需要先将自定义序列化器注册到 Fory：
 
 ```cpp
 auto fory = Fory::builder().xlang(true).build();
@@ -161,7 +161,7 @@ fory.register_extension_type<MyExt>("my_ext");
 fory.register_extension_type<MyExt>("com.example", "MyExt");
 ```
 
-## Complete Example
+## 完整示例
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -278,9 +278,9 @@ int main() {
 }
 ```
 
-## WriteContext Methods
+## WriteContext 方法
 
-The `WriteContext` provides methods for writing data:
+`WriteContext` 提供了写入数据的方法：
 
 ```cpp
 // Primitive types
@@ -307,9 +307,9 @@ ctx.buffer().write_float(value);
 ctx.buffer().write_double(value);
 ```
 
-## ReadContext Methods
+## ReadContext 方法
 
-The `ReadContext` provides methods for reading data:
+`ReadContext` 提供了读取数据的方法：
 
 ```cpp
 // Primitive types (use error reference pattern)
@@ -333,9 +333,9 @@ float f = ctx.buffer().read_float(ctx.error());
 double d = ctx.buffer().read_double(ctx.error());
 ```
 
-## Delegating to Built-in Serializers
+## 委托给内置序列化器
 
-Reuse existing serializers for nested types:
+嵌套类型可以复用现有序列化器：
 
 ```cpp
 static void write_data(const MyType &value, WriteContext &ctx) {
@@ -354,18 +354,18 @@ static MyType read_data(ReadContext &ctx) {
 }
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Use variable-length encoding** for integers that may be small
-2. **Check errors after read operations** using `ctx.has_error()`
-3. **Return default values on error** to maintain consistent behavior
-4. **Delegate to built-in serializers** for standard types
-5. **Match type IDs across languages** for cross-language compatibility
-6. **Use `(void)param`** to suppress unused parameter warnings
+1. 对可能较小的整数使用变长编码。
+2. 读取后通过 `ctx.has_error()` 检查错误。
+3. 发生错误时返回默认值，保持行为一致。
+4. 标准类型优先委托给内置序列化器。
+5. 跨语言场景下保持一致的 type ID。
+6. 使用 `(void)param` 抑制未使用参数警告。
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type_registration) - Registering serializers
-- [Basic Serialization](basic_serialization) - Using FORY_STRUCT macro
-- [Schema Evolution](schema_evolution) - Compatible mode
-- [Cross-Language](cross_language) - Cross-language serialization
+- [类型注册](type_registration) - 注册序列化器
+- [基础序列化](basic_serialization) - 使用 `FORY_STRUCT` 宏
+- [Schema 演进](schema_evolution) - 兼容模式
+- [跨语言](cross_language) - 跨语言序列化

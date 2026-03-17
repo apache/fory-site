@@ -52,7 +52,7 @@ f := fory.New(
 
 ## 配置项
 
-### WithTrackRef
+### WithTrackRef：引用跟踪
 
 启用引用跟踪，以支持循环引用和共享对象：
 
@@ -82,7 +82,7 @@ f := fory.New(fory.WithTrackRef(true))
 
 详见 [引用](references.md)。
 
-### WithCompatible
+### WithCompatible：兼容模式
 
 启用 schema 演进兼容模式：
 
@@ -106,7 +106,7 @@ f := fory.New(fory.WithCompatible(true))
 
 详见 [Schema 演进](schema-evolution.md)。
 
-### WithMaxDepth
+### WithMaxDepth：最大深度
 
 设置最大嵌套深度，防止栈溢出：
 

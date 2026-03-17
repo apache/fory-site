@@ -76,7 +76,7 @@ int a = person.age.get();        // Explicit get()
 
 ## 标签类型
 
-### `fory::nullable`
+### `fory::nullable`：可空字段
 
 将智能指针字段标记为可空（可为 `nullptr`）：
 
