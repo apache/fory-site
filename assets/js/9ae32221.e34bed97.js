@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[66522],{57631:s=>{s.exports=JSON.parse('{"label":"swift","permalink":"/blog/tags/swift","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
