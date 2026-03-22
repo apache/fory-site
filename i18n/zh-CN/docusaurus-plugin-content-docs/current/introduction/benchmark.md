@@ -39,6 +39,28 @@ sidebar_position: 2
 
 注意：结果取决于硬件、数据集和实现版本。有关如何自行运行性能测试的信息，请参阅 Fory Rust Benchmark 指南：https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
 
+## C++ 性能测试
+
+Fory C++ 在性能方面相较 Protobuf C++ 序列化框架具有竞争力。
+
+<img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
+
+## Go 性能测试
+
+Fory Go 在单对象和列表两类工作负载下，相较 Protobuf 与 Msgpack 展现出较强的性能表现。
+
+<img src="/img/blog/fory_0_16_0_release/go_benchmark_combined.png" width="90%"/>
+
+注意：结果取决于硬件、数据集和实现版本。详细信息请参见 Go 性能测试报告：https://fory.apache.org/docs/benchmarks/go/
+
+## Python 性能测试
+
+Fory Python 在单对象和列表两类工作负载下，相较 `pickle` 与 Protobuf 展现出较强的性能表现。
+
+<img src="/img/benchmarks/python/throughput.png" width="90%"/>
+
+注意：结果取决于硬件、数据集、Python 运行时和实现版本。详细信息请参见 Python 性能测试报告：https://fory.apache.org/docs/benchmarks/python/
+
 ## JavaScript 性能测试
 
 <img width="33%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
