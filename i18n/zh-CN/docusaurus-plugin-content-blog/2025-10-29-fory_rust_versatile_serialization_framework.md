@@ -304,6 +304,8 @@ fory-derive/     # 过程宏集合
 | system_data    | medium   | serialize | 174,240    | 11,896     | 14,753       | fory |
 | system_data    | large    | serialize | 10,671     | 876        | 1,040        | fory |
 
+可以通过 https://github.com/apache/fory/tree/v0.16.0/benchmarks/rust 查看更多 Rust Benchmark 代码和数据。
+
 ## 适用与不适用的场景
 
 ### ✅ 最佳落地案例
