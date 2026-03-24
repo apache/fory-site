@@ -407,6 +407,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 JavaScript cross-language support is schema-driven. Instead of registering a class, you describe the payload shape with `Type.object(...)`, then use the returned serializer pair to encode and decode values.
 
+These packages are not published to npm yet. Build them from the Apache Fory repository first, then use the following API shape.
+
 ```javascript
 import Fory, { Type } from "@apache-fory/core";
 

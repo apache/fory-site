@@ -91,9 +91,13 @@ pip install pyfory==0.16.0
 
 ## Go
 
+Use the full Go module path `github.com/apache/fory/go/fory`:
+
 ```bash
 go get github.com/apache/fory/go/fory@v0.16.0
 ```
+
+If your Go proxy has not picked up the new submodule tag yet, retry later or use `GOPROXY=direct` temporarily.
 
 ## Rust
 
@@ -110,16 +114,24 @@ cargo add fory@0.16.0
 
 ## JavaScript
 
-Install the core JavaScript runtime:
+The JavaScript packages are defined in the Apache Fory source tree as `@apache-fory/core` and `@apache-fory/hps`, but they are not published to npm yet.
+
+Install and build them from source for now:
 
 ```bash
-npm install @apache-fory/core
+git clone https://github.com/apache/fory.git
+cd fory/javascript
+npm install
+npm run build
 ```
 
-Optional native acceleration on Node.js 20+:
+After building from source, use `@apache-fory/core` and optionally `@apache-fory/hps` in your project or workspace setup.
+
+Optional native acceleration requires Node.js 20+:
 
 ```bash
-npm install @apache-fory/hps
+cd packages/hps
+npm run build
 ```
 
 ## C#

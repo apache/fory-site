@@ -407,6 +407,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 JavaScript 的跨语言支持是基于 Schema 描述的。它不是注册类，而是通过 `Type.object(...)` 描述载荷结构，再使用返回的序列化器来编码和解码数据。
 
+这些包目前还没有发布到 npm。因此请先从 Apache Fory 仓库完成构建，再按下面的 API 方式使用。
+
 ```javascript
 import Fory, { Type } from "@apache-fory/core";
 

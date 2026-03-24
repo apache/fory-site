@@ -91,9 +91,13 @@ pip install pyfory==0.16.0
 
 ## Go
 
+请使用完整的 Go 模块路径 `github.com/apache/fory/go/fory`：
+
 ```bash
 go get github.com/apache/fory/go/fory@v0.16.0
 ```
+
+如果你的 Go proxy 还没有同步到新的子模块 tag，可以稍后重试，或者临时使用 `GOPROXY=direct`。
 
 ## Rust
 
@@ -110,16 +114,24 @@ cargo add fory@0.16.0
 
 ## JavaScript
 
-安装 JavaScript 核心运行时：
+Apache Fory 的 JavaScript 包在源码仓库中定义为 `@apache-fory/core` 和 `@apache-fory/hps`，但目前还没有发布到 npm。
+
+目前请先从源码安装并构建：
 
 ```bash
-npm install @apache-fory/core
+git clone https://github.com/apache/fory.git
+cd fory/javascript
+npm install
+npm run build
 ```
 
-可选的原生加速模块（需要 Node.js 20+）：
+完成源码构建后，再在你的项目或 workspace 中使用 `@apache-fory/core`，并按需启用 `@apache-fory/hps`。
+
+可选的原生加速模块需要 Node.js 20+：
 
 ```bash
-npm install @apache-fory/hps
+cd packages/hps
+npm run build
 ```
 
 ## C#
