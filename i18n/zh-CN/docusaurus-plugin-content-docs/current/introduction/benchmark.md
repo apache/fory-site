@@ -31,6 +31,14 @@ Java 性能测试部分使用 `docs/benchmarks/java` 中的当前基准套件，
 
 更多性能测试说明、原始数据和完整 Java benchmark README 请参见 [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks/java)。
 
+## Python 性能测试
+
+Fory Python 在对象和列表两类工作负载下，相比 `pickle` 和 Protobuf 展现出较强的性能表现。
+
+![Python 吞吐图](../benchmarks/python/throughput.png)
+
+性能测试配置、原始结果以及复现方式请参见 [Python 性能测试报告](../benchmarks/python/README.md)。
+
 ## Rust 性能测试
 
 Fory Rust 相比其他 Rust 序列化框架展现出有竞争力的性能。

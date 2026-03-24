@@ -31,6 +31,14 @@ The Java benchmark section compares Fory against popular Java serialization fram
 
 For additional benchmark notes, raw data, and the complete Java benchmark README, see [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks/java).
 
+## Python Benchmark
+
+Fory Python demonstrates strong performance compared to `pickle` and Protobuf across object and list workloads.
+
+![Python Throughput](../benchmarks/python/throughput.png)
+
+For benchmark setup, raw results, and reproduction steps, see [Python Benchmarks](../benchmarks/python/README.md).
+
 ## Rust Benchmark
 
 Fory Rust demonstrates competitive performance compared to other Rust serialization frameworks.
