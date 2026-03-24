@@ -114,7 +114,7 @@ cargo add fory@0.16.0
 
 ## JavaScript
 
-The JavaScript packages are defined in the Apache Fory source tree as `@apache-fory/core` and `@apache-fory/hps`, but they are not published to npm yet.
+The JavaScript packages are not published to npm yet.
 
 Install and build them from source for now:
 
