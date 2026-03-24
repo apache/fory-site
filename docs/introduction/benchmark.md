@@ -9,7 +9,14 @@ sidebar_position: 3
 
 ## Java Benchmark
 
-The following benchmarks compare Fory against popular Java serialization frameworks. Charts labeled **"compatible"** show schema evolution mode with forward/backward compatibility enabled, while others show schema consistent mode where class schemas must match.
+The Java benchmark section compares Fory against popular Java serialization frameworks using the current benchmark suite from `docs/benchmarks/java`.
+
+The plots are grouped by:
+
+- **Heap**: serialization to on-heap `byte[]` buffers
+- **Off-heap**: serialization to direct/off-heap buffers
+- **Compatible**: schema evolution mode with forward/backward compatibility enabled
+- **Consistent**: schema-consistent mode where peer schemas must match exactly
 
 **Test Classes**:
 
@@ -17,23 +24,69 @@ The following benchmarks compare Fory against popular Java serialization framewo
 - `MediaContent`: Class from [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java)
 - `Sample`: Class from [Kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/master/benchmarks/src/main/java/com/esotericsoftware/kryo/benchmarks/data/Sample.java)
 
-### Java Serialization
+### Heap Serialization
 
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+Compatible mode:
 
-### Java Deserialization
+<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
 
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
+Consistent mode:
+
+<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
+
+### Off-Heap Serialization
+
+Compatible mode:
+
+<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
+
+Consistent mode:
+
+<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_STRUCT_to_directBuffer_tps.png" />
+
+### Heap Deserialization
+
+Compatible mode:
+
+<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
+
+Consistent mode:
+
+<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
+
+### Off-Heap Deserialization
+
+Compatible mode:
+
+<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
+
+Consistent mode:
+
+<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_STRUCT_from_directBuffer_tps.png" />
+
+### Repository Throughput Summary
+
+Serialization throughput:
+
+<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+
+Deserialization throughput:
+
+<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
+
+### Zero-Copy Benchmark
+
+Serialize:
+
+<img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_serialize_BUFFER_to_array_tps.png" />
+
+Deserialize:
+
+<img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_deserialize_BUFFER_from_array_tps.png" />
 
 **Important**: Fory's runtime code generation requires proper warm-up for performance measurement:
 
-For additional benchmarks covering type forward/backward compatibility, off-heap support, and zero-copy serialization, see [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks).
+For additional benchmark notes, raw data, and the complete Java benchmark README, see [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks/java).
 
 ## Rust Benchmark
 
