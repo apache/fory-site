@@ -66,13 +66,13 @@ Consistent 模式：
 
 ### 仓库吞吐汇总
 
-序列化吞吐：
+**序列化吞吐**：
 
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+![Java 序列化吞吐](../benchmarks/java/java_repo_serialization_throughput.png)
 
-反序列化吞吐：
+**反序列化吞吐**：
 
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
+![Java 反序列化吞吐](../benchmarks/java/java_repo_deserialization_throughput.png)
 
 ### 零拷贝性能测试
 

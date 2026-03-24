@@ -66,13 +66,13 @@ Consistent mode:
 
 ### Repository Throughput Summary
 
-Serialization throughput:
+**Serialization Throughput**:
 
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+![Java Serialization Throughput](../benchmarks/java/java_repo_serialization_throughput.png)
 
-Deserialization throughput:
+**Deserialization Throughput**:
 
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
+![Java Deserialization Throughput](../benchmarks/java/java_repo_deserialization_throughput.png)
 
 ### Zero-Copy Benchmark
 
