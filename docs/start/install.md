@@ -4,13 +4,13 @@ title: Install
 sidebar_position: 0
 ---
 
-The official Apache Fory™ releases are provided as source artifacts.
+Apache Fory™ releases are available both as source artifacts and language-specific packages.
 
-For source download, please see Apache Fory™ [download](https://fory.apache.org/download) page.
+For source downloads, see the Apache Fory™ [download](https://fory.apache.org/download) page.
 
 ## Java
 
-To add a dependency on Apache Fory™ using Maven, use the following:
+Use Maven to add Apache Fory™:
 
 ```xml
 <dependency>
@@ -23,7 +23,7 @@ To add a dependency on Apache Fory™ using Maven, use the following:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-format</artifactId>
-  <version>0.13.1</version>
+  <version>0.16.0</version>
 </dependency>
 -->
 <!-- SIMD acceleration for array compression (Java 16+) -->
@@ -31,14 +31,14 @@ To add a dependency on Apache Fory™ using Maven, use the following:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-simd</artifactId>
-  <version>0.13.1</version>
+  <version>0.16.0</version>
 </dependency>
 -->
 ```
 
 ## Scala
 
-To add a dependency on Apache Fory™ scala for scala 2.13 with maven, use the following:
+Scala 2.13 with Maven:
 
 ```xml
 <dependency>
@@ -48,7 +48,7 @@ To add a dependency on Apache Fory™ scala for scala 2.13 with maven, use the f
 </dependency>
 ```
 
-To add a dependency on Apache Fory™ scala for scala 3 with maven, use the following:
+Scala 3 with Maven:
 
 ```xml
 <dependency>
@@ -58,13 +58,13 @@ To add a dependency on Apache Fory™ scala for scala 3 with maven, use the foll
 </dependency>
 ```
 
-To add a dependency on Apache Fory™ scala for scala 2.13 with sbt, use the following:
+Scala 2.13 with sbt:
 
 ```sbt
 libraryDependencies += "org.apache.fory" % "fory-scala_2.13" % "0.16.0"
 ```
 
-To add a dependency on Apache Fory™ scala for scala 3 with sbt, use the following:
+Scala 3 with sbt:
 
 ```sbt
 libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.16.0"
@@ -72,7 +72,7 @@ libraryDependencies += "org.apache.fory" % "fory-scala_3" % "0.16.0"
 
 ## Kotlin
 
-To add a dependency on Apache Fory™ kotlin with maven, use the following:
+Add Apache Fory™ Kotlin with Maven:
 
 ```xml
 <dependency>
@@ -89,14 +89,20 @@ python -m pip install --upgrade pip
 pip install pyfory==0.16.0
 ```
 
+## Go
+
+```bash
+go get github.com/apache/fory/go/fory@v0.16.0
+```
+
 ## Rust
 
 ```toml
 [dependencies]
-fory = "0.14"
+fory = "0.16.0"
 ```
 
-or just execute command:
+Or use `cargo add`:
 
 ```bash
 cargo add fory@0.16.0
@@ -104,4 +110,46 @@ cargo add fory@0.16.0
 
 ## JavaScript
 
-Apache Fory™ is NOT yet available on npm, please install from source code now.
+Install the core JavaScript runtime:
+
+```bash
+npm install @apache-fory/core
+```
+
+Optional native acceleration on Node.js 20+:
+
+```bash
+npm install @apache-fory/hps
+```
+
+## C#
+
+Install the `Apache.Fory` NuGet package. It includes both the runtime and the source generator for `[ForyObject]` types.
+
+```bash
+dotnet add package Apache.Fory --version 0.16.0
+```
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Apache.Fory" Version="0.16.0" />
+</ItemGroup>
+```
+
+## Swift
+
+Add Apache Fory™ from the GitHub repository with Swift Package Manager:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/apache/fory.git", exact: "0.16.0")
+],
+targets: [
+    .target(
+        name: "MyApp",
+        dependencies: [
+            .product(name: "Fory", package: "fory")
+        ]
+    )
+]
+```
