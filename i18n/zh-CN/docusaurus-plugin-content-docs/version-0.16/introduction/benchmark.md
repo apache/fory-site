@@ -1,26 +1,24 @@
 ---
 id: benchmark
 title: 性能测试
-sidebar_position: 2
+sidebar_position: 3
 ---
 
-不同的序列化框架适用于不同的场景，此处的性能测试结果仅供参考。
-
-如果您需要针对特定场景进行性能测试，请确保所有序列化框架都针对该场景进行了适当配置。
-
-动态序列化框架支持多态和引用，与静态序列化框架相比会有更多开销，除非像 Apache Fory™ 那样使用 JIT 技术。
-由于 Apache Fory™ 会在运行时生成代码，因此在收集性能测试统计数据之前请进行预热。
+> **说明**：不同的序列化框架在不同场景下各有优势。性能测试结果仅供参考。
+> 对于你的具体使用场景，请使用合适的配置和工作负载自行进行基准测试。
 
 ## Java 性能测试
 
-Java 部分已切换为 `docs/benchmarks/java` 中的最新性能测试图。图表现在按以下维度分组：
+Java 性能测试部分使用 `docs/benchmarks/java` 中的当前基准套件，对 Fory 与常见 Java 序列化框架进行对比。
 
-- **Heap**：序列化到堆上 `byte[]` 缓冲区
+图表按以下维度分组：
+
+- **Heap**：序列化到堆上的 `byte[]` 缓冲区
 - **Off-heap**：序列化到 direct/off-heap 缓冲区
-- **Compatible**：启用前向/后向兼容的 Schema 演进模式
-- **Consistent**：要求读写两端 Schema 完全一致的模式
+- **Compatible**：启用向前和向后兼容的 Schema 演进模式
+- **Consistent**：要求通信双方 Schema 完全一致的 Schema 一致模式
 
-**测试数据类型**：
+**测试类**：
 
 - `Struct`：包含 [100 个基础类型字段](https://github.com/apache/fory/tree/main/docs/benchmarks#Struct) 的类
 - `MediaContent`：来自 [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java) 的类
@@ -66,7 +64,7 @@ Consistent 模式：
 
 <img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_STRUCT_from_directBuffer_tps.png" />
 
-### 仓库基准汇总
+### 仓库吞吐汇总
 
 序列化吞吐：
 
@@ -86,11 +84,13 @@ Consistent 模式：
 
 <img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_deserialize_BUFFER_from_array_tps.png" />
 
-注意：Apache Fory™ 依赖运行时代码生成，进行性能测试前必须充分预热。
+**重要说明**：Fory 的运行时代码生成依赖充分预热后才能进行准确的性能测量。
 
-更多说明、原始数据和完整 Java benchmark README 请参见 [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks/java)。
+更多性能测试说明、原始数据和完整 Java benchmark README 请参见 [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks/java)。
 
 ## Rust 性能测试
+
+Fory Rust 相比其他 Rust 序列化框架展现出有竞争力的性能。
 
 <img src="/img/benchmarks/rust/company.png" width="90%"/>
 
@@ -98,34 +98,42 @@ Consistent 模式：
 
 <img src="/img/benchmarks/rust/system_data.png" width="90%"/>
 
-注意：结果取决于硬件、数据集和实现版本。有关如何自行运行性能测试的信息，请参阅 Fory Rust Benchmark 指南：https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
+注意：结果取决于硬件、数据集和实现版本。关于如何自行运行性能测试，请参见 Rust 指南：https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
 
 ## C++ 性能测试
 
-Fory C++ 在性能方面相较 Protobuf C++ 序列化框架具有竞争力。
+Fory C++ 相比 Protobuf C++ 序列化框架展现出有竞争力的性能。
 
 <img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
 
 ## Go 性能测试
 
-Fory Go 在单对象和列表两类工作负载下，相较 Protobuf 与 Msgpack 展现出较强的性能表现。
+Fory Go 在单对象和列表两类工作负载下，相比 Protobuf 和 Msgpack 展现出较强的性能表现。
 
 <img src="/img/blog/fory_0_16_0_release/go_benchmark_combined.png" width="90%"/>
 
 注意：结果取决于硬件、数据集和实现版本。详细信息请参见 Go 性能测试报告：https://fory.apache.org/docs/benchmarks/go/
 
-## Python 性能测试
+## C\# 性能测试
 
-Fory Python 在单对象和列表两类工作负载下，相较 `pickle` 与 Protobuf 展现出较强的性能表现。
+Fory C\# 在强类型对象的序列化和反序列化工作负载下，相比 Protobuf 和 Msgpack 展现出较强的性能表现。
 
-<img src="/img/benchmarks/python/throughput.png" width="90%"/>
+<img src="/img/blog/fory_0_16_0_release/csharp_benchmark_combined.png" width="90%"/>
 
-注意：结果取决于硬件、数据集、Python 运行时和实现版本。详细信息请参见 Python 性能测试报告：https://fory.apache.org/docs/benchmarks/python/
+注意：结果取决于硬件和运行时版本。详细信息请参见 C\# 性能测试报告：https://fory.apache.org/docs/benchmarks/csharp/
+
+## Swift 性能测试
+
+Fory Swift 在标量对象和列表两类工作负载下，相比 Protobuf 和 Msgpack 展现出较强的性能表现。
+
+<img src="/img/blog/fory_0_16_0_release/swift_benchmark_combined.png" width="90%"/>
+
+注意：结果取决于硬件和运行时版本。详细信息请参见 Swift 性能测试报告：https://fory.apache.org/docs/benchmarks/swift/
 
 ## JavaScript 性能测试
 
-<img width="33%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
+<img width="50%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
 
-此柱状图使用的数据包含一个具有多种字段类型的复杂对象，JSON 数据大小为 3KB。
+该柱状图使用的数据包含一个具有多种字段类型的复杂对象，JSON 数据大小为 3KB。
 
 性能测试代码请参见 [benchmarks](https://github.com/apache/fory/blob/main/javascript/benchmark/index.js)。
