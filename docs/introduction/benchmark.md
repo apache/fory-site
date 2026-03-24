@@ -11,61 +11,6 @@ sidebar_position: 3
 
 The Java benchmark section compares Fory against popular Java serialization frameworks using the current benchmark suite from `docs/benchmarks/java`.
 
-The plots are grouped by:
-
-- **Heap**: serialization to on-heap `byte[]` buffers
-- **Off-heap**: serialization to direct/off-heap buffers
-- **Compatible**: schema evolution mode with forward/backward compatibility enabled
-- **Consistent**: schema-consistent mode where peer schemas must match exactly
-
-**Test Classes**:
-
-- `Struct`: Class with [100 primitive fields](https://github.com/apache/fory/tree/main/docs/benchmarks#Struct)
-- `MediaContent`: Class from [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java)
-- `Sample`: Class from [Kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/master/benchmarks/src/main/java/com/esotericsoftware/kryo/benchmarks/data/Sample.java)
-
-### Heap Serialization
-
-Compatible mode:
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
-
-Consistent mode:
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
-
-### Off-Heap Serialization
-
-Compatible mode:
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
-
-Consistent mode:
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_STRUCT_to_directBuffer_tps.png" />
-
-### Heap Deserialization
-
-Compatible mode:
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
-
-Consistent mode:
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
-
-### Off-Heap Deserialization
-
-Compatible mode:
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
-
-Consistent mode:
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_STRUCT_from_directBuffer_tps.png" />
-
-### Repository Throughput Summary
-
 **Serialization Throughput**:
 
 ![Java Serialization Throughput](../benchmarks/java/java_repo_serialization_throughput.png)
@@ -74,13 +19,11 @@ Consistent mode:
 
 ![Java Deserialization Throughput](../benchmarks/java/java_repo_deserialization_throughput.png)
 
-### Zero-Copy Benchmark
-
-Serialize:
+**Zero-Copy Serialize Throughput**:
 
 <img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_serialize_BUFFER_to_array_tps.png" />
 
-Deserialize:
+**Zero-Copy Deserialize Throughput**:
 
 <img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_deserialize_BUFFER_from_array_tps.png" />
 
