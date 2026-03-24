@@ -59,7 +59,7 @@ print(decoded)  # User(name='Alice', age=30)
 
 ## Key Features
 
-### 🚀 High-Performance Serialization
+### High-Performance Serialization
 
 Apache Fory™ delivers exceptional performance through advanced optimization techniques:
 
@@ -69,7 +69,7 @@ Apache Fory™ delivers exceptional performance through advanced optimization te
 - **Intelligent Encoding**: Variable-length compression for integers and strings; SIMD acceleration for arrays (Java 16+)
 - **Meta Sharing**: Class metadata packing reduces redundant type information across serializations
 
-### 🔄 Cross-Language Serialization
+### Cross-Language Serialization
 
 The **[xlang serialization format](../specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
 
@@ -79,7 +79,7 @@ The **[xlang serialization format](../specification/xlang_serialization_spec.md)
 - **Schema Evolution**: Optional forward/backward compatibility for evolving schemas
 - **Automatic Serialization**: No IDL or schema definitions required; serialize any object directly without code generation
 
-### 📊 Row Format
+### Row Format
 
 A cache-friendly **[row format](../specification/row_format_spec.md)** optimized for analytics workloads:
 
@@ -88,7 +88,7 @@ A cache-friendly **[row format](../specification/row_format_spec.md)** optimized
 - **Apache Arrow Integration**: Seamless conversion to columnar format for analytics pipelines
 - **Multi-Language**: Available in Java, Python, Rust and C++
 
-### 🔒 Security & Production-Readiness
+### Security & Production-Readiness
 
 Enterprise-grade security and compatibility:
 
@@ -116,24 +116,24 @@ All protocols share the same optimized codebase, allowing improvements in one pr
 
 | Guide                            | Description                                | Source                                                                                    | Website                                |
 | -------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------- | -------------------------------------- |
-| **Java Serialization**           | Comprehensive guide for Java serialization | [Java Guide](https://github.com/apache/fory/blob/main/docs/guide/java/)                   | [📖 View](../guide/java)               |
-| **Cross-Language Serialization** | Multi-language object exchange             | [Xlang Guide](https://github.com/apache/fory/blob/main/docs/guide/xlang/)                 | [📖 View](../guide/xlang)              |
-| **Row Format**                   | Zero-copy random access format             | [Java Row Format](https://github.com/apache/fory/blob/main/docs/guide/java/row-format.md) | [📖 View](../guide/java/row-format.md) |
-| **Python**                       | Python-specific features and usage         | [Python Guide](https://github.com/apache/fory/blob/main/docs/guide/python/)               | [📖 View](../guide/python)             |
-| **Rust**                         | Rust implementation and patterns           | [Rust Guide](https://github.com/apache/fory/blob/main/docs/guide/rust/)                   | [📖 View](../guide/rust)               |
-| **Go**                           | Go implementation and usage                | [Go Guide](https://github.com/apache/fory/blob/main/docs/guide/go/)                       | [📖 View](../guide/go)                 |
-| **Scala**                        | Scala integration and best practices       | [Scala Guide](https://github.com/apache/fory/blob/main/docs/guide/scala/)                 | [📖 View](../guide/scala)              |
-| **GraalVM**                      | Native image support and AOT compilation   | [GraalVM Guide](https://github.com/apache/fory/blob/main/docs/guide/graalvm_guide.md)     | [📖 View](../guide/graalvm_guide.md)   |
-| **Development**                  | Building and contributing to Fory          | [Development](https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md)         | [📖 View](../guide/DEVELOPMENT)        |
+| **Java Serialization**           | Comprehensive guide for Java serialization | [Java Guide](https://github.com/apache/fory/blob/main/docs/guide/java/)                   | [View](../guide/java)               |
+| **Cross-Language Serialization** | Multi-language object exchange             | [Xlang Guide](https://github.com/apache/fory/blob/main/docs/guide/xlang/)                 | [View](../guide/xlang)              |
+| **Row Format**                   | Zero-copy random access format             | [Java Row Format](https://github.com/apache/fory/blob/main/docs/guide/java/row-format.md) | [View](../guide/java/row-format.md) |
+| **Python**                       | Python-specific features and usage         | [Python Guide](https://github.com/apache/fory/blob/main/docs/guide/python/)               | [View](../guide/python)             |
+| **Rust**                         | Rust implementation and patterns           | [Rust Guide](https://github.com/apache/fory/blob/main/docs/guide/rust/)                   | [View](../guide/rust)               |
+| **Go**                           | Go implementation and usage                | [Go Guide](https://github.com/apache/fory/blob/main/docs/guide/go/)                       | [View](../guide/go)                 |
+| **Scala**                        | Scala integration and best practices       | [Scala Guide](https://github.com/apache/fory/blob/main/docs/guide/scala/)                 | [View](../guide/scala)              |
+| **GraalVM**                      | Native image support and AOT compilation   | [GraalVM Guide](https://github.com/apache/fory/blob/main/docs/guide/graalvm_guide.md)     | [View](../guide/graalvm_guide.md)   |
+| **Development**                  | Building and contributing to Fory          | [Development](https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md)         | [View](../guide/DEVELOPMENT)        |
 
 ### Protocol Specifications
 
 | Specification           | Description                    | Source                                                                                                                 | Website                                                 |
 | ----------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| **Xlang Serialization** | Cross-language binary protocol | [xlang_serialization_spec.md](https://github.com/apache/fory/blob/main/docs/specification/xlang_serialization_spec.md) | [📖 View](../specification/xlang_serialization_spec.md) |
-| **Java Serialization**  | Java-optimized protocol        | [java_serialization_spec.md](https://github.com/apache/fory/blob/main/docs/specification/java_serialization_spec.md)   | [📖 View](../specification/java_serialization_spec.md)  |
-| **Row Format**          | Row-based binary format        | [row_format_spec.md](https://github.com/apache/fory/blob/main/docs/specification/row_format_spec.md)                   | [📖 View](../specification/row_format_spec.md)          |
-| **Type Mapping**        | Cross-language type conversion | [xlang_type_mapping.md](https://github.com/apache/fory/blob/main/docs/specification/xlang_type_mapping.md)             | [📖 View](../specification/xlang_type_mapping.md)       |
+| **Xlang Serialization** | Cross-language binary protocol | [xlang_serialization_spec.md](https://github.com/apache/fory/blob/main/docs/specification/xlang_serialization_spec.md) | [View](../specification/xlang_serialization_spec.md) |
+| **Java Serialization**  | Java-optimized protocol        | [java_serialization_spec.md](https://github.com/apache/fory/blob/main/docs/specification/java_serialization_spec.md)   | [View](../specification/java_serialization_spec.md)  |
+| **Row Format**          | Row-based binary format        | [row_format_spec.md](https://github.com/apache/fory/blob/main/docs/specification/row_format_spec.md)                   | [View](../specification/row_format_spec.md)          |
+| **Type Mapping**        | Cross-language type conversion | [xlang_type_mapping.md](https://github.com/apache/fory/blob/main/docs/specification/xlang_type_mapping.md)             | [View](../specification/xlang_type_mapping.md)       |
 
 ## Compatibility
 
@@ -190,11 +190,11 @@ We welcome contributions! Please read our [Contributing Guide](https://github.co
 
 **Ways to Contribute**:
 
-- 🐛 Report bugs and issues
-- 💡 Propose new features
-- 📝 Improve documentation
-- 🔧 Submit pull requests
-- 🧪 Add test cases
-- 📊 Share benchmarks
+- Report bugs and issues
+- Propose new features
+- Improve documentation
+- Submit pull requests
+- Add test cases
+- Share benchmarks
 
 See [Development Guide](../guide/DEVELOPMENT.md) for build instructions and development workflow.

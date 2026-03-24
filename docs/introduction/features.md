@@ -6,7 +6,7 @@ sidebar_position: 2
 
 ## Core Capabilities
 
-### 🚀 High-Performance Serialization
+### High-Performance Serialization
 
 Apache Fory™ delivers exceptional performance through advanced optimization techniques:
 
@@ -16,7 +16,7 @@ Apache Fory™ delivers exceptional performance through advanced optimization te
 - **Intelligent Encoding**: Variable-length compression for integers and strings; SIMD acceleration for arrays (Java 16+)
 - **Meta Sharing**: Class metadata packing reduces redundant type information across serializations
 
-### 🌍 Cross-Language Serialization
+### Cross-Language Serialization
 
 The **[xlang serialization format](../specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
 
@@ -26,7 +26,7 @@ The **[xlang serialization format](../specification/xlang_serialization_spec.md)
 - **Schema Evolution**: Optional forward/backward compatibility for evolving schemas
 - **Automatic Serialization**: No IDL or schema definitions required; serialize any object directly without code generation
 
-### 📊 Row Format
+### Row Format
 
 A cache-friendly **[row format](../specification/row_format_spec.md)** optimized for analytics workloads:
 
@@ -35,7 +35,7 @@ A cache-friendly **[row format](../specification/row_format_spec.md)** optimized
 - **Apache Arrow Integration**: Seamless conversion to columnar format for analytics pipelines
 - **Multi-Language**: Available in Java, Python, Rust and C++
 
-### 🔒 Security & Production-Readiness
+### Security & Production-Readiness
 
 Enterprise-grade security and compatibility:
 
@@ -46,7 +46,7 @@ Enterprise-grade security and compatibility:
 
 ## Java Features
 
-### 🚀 High Performance
+### High Performance
 
 - **JIT Code Generation**: Highly-extensible JIT framework generates serializer code at runtime using async multi-threaded compilation, delivering 20-170x speedup through:
   - Inlining variables to reduce memory access
@@ -58,13 +58,13 @@ Enterprise-grade security and compatibility:
 - **Meta Sharing**: Cached class metadata reduces redundant type information
 - **SIMD Acceleration**: Java Vector API support for array operations (Java 16+)
 
-### 🔧 Drop-in Replacement
+### Drop-in Replacement
 
 - **100% JDK Serialization Compatible**: Supports `writeObject`/`readObject`/`writeReplace`/`readResolve`/`readObjectNoData`/`Externalizable`
 - **Java 8-24 Support**: Works across all modern Java versions including Java 17+ records
 - **GraalVM Native Image**: AOT compilation support without reflection configuration
 
-### 🔄 Advanced Features
+### Advanced Features
 
 - **Reference Tracking**: Automatic handling of shared and circular references
 - **Schema Evolution**: Forward/backward compatibility for class schema changes
@@ -74,45 +74,45 @@ Enterprise-grade security and compatibility:
 
 ## Python Features
 
-### 🔧 **Flexible Serialization Modes**
+### **Flexible Serialization Modes**
 
 - **Python native Mode**: Full Python compatibility, drop-in replacement for pickle/cloudpickle
 - **Cross-Language Mode**: Optimized for multi-language data exchange
 - **Row Format**: Zero-copy row format for analytics workloads
 
-### 🎯 Versatile Serialization Features
+### Versatile Serialization Features
 
 - **Shared/circular reference support** for complex object graphs in both Python-native and cross-language modes
 - **Polymorphism support** for customized types with automatic type dispatching
 - **Schema evolution** support for backward/forward compatibility when using dataclasses in cross-language mode
 - **Out-of-band buffer support** for zero-copy serialization of large data structures like NumPy arrays and Pandas DataFrames, compatible with pickle protocol 5
 
-### ⚡ **Blazing Fast Performance**
+### **Blazing Fast Performance**
 
 - **Extremely fast performance** compared to other serialization frameworks
 - **Runtime code generation** and **Cython-accelerated** core implementation for optimal performance
 
-### 📦 Compact Data Size
+### Compact Data Size
 
 - **Compact object graph protocol** with minimal space overhead—up to 3× size reduction compared to pickle/cloudpickle
 - **Meta packing and sharing** to minimize type forward/backward compatibility space overhead
 
-### 🛡️ **Security & Safety**
+### **Security & Safety**
 
 - **Strict mode** prevents deserialization of untrusted types by type registration and checks.
 - **Reference tracking** for handling circular references safely
 
 ## Rust Features
 
-### 🚀 Why Apache Fory™ Rust?
+### Why Apache Fory™ Rust?
 
-- **🔥 Blazingly Fast**: Zero-copy deserialization and optimized binary protocols
-- **🌍 Cross-Language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
-- **🎯 Type-Safe**: Compile-time type checking with derive macros
-- **🔄 Circular References**: Automatic tracking of shared and circular references with `Rc`/`Arc` and weak pointers
-- **🧬 Polymorphic**: Serialize trait objects with `Box<dyn Trait>`, `Rc<dyn Trait>`, and `Arc<dyn Trait>`
-- **📦 Schema Evolution**: Compatible mode for independent schema changes
-- **⚡ Two Modes**: Object graph serialization and zero-copy row-based format
+- **Blazingly Fast**: Zero-copy deserialization and optimized binary protocols
+- **Cross-Language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
+- **Type-Safe**: Compile-time type checking with derive macros
+- **Circular References**: Automatic tracking of shared and circular references with `Rc`/`Arc` and weak pointers
+- **Polymorphic**: Serialize trait objects with `Box<dyn Trait>`, `Rc<dyn Trait>`, and `Arc<dyn Trait>`
+- **Schema Evolution**: Compatible mode for independent schema changes
+- **Two Modes**: Object graph serialization and zero-copy row-based format
 
 ### Object Graph Serialization
 
@@ -193,38 +193,18 @@ When a Scala class has default parameters, the Scala compiler generates methods 
 
 ## Kotlin Features
 
+Kotlin support builds on the default Fory Java implementation and adds handling for Kotlin-specific types and schema evolution.
+
 ### Supported Types
 
-- primitives: `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double`, `UByte`, `UShort`, `UInt`, `ULong`.
-- `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double` works out of the box with the default fory java implementation.
-- stdlib `collection`: `ArrayDeque`, `ArrayList`, `HashMap`,`HashSet`, `LinkedHashSet`, `LinkedHashMap`.
-- `ArrayList`, `HashMap`,`HashSet`, `LinkedHashSet`, `LinkedHashMap` works out of the box with the default fory java implementation.
-- `String` works out of the box with the default fory java implementation.
-- arrays: `Array`, `BooleanArray`, `ByteArray`, `CharArray`, `DoubleArray`, `FloatArray`, `IntArray`, `LongArray`, `ShortArray`
-- all standard array types work out of the box with the default fory java implementation.
-- unsigned arrays: `UByteArray`, `UShortArray`, `UIntArray`, `ULongArray`
-- from stdlib: `Pair`, `Triple`, `Result`
-- kotlin.random: `Random`
-- kotlin.ranges: `CharRange`, `CharProgression`, `IntRange`, `IntProgression`, `LongRange`, `LongProgression`, `UintRange`, `UintProgression`, `ULongRange`, `ULongProgression`
-- kotlin.text: `Regex`
-- kotlin.time: `Duration`
-- kotlin.uuid: `Uuid`
-
-Additional support is added for the following classes in kotlin:
-
-- Unsigned primitives: `UByte`, `UShort`, `UInt`, `ULong`
-- Unsigned array types: `UByteArray`, `UShortArray`, `UIntArray`, `ULongArray`
-- Empty collections: `emptyList`, `emptyMap`, `emptySet`
-- Collections: `ArrayDeque`
-- kotlin.time: `Duration`
-- kotlin.uuid: `Uuid`
+- Primitive types: `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double`
+- Unsigned types: `UByte`, `UShort`, `UInt`, `ULong`
+- Strings, standard arrays, and standard collections through the default Java implementation
+- Kotlin collections and arrays such as `ArrayDeque`, `Array`, `BooleanArray`, `ByteArray`, `IntArray`, `LongArray`, `UByteArray`, `UIntArray`, and `ULongArray`
+- Common stdlib types including `Pair`, `Triple`, `Result`, `Regex`, `Random`, `Duration`, and `Uuid`
+- Kotlin ranges and progressions such as `CharRange`, `IntRange`, `LongRange`, `UIntRange`, `ULongRange`, and related progression types
+- Empty collections such as `emptyList`, `emptyMap`, and `emptySet`
 
 ### Data Class Default Value Support
 
-Apache Fory™ Kotlin provides support for Kotlin data class default values during serialization and deserialization. This feature allows for backward and forward compatibility when data class schemas evolve.
-
-When a Kotlin data class has parameters with default values, Apache Fory™ can:
-
-1. **Detect default values** using Kotlin reflection
-2. **Apply default values** during deserialization when fields are missing from serialized data
-3. **Support schema evolution** by allowing new fields with defaults to be added without breaking existing serialized data
+In compatible mode, Fory can detect Kotlin data class default values and apply them during deserialization when fields are missing. This allows schemas to evolve more safely, for example when adding new fields with defaults.

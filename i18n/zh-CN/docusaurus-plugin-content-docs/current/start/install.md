@@ -114,7 +114,7 @@ cargo add fory@0.16.0
 
 ## JavaScript
 
-Apache Fory 的 JavaScript 包在源码仓库中定义为 `@apache-fory/core` 和 `@apache-fory/hps`，但目前还没有发布到 npm。
+Apache Fory 的 JavaScript 包目前还没有发布到 npm。
 
 目前请先从源码安装并构建：
 

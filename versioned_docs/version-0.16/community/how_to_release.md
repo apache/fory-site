@@ -208,10 +208,17 @@ If the discussion goes positive, you will need to prepare the release artifiacts
 
 ### Github branch and tag
 
-- Create a new branch named `releases-0.12.0`
+- Create a new branch named `releases-0.16.0`
 - Bump version to `$version` by executing command `python ci/release.py bump_version -l all -version $version`
 - Make a git commit and push the branch to `git@github.com:apache/fory.git`
-- Create a new tag by `git tag v0.12.0-rc1`, then push it to `git@github.com:apache/fory.git`
+- Create a new release tag by `git tag v0.16.0-rc1`, then push it to `git@github.com:apache/fory.git`
+- If the Go module under `go/fory` is part of this release, create and push the Go submodule tag as well. For example, for the final `0.16.0` release:
+
+```bash
+git remote add apache git@github.com:apache/fory.git
+git tag go/fory/v0.16.0
+git push apache go/fory/v0.16.0
+```
 
 ### Build and upload artifacts to SVN dist/dev repo
 
@@ -434,6 +441,9 @@ https://repository.apache.org/content/repositories/orgapachefory-1003
 
 Git tag for the release:
 https://github.com/apache/fory/releases/tag/v0.12.0-rc1
+
+If this release also publishes the Go module, include the Go submodule tag too:
+https://github.com/apache/fory/releases/tag/go/fory/v0.16.0
 
 Git commit for the release:
 https://github.com/apache/fory/commit/fae06330edd049bb960536e978a45b97bca66faf

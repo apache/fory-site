@@ -215,6 +215,7 @@ If the discussion goes positive, you will need to prepare the release artifiacts
 - If the Go module under `go/fory` is part of this release, create and push the Go submodule tag as well. For example, for the final `0.16.0` release:
 
 ```bash
+git remote add apache git@github.com:apache/fory.git
 git tag go/fory/v0.16.0
 git push apache go/fory/v0.16.0
 ```

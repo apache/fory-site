@@ -19,7 +19,7 @@ id: how_to_release
 此发布过程在 Ubuntu 系统中运行，需要以下几个环境依赖：
 
 - JDK 1.8+
-- Apache Maven 3.x+ 版本
+- Apache Maven 3.x+
 - Python 3.8
 - GnuPG 2.x
 - Git
@@ -202,10 +202,17 @@ ${name}
 
 ### Github 分支和标签
 
-- 创建一个名为 `releases-0.12.0`
+- 创建一个名为 `releases-0.16.0`
 - 通过执行命令将版本 `$version` 升级到 `python ci/release.py bump_version -l all -version $version`
 - 执行 git commit 并将分支推送到 `git@github.com:apache/fory.git`
-- 通过 `git tag v0.12.0-rc1` 创建一个新标签，然后将其推送到 `git@github.com:apache/fory.git`
+- 通过 `git tag v0.16.0-rc1` 创建一个 release 标签，然后将其推送到 `git@github.com:apache/fory.git`
+- 如果本次发布包含 `go/fory` 这个 Go 子模块，还需要额外创建并推送 Go 子模块标签。例如，对于最终版 `0.16.0`，执行：
+
+```bash
+git remote add apache git@github.com:apache/fory.git
+git tag go/fory/v0.16.0
+git push apache go/fory/v0.16.0
+```
 
 ### 构建 artifacts 并上传到 SVN dist/dev 仓库
 
@@ -283,6 +290,9 @@ https://repository.apache.org/content/repositories/orgapachefory-1003
 
 Git tag for the release:
 https://github.com/apache/fory/releases/tag/v0.12.0-rc1
+
+如果本次发布还包含 Go 模块，请同时附上 Go 子模块标签：
+https://github.com/apache/fory/releases/tag/go/fory/v0.16.0
 
 Git commit for the release:
 https://github.com/apache/fory/commit/fae06330edd049bb960536e978a45b97bca66faf
