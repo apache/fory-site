@@ -19,17 +19,11 @@ The following benchmarks compare Fory against popular Java serialization framewo
 
 ### Java Serialization
 
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+![Java Serialization Throughput](../benchmarks/java/java_repo_serialization_throughput.png)
 
-### Java Deserialization
+**Deserialization Throughput**:
 
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
-<img width="48%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
+![Java Deserialization Throughput](../benchmarks/java/java_repo_deserialization_throughput.png)
 
 **Important**: Fory's runtime code generation requires proper warm-up for performance measurement:
 
@@ -62,6 +56,17 @@ single-object and list workloads.
 
 Note: Results depend on hardware, dataset, and implementation versions. See the
 Go benchmark report for details: https://fory.apache.org/docs/benchmarks/go/
+
+## Python Benchmark
+
+Fory Python demonstrates strong performance compared to `pickle` and Protobuf
+across single-object and list workloads.
+
+<img src="/img/benchmarks/python/throughput.png" width="90%"/>
+
+Note: Results depend on hardware, dataset, Python runtime, and implementation
+versions. See the Python benchmark report for details:
+https://fory.apache.org/docs/benchmarks/python/
 
 ## C# Benchmark
 

@@ -311,6 +311,8 @@ This modular design ensures clean separation of concerns and makes the codebase 
 | system_data    | medium | serialize | 174,240    | 11,896     | 14,753       | fory    |
 | system_data    | large  | serialize | 10,671     | 876        | 1,040        | fory    |
 
+See https://github.com/apache/fory/tree/v0.16.0/benchmarks/rust for rust benchmark code and data.
+
 ## When to Use Apache Fory Rust
 
 ### ✅ **Ideal Use Cases**

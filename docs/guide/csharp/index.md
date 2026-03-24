@@ -99,6 +99,6 @@ User decoded = fory.Deserialize<User>(payload);
 
 ## Related Resources
 
-- [Cross-language serialization specification](../../specification/xlang_serialization_spec.md)
-- [Cross-language guide](../xlang/index.md)
+- [Cross-language serialization specification](../../specification/xlang_serialization_spec)
+- [Cross-language guide](../xlang)
 - [C# source directory](https://github.com/apache/fory/tree/main/csharp)

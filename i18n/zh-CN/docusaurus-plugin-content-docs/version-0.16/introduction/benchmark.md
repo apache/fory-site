@@ -15,17 +15,11 @@ sidebar_position: 2
 
 ### Java 序列化
 
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/serialization/bench_serialize_SAMPLE_to_array_tps.png" />
+![Java 序列化吞吐量](../benchmarks/java/java_repo_serialization_throughput.png)
 
-### Java 反序列化
+**反序列化吞吐量**：
 
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
-<img width="33%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_SAMPLE_from_array_tps.png" />
+![Java 反序列化吞吐量](../benchmarks/java/java_repo_deserialization_throughput.png)
 
 更多关于类型前向/后向兼容性、堆外支持、零拷贝序列化的性能测试，请参见 [benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks)。
 
