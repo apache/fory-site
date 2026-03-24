@@ -11,61 +11,6 @@ sidebar_position: 3
 
 Java 性能测试部分使用 `docs/benchmarks/java` 中的当前基准套件，对 Fory 与常见 Java 序列化框架进行对比。
 
-图表按以下维度分组：
-
-- **Heap**：序列化到堆上的 `byte[]` 缓冲区
-- **Off-heap**：序列化到 direct/off-heap 缓冲区
-- **Compatible**：启用向前和向后兼容的 Schema 演进模式
-- **Consistent**：要求通信双方 Schema 完全一致的 Schema 一致模式
-
-**测试类**：
-
-- `Struct`：包含 [100 个基础类型字段](https://github.com/apache/fory/tree/main/docs/benchmarks#Struct) 的类
-- `MediaContent`：来自 [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java) 的类
-- `Sample`：来自 [Kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/master/benchmarks/src/main/java/com/esotericsoftware/kryo/benchmarks/data/Sample.java) 的类
-
-### Heap 序列化
-
-Compatible 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_MEDIA_CONTENT_to_array_tps.png" />
-
-Consistent 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_MEDIA_CONTENT_to_array_tps.png" />
-
-### Off-heap 序列化
-
-Compatible 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_compatible_STRUCT_to_directBuffer_tps.png" />
-
-Consistent 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/serialization/bench_serialize_STRUCT_to_directBuffer_tps.png" />
-
-### Heap 反序列化
-
-Compatible 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_MEDIA_CONTENT_from_array_tps.png" />
-
-Consistent 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_MEDIA_CONTENT_from_array_tps.png" />
-
-### Off-heap 反序列化
-
-Compatible 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_compatible_STRUCT_from_directBuffer_tps.png" />
-
-Consistent 模式：
-
-<img width="90%" alt="" src="/img/benchmarks/deserialization/bench_deserialize_STRUCT_from_directBuffer_tps.png" />
-
-### 仓库吞吐汇总
-
 **序列化吞吐**：
 
 ![Java 序列化吞吐](../benchmarks/java/java_repo_serialization_throughput.png)
@@ -74,13 +19,11 @@ Consistent 模式：
 
 ![Java 反序列化吞吐](../benchmarks/java/java_repo_deserialization_throughput.png)
 
-### 零拷贝性能测试
-
-序列化：
+**零拷贝序列化吞吐**：
 
 <img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_serialize_BUFFER_to_array_tps.png" />
 
-反序列化：
+**零拷贝反序列化吞吐**：
 
 <img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_deserialize_BUFFER_from_array_tps.png" />
 
