@@ -134,7 +134,7 @@ cd packages/hps
 npm run build
 ```
 
-## C#
+## C\#
 
 安装 `Apache.Fory` NuGet 包。它同时包含运行时和 `[ForyObject]` 类型所需的源代码生成器。
 

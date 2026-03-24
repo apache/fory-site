@@ -134,7 +134,7 @@ cd packages/hps
 npm run build
 ```
 
-## C#
+## C\#
 
 Install the `Apache.Fory` NuGet package. It includes both the runtime and the source generator for `[ForyObject]` types.
 

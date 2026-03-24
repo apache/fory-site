@@ -432,7 +432,7 @@ const result = deserialize(payload);
 console.log(result);
 ```
 
-### C#
+### C\#
 
 C# 的跨语言代码看起来与原生模式很接近，但运行时需要显式启用 xlang 和 compatible 模式。与此同时，仍然必须与 Java、Go、Swift、Rust 等对端使用相同的类型 ID 或 namespace/name 映射。
 

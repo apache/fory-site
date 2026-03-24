@@ -432,7 +432,7 @@ const result = deserialize(payload);
 console.log(result);
 ```
 
-### C#
+### C\#
 
 C# cross-language code looks similar to native usage, but the runtime is explicitly configured for xlang and compatible mode. Use the same type ID or namespace/name mapping as your Java, Go, Swift, or Rust peers.
 
