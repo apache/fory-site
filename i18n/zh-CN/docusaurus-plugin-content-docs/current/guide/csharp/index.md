@@ -85,17 +85,17 @@ User decoded = fory.Deserialize<User>(payload);
 
 | 主题                                          | 说明                               |
 | --------------------------------------------- | ---------------------------------- |
-| [配置](configuration.md)                      | 构建器选项与运行时模式             |
-| [基础序列化](basic-serialization.md)          | 强类型和动态序列化 API             |
-| [类型注册](type-registration.md)              | 注册用户类型和自定义序列化器       |
-| [自定义序列化器](custom-serializers.md)       | 实现 `Serializer<T>`               |
-| [字段配置](field-configuration.md)            | `[Field]` 特性与整数编码选项       |
-| [引用](references.md)                         | 共享引用与循环引用处理             |
-| [Schema 演进](schema-evolution.md)            | 兼容模式行为                       |
-| [跨语言](cross-language.md)                   | 互操作性指导                       |
-| [支持的类型](supported-types.md)              | 内置类型与生成类型支持             |
-| [线程安全](thread-safety.md)                  | `Fory` 与 `ThreadSafeFory` 的用法  |
-| [故障排查](troubleshooting.md)                | 常见错误与调试步骤                 |
+| [配置](https://fory.apache.org/docs/guide/csharp/configuration)               | 构建器选项与运行时模式             |
+| [基础序列化](https://fory.apache.org/docs/guide/csharp/basic-serialization)   | 强类型和动态序列化 API             |
+| [类型注册](https://fory.apache.org/docs/guide/csharp/type-registration)       | 注册用户类型和自定义序列化器       |
+| [自定义序列化器](https://fory.apache.org/docs/guide/csharp/custom-serializers) | 实现 `Serializer<T>`               |
+| [字段配置](https://fory.apache.org/docs/guide/csharp/field-configuration)     | `[Field]` 特性与整数编码选项       |
+| [引用](https://fory.apache.org/docs/guide/csharp/references)                  | 共享引用与循环引用处理             |
+| [Schema 演进](https://fory.apache.org/docs/guide/csharp/schema-evolution)     | 兼容模式行为                       |
+| [跨语言](https://fory.apache.org/docs/guide/csharp/cross-language)            | 互操作性指导                       |
+| [支持的类型](https://fory.apache.org/docs/guide/csharp/supported-types)       | 内置类型与生成类型支持             |
+| [线程安全](https://fory.apache.org/docs/guide/csharp/thread-safety)           | `Fory` 与 `ThreadSafeFory` 的用法  |
+| [故障排查](https://fory.apache.org/docs/guide/csharp/troubleshooting)         | 常见错误与调试步骤                 |
 
 ## 相关资源
 
