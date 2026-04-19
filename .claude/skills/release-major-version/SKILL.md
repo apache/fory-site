@@ -80,18 +80,20 @@ This workflow covers:
 
 ## Step 1: Write the Release Blog
 
-1. Find the previous release blog in `blog/`, typically `blog/YYYY-MM-DD-fory_<prev>_release.md`.
-2. Create the new release post by adapting the previous one instead of starting from scratch.
-3. Update the post carefully:
+1. Ask the user to provide the English draft for the release blog if it has not already been provided.
+2. Find the previous release blog in `blog/`, typically `blog/YYYY-MM-DD-fory_<prev>_release.md`.
+3. Use the previous release blog as a structural/reference template, but treat the user-provided English draft as the source content for the new post.
+4. Create or revise the new release post around that English draft rather than inventing the release narrative from scratch.
+5. Update the post carefully:
    - frontmatter `slug`, `title`, `tags`, date-based filename
    - opening release paragraph
    - compare link
    - PR counts / contributor counts if the post includes them
    - highlights/features/fixes sections
    - benchmark images and asset paths
-4. Put blog-specific assets under `static/img/blog/fory_<version>_release/` when the post needs dedicated images.
-5. If you add benchmark images, ensure the referenced static paths and copied files match exactly.
-6. Validate the post for obvious copy/paste errors from the previous release.
+6. Put blog-specific assets under `static/img/blog/fory_<version>_release/` when the post needs dedicated images.
+7. If you add benchmark images, ensure the referenced static paths and copied files match exactly.
+8. Validate the post for obvious copy/paste errors from the previous release.
 
 ## Step 1A: Bump Versioned References in Current Docs
 
