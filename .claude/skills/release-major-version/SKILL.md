@@ -64,18 +64,22 @@ This workflow covers:
    - `versions.json`
    - `scripts/docusaurus-with-i18n.sh`
 2. Confirm the current latest released version, the target new version, and the previous released version that will become the explicit older-version route after the cut.
-3. Verify the site repo already contains the intended upstream docs state from `apache/fory` before you start. At minimum:
-   - check whether the needed `docs/guide` and `docs/specification` changes are already present in this repo
-   - if not, stop and sync or ask the user before freezing a stale snapshot
+3. Verify the site repo already contains the intended upstream docs state from `apache/fory` before you start. Do not assume the release only touches `docs/guide`.
+   - compare current `docs/` against `versioned_docs/version-<previous-version>/` to discover the actual English doc delta for this release
+   - inspect the changed paths across all doc trees, including `docs/start`, `docs/guide`, `docs/compiler`, `docs/benchmarks`, `docs/specification`, `docs/introduction`, and `docs/community`
+   - explicitly confirm that any upstream docs expected for the release are already synced into this repo before freezing the snapshot
+   - if needed upstream docs are missing, stop and sync or ask the user before freezing a stale snapshot
 4. Check that the target version is clean:
    - the release blog filename does not already exist unless this is an intentional continuation
    - the blog asset directory does not already exist unless this is an intentional continuation
    - `versioned_docs/version-<version>/` does not already exist
    - `versioned_sidebars/version-<version>-sidebars.json` does not already exist
    - `i18n/zh-CN/docusaurus-plugin-content-docs/version-<version>/` does not already exist
-5. Scan:
-   - `blog/` for the previous release post to use as template
-   - `docs/`, `versioned_docs/`, and `i18n/zh-CN/docusaurus-plugin-content-docs/` so you understand the current tree
+5. Build a concrete release-doc scope before editing:
+   - scan `blog/` for the previous release post to use as template
+   - scan `docs/`, `versioned_docs/`, and `i18n/zh-CN/docusaurus-plugin-content-docs/` so you understand the current tree
+   - derive the release-doc scope from `versioned_docs/version-<previous-version>/` vs `docs/`
+   - treat that changed-doc list as the required release-doc scope for zh-CN translation and final review, instead of guessing only a few subtrees
 6. If the task is non-trivial, maintain a task note under `tasks/task-<slug>.md` and archive it to `tasks/history/` when finished.
 
 ## Step 1: Write the Release Blog
@@ -140,6 +144,10 @@ Minimum workflow:
    - keep blog asset paths aligned with the English source unless there is a deliberate zh-only asset change
 4. Translate or sync the zh-CN docs for the doc changes that should ship with the new release.
    - primary path mapping: `docs/<subpath>` -> `i18n/zh-CN/docusaurus-plugin-content-docs/current/<subpath>`
+   - do not limit this to `docs/guide/**`
+   - translate or sync every changed English doc in the release-doc scope relative to `versioned_docs/version-<previous-version>/`
+   - this includes changed files under `docs/benchmarks/**`, `docs/community/**`, `docs/compiler/**`, `docs/guide/**`, `docs/introduction/**`, `docs/specification/**`, and `docs/start/**`
+   - if a changed English current doc has no matching zh-CN current update before versioning, treat that as a blocking gap unless the file is intentionally English-only and documented as such
 5. Follow the translation skill's hard rule: no external translation tools or services.
 6. If top-level category labels changed, also update:
    - `i18n/zh-CN/docusaurus-plugin-content-docs/current.json`
@@ -181,6 +189,11 @@ After the command:
 4. Check for accidental carry-over of placeholder or half-English zh-CN content before accepting the snapshot
 5. Decide whether a manual `i18n/zh-CN/docusaurus-plugin-content-docs/version-<version>.json` should be added for this release
 6. If a later validation/build step generates additional fallback files under the new `version-<version>/` zh-CN tree, inspect them explicitly and decide whether they belong in the release commit
+7. Before accepting the snapshot, explicitly compare the release-doc scope in:
+   - `docs/<subpath>`
+   - `i18n/zh-CN/docusaurus-plugin-content-docs/current/<subpath>`
+   - `i18n/zh-CN/docusaurus-plugin-content-docs/version-<version>/<subpath>`
+   and resolve any obvious case where the versioned zh snapshot froze an older current zh file
 
 ## Step 6: Update the Default Docs Version
 
@@ -223,6 +236,9 @@ Also run targeted checks:
 - for example, search for the previous release string, older release strings likely to be copy/paste remnants, and placeholders such as `TODO` / `TBD`
 - treat stale latest-version references in current install/docs pages as blocking, especially in `docs/start/install.md`, `docs/guide/**/index.md`, and other `docs/guide/**` pages
 - confirm release blog asset paths exist under `static/img/blog/fory_<version>_release/`
+- compare the release-doc scope against the previous release snapshot so you do not miss changed docs outside `guide/` such as `compiler/generated-code.md`
+- for each changed English current doc in the release-doc scope, verify whether the matching zh current doc is updated, missing, or intentionally left as English fallback
+- if any changed doc under `benchmarks/`, `community/`, `compiler/`, `guide/`, `introduction/`, `specification/`, or `start/` is missing from zh current, treat that as unfinished release work rather than optional follow-up
 
 ## Step 8: Fresh Self-Review
 
@@ -237,6 +253,8 @@ The review should check at least:
 5. Are blog asset paths and benchmark links valid?
 6. Are there any obvious missing follow-up edits, such as `docs/start/install.md` or guide pages with pinned version references that should move to the new release?
 7. Did the workflow accidentally snapshot stale site docs because upstream `apache/fory` doc changes were not synced first?
+8. Did any changed English current doc outside `guide/` fail to get translated or reviewed in zh-CN before versioning, for example under `compiler/`, `benchmarks/`, `specification/`, `start/`, or `introduction/`?
+9. Does every changed zh current doc in the release-doc scope match the intended `version-<version>` snapshot, or did the workflow freeze an older zh current state?
 
 Treat review findings as blocking until resolved or explicitly documented.
 
