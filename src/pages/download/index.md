@@ -9,11 +9,11 @@ For binary install, please see Apache Fory™ [install](/docs/start/install/) do
 
 ## The latest release
 
-The latest source release is 0.16.0:
+The latest source release is 0.17.0:
 
 | Version | Date       | Source                                                                                                                                                                                                                                                                              | Release Notes                                                        |
 | ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| 0.16.0  | 2026-03-17 | [source](https://www.apache.org/dyn/closer.lua/fory/0.16.0/apache-fory-0.16.0-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/0.16.0/apache-fory-0.16.0-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/0.16.0/apache-fory-0.16.0-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v0.16.0) |
+| 0.17.0  | 2026-04-19 | [source](https://www.apache.org/dyn/closer.lua/fory/0.17.0/apache-fory-0.17.0-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/0.17.0/apache-fory-0.17.0-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/0.17.0/apache-fory-0.17.0-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v0.17.0) |
 
 ## All archived releases
 
@@ -28,16 +28,16 @@ These files are named after the files they relate to but have `.sha512/.asc` ext
 
 ### Verifying Checksums
 
-To verify the SHA digests, you need the `.tgz` and its associated `.tgz.sha512` file. An example command:
+To verify the SHA digests, you need the `.tar.gz` file and its associated `.tar.gz.sha512` file. An example command:
 
 ```bash
-sha512sum --check apache-fory-0.16.0-src.tar.gz
+sha512sum --check apache-fory-0.17.0-src.tar.gz
 ```
 
 It should output something like:
 
 ```bash
-apache-fory-0.16.0-src.tar.gz: OK
+apache-fory-0.17.0-src.tar.gz: OK
 ```
 
 ### Verifying Signatures
@@ -54,7 +54,7 @@ gpg --import KEYS
 Then you can verify signature:
 
 ```bash
-gpg --verify apache-fory-0.16.0-src.tar.gz.asc apache-fory-0.16.0-src.tar.gz
+gpg --verify apache-fory-0.17.0-src.tar.gz.asc apache-fory-0.17.0-src.tar.gz
 ```
 
 If something like the following appears, it means the signature is correct:
