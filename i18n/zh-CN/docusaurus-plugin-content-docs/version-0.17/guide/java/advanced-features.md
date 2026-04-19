@@ -1,6 +1,6 @@
 ---
 title: 高级特性
-sidebar_position: 7
+sidebar_position: 10
 id: advanced_features
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

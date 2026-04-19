@@ -600,6 +600,7 @@ public class User {
 
 ## 相关主题
 
-- [基础序列化](basic_serialization) - 快速上手 Fory 序列化
-- [Schema 演进](schema_evolution) - 兼容模式与 schema 演进
-- [跨语言](cross_language) - 与 Python、Rust、C++、Go 互操作
+- [基础序列化](basic-serialization.md) - 快速上手 Fory 序列化
+- [配置选项](configuration.md) - 运行时构建器选项
+- [枚举配置](enum-configuration.md) - `@ForyEnumId` 以及按名称/按 tag 的枚举行为
+- [Schema 演进](schema-evolution.md) - 兼容模式与 Schema 演进

@@ -71,7 +71,7 @@ fory.register(MyClass, typename="com.example.MyClass")
 ### 模式 3：使用自定义序列化器
 
 ```python
-fory.register(MyClass, type_id=100, serializer=MySerializer(fory, MyClass))
+fory.register(MyClass, type_id=100, serializer=MySerializer(fory.type_resolver, MyClass))
 ```
 
 ### 模式 4：批量注册

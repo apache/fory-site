@@ -63,7 +63,11 @@ foryc --scan-generated [OPTIONS]
 | `--cpp_out=DST_DIR`                   | 将 C++ 代码输出到 `DST_DIR`                      | （无）        |
 | `--go_out=DST_DIR`                    | 将 Go 代码输出到 `DST_DIR`                       | （无）        |
 | `--rust_out=DST_DIR`                  | 将 Rust 代码输出到 `DST_DIR`                     | （无）        |
+| `--javascript_out=DST_DIR`            | 将 JavaScript 代码输出到 `DST_DIR`               | （无）        |
+| `--swift_out=DST_DIR`                 | 将 Swift 代码输出到 `DST_DIR`                    | （无）        |
+| `--dart_out=DST_DIR`                  | 将 Dart 代码输出到 `DST_DIR`                     | （无）        |
 | `--go_nested_type_style`              | Go 嵌套类型命名风格：`camelcase` 或 `underscore` | schema/默认值 |
+| `--swift_namespace_style`             | Swift 命名空间风格：`enum` 或 `flatten`          | `enum`        |
 | `--emit-fdl`                          | 对非 `.fdl` 输入打印转换后的 Fory IDL            | `false`       |
 | `--emit-fdl-path`                     | 将转换后的 Fory IDL 写入文件或目录               | （stdout）    |
 
@@ -108,7 +112,7 @@ foryc schema.fdl
 **为指定语言编译：**
 
 ```bash
-foryc schema.fdl --lang java,python
+foryc schema.fdl --lang java,python,csharp,javascript,swift,dart
 ```
 
 **指定输出目录：**
@@ -127,6 +131,12 @@ foryc schema.fdl --package com.myapp.models
 
 ```bash
 foryc user.fdl order.fdl product.fdl --output ./generated
+```
+
+**编译包含 service 定义的简单 schema（生成 Java + Python 模型）：**
+
+```bash
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python
 ```
 
 **使用 import 搜索路径：**
@@ -155,7 +165,7 @@ foryc src/main.fdl -I libs/common,libs/types --proto_path third_party/
 foryc schema.fdl --java_out=./src/main/java
 
 # 多语言分别输出到不同目录
-foryc schema.fdl --java_out=./java/gen --python_out=./python/src --go_out=./go/gen
+foryc schema.fdl --java_out=./java/gen --python_out=./python/src --go_out=./go/gen --csharp_out=./csharp/gen --javascript_out=./javascript/src --swift_out=./swift/gen --dart_out=./dart/gen
 
 # 结合 import 路径
 foryc schema.fdl --java_out=./gen/java -I proto/ -I common/
@@ -224,13 +234,16 @@ Compiling src/main.fdl...
 
 ## 支持语言
 
-| 语言   | 标记     | 输出后缀 | 说明                   |
-| ------ | -------- | -------- | ---------------------- |
-| Java   | `java`   | `.java`  | 带 Fory 注解的 POJO    |
-| Python | `python` | `.py`    | 带类型提示的 dataclass |
-| Go     | `go`     | `.go`    | 带 struct tag 的结构体 |
-| Rust   | `rust`   | `.rs`    | 带 derive 宏的结构体   |
-| C++    | `cpp`    | `.h`     | 带 FORY 宏的结构体     |
+| 语言       | 标记         | 输出后缀 | 说明                      |
+| ---------- | ------------ | -------- | ------------------------- |
+| Java       | `java`       | `.java`  | 带 Fory 注解的 POJO       |
+| Python     | `python`     | `.py`    | 带类型提示的 dataclass    |
+| Go         | `go`         | `.go`    | 带 struct tag 的结构体    |
+| Rust       | `rust`       | `.rs`    | 带 derive 宏的结构体      |
+| C++        | `cpp`        | `.h`     | 带 FORY 宏的结构体        |
+| JavaScript | `javascript` | `.ts`    | 带注册函数的接口          |
+| Swift      | `swift`      | `.swift` | `@ForyObject` Swift 模型  |
+| Dart       | `dart`       | `.dart`  | 带注解的 `@ForyStruct` 类 |
 
 ## 输出结构
 
@@ -299,6 +312,35 @@ generated/
 - 单头文件输出
 - 命名空间与 package 对齐（点号转换为 `::`）
 - 自动包含 header guard 与前向声明
+
+### JavaScript
+
+```
+generated/
+└── javascript/
+    └── example.ts
+```
+
+- 每个 schema 生成一个 `.ts` 文件
+- message 生成为 `export interface`
+- enum 生成为 `export enum`
+- union 生成为带 case enum 的判别联合
+- 文件内包含注册辅助函数
+
+### Dart
+
+```
+generated/
+└── dart/
+    └── package/
+        ├── package.dart
+        └── package.fory.dart
+```
+
+- 每个 schema 生成两个文件：带注解类型的主 `.dart` 文件，以及带序列化器的 `.fory.dart` part 文件
+- package 各段映射为目录层级（例如 `demo.foo` -> `demo/foo/`）
+- 注册辅助类位于 part 文件中
+- 非可空、非 `ref` 的基础类型列表会使用类型化数组（例如 `Int32List`）
 
 ## 构建系统集成
 
@@ -488,6 +530,30 @@ cc_library(
 )
 ```
 
+### Dart / Flutter
+
+在 `pubspec.yaml` 中加入 Fory 依赖：
+
+```yaml
+dependencies:
+  fory: ^0.1.0
+
+dev_dependencies:
+  build_runner: ^2.4.0
+```
+
+用编译器生成 schema 类型：
+
+```bash
+foryc schema.fdl --dart_out=lib/generated
+```
+
+随后运行 `build_runner` 生成序列化器：
+
+```bash
+dart run build_runner build
+```
+
 ## 错误处理
 
 ### 语法错误
@@ -495,6 +561,18 @@ cc_library(
 ```
 Error: Line 5, Column 12: Expected ';' after field declaration
 ```
+
+### 未知类型引用
+
+```
+Error: Unknown type 'Address' in Customer.address
+```
+
+修复方式：先定义被引用的类型，或检查拼写是否正确。
+
+service RPC 的请求和响应类型也按同样规则校验。例如
+`rpc SayHello (HelloRequest) returns (HelloReply);`
+中的类型必须已定义；否则校验器会在 RPC 所在行报出 `Unknown type '...'` 错误。
 
 修复方式：检查对应行是否缺少分号或存在语法问题。
 
@@ -653,3 +731,10 @@ fory = "x.y.z"
 ```
 
 **C++：** 确保编译器 include 路径可找到 Fory 头文件。
+
+**Dart：** 确保 `pubspec.yaml` 中包含 fory 依赖：
+
+```yaml
+dependencies:
+  fory: ^0.1.0
+```

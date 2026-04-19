@@ -1,6 +1,6 @@
 ---
 title: 迁移指南
-sidebar_position: 10
+sidebar_position: 13
 id: migration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

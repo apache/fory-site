@@ -40,6 +40,20 @@ Apache Fory™ 通过**使用代码生成而非反射**，可以完美地与 Gra
 
 ## 基础用法
 
+### 步骤 0：添加 GraalVM 支持依赖
+
+在构建 native image 时，请将 `fory-graalvm-feature` 添加到应用依赖中：
+
+```xml
+<dependency>
+  <groupId>org.apache.fory</groupId>
+  <artifactId>fory-graalvm-feature</artifactId>
+  <version>${fory.version}</version>
+</dependency>
+```
+
+该依赖已经在 `META-INF/native-image` 中携带 GraalVM feature 元数据，因此只要将它加入依赖，就会在 `native-image` 构建期间自动启用 `org.apache.fory.graalvm.feature.ForyGraalVMFeature`。
+
 ### 步骤 1：创建 Fory 并注册类
 
 ```java
@@ -72,36 +86,19 @@ public class Example {
 Args = --initialize-at-build-time=com.example.Example
 ```
 
-## ForyGraalVMFeature（可选）
+## `fory-graalvm-feature` 会处理什么
 
-对于大多数具有公共构造函数的类型，上述基本设置就足够了。但是，一些高级情况需要反射注册：
+加入 `fory-graalvm-feature` 依赖后，Fory 会自动注册这些高级场景所需的额外 GraalVM 元数据：
 
 - **私有构造函数**（没有可访问的无参构造函数的类）
 - **私有内部类/记录**
 - **动态代理序列化**
 
-`fory-graalvm-feature` 模块会自动处理这些情况，无需手动配置 `reflect-config.json`。
-
-### 添加依赖
-
-```xml
-<dependency>
-  <groupId>org.apache.fory</groupId>
-  <artifactId>fory-graalvm-feature</artifactId>
-  <version>${fory.version}</version>
-</dependency>
-```
-
-### 启用功能
-
-将以下内容添加到您的 `native-image.properties`：
+这意味着在大多数应用中都不再需要手工维护 `reflect-config.json`。你自己的 `native-image.properties` 仍只需要配置在构建时初始化的引导类，例如：
 
 ```properties
-Args = --initialize-at-build-time=com.example.Example \
-       --features=org.apache.fory.graalvm.feature.ForyGraalVMFeature
+Args = --initialize-at-build-time=com.example.Example
 ```
-
-### ForyGraalVMFeature 处理的内容
 
 | 场景                     | 不使用 Feature              | 使用 Feature |
 | ------------------------ | --------------------------- | ------------ |
@@ -137,16 +134,22 @@ public class ProxyExample {
     String execute();
   }
 
+  public interface Audited {
+    String traceId();
+  }
+
   static Fory fory;
 
   static {
     fory = Fory.builder().build();
-    // 为序列化注册代理接口
-    GraalvmSupport.registerProxySupport(MyService.class);
+    // 按照 Proxy.newProxyInstance(...) 的接口顺序精确注册
+    GraalvmSupport.registerProxySupport(MyService.class, Audited.class);
     fory.ensureSerializersCompiled();
   }
 }
 ```
+
+对于只实现单个接口的代理，可以使用 `registerProxySupport(MyService.class)`。如果代理实现了多个接口，则应按创建代理时使用的相同顺序传入完整接口列表。只要 classpath 中包含 `fory-graalvm-feature`，这就可以替代这些代理形状对应的手工 `proxy-config.json` 配置。
 
 ## 线程安全的 Fory
 
@@ -163,8 +166,8 @@ public class ThreadSafeExample {
   static ThreadSafeFory fory;
 
   static {
-    fory = new ThreadLocalFory(classLoader -> {
-      Fory f = Fory.builder().build();
+    fory = new ThreadLocalFory(builder -> {
+      Fory f = builder.build();
       f.register(Foo.class);
       f.ensureSerializersCompiled();
       return f;
@@ -198,7 +201,7 @@ fory.ensureSerializersCompiled();
 
 如果该类具有私有构造函数，可以：
 
-1. 添加 `fory-graalvm-feature` 依赖，或
+1. 确保 `fory-graalvm-feature` 已经位于 native-image classpath 中，或
 2. 为该特定类创建 `reflect-config.json`
 
 ## 框架集成

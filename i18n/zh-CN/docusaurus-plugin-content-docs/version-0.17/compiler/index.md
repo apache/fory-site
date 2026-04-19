@@ -20,7 +20,7 @@ license: |
 ---
 
 Fory IDL 是 Apache Fory 的 Schema 定义语言，可实现类型安全的跨语言序列化。
-你只需定义一次数据结构，即可为 Java、Python、Go、Rust 和 C++ 生成原生数据结构代码。
+你只需定义一次数据结构，即可为 Java、Python、Go、Rust、C++、C#、Swift、JavaScript 和 Dart 生成原生数据结构代码。
 
 ## 示例 Schema
 
@@ -99,6 +99,10 @@ union Animal [id=106] {
 - Go：带 struct tag 的结构体
 - Rust：带 `#[derive(ForyObject)]` 的结构体
 - C++：带 `FORY_STRUCT` 宏的结构体
+- C#：带 `[ForyObject]` 的类及注册辅助函数
+- JavaScript：带注册函数的接口
+- Swift：带 `@ForyObject` 模型、`@ForyField` 元数据和注册辅助函数
+- Dart：带 `@ForyStruct` 类、`@ForyField` 注解和注册辅助函数
 
 ## 快速开始
 
@@ -136,7 +140,7 @@ message Person {
 foryc example.fdl --output ./generated
 
 # 为指定语言生成
-foryc example.fdl --lang java,python --output ./generated
+foryc example.fdl --lang java,python,csharp,javascript,swift,dart --output ./generated
 ```
 
 ### 4. 使用生成代码
@@ -191,11 +195,11 @@ message Example {
 
 Fory IDL 类型会映射为各语言原生类型：
 
-| Fory IDL 类型 | Java      | Python         | Go       | Rust     | C++           |
-| ------------- | --------- | -------------- | -------- | -------- | ------------- |
-| `int32`       | `int`     | `pyfory.int32` | `int32`  | `i32`    | `int32_t`     |
-| `string`      | `String`  | `str`          | `string` | `String` | `std::string` |
-| `bool`        | `boolean` | `bool`         | `bool`   | `bool`   | `bool`        |
+| Fory IDL 类型 | Java      | Python         | Go       | Rust     | C++           | C#       | JavaScript | Swift    | Dart     |
+| ------------- | --------- | -------------- | -------- | -------- | ------------- | -------- | ---------- | -------- | -------- |
+| `int32`       | `int`     | `pyfory.int32` | `int32`  | `i32`    | `int32_t`     | `int`    | `number`   | `Int32`  | `Int32`  |
+| `string`      | `String`  | `str`          | `string` | `String` | `std::string` | `string` | `string`   | `String` | `String` |
+| `bool`        | `boolean` | `bool`         | `bool`   | `bool`   | `bool`        | `bool`   | `boolean`  | `Bool`   | `bool`   |
 
 完整映射请参见 [类型系统](schema-idl.md#type-system)。
 

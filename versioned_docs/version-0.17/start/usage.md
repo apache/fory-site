@@ -172,7 +172,7 @@ let result: Person = try fory.deserialize(data)
 print("\(result.name) \(result.age)")
 ```
 
-For detailed Swift usage including polymorphism, schema evolution, and troubleshooting, see [Swift Guide](../guide/swift/index.md).
+For detailed Swift usage including polymorphism, schema evolution, and troubleshooting, see [Swift Guide](../guide/swift/).
 
 ### Rust Serialization
 
@@ -496,7 +496,7 @@ For examples with circular references, shared references, and polymorphism acros
 - [Cross-Language Serialization Guide](../guide/xlang/index.md)
 - [Go Guide - Cross Language](../guide/go/cross-language.md)
 - [C# Guide - Cross Language](../guide/csharp/cross-language.md)
-- [Swift Guide - Cross Language](../guide/swift/cross-language.md)
+- [Swift Guide - Cross Language](../guide/swift/cross_language)
 
 ## Row Format Encoding
 

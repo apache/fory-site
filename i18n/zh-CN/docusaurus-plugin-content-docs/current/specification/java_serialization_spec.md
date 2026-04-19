@@ -299,7 +299,9 @@ namespace、type name、field name 复用 xlang 的 meta string 编码。
 ### Enum
 
 - `serializeEnumByName=true`：写 enum 名称（meta string）
-- 否则：写 ordinal（varuint32 small7）
+- 否则：写 enum tag（`varuint32 small7`）
+  - 默认情况下，tag 就是声明顺序对应的 ordinal。
+  - 如果 enum 配置了 `@ForyEnumId`，则写入其配置的稳定 ID。Java 支持恰好标注一个 ID 字段、一个无参 ID getter，或为每个 enum 常量显式指定 tag 值。
 
 ### Binary (byte[])
 

@@ -91,13 +91,16 @@ package com.example.models alias models_v1;
 
 语言映射：
 
-| 语言   | package 用法            |
-| ------ | ----------------------- |
-| Java   | Java package            |
-| Python | 模块名（`.` 转 `_`）    |
-| Go     | 包名（通常取最后一段）  |
-| Rust   | 模块名（`.` 转 `_`）    |
-| C++    | 命名空间（`.` 转 `::`） |
+| 语言       | package 用法              |
+| ---------- | ------------------------- |
+| Java       | Java package              |
+| Python     | 模块名（`.` 转 `_`）      |
+| Go         | 包名（通常取最后一段）    |
+| Rust       | 模块名（`.` 转 `_`）      |
+| C++        | 命名空间（`.` 转 `::`）   |
+| C#         | 命名空间                  |
+| JavaScript | 模块名（取最后一段）      |
+| Dart       | 库名（保留 package 各段） |
 
 ## 文件级选项
 
@@ -306,15 +309,29 @@ enum Status {
 
 ### 语言映射
 
-- Java：`enum`
-- Python：`IntEnum`
-- Go：`type + const`
-- Rust：`repr(i32)` 枚举
-- C++：`enum class`
+| 语言       | 实现形式                               |
+| ---------- | -------------------------------------- |
+| Java       | `enum Status { UNKNOWN, ACTIVE, ... }` |
+| Python     | `class Status(IntEnum): UNKNOWN = 0`   |
+| Go         | `type Status int32` 配合常量           |
+| Rust       | `#[repr(i32)] enum Status { Unknown }` |
+| C++        | `enum class Status : int32_t { ... }`  |
+| JavaScript | `export enum Status { UNKNOWN, ... }`  |
+| Dart       | `enum Status { unknown, active, ... }` |
 
 ### 枚举前缀处理
 
 针对 protobuf 风格 `TYPE_NAME_VALUE`，生成器通常会按语言习惯去除冗余前缀，使 API 更自然。
+
+| 语言       | 输出示例                                  | 风格             |
+| ---------- | ----------------------------------------- | ---------------- |
+| Java       | `UNKNOWN, TIER1, TIER2`                   | 作用域枚举       |
+| Rust       | `Unknown, Tier1, Tier2`                   | 作用域枚举       |
+| C++        | `UNKNOWN, TIER1, TIER2`                   | 作用域枚举       |
+| Python     | `UNKNOWN, TIER1, TIER2`                   | 作用域 `IntEnum` |
+| Go         | `DeviceTierUnknown, DeviceTierTier1, ...` | 非作用域常量     |
+| JavaScript | `UNKNOWN, TIER1, TIER2`                   | 作用域枚举       |
+| Dart       | `unknown, tier1, tier2`                   | 作用域枚举       |
 
 ## Message 定义
 
@@ -342,11 +359,15 @@ message User [id=100] {
 
 ### 语言映射
 
-- Java：类 / record（按选项）
-- Python：dataclass
-- Go：struct
-- Rust：struct
-- C++：class/struct + 宏元信息
+| 语言       | 实现形式                          |
+| ---------- | --------------------------------- |
+| Java       | 带 getter/setter 的 POJO          |
+| Python     | `@dataclass` 类                   |
+| Go         | 导出字段的 struct                 |
+| Rust       | `#[derive(ForyObject)]` 的 struct |
+| C++        | 带 `FORY_STRUCT` 宏的 struct      |
+| JavaScript | `export interface` 声明           |
+| Dart       | `@ForyStruct` `final class`       |
 
 ### 预留字段
 
@@ -397,13 +418,15 @@ message Person {
 
 ### 各语言生成形态
 
-| 语言   | 嵌套类型形态          |
-| ------ | --------------------- |
-| Java   | `Outer.Inner`         |
-| Python | `Outer.Inner`         |
-| Rust   | `outer::Inner`        |
-| C++    | `Outer::Inner`        |
-| Go     | `Outer_Inner`（默认） |
+| 语言       | 嵌套类型形态                                    |
+| ---------- | ----------------------------------------------- |
+| Java       | `Outer.Inner`                                   |
+| Python     | `Outer.Inner`                                   |
+| Rust       | `outer::Inner`                                  |
+| C++        | `Outer::Inner`                                  |
+| Go         | `Outer_Inner`（默认，可配置为 camelcase）       |
+| JavaScript | 扁平名称（如 `Result`）                         |
+| Dart       | 带下划线的扁平类名（如 `SearchResponse_Result`） |
 
 ### 嵌套规则
 
@@ -466,6 +489,18 @@ message User {
 
 建议在跨语言场景显式使用，以避免默认值差异。
 
+**生成代码：**
+
+| 语言       | 非 optional         | optional                                        |
+| ---------- | ------------------- | ----------------------------------------------- |
+| Java       | `String name`       | `String email` 配合 `@ForyField(nullable=true)` |
+| Python     | `name: str`         | `name: Optional[str]`                           |
+| Go         | `Name string`       | `Name *string`                                  |
+| Rust       | `name: String`      | `name: Option<String>`                          |
+| C++        | `std::string name`  | `std::optional<std::string> name`               |
+| JavaScript | `name: string`      | `name?: string \| null`                         |
+| Dart       | `String name`       | `String? email`                                 |
+
 #### `ref`
 
 开启引用跟踪，用于共享对象与循环结构：
@@ -480,6 +515,18 @@ message Node {
 
 当运行时全局 ref tracking 开启时，字段级 `ref` 才会生效。
 
+**生成代码：**
+
+| 语言       | 不使用 `ref`     | 使用 `ref`                                 |
+| ---------- | ---------------- | ------------------------------------------ |
+| Java       | `Node parent`    | `Node parent` 配合 `@ForyField(ref=true)`  |
+| Python     | `parent: Node`   | `parent: Node = pyfory.field(ref=True)`    |
+| Go         | `Parent Node`    | `Parent *Node` 配合 `fory:"ref"`           |
+| Rust       | `parent: Node`   | `parent: Arc<Node>`                        |
+| C++        | `Node parent`    | `std::shared_ptr<Node> parent`             |
+| JavaScript | `parent: Node`   | `parent: Node`（无额外 `ref` 区分）        |
+| Dart       | `Node parent`    | `Node parent` 配合 `@ForyField(ref: true)` |
+
 #### `list`
 
 列表字段（`repeated` 为等价别名）：
@@ -489,6 +536,18 @@ message Group {
     list<string> tags = 1;
 }
 ```
+
+**生成代码：**
+
+| 语言       | 类型                       |
+| ---------- | -------------------------- |
+| Java       | `List<String>`             |
+| Python     | `List[str]`                |
+| Go         | `[]string`                 |
+| Rust       | `Vec<String>`              |
+| C++        | `std::vector<std::string>` |
+| JavaScript | `string[]`                 |
+| Dart       | `List<String>`             |
 
 ### 组合修饰符
 
@@ -530,9 +589,37 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
 `bool` 表示布尔值。
 
+| 语言       | 类型      | 说明 |
+| ---------- | --------- | ---- |
+| Java       | `boolean` |      |
+| Python     | `bool`    |      |
+| Go         | `bool`    |      |
+| Rust       | `bool`    |      |
+| C++        | `bool`    |      |
+| JavaScript | `boolean` |      |
+| Dart       | `bool`    |      |
+
 #### Integer Types
 
 支持有符号/无符号与不同位宽。跨语言场景建议明确编码策略并保持字段语义稳定。
+
+**有符号整数映射：**
+
+| Fory IDL | Java    | Python         | Go      | Rust  | C++       | JavaScript         | Dart    |
+| -------- | ------- | -------------- | ------- | ----- | --------- | ------------------ | ------- |
+| `int8`   | `byte`  | `pyfory.int8`  | `int8`  | `i8`  | `int8_t`  | `number`           | `Int8`  |
+| `int16`  | `short` | `pyfory.int16` | `int16` | `i16` | `int16_t` | `number`           | `Int16` |
+| `int32`  | `int`   | `pyfory.int32` | `int32` | `i32` | `int32_t` | `number`           | `Int32` |
+| `int64`  | `long`  | `pyfory.int64` | `int64` | `i64` | `int64_t` | `bigint \| number` | `int`   |
+
+**无符号整数映射：**
+
+| Fory IDL | Java    | Python          | Go       | Rust  | C++        | JavaScript         | Dart     |
+| -------- | ------- | --------------- | -------- | ----- | ---------- | ------------------ | -------- |
+| `uint8`  | `short` | `pyfory.uint8`  | `uint8`  | `u8`  | `uint8_t`  | `number`           | `UInt8`  |
+| `uint16` | `int`   | `pyfory.uint16` | `uint16` | `u16` | `uint16_t` | `number`           | `UInt16` |
+| `uint32` | `long`  | `pyfory.uint32` | `uint32` | `u32` | `uint32_t` | `number`           | `UInt32` |
+| `uint64` | `long`  | `pyfory.uint64` | `uint64` | `u64` | `uint64_t` | `bigint \| number` | `int`    |
 
 #### Integer Encoding Variants
 
@@ -547,13 +634,38 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 - `float32`
 - `float64`
 
+| Fory IDL  | Java     | Python           | Go        | Rust  | C++      | JavaScript | Dart      |
+| --------- | -------- | ---------------- | --------- | ----- | -------- | ---------- | --------- |
+| `float32` | `float`  | `pyfory.float32` | `float32` | `f32` | `float`  | `number`   | `Float32` |
+| `float64` | `double` | `pyfory.float64` | `float64` | `f64` | `double` | `number`   | `double`  |
+
 #### String Type
 
 `string` 使用 UTF-8 文本语义。
 
+| 语言       | 类型          | 说明                 |
+| ---------- | ------------- | -------------------- |
+| Java       | `String`      | 不可变               |
+| Python     | `str`         |                      |
+| Go         | `string`      | 不可变               |
+| Rust       | `String`      | 所有权字符串，堆分配 |
+| C++        | `std::string` |                      |
+| JavaScript | `string`      |                      |
+| Dart       | `String`      |                      |
+
 #### Bytes Type
 
 `bytes` 用于原始二进制载荷。
+
+| 语言       | 类型                   | 说明   |
+| ---------- | ---------------------- | ------ |
+| Java       | `byte[]`               |        |
+| Python     | `bytes`                | 不可变 |
+| Go         | `[]byte`               |        |
+| Rust       | `Vec<u8>`              |        |
+| C++        | `std::vector<uint8_t>` |        |
+| JavaScript | `Uint8Array`           |        |
+| Dart       | `Uint8List`            |        |
 
 #### Temporal Types
 
@@ -561,13 +673,43 @@ Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
 `date` 表示日期（不含时区时间部分）。
 
+| 语言       | 类型                        | 说明                    |
+| ---------- | --------------------------- | ----------------------- |
+| Java       | `java.time.LocalDate`       |                         |
+| Python     | `datetime.date`             |                         |
+| Go         | `time.Time`                 | 会忽略时间部分          |
+| Rust       | `chrono::NaiveDate`         | 需依赖 `chrono` crate   |
+| C++        | `fory::serialization::Date` |                         |
+| JavaScript | `Date`                      |                         |
+| Dart       | `LocalDate`                 | Fory package 提供的类型 |
+
 ##### Timestamp
 
 `timestamp` 表示时间点（跨语言应统一时间语义与精度预期）。
 
+| 语言       | 类型                             | 说明                    |
+| ---------- | -------------------------------- | ----------------------- |
+| Java       | `java.time.Instant`              | 基于 UTC                |
+| Python     | `datetime.datetime`              |                         |
+| Go         | `time.Time`                      |                         |
+| Rust       | `chrono::NaiveDateTime`          | 需依赖 `chrono` crate   |
+| C++        | `fory::serialization::Timestamp` |                         |
+| JavaScript | `Date`                           |                         |
+| Dart       | `Timestamp`                      | Fory package 提供的类型 |
+
 #### Any
 
 `any` 允许存储动态类型值。使用 `any` 时建议配合清晰的业务约束，避免滥用导致模型不稳定。
+
+| 语言       | 类型           | 说明           |
+| ---------- | -------------- | -------------- |
+| Java       | `Object`       | 写入运行时类型 |
+| Python     | `Any`          | 写入运行时类型 |
+| Go         | `any`          | 写入运行时类型 |
+| Rust       | `Box<dyn Any>` | 写入运行时类型 |
+| C++        | `std::any`     | 写入运行时类型 |
+| JavaScript | `any`          | 写入运行时类型 |
+| Dart       | `Object?`      | 写入运行时类型 |
 
 ### Named Types
 
@@ -599,6 +741,11 @@ map<K, V>
 
 - `K` 一般应为可稳定比较的标量类型
 - `V` 可为任意支持类型
+
+| Fory IDL             | Java                   | Python            | Go                 | Rust                    | C++                              | JavaScript            | Dart                 |
+| -------------------- | ---------------------- | ----------------- | ------------------ | ----------------------- | -------------------------------- | --------------------- | -------------------- |
+| `map<string, int32>` | `Map<String, Integer>` | `Dict[str, int]`  | `map[string]int32` | `HashMap<String, i32>`  | `std::map<std::string, int32_t>` | `Map<string, number>` | `Map<String, Int32>` |
+| `map<string, User>`  | `Map<String, User>`    | `Dict[str, User]` | `map[string]User`  | `HashMap<String, User>` | `std::map<std::string, User>`    | `Map<string, User>`   | `Map<String, User>`  |
 
 ### Type Compatibility Matrix
 

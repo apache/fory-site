@@ -451,7 +451,7 @@ header 位描述 key/value 的：
 
 ### enum
 
-enum 可按 ordinal 或名称编码（取决于配置与目标兼容要求）。
+enum 以无符号 varint tag 进行序列化。对于普通 enum，这个 tag 通常就是声明顺序对应的 ordinal。某些实现或代码生成出的 enum 形式也可能改用显式的稳定 enum value 或 variant ID。若编码依赖声明顺序，重新排列 enum 值会导致反序列化结果不再符合用户预期。在这种情况下，用户应优先采用基于显式稳定 ID 的编码，或注册自定义 enum serializer，在禁用 unique hash 的前提下写入稳定的字符串表示。
 
 ### timestamp
 

@@ -82,22 +82,16 @@ public class Example {
 ### 多线程使用
 
 ```java
-import java.util.List;
-import java.util.Arrays;
-
 import org.apache.fory.*;
 import org.apache.fory.config.*;
 
 public class Example {
   public static void main(String[] args) {
     SomeClass object = new SomeClass();
-    // 注意 Fory 实例应该在多次不同对象的序列化之间复用。
-    ThreadSafeFory fory = new ThreadLocalFory(classLoader -> {
-      Fory f = Fory.builder().withLanguage(Language.JAVA)
-        .withClassLoader(classLoader).build();
-      f.register(SomeClass.class, 1);
-      return f;
-    });
+    ThreadSafeFory fory = Fory.builder()
+      .withLanguage(Language.JAVA)
+      .buildThreadSafeFory();
+    fory.register(SomeClass.class, 1);
     byte[] bytes = fory.serialize(object);
     System.out.println(fory.deserialize(bytes));
   }
@@ -107,20 +101,17 @@ public class Example {
 ### Fory 实例复用模式
 
 ```java
-import java.util.List;
-import java.util.Arrays;
-
 import org.apache.fory.*;
 import org.apache.fory.config.*;
 
 public class Example {
-  // 复用 fory。
-  private static final ThreadSafeFory fory = new ThreadLocalFory(classLoader -> {
-    Fory f = Fory.builder().withLanguage(Language.JAVA)
-      .withClassLoader(classLoader).build();
-    f.register(SomeClass.class, 1);
-    return f;
-  });
+  private static final ThreadSafeFory fory = Fory.builder()
+      .withLanguage(Language.JAVA)
+      .buildThreadSafeFory();
+
+  static {
+    fory.register(SomeClass.class, 1);
+  }
 
   public static void main(String[] args) {
     SomeClass object = new SomeClass();
@@ -132,26 +123,11 @@ public class Example {
 
 ## 线程安全
 
-Fory 提供多种线程安全序列化选项：
+Fory 提供两种线程安全运行时风格：
 
-### ThreadLocalFory
+### `buildThreadSafeFory`
 
-使用线程本地存储为每个线程维护独立的 Fory 实例：
-
-```java
-ThreadSafeFory fory = new ThreadLocalFory(classLoader -> {
-  Fory f = Fory.builder().withLanguage(Language.JAVA)
-    .withClassLoader(classLoader).build();
-  f.register(SomeClass.class, 1);
-  return f;
-});
-byte[] bytes = fory.serialize(object);
-System.out.println(fory.deserialize(bytes));
-```
-
-### ThreadSafeForyPool
-
-对于虚拟线程或不适合使用线程本地存储的环境，使用 `buildThreadSafeForyPool`：
+这是默认选择。它会构建一个固定大小的共享 `ThreadPoolFory`，其大小为 `4 * availableProcessors()`，也是虚拟线程工作负载下的首选运行时：
 
 ```java
 ThreadSafeFory fory = Fory.builder()
@@ -159,10 +135,36 @@ ThreadSafeFory fory = Fory.builder()
   .withRefTracking(false)
   .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
   .withAsyncCompilation(true)
-  .buildThreadSafeForyPool(minPoolSize, maxPoolSize);
+  .buildThreadSafeFory();
 ```
 
-注意，在 `ForyBuilder` 上调用 `buildThreadSafeFory()` 将创建 `ThreadLocalFory` 实例。这在使用虚拟线程的环境中可能不合适，因为每个线程都会创建自己的 Fory 实例，这是一个相对昂贵的操作。对于虚拟线程，另一种选择是使用 `buildThreadSafeForyPool`。
+更多细节请参见 [虚拟线程](virtual-threads.md)。
+
+### ThreadLocalFory
+
+仅当你明确希望为每个长期存在的平台线程分配一个 `Fory` 实例，或者无论 JDK 版本如何都要固定采用这种方式时，才使用 `buildThreadLocalFory()`：
+
+```java
+ThreadSafeFory fory = Fory.builder()
+  .withLanguage(Language.JAVA)
+  .buildThreadLocalFory();
+fory.register(SomeClass.class, 1);
+byte[] bytes = fory.serialize(object);
+System.out.println(fory.deserialize(bytes));
+```
+
+### `buildThreadSafeForyPool`
+
+如果你希望显式指定固定共享池大小，请使用 `buildThreadSafeForyPool(poolSize)`。它会预先创建 `poolSize` 个 `Fory` 实例，把它们放在共享固定槽位中，然后让任意调用方通过与线程无关的快速路径借用实例。只有当池中所有实例都在使用时，调用才会阻塞；运行时不会按照线程身份缓存实例：
+
+```java
+ThreadSafeFory fory = Fory.builder()
+  .withLanguage(Language.JAVA)
+  .withRefTracking(false)
+  .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
+  .withAsyncCompilation(true)
+  .buildThreadSafeForyPool(poolSize);
+```
 
 ### Builder 方法
 
@@ -175,19 +177,28 @@ Fory fory = Fory.builder()
   .withAsyncCompilation(true)
   .build();
 
-// 线程安全 Fory (ThreadLocalFory)
+// 线程安全 Fory（由 Fory 实例池支撑）
 ThreadSafeFory fory = Fory.builder()
   .withLanguage(Language.JAVA)
   .withRefTracking(false)
   .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
   .withAsyncCompilation(true)
   .buildThreadSafeFory();
+
+// 显式线程本地运行时
+ThreadSafeFory threadLocalFory = Fory.builder()
+  .withLanguage(Language.JAVA)
+  .buildThreadLocalFory();
 ```
 
 ## 后续步骤
 
 - [配置选项](configuration.md) - 了解 ForyBuilder 选项
+- [字段配置](field-configuration.md) - `@ForyField`、`@Ignore` 和整数编码注解
+- [枚举配置](enum-configuration.md) - `serializeEnumByName` 与 `@ForyEnumId`
 - [基础序列化](basic-serialization.md) - 详细的序列化模式
+- [压缩](compression.md) - 整数、long 和数组压缩选项
+- [虚拟线程](virtual-threads.md) - 虚拟线程使用方式与池大小建议
 - [类型注册](type-registration.md) - 类注册和安全性
 - [自定义序列化器](custom-serializers.md) - 实现自定义序列化器
 - [跨语言序列化](cross-language.md) - 为其他语言序列化数据

@@ -172,7 +172,7 @@ let result: Person = try fory.deserialize(data)
 print("\(result.name) \(result.age)")
 ```
 
-关于多态、Schema 演进和常见问题排查，请参见 [Swift 指南](../guide/swift/index.md)。
+关于多态、Schema 演进和常见问题排查，请参见 [Swift 指南](../guide/swift/)。
 
 ### Rust 序列化
 
@@ -496,7 +496,7 @@ print("\(result.name) \(result.age)")
 - [跨语言序列化指南](../guide/xlang/index.md)
 - [Go 指南 - 跨语言](../guide/go/cross-language.md)
 - [C# 指南 - 跨语言](../guide/csharp/cross-language.md)
-- [Swift 指南 - 跨语言](../guide/swift/cross-language.md)
+- [Swift 指南 - 跨语言](../guide/swift/cross_language)
 
 ## Row Format 编码
 

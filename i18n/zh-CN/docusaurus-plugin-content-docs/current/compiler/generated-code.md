@@ -685,6 +685,321 @@ if err := restored.FromBytes(data); err != nil {
 }
 ```
 
+## C#
+
+### 输出布局
+
+C# 输出通常是每个 schema 对应一个 `.cs` 文件，例如：
+
+- `<csharp_out>/addressbook/addressbook.cs`
+
+### 类型生成
+
+message 会生成带 `[ForyObject]` 的类、C# 属性以及字节辅助方法：
+
+```csharp
+[ForyObject]
+public sealed partial class Person
+{
+    public string Name { get; set; } = string.Empty;
+    public int Id { get; set; }
+    public List<Person.PhoneNumber> Phones { get; set; } = new();
+    public Animal Pet { get; set; } = null!;
+
+    public byte[] ToBytes() { ... }
+    public static Person FromBytes(byte[] data) { ... }
+}
+```
+
+union 会生成带类型化 case 辅助方法的 `Union` 子类：
+
+```csharp
+public sealed class Animal : Union
+{
+    public static Animal Dog(Dog value) { ... }
+    public static Animal Cat(Cat value) { ... }
+    public bool IsDog => ...;
+    public Dog DogValue() { ... }
+}
+```
+
+### 注册
+
+每个 schema 都会生成一个注册辅助类：
+
+```csharp
+public static class AddressbookForyRegistration
+{
+    public static void Register(Fory fory)
+    {
+        fory.Register<addressbook.Animal>((uint)106);
+        fory.Register<addressbook.Person>((uint)100);
+        // ...
+    }
+}
+```
+
+若未显式提供类型 ID，生成的注册代码会像其他目标语言一样使用计算得到的数值 ID。
+
+## JavaScript
+
+### 输出布局
+
+JavaScript 输出通常是每个 schema 对应一个 `.ts` 文件，例如：
+
+- `<javascript_out>/addressbook.ts`
+
+### 类型生成
+
+message 会生成使用 camelCase 字段名的 `export interface` 声明：
+
+```typescript
+export interface Person {
+  name: string;
+  id: number;
+  phones: PhoneNumber[];
+  pet?: Animal | null;
+}
+```
+
+enum 会生成 `export enum` 声明：
+
+```typescript
+export enum PhoneType {
+  MOBILE = 0,
+  HOME = 1,
+  WORK = 2,
+}
+```
+
+union 会生成带 case enum 的判别联合类型：
+
+```typescript
+export enum AnimalCase {
+  DOG = 1,
+  CAT = 2,
+}
+
+export type Animal =
+  | { case: AnimalCase.DOG; value: Dog }
+  | { case: AnimalCase.CAT; value: Cat };
+```
+
+## Swift
+
+### 输出布局
+
+Swift 输出通常是每个 schema 对应一个 `.swift` 文件，例如：
+
+- `<swift_out>/addressbook/addressbook.swift`
+
+### 类型生成
+
+生成器会创建带 `@ForyObject` 和字段 ID 的 Swift 模型。
+
+当 package/namespace 非空时，命名空间形态由 `swift_namespace_style` 控制：
+
+- `enum`（默认）：生成嵌套 enum 命名空间包装
+- `flatten`：在顶层类型名上加上由 package 派生的前缀（例如 `Demo_Foo_User`）
+
+当 package/namespace 为空时，不会生成 enum 包装或 flatten 前缀。
+
+对于非空 package 且使用默认 `enum` 风格时：
+
+```swift
+public enum Addressbook {
+    @ForyObject
+    public enum Animal: Equatable {
+        @ForyField(id: 1)
+        case dog(Addressbook.Dog)
+        @ForyField(id: 2)
+        case cat(Addressbook.Cat)
+    }
+
+    @ForyObject
+    public struct Person: Equatable {
+        @ForyField(id: 1)
+        public var name: String = ""
+        @ForyField(id: 8)
+        public var pet: Addressbook.Animal = .foryDefault()
+    }
+}
+```
+
+对于非空 package 且使用 `flatten` 风格时：
+
+```swift
+@ForyObject
+public struct Addressbook_Person: Equatable { ... }
+```
+
+当命令行和 schema 选项同时设置时，CLI 参数 `--swift_namespace_style` 会覆盖 schema 中的 `swift_namespace_style`。
+
+union 会生成带关联值的标记 Swift enum。
+带 `ref`/`weak_ref` 字段的 message 会生成 `final class` 模型，以保留引用语义。
+
+### 注册
+
+每个 schema 都会生成带传递性 import 注册的辅助类：
+
+```swift
+public enum ForyRegistration {
+    public static func register(_ fory: Fory) throws {
+        try ComplexPb.ForyRegistration.register(fory)
+        fory.register(Addressbook.Person.self, id: 100)
+        fory.register(Addressbook.Animal.self, id: 106)
+    }
+}
+```
+
+对于非空 package 且使用 `flatten` 风格时，辅助类名称也会带前缀（例如 `Addressbook_ForyRegistration`）。
+
+若未显式提供 `[id=...]`，注册会使用计算得到的数值 ID。
+若设置 `option enable_auto_type_id = false;`，则生成代码会改用基于名称的注册 API。
+
+## Dart
+
+### 输出布局
+
+Dart 输出通常是每个 schema 对应两个文件：一个带注解类型的主 `.dart` 文件，以及一个包含生成序列化器和注册辅助逻辑的 `.fory.dart` part 文件。
+
+- `<dart_out>/package/package.dart`
+- `<dart_out>/package/package.fory.dart`
+
+### 类型生成
+
+message 会生成带 `@ForyStruct` 注解的 `final class`，并在每个字段上加 `@ForyField`：
+
+```dart
+@ForyStruct()
+final class Person {
+  Person();
+
+  @ForyField(id: 1)
+  String name = '';
+
+  @ForyField(id: 2)
+  Int32 id = Int32(0);
+
+  @ForyField(id: 7)
+  List<Person_PhoneNumber> phones = <Person_PhoneNumber>[];
+
+  @ForyField(id: 8)
+  Animal pet = Animal._empty();
+}
+```
+
+enum 会生成带 `rawValue` getter 和 `fromRawValue` factory 的 Dart `enum`：
+
+```dart
+enum Person_PhoneType {
+  mobile,
+  home,
+  work;
+
+  int get rawValue => switch (this) {
+    Person_PhoneType.mobile => 0,
+    Person_PhoneType.home => 1,
+    Person_PhoneType.work => 2,
+  };
+
+  static Person_PhoneType fromRawValue(int value) => switch (value) {
+    0 => Person_PhoneType.mobile,
+    1 => Person_PhoneType.home,
+    2 => Person_PhoneType.work,
+    _ => throw StateError('Unknown Person_PhoneType raw value $value.'),
+  };
+}
+```
+
+union 会生成带 `@ForyUnion` 注解的类，包含工厂构造器、case enum 以及自定义序列化器：
+
+```dart
+enum AnimalCase {
+  dog,
+  cat;
+
+  int get id => switch (this) {
+    AnimalCase.dog => 1,
+    AnimalCase.cat => 2,
+  };
+}
+
+@ForyUnion()
+final class Animal {
+  final AnimalCase _case;
+  final Object? _value;
+
+  const Animal._(this._case, this._value);
+
+  factory Animal.dog(Dog value) => Animal._(AnimalCase.dog, value);
+  factory Animal.cat(Cat value) => Animal._(AnimalCase.cat, value);
+
+  bool get isDog => _case == AnimalCase.dog;
+  Dog get dogValue => _value as Dog;
+  // ...
+}
+```
+
+嵌套类型使用扁平下划线命名（例如 `Person_PhoneNumber`、`Person_PhoneType`）。
+
+非 optional、非 ref 的原始类型列表会使用 typed array 以获得零拷贝性能（例如 `list<int32>` -> `Int32List`）。
+
+列表元素或 map value 上的引用跟踪通过 `@ListType` / `@MapType` 注解表达：
+
+```dart
+@ListType(element: ValueType.ref())
+@ForyField(id: 3)
+List<Node> children = <Node>[];
+
+@MapType(value: ValueType.ref())
+@ForyField(id: 2)
+Map<String, Node> byName = <String, Node>{};
+```
+
+### 注册
+
+每个 schema 都会生成一个注册辅助类，负责处理该文件中的所有类型，并传递性注册 import 进来的类型：
+
+```dart
+abstract final class ForyRegistration {
+  static void register(
+    Fory fory,
+    Type type, {
+    int? id,
+    String? namespace,
+    String? typeName,
+  }) {
+    if (type == Person) {
+      registerGeneratedStruct(fory, _personForyRegistration, id: id, namespace: namespace, typeName: typeName);
+      return;
+    }
+    // ... other types
+  }
+}
+```
+
+### 使用示例
+
+```dart
+import 'package:fory/fory.dart';
+import 'generated/addressbook/addressbook.dart';
+
+void main() {
+  final fory = Fory();
+  ForyRegistration.register(fory, Person, id: 100);
+  ForyRegistration.register(fory, Dog, id: 104);
+  // ...
+
+  final person = Person()
+    ..name = 'Alice'
+    ..id = Int32(1);
+
+  final bytes = fory.serialize(person);
+  final roundTrip = fory.deserialize<Person>(bytes);
+}
+```
+
 ## 跨语言说明
 
 ### 类型 ID 行为
@@ -695,20 +1010,28 @@ if err := restored.FromBytes(data); err != nil {
 
 ### 嵌套类型形态
 
-| 语言   | 嵌套类型形式                 |
-| ------ | ---------------------------- |
-| Java   | `Person.PhoneNumber`         |
-| Python | `Person.PhoneNumber`         |
-| Rust   | `person::PhoneNumber`        |
-| C++    | `Person::PhoneNumber`        |
-| Go     | `Person_PhoneNumber`（默认） |
+| 语言       | 嵌套类型形式                 |
+| ---------- | ---------------------------- |
+| Java       | `Person.PhoneNumber`         |
+| Python     | `Person.PhoneNumber`         |
+| Rust       | `person::PhoneNumber`        |
+| C++        | `Person::PhoneNumber`        |
+| Go         | `Person_PhoneNumber`（默认） |
+| C#         | `Person.PhoneNumber`         |
+| JavaScript | `Person.PhoneNumber`         |
+| Swift      | `Person.PhoneNumber`         |
+| Dart       | `Person_PhoneNumber`         |
 
 ### 字节辅助方法命名
 
-| 语言   | 辅助方法名称              |
-| ------ | ------------------------- |
-| Java   | `toBytes` / `fromBytes`   |
-| Python | `to_bytes` / `from_bytes` |
-| Rust   | `to_bytes` / `from_bytes` |
-| C++    | `to_bytes` / `from_bytes` |
-| Go     | `ToBytes` / `FromBytes`   |
+| 语言       | 辅助方法名称              |
+| ---------- | ------------------------- |
+| Java       | `toBytes` / `fromBytes`   |
+| Python     | `to_bytes` / `from_bytes` |
+| Rust       | `to_bytes` / `from_bytes` |
+| C++        | `to_bytes` / `from_bytes` |
+| Go         | `ToBytes` / `FromBytes`   |
+| C#         | `ToBytes` / `FromBytes`   |
+| JavaScript | （通过 `fory.serialize()`） |
+| Swift      | `toBytes` / `fromBytes`   |
+| Dart       | （通过 `fory.serialize()`） |

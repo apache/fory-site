@@ -23,7 +23,7 @@ license: |
 
 ## 实现自定义序列化器
 
-为 Python 模式覆盖 `write/read`，为跨语言模式覆盖 `xwrite/xread`：
+在 Python 模式和跨语言模式下，都只需实现一套 `write/read`：
 
 ```python
 import pyfory
@@ -36,30 +36,22 @@ class Foo:
     f2: str
 
 class FooSerializer(Serializer):
-    def __init__(self, fory, cls):
-        super().__init__(fory, cls)
+    def __init__(self, type_resolver, cls):
+        super().__init__(type_resolver, cls)
 
-    def write(self, buffer, obj: Foo):
+    def write(self, write_context, obj: Foo):
         # 自定义序列化逻辑
-        buffer.write_varint32(obj.f1)
-        buffer.write_string(obj.f2)
+        write_context.write_varint32(obj.f1)
+        write_context.write_string(obj.f2)
 
-    def read(self, buffer):
+    def read(self, read_context):
         # 自定义反序列化逻辑
-        f1 = buffer.read_varint32()
-        f2 = buffer.read_string()
+        f1 = read_context.read_varint32()
+        f2 = read_context.read_string()
         return Foo(f1, f2)
 
-    # 用于跨语言模式
-    def xwrite(self, buffer, obj: Foo):
-        buffer.write_int32(obj.f1)
-        buffer.write_string(obj.f2)
-
-    def xread(self, buffer):
-        return Foo(buffer.read_int32(), buffer.read_string())
-
 f = pyfory.Fory()
-f.register(Foo, type_id=100, serializer=FooSerializer(f, Foo))
+f.register(Foo, type_id=100, serializer=FooSerializer(f.type_resolver, Foo))
 
 # 现在 Foo 使用自定义序列化器
 data = f.dumps(Foo(42, "hello"))
@@ -133,10 +125,10 @@ value = buffer.read_bool()
 fory = pyfory.Fory()
 
 # 使用 type_id 注册
-fory.register(MyClass, type_id=100, serializer=MySerializer(fory, MyClass))
+fory.register(MyClass, type_id=100, serializer=MySerializer(fory.type_resolver, MyClass))
 
 # 使用 typename 注册（用于 xlang）
-fory.register(MyClass, typename="com.example.MyClass", serializer=MySerializer(fory, MyClass))
+fory.register(MyClass, typename="com.example.MyClass", serializer=MySerializer(fory.type_resolver, MyClass))
 ```
 
 ## 相关主题
