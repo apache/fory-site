@@ -19,36 +19,36 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ Scala 为 Scala 类型提供优化的序列化器，构建在 Fory Java 之上。它支持所有 Scala 对象序列化：
+Apache Fory™ Scala 基于 Fory Java 构建，为 Scala 类型提供优化的序列化器。它支持完整的 Scala 对象序列化，包括：
 
 - `case` 类序列化
 - `pojo/bean` 类序列化
 - `object` 单例序列化
 - `collection` 序列化（Seq、List、Map 等）
-- `tuple` 和 `either` 类型
+- `tuple` 与 `either` 类型
 - `Option` 类型
-- Scala 2 和 3 枚举
+- Scala 2 和 Scala 3 枚举
 
 同时支持 Scala 2 和 Scala 3。
 
 ## 特性
 
-Fory Scala 继承了 Fory Java 的所有特性，并增加了 Scala 特定的优化：
+Fory Scala 继承了 Fory Java 的全部特性，并增加了 Scala 特定优化：
 
-- **高性能**：JIT 代码生成、零拷贝、比传统序列化快 20-170 倍
-- **Scala 类型支持**：为 case 类、单例、集合、元组、Option、Either 提供优化的序列化器
-- **默认值支持**：在 schema 演化期间自动处理 Scala 类的默认参数
-- **单例保持**：`object` 单例在反序列化后保持引用相等性
-- **Schema 演化**：支持类 schema 变更的前向/后向兼容性
+- **高性能**：JIT 代码生成、零拷贝，性能可比传统序列化快 20 到 170 倍
+- **Scala 类型支持**：为 case 类、单例、集合、tuple、Option、Either 提供优化序列化器
+- **默认值支持**：在 Schema 演进期间自动处理 Scala 类的默认参数
+- **单例保持**：`object` 单例在反序列化后仍保持引用相等性
+- **Schema 演进**：支持类 Schema 变更时的前向和后向兼容
 
-查看 [Java 特性](../java/index.md#features)获取完整特性列表。
+完整特性列表请参见 [Java 特性](../java/index.md#features)。
 
 ## 安装
 
 使用 sbt 添加依赖：
 
 ```sbt
-libraryDependencies += "org.apache.fory" %% "fory-scala" % "0.14.1"
+libraryDependencies += "org.apache.fory" %% "fory-scala" % "0.17.0"
 ```
 
 ## 快速开始
@@ -81,20 +81,20 @@ object ScalaExample {
 }
 ```
 
-## 构建于 Fory Java 之上
+## 基于 Fory Java 构建
 
-Fory Scala 构建在 Fory Java 之上。大多数配置选项、特性和概念都直接适用于 Scala。请参考 Java 文档：
+Fory Scala 基于 Fory Java 构建。Fory Java 中的大多数配置选项、特性和概念都可直接应用于 Scala。可参考 Java 文档了解：
 
-- [配置选项](../java/configuration.md) - 所有 ForyBuilder 选项
-- [基础序列化](../java/basic-serialization.md) - 序列化模式和 API
-- [类型注册](../java/type-registration.md) - 类注册和安全性
-- [Schema 演化](../java/schema-evolution.md) - 前向/后向兼容性
+- [配置](../java/configuration.md) - 所有 ForyBuilder 选项
+- [基础序列化](../java/basic-serialization.md) - 序列化模式与 API
+- [类型注册](../java/type-registration.md) - 类注册与安全性
+- [Schema 演进](../java/schema-evolution.md) - 前向和后向兼容
 - [自定义序列化器](../java/custom-serializers.md) - 实现自定义序列化器
-- [压缩](../java/compression.md) - Int、long 和 string 压缩
-- [故障排查](../java/troubleshooting.md) - 常见问题和解决方案
+- [压缩](../java/compression.md) - Int、long 和字符串压缩
+- [故障排查](../java/troubleshooting.md) - 常见问题与解决方案
 
 ## Scala 特定文档
 
 - [Fory 创建](fory-creation.md) - Scala 特定的 Fory 设置要求
-- [类型序列化](type-serialization.md) - 序列化 Scala 类型
+- [类型序列化](type-serialization.md) - Scala 类型的序列化
 - [默认值](default-values.md) - Scala 类默认值支持

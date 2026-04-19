@@ -1,7 +1,7 @@
 ---
 title: 入门指南
-sidebar_position: 1
-id: xlang_getting_started
+sidebar_position: 10
+id: getting_started
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-本指南涵盖了所有支持语言的跨语言序列化安装和基本设置。
+本指南介绍所有受支持语言中跨语言序列化的安装与基础设置。
 
 ## 安装
 
@@ -31,14 +31,14 @@ license: |
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>0.14.1</version>
+  <version>0.17.0</version>
 </dependency>
 ```
 
 **Gradle：**
 
 ```gradle
-implementation 'org.apache.fory:fory-core:0.14.1'
+implementation 'org.apache.fory:fory-core:0.17.0'
 ```
 
 ### Python
@@ -57,7 +57,7 @@ go get github.com/apache/fory/go/fory
 
 ```toml
 [dependencies]
-fory = "0.14"
+fory = "0.17.0"
 ```
 
 ### JavaScript
@@ -68,11 +68,11 @@ npm install @apache-fory/fory
 
 ### C++
 
-使用 Bazel 或 CMake 从源代码构建。有关详细信息，请参阅 [C++ 指南](../cpp/index.md)。
+使用 Bazel 或 CMake 从源码构建。详见 [C++ 指南](../cpp/index.md)。
 
 ## 启用跨语言模式
 
-每种语言都需要启用 xlang 模式以确保跨语言的二进制兼容性。
+每种语言都需要启用 xlang 模式，以确保跨语言之间的二进制兼容性。
 
 ### Java
 
@@ -91,11 +91,11 @@ Fory fory = Fory.builder()
 ```python
 import pyfory
 
-# xlang 模式默认启用
-fory = pyfory.Fory()
+# 必须显式启用跨语言模式
+fory = pyfory.Fory(xlang=True)
 
-# 显式配置
-fory = pyfory.Fory(ref_tracking=True)
+# 需要时启用引用跟踪
+fory = pyfory.Fory(xlang=True, ref=True)
 ```
 
 ### Go
@@ -103,9 +103,9 @@ fory = pyfory.Fory(ref_tracking=True)
 ```go
 import forygo "github.com/apache/fory/go/fory"
 
-fory := forygo.NewFory()
+fory := forygo.NewFory(forygo.WithXlang(true))
 // 或启用引用跟踪
-fory := forygo.NewFory(true)
+fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
 ```
 
 ### Rust
@@ -113,7 +113,7 @@ fory := forygo.NewFory(true)
 ```rust
 use fory::Fory;
 
-let fory = Fory::default();
+let fory = Fory::default().xlang(true);
 ```
 
 ### JavaScript
@@ -138,11 +138,11 @@ auto fory = Fory::builder()
 
 ## 类型注册
 
-自定义类型必须在所有语言中使用一致的名称或 ID 进行注册。
+自定义类型必须在所有语言中使用一致的名称或 ID 注册。
 
 ### 按名称注册（推荐）
 
-使用字符串名称更灵活，不易产生冲突：
+使用字符串名称更灵活，也更不容易发生冲突：
 
 **Java：**
 
@@ -159,18 +159,24 @@ fory.register_type(Person, typename="example.Person")
 **Go：**
 
 ```go
-fory.RegisterNamedType(Person{}, "example.Person")
+fory.RegisterNamedStruct(Person{}, "example.Person")
 ```
 
 **Rust：**
 
 ```rust
-#[derive(Fory)]
-#[tag("example.Person")]
+use fory::{Fory, ForyObject};
+
+#[derive(ForyObject)]
 struct Person {
     name: String,
     age: i32,
 }
+
+let mut fory = Fory::default().xlang(true);
+fory
+    .register_by_namespace::<Person>("example", "Person")
+    .expect("register Person");
 ```
 
 **JavaScript：**
@@ -193,7 +199,7 @@ fory.register_struct<Person>("example.Person");
 
 ### 按 ID 注册
 
-使用数字 ID 更快，生成的二进制输出更小：
+使用数字 ID 速度更快，并且生成的二进制输出更小：
 
 **Java：**
 
@@ -210,7 +216,7 @@ fory.register_type(Person, type_id=100)
 **Go：**
 
 ```go
-fory.Register(Person{}, 100)
+fory.RegisterStruct(Person{}, 100)
 ```
 
 **C++：**
@@ -223,9 +229,9 @@ fory.register_struct<Person>(100);
 
 ## Hello World 示例
 
-一个完整的示例，展示了在 Java 中序列化并在 Python 中反序列化：
+下面给出一个完整示例，展示如何在 Java 中序列化、在 Python 中反序列化：
 
-### Java（序列化器）
+### Java（序列化端）
 
 ```java
 import org.apache.fory.*;
@@ -255,7 +261,7 @@ public class HelloWorld {
 }
 ```
 
-### Python（反序列化器）
+### Python（反序列化端）
 
 ```python
 import pyfory
@@ -266,7 +272,7 @@ class Person:
     name: str
     age: pyfory.Int32Type
 
-fory = pyfory.Fory()
+fory = pyfory.Fory(xlang=True)
 fory.register_type(Person, typename="example.Person")
 
 with open("person.bin", "rb") as f:
@@ -274,19 +280,19 @@ with open("person.bin", "rb") as f:
 
 person = fory.deserialize(data)
 print(f"Name: {person.name}, Age: {person.age}")
-# 输出: Name: Alice, Age: 30
+# Output: Name: Alice, Age: 30
 ```
 
 ## 最佳实践
 
-1. **使用一致的类型名称**：确保所有语言使用相同的类型名称或 ID
-2. **启用引用跟踪**：如果数据包含循环引用或共享引用
-3. **重用 Fory 实例**：创建 Fory 的成本较高；应重用实例
-4. **使用类型注解**：在 Python 中，使用 `pyfory.Int32Type` 等进行精确类型映射
-5. **测试跨语言**：验证序列化在所有目标语言中都能正常工作
+1. **使用一致的类型名**：确保所有语言使用相同的类型名或 ID。
+2. **启用引用跟踪**：如果你的数据包含循环引用或共享引用。
+3. **复用 Fory 实例**：创建 Fory 的成本较高，应尽量复用实例。
+4. **使用类型注解**：在 Python 中使用 `pyfory.Int32Type` 等精确类型映射。
+5. **测试跨语言链路**：验证序列化结果在所有目标语言之间都能正确工作。
 
 ## 后续步骤
 
-- [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping) - 跨语言类型映射参考
-- [序列化](serialization.md) - 详细的序列化示例
-- [故障排查](troubleshooting.md) - 常见问题及解决方案
+- [类型映射](../../specification/xlang_type_mapping.md) - 跨语言类型映射参考
+- [序列化](serialization.md) - 更详细的序列化示例
+- [故障排查](troubleshooting.md) - 常见问题与解决方案
