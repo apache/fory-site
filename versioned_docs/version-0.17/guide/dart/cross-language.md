@@ -1,0 +1,193 @@
+---
+title: Cross-Language Serialization
+sidebar_position: 9
+id: dart_cross_language
+license: |
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+---
+
+Apache Fory™ Dart serializes to the same binary format as the Java, Go, C#, Python, Rust, and Swift Fory runtimes. You can write a message in Dart and read it in Java — or any other direction — without any conversion layer.
+
+## Setup
+
+Create a `Fory` instance as normal. There is no separate "cross-language mode" to enable in Dart:
+
+```dart
+final fory = Fory(); // or Fory(compatible: true) for schema evolution
+```
+
+The key requirement is that both sides register the same type using the same identity.
+
+## Registration Identity
+
+The most important rule: **use the same type identity on every side**. You have two options:
+
+### Numeric ID
+
+Simpler for small, tightly-coordinated teams:
+
+```dart
+// Dart
+ModelsFory.register(fory, Person, id: 100);
+```
+
+### Namespace + Type Name
+
+Better when multiple teams define types independently:
+
+```dart
+// Dart
+ModelsFory.register(
+  fory,
+  Person,
+  namespace: 'example',
+  typeName: 'Person',
+);
+```
+
+Do not mix the two strategies for the same type across runtimes.
+
+## Dart to Java Example
+
+### Dart
+
+```dart
+import 'package:fory/fory.dart';
+
+part 'person.fory.dart';
+
+@ForyStruct()
+class Person {
+  Person();
+
+  String name = '';
+  Int32 age = Int32(0);
+}
+
+final fory = Fory();
+PersonFory.register(fory, Person, id: 100);
+final bytes = fory.serialize(Person()
+  ..name = 'Alice'
+  ..age = Int32(30));
+```
+
+### Java
+
+```java
+Fory fory = Fory.builder()
+    .withLanguage(Language.XLANG)
+    .build();
+
+fory.register(Person.class, 100);
+Person value = (Person) fory.deserialize(bytesFromDart);
+```
+
+## Dart to C# Example
+
+### Dart
+
+```dart
+final fory = Fory(compatible: true);
+PersonFory.register(fory, Person, id: 100);
+final bytes = fory.serialize(Person()
+  ..name = 'Alice'
+  ..age = Int32(30));
+```
+
+### CSharp
+
+```csharp
+[ForyObject]
+public sealed class Person
+{
+    public string Name { get; set; } = string.Empty;
+    public int Age { get; set; }
+}
+
+Fory fory = Fory.Builder()
+    .Compatible(true)
+    .Build();
+
+fory.Register<Person>(100);
+Person person = fory.Deserialize<Person>(payloadFromDart);
+```
+
+## Dart to Go Example
+
+### Dart
+
+```dart
+final fory = Fory();
+PersonFory.register(fory, Person, id: 100);
+final bytes = fory.serialize(Person()
+  ..name = 'Alice'
+  ..age = Int32(30));
+```
+
+### Go
+
+```go
+type Person struct {
+    Name string
+    Age  int32
+}
+
+f := fory.New(fory.WithXlang(true))
+_ = f.RegisterStruct(Person{}, 100)
+
+var person Person
+_ = f.Deserialize(bytesFromDart, &person)
+```
+
+## Field Matching Rules
+
+Fory matches fields by name or by stable field ID. For robust cross-language interop:
+
+1. Use the same type identity on every side (same numeric ID or same `namespace + typeName`).
+2. Assign stable `@ForyField(id: ...)` values to all fields before shipping the first payload.
+3. Keep field names consistent or rely on IDs, since Dart typically uses `lowerCamelCase` while Go uses `PascalCase` for exported fields and C# often uses `PascalCase` properties.
+4. Use compatible numeric types: `Int32` in Dart for Java `int`, Go `int32`, and C# `int`; `double` in Dart for 64-bit floats; `Float32` for 32-bit.
+5. Use `Timestamp` and `LocalDate` for date/time fields rather than raw `DateTime`.
+6. Validate real round trips across all languages before shipping.
+
+## Type Mapping Notes for Dart
+
+Because Dart `int` is not itself a promise about the exact xlang wire width, prefer wrappers or numeric field annotations when exact cross-language interpretation matters:
+
+- `Int32` for xlang `int32`
+- `UInt32` for xlang `uint32`
+- `Float16` and `Float32` for reduced-width floating point
+- `Timestamp` and `LocalDate` for explicit temporal semantics
+
+See [Supported Types](supported-types.md) and [xlang type mapping](../../specification/xlang_type_mapping.md).
+
+## Validation
+
+Before relying on a cross-language contract in production, test a payload end-to-end through every runtime you support.
+
+Run the Dart side:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+dart analyze
+dart test
+```
+
+## Related Topics
+
+- [Type Registration](type-registration.md)
+- [Schema Evolution](schema-evolution.md)
+- [Cross-language guide](../xlang/index.md)

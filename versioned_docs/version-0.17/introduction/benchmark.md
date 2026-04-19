@@ -1,0 +1,96 @@
+---
+id: benchmark
+title: Benchmark
+sidebar_position: 3
+---
+
+> **Note**: Different serialization frameworks excel in different scenarios. Benchmark results are for reference only.
+> For your specific use case, conduct benchmarks with appropriate configurations and workloads.
+
+## Java Benchmark
+
+The Java benchmark section compares Fory against popular Java serialization frameworks using the current benchmark suite from `docs/benchmarks/java`.
+
+**Serialization Throughput**:
+
+![Java Serialization Throughput](../benchmarks/java/java_repo_serialization_throughput.png)
+
+**Deserialization Throughput**:
+
+![Java Deserialization Throughput](../benchmarks/java/java_repo_deserialization_throughput.png)
+
+**Zero-Copy Serialize Throughput**:
+
+<img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_serialize_BUFFER_to_array_tps.png" />
+
+**Zero-Copy Deserialize Throughput**:
+
+<img width="90%" alt="" src="/img/benchmarks/zerocopy/zero_copy_bench_deserialize_BUFFER_from_array_tps.png" />
+
+**Important**: Fory's runtime code generation requires proper warm-up for performance measurement:
+
+For additional benchmark notes, raw data, and the complete Java benchmark README, see [Java Benchmarks](https://github.com/apache/fory/tree/main/docs/benchmarks/java).
+
+## Python Benchmark
+
+Fory Python demonstrates strong performance compared to `pickle` and Protobuf across object and list workloads.
+
+![Python Throughput](../benchmarks/python/throughput.png)
+
+For benchmark setup, raw results, and reproduction steps, see [Python Benchmarks](../benchmarks/python/README.md).
+
+## Rust Benchmark
+
+Fory Rust demonstrates competitive performance compared to other Rust serialization frameworks.
+
+<img src="/img/benchmarks/rust/company.png" width="90%"/>
+
+<img src="/img/benchmarks/rust/ecommerce_data.png" width="90%"/>
+
+<img src="/img/benchmarks/rust/system_data.png" width="90%"/>
+
+Note: Results depend on hardware, dataset, and implementation versions. See the Rust guide for how to run benchmarks yourself: https://github.com/apache/fory/blob/main/benchmarks/rust_benchmark/README.md
+
+## C++ Benchmark
+
+Fory C++ demonstrates competitive performance compared to Protobuf C++ serialization framework.
+
+<img src="/img/benchmarks/cpp/throughput.png" width="90%"/>
+
+## Go Benchmark
+
+Fory Go demonstrates strong performance compared to Protobuf and Msgpack across
+single-object and list workloads.
+
+<img src="/img/blog/fory_0_16_0_release/go_benchmark_combined.png" width="90%"/>
+
+Note: Results depend on hardware, dataset, and implementation versions. See the
+Go benchmark report for details: https://fory.apache.org/docs/benchmarks/go/
+
+## C# Benchmark
+
+Fory C# demonstrates strong performance compared to Protobuf and Msgpack across
+typed object serialization and deserialization workloads.
+
+<img src="/img/blog/fory_0_16_0_release/csharp_benchmark_combined.png" width="90%"/>
+
+Note: Results depend on hardware and runtime versions. See the C# benchmark
+report for details: https://fory.apache.org/docs/benchmarks/csharp/
+
+## Swift Benchmark
+
+Fory Swift demonstrates strong performance compared to Protobuf and Msgpack
+across both scalar-object and list workloads.
+
+<img src="/img/blog/fory_0_16_0_release/swift_benchmark_combined.png" width="90%"/>
+
+Note: Results depend on hardware and runtime versions. See the Swift benchmark
+report for details: https://fory.apache.org/docs/benchmarks/swift/
+
+## JavaScript Benchmark
+
+<img width="50%" alt="" src="/img/benchmarks/javascript/complex_object.jpg" />
+
+The data used for this bar graph includes a complex object that has many kinds of field types, and the size of the JSON data is 3KB.
+
+See [benchmarks](https://github.com/apache/fory/blob/main/javascript/benchmark/index.js) for the benchmark code.
