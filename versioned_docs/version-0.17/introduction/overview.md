@@ -123,7 +123,7 @@ All protocols share the same optimized codebase, allowing improvements in one pr
 | **Rust**                         | Rust implementation and patterns           | [Rust Guide](https://github.com/apache/fory/blob/main/docs/guide/rust/)                   | [View](../guide/rust)               |
 | **Go**                           | Go implementation and usage                | [Go Guide](https://github.com/apache/fory/blob/main/docs/guide/go/)                       | [View](../guide/go)                 |
 | **Scala**                        | Scala integration and best practices       | [Scala Guide](https://github.com/apache/fory/blob/main/docs/guide/scala/)                 | [View](../guide/scala)              |
-| **GraalVM**                      | Native image support and AOT compilation   | [GraalVM Guide](https://github.com/apache/fory/blob/main/docs/guide/graalvm_guide.md)     | [View](../guide/graalvm_guide.md)   |
+| **GraalVM**                      | Native image support and AOT compilation   | [GraalVM Support](https://github.com/apache/fory/blob/main/docs/guide/java/graalvm-support.md) | [View](../guide/java/graalvm-support.md) |
 | **Development**                  | Building and contributing to Fory          | [Development](https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md)         | [View](../guide/DEVELOPMENT)        |
 
 ### Protocol Specifications

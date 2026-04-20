@@ -202,3 +202,4 @@ ThreadSafeFory threadLocalFory = Fory.builder()
 - [类型注册](type-registration.md) - 类注册和安全性
 - [自定义序列化器](custom-serializers.md) - 实现自定义序列化器
 - [跨语言序列化](cross-language.md) - 为其他语言序列化数据
+- [GraalVM 支持](graalvm-support.md) - 面向原生镜像的构建期序列化器编译

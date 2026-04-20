@@ -1,7 +1,7 @@
 ---
-title: GraalVM 指南
-sidebar_position: 19
-id: graalvm_serialization
+title: GraalVM 支持
+sidebar_position: 13
+id: graalvm-support
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -94,7 +94,7 @@ Args = --initialize-at-build-time=com.example.Example
 - **私有内部类/记录**
 - **动态代理序列化**
 
-这意味着在大多数应用中都不再需要手工维护 `reflect-config.json`。你自己的 `native-image.properties` 仍只需要配置在构建时初始化的引导类，例如：
+这意味着在大多数应用中都不再需要手工维护 `reflect-config.json`。您自己的 `native-image.properties` 仍只需要配置在构建时初始化的引导类，例如：
 
 ```properties
 Args = --initialize-at-build-time=com.example.Example
