@@ -1,6 +1,6 @@
 ---
 title: 开发指南
-sidebar_position: 20
+sidebar_position: 10
 id: development
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

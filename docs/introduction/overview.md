@@ -124,7 +124,7 @@ All protocols share the same optimized codebase, allowing improvements in one pr
 | **Go**                           | Go implementation and usage                | [Go Guide](https://github.com/apache/fory/blob/main/docs/guide/go/)                       | [View](../guide/go)                 |
 | **Scala**                        | Scala integration and best practices       | [Scala Guide](https://github.com/apache/fory/blob/main/docs/guide/scala/)                 | [View](../guide/scala)              |
 | **GraalVM**                      | Native image support and AOT compilation   | [GraalVM Support](https://github.com/apache/fory/blob/main/docs/guide/java/graalvm-support.md) | [View](../guide/java/graalvm_support) |
-| **Development**                  | Building and contributing to Fory          | [Development](https://github.com/apache/fory/blob/main/docs/guide/DEVELOPMENT.md)         | [View](../guide/DEVELOPMENT)        |
+| **Development**                  | Building and contributing to Fory          | [Development](https://github.com/apache/fory/blob/main/docs/DEVELOPMENT.md)               | [View](../community/DEVELOPMENT)    |
 
 ### Protocol Specifications
 
@@ -197,4 +197,4 @@ We welcome contributions! Please read our [Contributing Guide](https://github.co
 - Add test cases
 - Share benchmarks
 
-See [Development Guide](../guide/DEVELOPMENT.md) for build instructions and development workflow.
+See [Development Guide](../community/DEVELOPMENT.md) for build instructions and development workflow.
