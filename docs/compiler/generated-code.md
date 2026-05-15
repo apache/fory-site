@@ -1087,7 +1087,7 @@ final class Node() derives ForySerializer {
 
   @Ref
   @ForyField(id = 2)
-  var parent: Option[Node @Ref] = None
+  var parent: Option[Node] = None
 }
 ```
 
@@ -1128,7 +1128,9 @@ enum Animal derives ForySerializer {
 }
 ```
 
-`optional T` fields generate `Option[T]`. Reference tracking uses `@Ref`.
+`optional T` fields generate `Option[T]`. Top-level message references use
+`@Ref` on the field or constructor parameter. Nested element/value references
+use type-use annotations such as `List[Node @Ref]`.
 
 ### Registration
 

@@ -925,7 +925,7 @@ message Node {
 | C++        | `Node parent`  | `std::shared_ptr<Node> parent`             |
 | JavaScript | `parent: Node` | `parent: Node` (no ref distinction)        |
 | Dart       | `Node parent`  | `Node parent` with `@ForyField(ref: true)` |
-| Scala      | `parent: Node` | `parent: Node @Ref`                        |
+| Scala      | `parent: Node` | `@Ref parent: Node`                        |
 
 Rust uses `Arc` by default; use `ref(thread_safe=false)` or `ref(weak=true)`
 to customize pointer types. For protobuf option syntax, see
