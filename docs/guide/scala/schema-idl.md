@@ -91,11 +91,14 @@ final class Node() derives ForySerializer {
 
   @Ref
   @ForyField(id = 2)
-  var parent: Option[Node @Ref] = None
+  var parent: Option[Node] = None
 }
 ```
 
 `@Ref` is the JVM reference-tracking annotation for Scala macro and IDL APIs.
+Use field or constructor-parameter `@Ref` for a top-level `ref T` field. Use
+type-use `T @Ref` only for nested element/value/payload refs, such as
+`list<ref T>`.
 
 Generated xlang collection fields use immutable Scala collection types:
 `List[T]`, `Set[T]`, and `Map[K, V]`. The runtime xlang serializers can also

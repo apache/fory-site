@@ -210,9 +210,13 @@ final class Node() derives ForySerializer {
 
   @Ref
   @ForyField(id = 2)
-  var parent: Option[Node @Ref] = None
+  var parent: Option[Node] = None
 }
 ```
+
+For Scala, top-level field reference tracking is owned by `@Ref` on the field or
+constructor parameter. Type-use `T @Ref` is for nested element/value/payload
+references, such as `List[Node @Ref]`.
 
 #### Go: Struct Tags
 
