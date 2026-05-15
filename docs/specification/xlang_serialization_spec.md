@@ -444,10 +444,10 @@ In xlang mode, for cross-language compatibility:
 **Annotation examples:**
 
 ```java
-// Java: use @ForyField annotation
+// Java: use @Ref for reference tracking
 public class MyClass {
     @Nullable
-    @ForyField(ref = true)
+    @Ref
     private Object refField;
 
     private String requiredField;
@@ -456,10 +456,10 @@ public class MyClass {
 
 ```python
 # Python: use typing with fory field descriptors
-from pyfory import Fory, ForyField
+from pyfory import ForyField, Ref
 
 class MyClass:
-    ref_field: ForyField(SomeType, nullable=True, ref=True)
+    ref_field: ForyField(Ref[SomeType], nullable=True)
     required_field: ForyField(str, nullable=False)
 ```
 
@@ -1578,6 +1578,8 @@ Rules:
 
 - Each union alternative MUST have a stable tag number (`= 1`, `= 2`, ...).
 - Tag numbers MUST be unique within the union and MUST NOT be reused.
+- Tag number `0` is reserved for language bindings that expose an unknown-case
+  carrier. Schema-defined alternatives MUST NOT use tag `0`.
 
 #### Type IDs and type meta
 
@@ -1610,6 +1612,13 @@ A union payload is:
 ```
 
 This is required even for primitives so unknown alternatives can be skipped safely.
+
+If a reader sees a positive `case_id` that is not present in its local union
+schema, it SHOULD preserve the unknown case when the target language has a
+language-neutral carrier for it. Such a carrier MUST store the original positive
+case ID and the deserialized `case_value`. Writers MUST NOT serialize `0` as a
+schema-defined case ID; `0` is only the local unknown-case slot used by bindings
+that need one.
 
 #### Wire layouts
 
