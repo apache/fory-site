@@ -21,7 +21,7 @@ license: |
 
 Fory IDL is a schema definition language for Apache Fory that enables type-safe
 cross-language serialization. Define your data structures once and generate
-native data structure code for Java, Python, Go, Rust, C++, C#, Swift, JavaScript, and Dart.
+native data structure code for Java, Python, Go, Rust, C++, C#, Swift, JavaScript, Dart, and Scala.
 
 ## Example Schema
 
@@ -104,6 +104,7 @@ Generated code uses native language constructs:
 - JavaScript: Interfaces with registration function
 - Swift: Fory model macros with field/case metadata and registration helpers
 - Dart: `@ForyStruct` classes with `@ForyField` annotations and registration helpers
+- Scala: Scala 3 `case class`, normal class, enum, and ADT enum models with macro-derived serializers
 
 ## Quick Start
 
@@ -141,7 +142,7 @@ message Person {
 foryc example.fdl --output ./generated
 
 # Generate for specific languages
-foryc example.fdl --lang java,python,csharp,javascript,swift,dart --output ./generated
+foryc example.fdl --lang java,python,csharp,javascript,swift,dart,scala --output ./generated
 ```
 
 ### 4. Use Generated Code
@@ -197,11 +198,11 @@ message Example {
 
 Fory IDL types map to native types in each language:
 
-| Fory IDL Type | Java      | Python         | Go       | Rust     | C++           | C#       | JavaScript | Swift    | Dart     |
-| ------------- | --------- | -------------- | -------- | -------- | ------------- | -------- | ---------- | -------- | -------- |
-| `int32`       | `int`     | `pyfory.Int32` | `int32`  | `i32`    | `int32_t`     | `int`    | `number`   | `Int32`  | `int`    |
-| `string`      | `String`  | `str`          | `string` | `String` | `std::string` | `string` | `string`   | `String` | `String` |
-| `bool`        | `boolean` | `bool`         | `bool`   | `bool`   | `bool`        | `bool`   | `boolean`  | `Bool`   | `bool`   |
+| Fory IDL Type | Java      | Python         | Go       | Rust     | C++           | C#       | JavaScript | Swift    | Dart     | Scala     |
+| ------------- | --------- | -------------- | -------- | -------- | ------------- | -------- | ---------- | -------- | -------- | --------- |
+| `int32`       | `int`     | `pyfory.Int32` | `int32`  | `i32`    | `int32_t`     | `int`    | `number`   | `Int32`  | `int`    | `Int`     |
+| `string`      | `String`  | `str`          | `string` | `String` | `std::string` | `string` | `string`   | `String` | `String` | `String`  |
+| `bool`        | `boolean` | `bool`         | `bool`   | `bool`   | `bool`        | `bool`   | `boolean`  | `Bool`   | `bool`   | `Boolean` |
 
 See [Type System](schema-idl.md#type-system) for complete mappings.
 

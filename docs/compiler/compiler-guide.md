@@ -67,6 +67,7 @@ Compile options:
 | `--javascript_out=DST_DIR`            | Generate JavaScript code in DST_DIR                   | (none)        |
 | `--swift_out=DST_DIR`                 | Generate Swift code in DST_DIR                        | (none)        |
 | `--dart_out=DST_DIR`                  | Generate Dart code in DST_DIR                         | (none)        |
+| `--scala_out=DST_DIR`                 | Generate Scala 3 code in DST_DIR                      | (none)        |
 | `--go_nested_type_style`              | Go nested type naming: `camelcase` or `underscore`    | `underscore`  |
 | `--swift_namespace_style`             | Swift namespace style: `enum` or `flatten`            | `enum`        |
 | `--emit-fdl`                          | Emit translated FDL (for non-FDL inputs)              | `false`       |
@@ -174,6 +175,9 @@ foryc schema.fdl --java_out=./java/gen --python_out=./python/src --go_out=./go/g
 
 # Combine with import paths
 foryc schema.fdl --java_out=./gen/java -I proto/ -I common/
+
+# Generate Scala 3 code to a specific directory
+foryc schema.fdl --scala_out=./src/main/scala
 ```
 
 When using `--{lang}_out` options:
@@ -250,6 +254,7 @@ Compiling src/main.fdl...
 | JavaScript | `javascript` | `.ts`            | Interfaces with registration function  |
 | Swift      | `swift`      | `.swift`         | Fory Swift model macros                |
 | Dart       | `dart`       | `.dart`          | `@ForyStruct` classes with annotations |
+| Scala      | `scala`      | `.scala`         | Scala 3 models with macro derivation   |
 
 ## Output Structure
 
@@ -378,6 +383,26 @@ generated/
 - Package segments map to directories (e.g., `demo.foo` → `demo/foo/`)
 - Registration helper class included in the part file
 - Typed arrays used for non-optional, non-ref primitive lists (e.g., `Int32List`)
+
+### Scala
+
+```
+generated/
+└── scala/
+    └── example/
+        ├── User.scala
+        ├── Status.scala
+        ├── Animal.scala
+        └── ExampleForyRegistration.scala
+```
+
+- One Scala 3 source file per generated type
+- Package structure matches the Fory IDL package
+- Messages derive `org.apache.fory.scala.ForySerializer`
+- `optional T` fields use `Option[T]`
+- Enums use Scala 3 `enum`
+- Unions use Scala 3 ADT `enum` with `@ForyUnion`, `@ForyCase`, and an `UnknownCase`
+- Registration helper object included
 
 ### C# IDL Matrix Verification
 

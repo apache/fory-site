@@ -1042,6 +1042,121 @@ void main() {
 }
 ```
 
+## Scala
+
+The Scala target emits Scala 3 source only. The `fory-scala` runtime artifact
+still supports Scala 2.13 and Scala 3, but generated IDL source and macro
+derivation require Scala 3.
+
+### Output Layout
+
+For `package addressbook`, Scala output is generated under:
+
+- `<scala_out>/addressbook/`
+- Type files: `AddressBook.scala`, `Person.scala`, `Dog.scala`, `Cat.scala`, `Animal.scala`
+- Registration helper: `AddressbookForyRegistration.scala`
+
+### Type Generation
+
+Messages outside compiler-detected construction cycles generate case classes:
+
+```scala
+import org.apache.fory.annotation.{ForyField, ForyStruct}
+import org.apache.fory.scala.ForySerializer
+
+@ForyStruct
+final case class Person(
+  @ForyField(id = 1) name: String,
+  @ForyField(id = 3) email: Option[String],
+  @ForyField(id = 7) phones: List[Person.PhoneNumber],
+  @ForyField(id = 8) pet: Animal
+) derives ForySerializer
+```
+
+Messages in circular construction cycles generate normal classes with mutable
+serialized fields so reads can register the object before reading back-references:
+
+```scala
+import org.apache.fory.annotation.{ForyField, ForyStruct, Ref}
+import org.apache.fory.scala.ForySerializer
+
+@ForyStruct
+final class Node() derives ForySerializer {
+  @ForyField(id = 1)
+  var id: String = ""
+
+  @Ref
+  @ForyField(id = 2)
+  var parent: Option[Node @Ref] = None
+}
+```
+
+Enums generate Scala 3 enums with stable Fory IDs:
+
+```scala
+import org.apache.fory.annotation.ForyEnumId
+
+enum PhoneType {
+  @ForyEnumId(0)
+  case Mobile
+
+  @ForyEnumId(1)
+  case Home
+
+  @ForyEnumId(2)
+  case Work
+}
+```
+
+Unions generate Scala 3 ADT enums. Case ID `0` is reserved for the unknown-case
+carrier; schema-defined cases start at `1`.
+
+```scala
+import org.apache.fory.annotation.{ForyCase, ForyUnion}
+import org.apache.fory.scala.ForySerializer
+
+@ForyUnion
+enum Animal derives ForySerializer {
+  @ForyCase(id = 0)
+  case UnknownCase(caseId: Int, value: Any)
+
+  @ForyCase(id = 1)
+  case DogCase(value: Dog)
+
+  @ForyCase(id = 2)
+  case CatCase(value: Cat)
+}
+```
+
+`optional T` fields generate `Option[T]`. Reference tracking uses `@Ref`.
+
+### Registration
+
+Generated registration helpers register Scala serializers, enums, structs, and
+unions for `Fory` and `ThreadSafeFory`:
+
+```scala
+object AddressbookForyRegistration {
+  def register(fory: Fory): Unit = {
+    ScalaSerializers.registerSerializers(fory)
+    ScalaSerializers.registerEnum(fory, classOf[Person.PhoneType], 101L)
+    ForySerializer.register(fory, classOf[Person.PhoneNumber], 102L)
+    ForySerializer.register(fory, classOf[Person], 100L)
+    ForySerializer.register(fory, classOf[Animal], 106L)
+  }
+}
+```
+
+Run the end-to-end Scala IDL matrix with:
+
+```bash
+cd integration_tests/idl_tests
+./run_scala_tests.sh
+```
+
+The runner regenerates Scala fixtures, runs Scala 3 IDL tests, and then runs the
+Java peer matrix with `IDL_PEER_LANG=scala`.
+
 ## Cross-Language Notes
 
 ### Type ID Behavior
