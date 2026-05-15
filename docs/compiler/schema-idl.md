@@ -217,6 +217,29 @@ message Payment {
 
 The CLI flag `--swift_namespace_style` overrides this schema option when both are set.
 
+### Rust Chrono Temporal Types Option
+
+Rust generated code uses Fory's lightweight temporal carrier types by default:
+`fory::Date`, `fory::Timestamp`, and `fory::Duration`. Set
+`rust_use_chrono_temporal_types` when the generated Rust API should expose
+chrono temporal types instead:
+
+```protobuf
+package payment;
+option rust_use_chrono_temporal_types = true;
+
+message Event {
+    date business_day = 1;
+    timestamp created_at = 2;
+    duration timeout = 3;
+}
+```
+
+With this option, Rust code maps `date` to `chrono::NaiveDate`, `timestamp` to
+`chrono::NaiveDateTime`, and `duration` to `chrono::Duration`. The Rust crate
+that compiles the generated code must depend on `chrono` and enable Fory's
+`chrono` feature.
+
 ### Java Outer Classname Option
 
 Generate all types as inner classes of a single outer wrapper class:
@@ -1150,27 +1173,38 @@ Underscore spellings for integer encoding are not FDL type names.
 
 ##### Date
 
-| Language   | Type                        | Notes                   |
-| ---------- | --------------------------- | ----------------------- |
-| Java       | `java.time.LocalDate`       |                         |
-| Python     | `datetime.date`             |                         |
-| Go         | `time.Time`                 | Time portion ignored    |
-| Rust       | `chrono::NaiveDate`         | Requires `chrono` crate |
-| C++        | `fory::serialization::Date` |                         |
-| JavaScript | `Date`                      |                         |
-| Dart       | `LocalDate`                 | Fory package type       |
+| Language   | Type                        | Notes                                                                       |
+| ---------- | --------------------------- | --------------------------------------------------------------------------- |
+| Java       | `java.time.LocalDate`       |                                                                             |
+| Python     | `datetime.date`             |                                                                             |
+| Go         | `time.Time`                 | Time portion ignored                                                        |
+| Rust       | `fory::Date`                | Set `rust_use_chrono_temporal_types = true` to generate `chrono::NaiveDate` |
+| C++        | `fory::serialization::Date` |                                                                             |
+| JavaScript | `Date`                      |                                                                             |
+| Dart       | `LocalDate`                 | Fory package type                                                           |
 
 ##### Timestamp
 
-| Language   | Type                             | Notes                   |
-| ---------- | -------------------------------- | ----------------------- |
-| Java       | `java.time.Instant`              | UTC-based               |
-| Python     | `datetime.datetime`              |                         |
-| Go         | `time.Time`                      |                         |
-| Rust       | `chrono::NaiveDateTime`          | Requires `chrono` crate |
-| C++        | `fory::serialization::Timestamp` |                         |
-| JavaScript | `Date`                           |                         |
-| Dart       | `Timestamp`                      | Fory package type       |
+| Language   | Type                             | Notes                                                                           |
+| ---------- | -------------------------------- | ------------------------------------------------------------------------------- |
+| Java       | `java.time.Instant`              | UTC-based                                                                       |
+| Python     | `datetime.datetime`              |                                                                                 |
+| Go         | `time.Time`                      |                                                                                 |
+| Rust       | `fory::Timestamp`                | Set `rust_use_chrono_temporal_types = true` to generate `chrono::NaiveDateTime` |
+| C++        | `fory::serialization::Timestamp` |                                                                                 |
+| JavaScript | `Date`                           |                                                                                 |
+| Dart       | `Timestamp`                      | Fory package type                                                               |
+
+##### Duration
+
+| Language | Type                            | Notes                                                                      |
+| -------- | ------------------------------- | -------------------------------------------------------------------------- |
+| Java     | `java.time.Duration`            |                                                                            |
+| Python   | `datetime.timedelta`            |                                                                            |
+| Go       | `time.Duration`                 |                                                                            |
+| Rust     | `fory::Duration`                | Set `rust_use_chrono_temporal_types = true` to generate `chrono::Duration` |
+| C++      | `fory::serialization::Duration` |                                                                            |
+| Dart     | `Duration`                      |                                                                            |
 
 #### Any
 

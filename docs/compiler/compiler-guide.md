@@ -73,7 +73,14 @@ Compile options:
 | `--emit-fdl`                          | Emit translated FDL (for non-FDL inputs)              | `false`       |
 | `--emit-fdl-path`                     | Write translated FDL to this path (file or directory) | (stdout)      |
 
-For both `go_nested_type_style` and `swift_namespace_style`, schema-level file options are supported (`option ... = ...;`) and the CLI flag overrides the schema option when both are present.
+Schema-level file options are supported for language-specific generation choices.
+For `go_nested_type_style` and `swift_namespace_style`, the CLI flag overrides
+the schema option when both are present. Rust temporal codegen has no CLI flag:
+set `option rust_use_chrono_temporal_types = true;` in the schema to generate
+`chrono::NaiveDate`, `chrono::NaiveDateTime`, and `chrono::Duration` instead of
+the default `fory::Date`, `fory::Timestamp`, and `fory::Duration`. Crates that
+compile generated chrono-based Rust code must depend on `chrono` and enable
+Fory's `chrono` feature.
 
 Scan options (with `--scan-generated`):
 
