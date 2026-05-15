@@ -25,8 +25,9 @@ This page explains how to configure field-level metadata for serialization in Ja
 
 Apache Fory™ provides field-level configuration through annotations:
 
-- **`@ForyField`**: Configure field metadata (id, ref, dynamic)
+- **`@ForyField`**: Configure field metadata (id, dynamic)
 - **`@Nullable`**: Mark a field type or nested type position as nullable
+- **`@Ref`**: Enable field or nested-element reference tracking
 - **`@Ignore`**: Exclude fields from serialization
 - **Integer type annotations**: Control integer encoding (varint, fixed, tagged, unsigned)
 
@@ -76,8 +77,8 @@ public class User {
     @ForyField(id = 2)
     private String email;
 
-    @ForyField(id = 3, ref = true)
-    private List<User> friends;
+    @ForyField(id = 3)
+    private List<@Ref User> friends;
 
     @ForyField(id = 4, dynamic = ForyField.Dynamic.TRUE)
     private Object data;
@@ -89,11 +90,11 @@ public class User {
 | Parameter | Type      | Default | Description                            |
 | --------- | --------- | ------- | -------------------------------------- |
 | `id`      | `int`     | `-1`    | Non-negative field tag ID, or no ID    |
-| `ref`     | `boolean` | `false` | Enable reference tracking              |
 | `dynamic` | `Dynamic` | `AUTO`  | Control polymorphism for struct fields |
 
 Use `@Nullable` on the field type or nested type position for nullable schema
-metadata. `@ForyField` does not carry nullability.
+metadata and `@Ref` for reference tracking. `@ForyField` does not carry either
+setting.
 
 ## Field ID (`id`)
 
@@ -164,7 +165,7 @@ public class Record {
 - When a field is non-nullable, Fory skips writing the null flag.
 - Boxed types (`Integer`, `Long`, etc.) that can be null should use `@Nullable`.
 
-## Reference Tracking (`ref`)
+## Reference Tracking (`@Ref`)
 
 Enable reference tracking for fields that may be shared or circular:
 
@@ -172,11 +173,13 @@ Enable reference tracking for fields that may be shared or circular:
 public class RefOuter {
     // Both fields may point to the same inner object
     @Nullable
-    @ForyField(id = 0, ref = true)
+    @ForyField(id = 0)
+    @Ref
     private RefInner inner1;
 
     @Nullable
-    @ForyField(id = 1, ref = true)
+    @ForyField(id = 1)
+    @Ref
     private RefInner inner2;
 }
 
@@ -186,7 +189,8 @@ public class CircularRef {
 
     // Self-referencing field for circular references
     @Nullable
-    @ForyField(id = 1, ref = true)
+    @ForyField(id = 1)
+    @Ref
     private CircularRef selfRef;
 }
 ```
@@ -198,8 +202,8 @@ public class CircularRef {
 
 **Notes**:
 
-- Default is `ref = false` (no reference tracking)
-- When `ref = false`, avoids IdentityMap overhead and skips ref tracking flag
+- Fields without `@Ref` do not use field-wrapper reference tracking
+- Avoid `@Ref` when values are not shared or circular, so Fory can skip the reference flag
 - Reference tracking only takes effect when global ref tracking is enabled
 
 ## Dynamic (Polymorphism Control)
@@ -451,7 +455,8 @@ public class Document {
 
     // Reference-tracked field for shared/circular references
     @Nullable
-    @ForyField(id = 9, ref = true)
+    @ForyField(id = 9)
+    @Ref
     private Document parent;
 
     // Ignored field (not serialized)
@@ -578,13 +583,13 @@ public class User {
 Xlang mode has **stricter default values** due to type system differences between languages:
 
 - **Nullable**: Fields are non-nullable by default
-- **Ref tracking**: Disabled by default (`ref = false`)
+- **Ref tracking**: Disabled by default unless the field type uses `@Ref`
 - **Polymorphism**: Concrete types are non-polymorphic by default
 
 In xlang mode, you **need to configure fields** when:
 
 - A field can be null (use `@Nullable`)
-- A field needs reference tracking for shared/circular objects (use `ref = true`)
+- A field needs reference tracking for shared/circular objects (use `@Ref`)
 - Integer types need specific encoding for cross-language compatibility
 - You want to reduce metadata size (use field IDs)
 
@@ -602,7 +607,8 @@ public class User {
     private String email;
 
     @Nullable
-    @ForyField(id = 3, ref = true) // Must declare ref for shared objects
+    @ForyField(id = 3)
+    @Ref // Must declare @Ref for shared objects
     private User friend;
 }
 ```
@@ -619,7 +625,7 @@ public class User {
 
 1. **Configure field IDs**: Recommended for compatible mode to reduce serialization cost
 2. **Use `@Nullable` for nullable fields**: Required for fields that can be null
-3. **Enable ref tracking for shared objects**: Use `ref = true` when objects are shared or circular
+3. **Enable ref tracking for shared objects**: Use `@Ref` when objects are shared or circular
 4. **Use `@Ignore` or `transient` for sensitive data**: Passwords, tokens, internal state
 5. **Choose appropriate encoding**: `varint` for small values, `fixed` for full-range values
 6. **Keep IDs stable**: Once assigned, don't change field IDs
@@ -631,7 +637,7 @@ public class User {
 | ----------------------------- | -------------------------------------- |
 | `@ForyField(id = N)`          | Field tag ID to reduce metadata size   |
 | `@Nullable`                   | Mark field or nested type as nullable  |
-| `@ForyField(ref = true)`      | Enable reference tracking              |
+| `@Ref`                        | Enable reference tracking              |
 | `@ForyField(dynamic = ...)`   | Control polymorphism for struct fields |
 | `@Ignore`                     | Exclude field from serialization       |
 | `@Int32Type(encoding = ...)`  | 32-bit signed integer encoding         |

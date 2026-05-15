@@ -29,7 +29,8 @@ Apache Fory™ Scala provides optimized serializers for Scala types, built on to
 - `Option` types
 - Scala 2 and 3 enumerations
 
-Both Scala 2 and Scala 3 are supported.
+The runtime artifact supports Scala 2.13 and Scala 3. Schema IDL generated
+Scala source and macro-derived xlang serializers require Scala 3.
 
 ## Features
 
@@ -98,3 +99,4 @@ Fory Scala is built on top of Fory Java. Most configuration options, features, a
 - [Fory Creation](fory-creation.md) - Scala-specific Fory setup requirements
 - [Type Serialization](type-serialization.md) - Serializing Scala types
 - [Default Values](default-values.md) - Scala class default values support
+- [Schema IDL And Xlang](schema-idl.md) - Scala 3 generated models and macro-derived xlang serializers

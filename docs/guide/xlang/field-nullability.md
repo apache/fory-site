@@ -36,6 +36,7 @@ The following types are nullable by default:
 - Go pointer types (`*int32`, `*string`, etc.)
 - Rust `Option<T>`
 - Python `Optional[T]`
+- Scala `Option[T]`
 
 | Field Type                                 | Default Nullable | Null Flag Written |
 | ------------------------------------------ | ---------------- | ----------------- |

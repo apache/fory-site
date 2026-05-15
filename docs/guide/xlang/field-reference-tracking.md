@@ -69,6 +69,17 @@ let fory = Fory::builder()
     .track_ref(true).build();
 ```
 
+### Scala
+
+```scala
+val fory = Fory.builder()
+  .withXlang(true)
+  .withCompatible(true)
+  .withRefTracking(true)
+  .withScalaOptimizationEnabled(true)
+  .build()
+```
+
 ## Wire Format
 
 When reference tracking is enabled, nullable fields write a **ref flag byte** before the value:
@@ -121,10 +132,11 @@ By default, **most fields do not track references** even when global `refTrackin
 | Go       | No                   | None (use `fory:"ref"` to enable)                          |
 | C++      | Yes                  | `std::shared_ptr<T>`, `fory::serialization::SharedWeak<T>` |
 | Rust     | No                   | `Rc<T>`, `Arc<T>`, `Weak<T>`                               |
+| Scala    | No                   | None (use `@Ref` to enable)                                |
 
 ### Customizing Per-Field Ref Tracking
 
-#### Java: @ForyField Annotation
+#### Java: @Ref Annotation
 
 ```java
 public class Document {
@@ -132,12 +144,11 @@ public class Document {
     String title;
 
     // Enable ref tracking for this field
-    @ForyField(ref = true)
+    @Ref
     Author author;
 
     // Shared across documents, track refs to avoid duplicates
-    @ForyField(ref = true)
-    List<Tag> tags;
+    List<@Ref Tag> tags;
 }
 ```
 
@@ -180,6 +191,26 @@ struct Document {
     // Explicitly enable ref tracking
     #[fory(ref = true)]
     tags: Vec<Tag>,
+}
+```
+
+#### Scala: @Ref Annotation
+
+Scala schema IDL and Scala 3 macro derivation use the same shared JVM `@Ref`
+annotation:
+
+```scala
+import org.apache.fory.annotation.{ForyField, ForyStruct, Ref}
+import org.apache.fory.scala.ForySerializer
+
+@ForyStruct
+final class Node() derives ForySerializer {
+  @ForyField(id = 1)
+  var children: List[Node @Ref] = List.empty
+
+  @Ref
+  @ForyField(id = 2)
+  var parent: Option[Node @Ref] = None
 }
 ```
 

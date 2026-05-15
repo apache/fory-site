@@ -131,8 +131,8 @@ the schema is always read from Kotlin source nullability.
 
 ## References
 
-`@ForyField(ref = true)` is not supported by Kotlin xlang generated
-serializers. Generated reads construct Kotlin values through primary
+Kotlin xlang generated serializers reject every `@Ref` annotation, including
+`@Ref(enable = false)`. Generated reads construct Kotlin values through primary
 constructors, so they cannot publish partially constructed objects for cyclic
 back-references. Use non-cyclic schemas for Kotlin xlang structs.
 

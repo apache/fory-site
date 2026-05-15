@@ -133,3 +133,23 @@ val fory = Fory.builder()
 
 ScalaSerializers.registerSerializers(fory)
 ```
+
+## Cross-Language Mode
+
+For Scala xlang or schema IDL generated code, enable xlang and register the
+Scala serializers before registering generated model types:
+
+```scala
+val fory = Fory.builder()
+  .withXlang(true)
+  .withCompatible(true)
+  .withScalaOptimizationEnabled(true)
+  .build()
+
+ScalaSerializers.registerSerializers(fory)
+ExampleForyRegistration.register(fory)
+```
+
+In xlang mode, Scala collections use canonical `list`, `set`, and `map`
+payloads instead of Scala factory payloads. Generated optional fields use
+`Option[T]`.
