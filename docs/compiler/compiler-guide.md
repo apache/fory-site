@@ -56,7 +56,6 @@ Compile options:
 | ------------------------------------- | ----------------------------------------------------- | ------------- |
 | `--lang`                              | Comma-separated target languages                      | `all`         |
 | `--output`, `-o`                      | Output directory                                      | `./generated` |
-| `--package`                           | Override package name from Fory IDL file              | (from file)   |
 | `-I`, `--proto_path`, `--import_path` | Add directory to import search path (can be repeated) | (none)        |
 | `--java_out=DST_DIR`                  | Generate Java code in DST_DIR                         | (none)        |
 | `--python_out=DST_DIR`                | Generate Python code in DST_DIR                       | (none)        |
@@ -68,6 +67,7 @@ Compile options:
 | `--swift_out=DST_DIR`                 | Generate Swift code in DST_DIR                        | (none)        |
 | `--dart_out=DST_DIR`                  | Generate Dart code in DST_DIR                         | (none)        |
 | `--scala_out=DST_DIR`                 | Generate Scala 3 code in DST_DIR                      | (none)        |
+| `--kotlin_out=DST_DIR`                | Generate Kotlin code in DST_DIR                       | (none)        |
 | `--go_nested_type_style`              | Go nested type naming: `camelcase` or `underscore`    | `underscore`  |
 | `--swift_namespace_style`             | Swift namespace style: `enum` or `flatten`            | `enum`        |
 | `--emit-fdl`                          | Emit translated FDL (for non-FDL inputs)              | `false`       |
@@ -125,19 +125,13 @@ foryc schema.fdl
 **Compile for specific languages:**
 
 ```bash
-foryc schema.fdl --lang java,python,csharp,javascript,swift,dart
+foryc schema.fdl --lang java,python,csharp,javascript,swift,dart,kotlin
 ```
 
 **Specify output directory:**
 
 ```bash
 foryc schema.fdl --output ./src/generated
-```
-
-**Override package name:**
-
-```bash
-foryc schema.fdl --package com.myapp.models
 ```
 
 **Compile multiple files:**
@@ -178,13 +172,16 @@ foryc src/main.fdl -I libs/common,libs/types --proto_path third_party/
 foryc schema.fdl --java_out=./src/main/java
 
 # Generate multiple languages to different directories
-foryc schema.fdl --java_out=./java/gen --python_out=./python/src --go_out=./go/gen --csharp_out=./csharp/gen --javascript_out=./javascript/src --swift_out=./swift/gen --dart_out=./dart/gen
+foryc schema.fdl --java_out=./java/gen --python_out=./python/src --go_out=./go/gen --csharp_out=./csharp/gen --javascript_out=./javascript/src --swift_out=./swift/gen --dart_out=./dart/gen --kotlin_out=./kotlin/gen
 
 # Combine with import paths
 foryc schema.fdl --java_out=./gen/java -I proto/ -I common/
 
 # Generate Scala 3 code to a specific directory
 foryc schema.fdl --scala_out=./src/main/scala
+
+# Generate Kotlin code to a specific directory
+foryc schema.fdl --kotlin_out=./src/main/kotlin
 ```
 
 When using `--{lang}_out` options:
@@ -262,6 +259,7 @@ Compiling src/main.fdl...
 | Swift      | `swift`      | `.swift`         | Fory Swift model macros                |
 | Dart       | `dart`       | `.dart`          | `@ForyStruct` classes with annotations |
 | Scala      | `scala`      | `.scala`         | Scala 3 models with macro derivation   |
+| Kotlin     | `kotlin`     | `.kt`            | Kotlin models with KSP serializers     |
 
 ## Output Structure
 
@@ -275,12 +273,12 @@ generated/
             ├── User.java
             ├── Order.java
             ├── Status.java
-            └── ExampleForyRegistration.java
+            └── ExampleForyModule.java
 ```
 
 - One file per type (enum or message)
 - Package structure matches Fory IDL package
-- Registration helper class generated
+- Schema module class generated
 
 ### Python
 
@@ -400,7 +398,7 @@ generated/
         ├── User.scala
         ├── Status.scala
         ├── Animal.scala
-        └── ExampleForyRegistration.scala
+        └── ExampleForyModule.scala
 ```
 
 - One Scala 3 source file per generated type
@@ -409,7 +407,7 @@ generated/
 - `optional T` fields use `Option[T]`
 - Enums use Scala 3 `enum`
 - Unions use Scala 3 ADT `enum` with `@ForyUnion`, `@ForyCase`, and an `UnknownCase`
-- Registration helper object included
+- Schema module object included
 
 ### C# IDL Matrix Verification
 

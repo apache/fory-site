@@ -103,6 +103,7 @@ package com.example.models alias models_v1;
 | C#         | Namespace                         |
 | JavaScript | Module name (last segment)        |
 | Dart       | Library name (package segments)   |
+| Kotlin     | Kotlin package                    |
 
 ## File-Level Options
 
@@ -172,6 +173,28 @@ message Payment {
 - Generated C# files use `namespace MyCorp.Payment.V1;`
 - Output path follows namespace segments (`MyCorp/Payment/V1/` under `--csharp_out`)
 - Type registration still uses the Fory IDL package (`payment`) for cross-language compatibility
+
+### Kotlin Package Option
+
+Override the Kotlin package for generated source:
+
+```protobuf
+package payment;
+option kotlin_package = "com.mycorp.payment.v1";
+
+message Payment {
+    string id = 1;
+}
+```
+
+**Effect:**
+
+- Generated Kotlin files are written under `com/mycorp/payment/v1/`
+- Kotlin source uses `package com.mycorp.payment.v1`
+- Type registration still uses the Fory IDL package (`payment`) for cross-language compatibility
+
+If `kotlin_package` is absent, Kotlin uses the FDL package. A Kotlin import
+graph cannot mix default-package schemas with named Kotlin packages.
 
 ### Go Nested Type Style Option
 
@@ -376,9 +399,9 @@ For protobuf extension options, see
 
 For language-specific packages/namespaces:
 
-1. Command-line package override (highest priority)
-2. Language-specific option (`java_package`, `go_package`, `csharp_namespace`)
-3. Fory IDL package declaration (fallback)
+1. Language-specific option (`java_package`, `go_package`, `csharp_namespace`,
+   `kotlin_package`)
+2. Fory IDL package declaration (fallback)
 
 **Example:**
 
@@ -387,11 +410,10 @@ package myapp.models;
 option java_package = "com.example.generated";
 ```
 
-| Scenario                  | Java Package Used         |
-| ------------------------- | ------------------------- |
-| No override               | `com.example.generated`   |
-| CLI: `--package=override` | `override`                |
-| No java_package option    | `myapp.models` (fallback) |
+| Scenario               | Java Package Used         |
+| ---------------------- | ------------------------- |
+| `java_package` present | `com.example.generated`   |
+| No `java_package`      | `myapp.models` (fallback) |
 
 ### Cross-Language Type Registration
 
@@ -1329,6 +1351,8 @@ For handwritten Dart models, `array<bool>` requires `BoolList` plus
 `list<bool>`. For handwritten Java models, unsigned primitive arrays use
 type-use annotations on the element type, for example
 `private @UInt32Type int[] ids;`.
+For generated Kotlin models, `array<int8>` uses `@ArrayType ByteArray`,
+including nested collection and map positions.
 
 #### Map
 

@@ -21,7 +21,7 @@ license: |
 
 This document explains generated code for each target language.
 
-Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and registration helpers.
+Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and registration helpers or modules.
 
 ## Reference Schemas
 
@@ -118,7 +118,11 @@ For `package addressbook`, Java output is generated under:
 
 - `<java_out>/addressbook/`
 - Type files: `AddressBook.java`, `Person.java`, `Dog.java`, `Cat.java`, `Animal.java`
-- Registration helper: `AddressbookForyRegistration.java`
+- Schema module: `AddressbookForyModule.java`
+
+For schemas without a Java package, the schema module name is derived from the
+source file stem, for example `main.fdl` generates `MainForyModule.java`.
+Java import graphs cannot mix default-package schemas with named Java packages.
 
 ### Type Generation
 
@@ -177,20 +181,28 @@ public final class Animal extends Union {
 }
 ```
 
-### Registration
+### Schema Module
 
-Generated registration helper:
+Each JVM schema generates a `ForyModule`. Imported schema modules are installed
+through `fory.register(...)`, so shared imports are deduplicated by the runtime.
 
 ```java
-public static void register(Fory fory) {
+public final class AddressbookForyModule implements org.apache.fory.ForyModule {
+  public static final AddressbookForyModule INSTANCE = new AddressbookForyModule();
+
+  static ThreadSafeFory getFory() { ... }
+
+  @Override
+  public void install(Fory fory) {
     org.apache.fory.resolver.TypeResolver resolver = fory.getTypeResolver();
-    resolver.registerUnion(Animal.class, 106L, new org.apache.fory.serializer.UnionSerializer(fory, Animal.class));
+    resolver.registerUnion(Animal.class, 106L, new org.apache.fory.serializer.UnionSerializer(resolver, Animal.class));
     resolver.register(Person.class, 100L);
     resolver.register(Person.PhoneType.class, 101L);
     resolver.register(Person.PhoneNumber.class, 102L);
     resolver.register(Dog.class, 104L);
     resolver.register(Cat.class, 105L);
     resolver.register(AddressBook.class, 103L);
+  }
 }
 ```
 
@@ -198,9 +210,9 @@ For schemas without explicit `[id=...]`, generated registration uses computed nu
 
 ```java
 resolver.register(Status.class, 1124725126L);
-resolver.registerUnion(Wrapper.class, 1471345060L, new org.apache.fory.serializer.UnionSerializer(fory, Wrapper.class));
+resolver.registerUnion(Wrapper.class, 1471345060L, new org.apache.fory.serializer.UnionSerializer(resolver, Wrapper.class));
 resolver.register(Envelope.class, 3022445236L);
-resolver.registerUnion(Envelope.Detail.class, 1609214087L, new org.apache.fory.serializer.UnionSerializer(fory, Envelope.Detail.class));
+resolver.registerUnion(Envelope.Detail.class, 1609214087L, new org.apache.fory.serializer.UnionSerializer(resolver, Envelope.Detail.class));
 resolver.register(Envelope.Payload.class, 2862577837L);
 ```
 
@@ -212,7 +224,7 @@ resolver.registerUnion(
     Holder.class,
     "myapp.models",
     "Holder",
-    new org.apache.fory.serializer.UnionSerializer(fory, Holder.class));
+    new org.apache.fory.serializer.UnionSerializer(resolver, Holder.class));
 ```
 
 ### Usage
@@ -1042,6 +1054,131 @@ void main() {
 }
 ```
 
+## Kotlin
+
+The Kotlin target emits Kotlin source only. The compiler does not generate Java
+files.
+
+### Output Layout
+
+For source file `addressbook.fdl` with `package addressbook`, Kotlin output is
+generated under:
+
+- `<kotlin_out>/addressbook/`
+- Type files: `AddressBook.kt`, `Person.kt`, `Dog.kt`, `Cat.kt`, `Animal.kt`
+- Schema module: `AddressbookForyModule.kt`
+
+The schema module name is derived from the source file stem. Schemas in the same
+Kotlin package need distinct generated file names; duplicate generated Kotlin
+file paths are rejected before files are written.
+
+If `option kotlin_package = "...";` is present, the output path and Kotlin
+package use that option. Otherwise Kotlin uses the FDL package. A Kotlin import
+graph cannot mix default-package schemas with named Kotlin packages.
+Registration still uses the FDL package so cross-language type names stay
+stable.
+
+### Type Generation
+
+Messages generate Kotlin `data class` declarations by default:
+
+```kotlin
+@ForyStruct
+public data class Person(
+  @field:ForyField(id = 1)
+  public val name: String,
+
+  @field:ForyField(id = 7)
+  public val phones: List<PersonPhoneNumber>,
+
+  @field:ForyField(id = 8)
+  public val pet: Animal,
+) {
+  public fun toBytes(): ByteArray = AddressbookForyModule.getFory().serialize(this)
+
+  public companion object {
+    public fun fromBytes(bytes: ByteArray): Person =
+      AddressbookForyModule.getFory().deserialize(bytes, Person::class.java)
+  }
+}
+```
+
+Messages that participate in compiler-detected construction cycles generate
+normal mutable classes so the generated serializer can publish the instance
+before reading back-references:
+
+```kotlin
+@ForyStruct
+public class Node() {
+  @ForyField(id = 1)
+  public var id: String = ""
+
+  @Ref
+  @ForyField(id = 2)
+  public var parent: Node? = null
+}
+```
+
+Generated Kotlin IDL sources express nullability with Kotlin `?`, not Fory
+`@Nullable`, including mutable classes emitted for compiler-detected
+construction cycles.
+
+Enums generate Kotlin enum classes with stable Fory enum IDs. Unions generate
+sealed classes with `@ForyUnion`; case ID `0` is the unknown-case carrier and
+schema-defined cases hold a single `value` property.
+
+```kotlin
+@ForyUnion
+public sealed class Animal {
+  @ForyCase(id = 0)
+  public data class UnknownCase(public val caseId: Int, public val value: Any?) : Animal()
+
+  @ForyCase(id = 1)
+  public data class DogCase(public val value: Dog) : Animal()
+}
+```
+
+Kotlin `int32`, `int64`, `uint32`, and `uint64` fields use xlang varint
+encoding by default, so generated Kotlin does not emit `@VarInt` for the
+default case. It emits `@Fixed` or `@Tagged` only when the schema requests that
+non-default encoding. `duration` maps to `kotlin.time.Duration`, and infinite
+durations are rejected when encoded. Dense `array<float16>` and
+`array<bfloat16>` use the Java core `Float16Array` and `BFloat16Array`
+carriers. Generated Kotlin IDL uses `@ArrayType ByteArray` for `array<int8>`,
+including nested positions.
+
+### Schema Module
+
+Generated schema modules register schema types and resolve KSP-generated
+serializers from the target class name. The package-owned helper runtime uses
+`ForyKotlin.builder()` with the schema module installed, so message
+`toBytes`/`fromBytes` helpers work without caller-managed runtime setup. For
+`addressbook.fdl`:
+
+```kotlin
+public object AddressbookForyModule : ForyModule {
+  private val fory: ThreadSafeFory by lazy {
+    ForyKotlin.builder()
+      .withXlang(true)
+      .withCompatible(true)
+      .withRefTracking(true)
+      .withModule(this)
+      .buildThreadSafeFory()
+  }
+
+  internal fun getFory(): ThreadSafeFory = fory
+
+  override fun install(fory: Fory) {
+    KotlinSerializers.registerType(fory, Person::class.java, 100L)
+    KotlinSerializers.registerSerializer(fory, Person::class.java)
+    KotlinSerializers.registerUnion(fory, Animal::class.java, 106L)
+  }
+}
+```
+
+`registerUnion` discovers the generated `<Target>_ForySerializer`; callers do
+not pass a serializer instance.
+
 ## Scala
 
 The Scala target emits Scala 3 source only. The `fory-scala` runtime artifact
@@ -1054,7 +1191,12 @@ For `package addressbook`, Scala output is generated under:
 
 - `<scala_out>/addressbook/`
 - Type files: `AddressBook.scala`, `Person.scala`, `Dog.scala`, `Cat.scala`, `Animal.scala`
-- Registration helper: `AddressbookForyRegistration.scala`
+- Schema module: `AddressbookForyModule.scala`
+
+For schemas without a Scala package, the schema module name is derived from the
+source file stem, for example `main.fdl` generates `MainForyModule.scala`.
+Scala import graphs cannot mix default-package schemas with named Scala
+packages.
 
 ### Type Generation
 
@@ -1070,7 +1212,15 @@ final case class Person(
   @ForyField(id = 3) email: Option[String],
   @ForyField(id = 7) phones: List[Person.PhoneNumber],
   @ForyField(id = 8) pet: Animal
-) derives ForySerializer
+) derives ForySerializer {
+  def toBytes(): Array[Byte] =
+    AddressbookForyModule.getFory.serialize(this)
+}
+
+object Person {
+  def fromBytes(bytes: Array[Byte]): Person =
+    AddressbookForyModule.getFory.deserialize(bytes).asInstanceOf[Person]
+}
 ```
 
 Messages in circular construction cycles generate normal classes with mutable
@@ -1132,15 +1282,26 @@ enum Animal derives ForySerializer {
 `@Ref` on the field or constructor parameter. Nested element/value references
 use type-use annotations such as `List[Node @Ref]`.
 
-### Registration
+### Schema Module
 
-Generated registration helpers register Scala serializers, enums, structs, and
-unions for `Fory` and `ThreadSafeFory`:
+Generated schema modules register schema serializers, enums, structs, and
+unions. The package-owned helper runtime uses `ForyScala.builder()` with the
+schema module installed, so message `toBytes`/`fromBytes` helpers work without
+caller-managed runtime setup:
 
 ```scala
-object AddressbookForyRegistration {
-  def register(fory: Fory): Unit = {
-    ScalaSerializers.registerSerializers(fory)
+object AddressbookForyModule extends org.apache.fory.ForyModule {
+  private lazy val fory: ThreadSafeFory =
+    ForyScala.builder()
+      .withXlang(true)
+      .withCompatible(true)
+      .withRefTracking(true)
+      .withModule(this)
+      .buildThreadSafeFory()
+
+  private[addressbook] def getFory: ThreadSafeFory = fory
+
+  override def install(fory: Fory): Unit = {
     ScalaSerializers.registerEnum(fory, classOf[Person.PhoneType], 101L)
     ForySerializer.register(fory, classOf[Person.PhoneNumber], 102L)
     ForySerializer.register(fory, classOf[Person], 100L)
@@ -1148,16 +1309,6 @@ object AddressbookForyRegistration {
   }
 }
 ```
-
-Run the end-to-end Scala IDL matrix with:
-
-```bash
-cd integration_tests/idl_tests
-./run_scala_tests.sh
-```
-
-The runner regenerates Scala fixtures, runs Scala 3 IDL tests, and then runs the
-Java peer matrix with `IDL_PEER_LANG=scala`.
 
 ## Cross-Language Notes
 
@@ -1186,6 +1337,8 @@ Java peer matrix with `IDL_PEER_LANG=scala`.
 | Language   | Helpers                   |
 | ---------- | ------------------------- |
 | Java       | `toBytes` / `fromBytes`   |
+| Kotlin     | `toBytes` / `fromBytes`   |
+| Scala      | `toBytes` / `fromBytes`   |
 | Python     | `to_bytes` / `from_bytes` |
 | Rust       | `to_bytes` / `from_bytes` |
 | C++        | `to_bytes` / `from_bytes` |

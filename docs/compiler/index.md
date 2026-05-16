@@ -21,7 +21,8 @@ license: |
 
 Fory IDL is a schema definition language for Apache Fory that enables type-safe
 cross-language serialization. Define your data structures once and generate
-native data structure code for Java, Python, Go, Rust, C++, C#, Swift, JavaScript, Dart, and Scala.
+native data structure code for Java, Python, Go, Rust, C++, C#, Swift,
+JavaScript, Dart, Scala, and Kotlin.
 
 ## Example Schema
 
@@ -105,6 +106,7 @@ Generated code uses native language constructs:
 - Swift: Fory model macros with field/case metadata and registration helpers
 - Dart: `@ForyStruct` classes with `@ForyField` annotations and registration helpers
 - Scala: Scala 3 `case class`, normal class, enum, and ADT enum models with macro-derived serializers
+- Kotlin: Kotlin `data class`, enum, and sealed class models with KSP-generated serializers
 
 ## Quick Start
 
@@ -142,7 +144,7 @@ message Person {
 foryc example.fdl --output ./generated
 
 # Generate for specific languages
-foryc example.fdl --lang java,python,csharp,javascript,swift,dart,scala --output ./generated
+foryc example.fdl --lang java,python,csharp,javascript,swift,dart,scala,kotlin --output ./generated
 ```
 
 ### 4. Use Generated Code
