@@ -39,6 +39,7 @@ Fory Kotlin inherits all features from Fory Java, plus Kotlin-specific optimizat
 - **Kotlin Type Support**: Optimized serializers for data classes, unsigned types, ranges, and stdlib types
 - **Default Value Support**: Automatic handling of Kotlin data class default parameters during schema evolution
 - **Static Xlang Serializers**: KSP-generated schema serializers for Kotlin/JVM and Android xlang mode
+- **Schema IDL Generation**: Fory compiler output for Kotlin models, sealed unions, and schema modules
 - **Schema Evolution**: Forward/backward compatibility for class schema changes
 
 See [Java Features](../java/index.md#features) for complete feature list.
@@ -64,23 +65,18 @@ implementation("org.apache.fory:fory-kotlin:0.17.0")
 ## Quick Start
 
 ```kotlin
-import org.apache.fory.Fory
 import org.apache.fory.ThreadSafeFory
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
 
 data class Person(val name: String, val id: Long, val github: String)
 data class Point(val x: Int, val y: Int, val z: Int)
 
 fun main() {
     // Create Fory instance (should be reused)
-    val fory: ThreadSafeFory = Fory.builder()
+    val fory: ThreadSafeFory = ForyKotlin.builder()
         .requireClassRegistration(true)
         .buildThreadSafeFory()
 
-    // Register Kotlin serializers
-    KotlinSerializers.registerSerializers(fory)
-
-    // Register your classes
     fory.register(Person::class.java)
     fory.register(Point::class.java)
 

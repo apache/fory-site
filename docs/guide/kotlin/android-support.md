@@ -55,20 +55,20 @@ rules must be packaged with that library artifact.
 
 ## Runtime Setup
 
-Register the Kotlin runtime serializers once for each Fory instance, then
-register application classes through the normal Fory Java registration APIs.
+Create the runtime with `ForyKotlin.builder()`, then register application
+classes through the Kotlin `register<T>` extension or the normal Fory Java
+registration APIs.
 
 ```kotlin
-import org.apache.fory.Fory
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
+import org.apache.fory.kotlin.register
 
-val fory = Fory.builder()
+val fory = ForyKotlin.builder()
   .withXlang(true)
   .requireClassRegistration(true)
   .build()
 
-KotlinSerializers.registerSerializers(fory)
-fory.register(User::class.java, "example", "User")
+fory.register<User>("example", "User")
 ```
 
 Do not reference generated serializer classes from application code. The runtime

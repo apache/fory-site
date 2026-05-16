@@ -25,19 +25,14 @@ This page covers Scala-specific requirements for creating Fory instances.
 
 When using Fory for Scala serialization, you must:
 
-1. Enable Scala optimization via `withScalaOptimizationEnabled(true)`
-2. Register Scala serializers via `ScalaSerializers.registerSerializers(fory)`
+1. Create the runtime with `ForyScala.builder()`, or install `ForyScala` with `Fory.builder().withModule(ForyScala)`.
+2. Register application classes before serialization.
 
 ```scala
-import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
-val fory = Fory.builder()
-  .withScalaOptimizationEnabled(true)
+val fory = ForyScala.builder()
   .build()
-
-// Register optimized Fory serializers for Scala
-ScalaSerializers.registerSerializers(fory)
 ```
 
 ## Registering Scala Internal Types
@@ -51,8 +46,7 @@ fory.register(Class.forName("scala.Enumeration.Val"))
 To avoid such registration, you can disable class registration:
 
 ```scala
-val fory = Fory.builder()
-  .withScalaOptimizationEnabled(true)
+val fory = ForyScala.builder()
   .requireClassRegistration(false)
   .build()
 ```
@@ -64,8 +58,7 @@ val fory = Fory.builder()
 Circular references are common in Scala. Reference tracking should be enabled with `withRefTracking(true)`:
 
 ```scala
-val fory = Fory.builder()
-  .withScalaOptimizationEnabled(true)
+val fory = ForyScala.builder()
   .withRefTracking(true)
   .build()
 ```
@@ -80,16 +73,11 @@ Fory instance creation is not cheap. Instances should be shared between multiple
 
 ```scala
 import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
 object ForyHolder {
-  val fory: Fory = {
-    val f = Fory.builder()
-      .withScalaOptimizationEnabled(true)
-      .build()
-    ScalaSerializers.registerSerializers(f)
-    f
-  }
+  val fory: Fory = ForyScala.builder()
+    .build()
 }
 ```
 
@@ -98,16 +86,12 @@ object ForyHolder {
 For multi-threaded applications, use `ThreadSafeFory`:
 
 ```scala
-import org.apache.fory.Fory
 import org.apache.fory.ThreadSafeFory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
 object ForyHolder {
-  val fory: ThreadSafeFory = Fory.builder()
-    .withScalaOptimizationEnabled(true)
+  val fory: ThreadSafeFory = ForyScala.builder()
     .buildThreadSafeFory()
-
-  ScalaSerializers.registerSerializers(fory)
 }
 ```
 
@@ -118,11 +102,9 @@ All configuration options from Fory Java are available. See [Java Configuration]
 Common options for Scala:
 
 ```scala
-import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
-val fory = Fory.builder()
-  .withScalaOptimizationEnabled(true)
+val fory = ForyScala.builder()
   // Enable reference tracking for circular references
   .withRefTracking(true)
   // Enable schema evolution support
@@ -130,24 +112,23 @@ val fory = Fory.builder()
   // Enable async compilation for better startup performance
   .withAsyncCompilation(true)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
 ```
 
 ## Cross-Language Mode
 
 For Scala xlang or schema IDL generated code, enable xlang and register the
-Scala serializers before registering generated model types:
+generated schema module:
 
 ```scala
-val fory = Fory.builder()
+import org.apache.fory.scala.ForyScala
+import example.ExampleForyModule
+
+val fory = ForyScala.builder()
   .withXlang(true)
   .withCompatible(true)
-  .withScalaOptimizationEnabled(true)
+  .withRefTracking(true)
+  .withModule(ExampleForyModule)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
-ExampleForyRegistration.register(fory)
 ```
 
 In xlang mode, Scala collections use canonical `list`, `set`, and `map`

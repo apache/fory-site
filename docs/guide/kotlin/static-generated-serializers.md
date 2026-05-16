@@ -104,6 +104,10 @@ The processor rejects these declarations:
 Kotlin default constructor arguments are supported for compatible reads. A
 struct can have up to 12 defaulted constructor fields.
 
+Constructor-based generated serializers support wide primary constructors.
+Compatible reads track remote field presence in generated side state instead of
+using constructor bit masks.
+
 ## Nullability
 
 Use Kotlin `?` to describe nullable schema positions. Nullability is preserved
@@ -126,15 +130,19 @@ data class NullabilityExample(
 )
 ```
 
-Do not use Fory `@Nullable` in Kotlin source. The KSP processor rejects it so
-the schema is always read from Kotlin source nullability.
+Do not use Fory `@Nullable` in hand-written constructor-based Kotlin structs.
+The KSP processor rejects it so the schema is always read from Kotlin source
+nullability. Compiler-generated Kotlin IDL sources follow the same rule and use
+Kotlin `?` for nullable fields.
 
 ## References
 
-Kotlin xlang generated serializers reject every `@Ref` annotation, including
-`@Ref(enable = false)`. Generated reads construct Kotlin values through primary
-constructors, so they cannot publish partially constructed objects for cyclic
-back-references. Use non-cyclic schemas for Kotlin xlang structs.
+Kotlin generated serializers preserve `@Ref` metadata for fields, list
+elements, and map values. Constructor-owned reads construct Kotlin values
+through primary constructors. Schema IDL classes that need reference
+publication are emitted as mutable no-arg classes, and their KSP-generated
+serializers publish the instance before reading fields. In both shapes, KSP owns
+field descriptors, nested nullability, and `@Ref` metadata.
 
 ## Collections
 
@@ -174,11 +182,14 @@ Kotlin dense primitive and unsigned array fields are supported:
 - `UIntArray`
 - `ULongArray`
 
-Dense arrays are supported as top-level fields. Nested dense arrays, such as
-`List<UIntArray>` or `Map<String, IntArray>`, are rejected.
+Dense arrays with unambiguous Kotlin carriers are supported in fields,
+collection elements, map values, and union cases. `array<float16>` and
+`array<bfloat16>` use the Java core `Float16Array` and `BFloat16Array` carriers.
 
-`ByteArray` is encoded as Fory `binary` unless you explicitly annotate the
-field with Java `@ArrayType`.
+`ByteArray` is encoded as Fory `binary` unless the `ByteArray` type use is
+annotated with Java `@ArrayType`. Generated Kotlin IDL uses
+`@ArrayType ByteArray` for `array<int8>`, including nested collection and map
+positions.
 
 `@ArrayType` is also supported on top-level `List<T>` fields when `T` is a
 non-null boolean or numeric dense-array element type. In that case the field is
@@ -199,28 +210,62 @@ Without an annotation, xlang `Int`, `Long`, `UInt`, and `ULong` use varint
 encoding. This is required by xlang mode and is not controlled by Java native
 mode numeric compression options.
 
+## Duration
+
+Xlang `duration` maps to `kotlin.time.Duration`. Infinite Kotlin durations
+cannot be represented by the xlang duration payload and fail during
+serialization.
+
+## Sealed Unions
+
+KSP generates serializers for top-level sealed classes annotated with
+`@ForyUnion`. Each schema case is a nested class annotated with `@ForyCase` and
+one constructor property named `value`. Case ID `0` is reserved for the unknown
+case carrier:
+
+```kotlin
+@ForyUnion
+sealed class Animal {
+  @ForyCase(id = 0)
+  data class UnknownCase(val caseId: Int, val value: Any?) : Animal()
+
+  @ForyCase(id = 1)
+  data class DogCase(val value: Dog) : Animal()
+}
+```
+
+Generated schema modules register sealed unions through `KotlinSerializers.registerUnion`.
+The runtime discovers the generated `<Target>_ForySerializer` automatically, so
+callers do not pass a serializer instance.
+
 ## Register Classes
 
-Register Kotlin struct classes with the normal Fory Java registration APIs. You
+Register Kotlin struct classes with the Kotlin `register<T>` extension. You
 choose the xlang namespace and type name; generated serializers do not choose
 IDs or names for you.
 
 ```kotlin
-val fory = Fory.builder()
+import org.apache.fory.kotlin.ForyKotlin
+import org.apache.fory.kotlin.register
+
+val fory = ForyKotlin.builder()
   .withXlang(true)
   .requireClassRegistration(true)
   .build()
 
-KotlinSerializers.registerSerializers(fory)
-fory.register(User::class.java, "example", "User")
+fory.register<User>("example", "User")
 ```
 
-`KotlinSerializers.registerSerializers(fory)` installs the Kotlin runtime
-serializers used by Kotlin-specific carriers such as unsigned types. The
-`fory.register(...)` call registers your xlang schema type name.
+`ForyKotlin.builder()` installs the Kotlin runtime bootstrap for the Fory
+instance. The `fory.register<T>(...)` extension registers your xlang schema type
+name and resolves the generated serializer from the target class.
 
 Do not register or reference generated serializer classes in application code.
 The runtime resolves them from the registered target class.
+
+Generated Schema IDL modules use the same path. They call
+`KotlinSerializers.registerType`, `registerSerializer`, `registerEnum`, and
+`registerUnion` as appropriate and never emit Java files.
 
 ## Generated Names
 
@@ -231,9 +276,9 @@ as `_`; source underscores are encoded as `_u_`.
 These names are an implementation detail. They matter for diagnostics and
 Android shrinking, but user code should only register target classes.
 
-If a Kotlin xlang struct is registered but its KSP generated serializer is
-missing, Fory fails with a configuration error. It does not fall back to
-runtime reflection for Kotlin schema metadata.
+If a constructor-owned Kotlin xlang struct is registered but its KSP generated
+serializer is missing, Fory fails with a configuration error. Compile generated
+IDL sources with KSP before registering generated Kotlin classes.
 
 ## Android And R8
 

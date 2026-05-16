@@ -56,21 +56,15 @@ libraryDependencies += "org.apache.fory" %% "fory-scala" % "0.17.0"
 
 ```scala
 import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
 case class Person(name: String, id: Long, github: String)
 case class Point(x: Int, y: Int, z: Int)
 
 object ScalaExample {
-  // Create Fory with Scala optimization enabled
-  val fory: Fory = Fory.builder()
-    .withScalaOptimizationEnabled(true)
+  val fory: Fory = ForyScala.builder()
     .build()
 
-  // Register optimized Fory serializers for Scala
-  ScalaSerializers.registerSerializers(fory)
-
-  // Register your classes
   fory.register(classOf[Person])
   fory.register(classOf[Point])
 

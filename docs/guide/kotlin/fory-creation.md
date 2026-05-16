@@ -23,18 +23,14 @@ This page covers Kotlin-specific requirements for creating Fory instances.
 
 ## Basic Setup
 
-When using Fory for Kotlin serialization, register Kotlin serializers via `KotlinSerializers.registerSerializers(fory)`:
+When using Fory for Kotlin serialization, create the runtime with `ForyKotlin.builder()`:
 
 ```kotlin
-import org.apache.fory.Fory
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
 
-val fory = Fory.builder()
+val fory = ForyKotlin.builder()
     .requireClassRegistration(true)
     .build()
-
-// Register Kotlin serializers
-KotlinSerializers.registerSerializers(fory)
 ```
 
 ## Thread Safety
@@ -45,14 +41,12 @@ Fory instance creation is not cheap. Instances should be shared between multiple
 
 ```kotlin
 import org.apache.fory.Fory
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
 
 object ForyHolder {
-    val fory: Fory = Fory.builder()
+    val fory: Fory = ForyKotlin.builder()
         .requireClassRegistration(true)
-        .build().also {
-            KotlinSerializers.registerSerializers(it)
-        }
+        .build()
 }
 ```
 
@@ -61,16 +55,13 @@ object ForyHolder {
 For multi-threaded applications, use `ThreadSafeFory`:
 
 ```kotlin
-import org.apache.fory.Fory
 import org.apache.fory.ThreadSafeFory
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
 
 object ForyHolder {
-    val fory: ThreadSafeFory = Fory.builder()
+    val fory: ThreadSafeFory = ForyKotlin.builder()
         .requireClassRegistration(true)
-        .buildThreadSafeFory().also {
-            KotlinSerializers.registerSerializers(it)
-        }
+        .buildThreadSafeFory()
 }
 ```
 
@@ -78,11 +69,9 @@ object ForyHolder {
 
 ```kotlin
 // Thread-safe Fory
-val fory: ThreadSafeFory = Fory.builder()
+val fory: ThreadSafeFory = ForyKotlin.builder()
     .requireClassRegistration(true)
     .buildThreadSafeFory()
-
-KotlinSerializers.registerSerializers(fory)
 ```
 
 ## Configuration
@@ -92,10 +81,9 @@ All configuration options from Fory Java are available. See [Java Configuration]
 Common options for Kotlin:
 
 ```kotlin
-import org.apache.fory.Fory
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
 
-val fory = Fory.builder()
+val fory = ForyKotlin.builder()
     // Enable reference tracking for circular references
     .withRefTracking(true)
     // Enable schema evolution support
@@ -106,6 +94,4 @@ val fory = Fory.builder()
     .withIntCompressed(true)
     .withLongCompressed(true)
     .build()
-
-KotlinSerializers.registerSerializers(fory)
 ```

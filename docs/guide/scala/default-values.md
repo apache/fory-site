@@ -60,8 +60,7 @@ No additional configuration is required.
 ### Case Class with Default Values
 
 ```scala
-import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
 // Class WITHOUT default values (for serialization)
 case class PersonV1(name: String)
@@ -69,12 +68,9 @@ case class PersonV1(name: String)
 // Class WITH default values (for deserialization)
 case class PersonV2(name: String, age: Int = 25, city: String = "Unknown")
 
-val fory = Fory.builder()
+val fory = ForyScala.builder()
   .withCompatible(true)
-  .withScalaOptimizationEnabled(true)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
 
 // Serialize using class without default values
 val original = PersonV1("John")
@@ -101,12 +97,9 @@ class EmployeeV2(
   val department: String = "Engineering"
 )
 
-val fory = Fory.builder()
+val fory = ForyScala.builder()
   .withCompatible(true)
-  .withScalaOptimizationEnabled(true)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
 
 // Serialize using class without default values
 val original = new EmployeeV1("Jane")
@@ -135,12 +128,9 @@ case class ConfigV2(
   enabled: Boolean = true
 )
 
-val fory = Fory.builder()
+val fory = ForyScala.builder()
   .withCompatible(true)
-  .withScalaOptimizationEnabled(true)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
 
 val original = ConfigV1("myConfig")
 val serialized = fory.serialize(original)
@@ -164,12 +154,9 @@ object Models {
   case class PersonV2(name: String, address: Address = Address("DefaultStreet"))
 }
 
-val fory = Fory.builder()
+val fory = ForyScala.builder()
   .withCompatible(true)
-  .withScalaOptimizationEnabled(true)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
 
 val original = Models.PersonV1("Alice")
 val serialized = fory.serialize(original)

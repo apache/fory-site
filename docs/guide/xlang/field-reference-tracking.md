@@ -72,11 +72,12 @@ let fory = Fory::builder()
 ### Scala
 
 ```scala
-val fory = Fory.builder()
+import org.apache.fory.scala.ForyScala
+
+val fory = ForyScala.builder()
   .withXlang(true)
   .withCompatible(true)
   .withRefTracking(true)
-  .withScalaOptimizationEnabled(true)
   .build()
 ```
 

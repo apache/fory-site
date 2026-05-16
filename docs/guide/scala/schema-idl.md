@@ -30,22 +30,20 @@ the shared JVM annotations in `org.apache.fory.annotation`. Macro internals live
 under `org.apache.fory.scala.internal`.
 
 ```scala
-import org.apache.fory.Fory
-import org.apache.fory.scala.ForySerializer
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.{ForyScala, ForySerializer}
+import example.ExampleForyModule
 
-val fory = Fory.builder()
+val fory = ForyScala.builder()
   .withXlang(true)
   .withCompatible(true)
-  .withScalaOptimizationEnabled(true)
+  .withRefTracking(true)
+  .withModule(ExampleForyModule)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
-ExampleForyRegistration.register(fory)
 ```
 
-For `ThreadSafeFory`, generated registration helpers install a callback so each
-runtime instance gets the same serializers.
+Generated schema modules are also Fory modules. Use `.withModule(...)` when
+creating a custom runtime, or use the generated no-argument `toBytes` and
+`fromBytes` helpers when the default xlang-compatible runtime is sufficient.
 
 Generated helpers register message type identities before installing message
 serializers. This two-phase order lets mutually recursive message graphs build
@@ -108,7 +106,8 @@ the schema IDL surface unless explicitly generated.
 
 ## Generated Enums
 
-IDL enums generate Scala 3 enums only. No Java enum sidecar is emitted.
+IDL enums generate Scala 3 enums only. The compiler does not emit Java enum
+files.
 
 ```scala
 import org.apache.fory.annotation.ForyEnumId

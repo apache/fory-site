@@ -26,14 +26,11 @@ This page covers serialization of Kotlin-specific types.
 All examples assume the following setup:
 
 ```kotlin
-import org.apache.fory.Fory
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
 
-val fory = Fory.builder()
+val fory = ForyKotlin.builder()
     .requireClassRegistration(false)
     .build()
-
-KotlinSerializers.registerSerializers(fory)
 ```
 
 ## Data Class
@@ -174,11 +171,11 @@ println(fory.deserialize(fory.serialize(uuid)))
 
 ## Types Working Out of the Box
 
-The following types work with the default Fory Java implementation without needing `KotlinSerializers`:
+The following types work with the default Fory Java implementation:
 
 - **Primitives**: `Byte`, `Boolean`, `Int`, `Short`, `Long`, `Char`, `Float`, `Double`
 - **String**: `String`
 - **Collections**: `ArrayList`, `HashMap`, `HashSet`, `LinkedHashSet`, `LinkedHashMap`
 - **Arrays**: `Array`, `BooleanArray`, `ByteArray`, `CharArray`, `DoubleArray`, `FloatArray`, `IntArray`, `LongArray`, `ShortArray`
 
-However, it's recommended to always call `KotlinSerializers.registerSerializers(fory)` to ensure all Kotlin types are properly supported.
+Use `ForyKotlin.builder()` for Kotlin-specific runtime types such as unsigned values, ranges, and `Duration`.

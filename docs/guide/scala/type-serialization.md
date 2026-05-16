@@ -27,13 +27,10 @@ All examples assume the following setup:
 
 ```scala
 import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
-val fory = Fory.builder()
-  .withScalaOptimizationEnabled(true)
+val fory = ForyScala.builder()
   .build()
-
-ScalaSerializers.registerSerializers(fory)
 ```
 
 ## Case Class
