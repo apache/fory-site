@@ -126,29 +126,14 @@ Notes:
 - Current xlang uses `*_ARRAY` for one-dimensional primitive arrays and nested `list` for
   multi-dimensional arrays.
 - Kotlin KSP xlang maps `UByte`, `UShort`, `UInt`, and `ULong` to `uint8`,
-  `uint16`, `uint32`, and `uint64` respectively. The generated descriptor uses
-  the JVM primitive carrier plus explicit Fory type metadata; it does not add
-  unsigned wrapper wire types. `ByteArray` maps to `binary` by default and to
-  `array<int8>` only when the field is explicitly marked with Fory `ArrayType`.
-  `UByteArray`, `UShortArray`, `UIntArray`, and `ULongArray` map to the dense
-  unsigned array schema types. Dense Kotlin numeric array component metadata
-  uses the fixed-width element type (`int32`, `int64`, `uint32`, or `uint64`);
-  scalar field defaults such as varint do not apply to dense Kotlin array
-  components. For `@ArrayType List<Int>`, `@ArrayType List<Long>`,
-  `@ArrayType List<UInt>`, and `@ArrayType List<ULong>`, Kotlin KSP records a
-  dense array schema on the list field and fixed-width dense element domain
-  metadata on the list element type. Generated Kotlin reads must restore the
-  declared Kotlin element carrier after decoding the erased JVM list.
-- Kotlin collection declarations in KSP xlang mode carry schema shape, not JVM
-  implementation identity. `List<T>`, mutable list declarations, and supported
-  concrete list declarations encode as `list<T>`; `Set<T>` encodes as `set<T>`;
-  `Map<K, V>` encodes as `map<K, V>`. Deserialization may construct a different
-  concrete implementation if it is assignable to the declared field type.
-  Sorted JVM collections reconstructed with natural ordering require non-null
-  scalar or string elements or keys. JVM concurrent map declarations require
-  non-null values. `@ArrayType List<T>` maps to dense `array<T>` only for
-  non-null bool or numeric element domains; unsupported element domains are KSP
-  errors.
+  `uint16`, `uint32`, and `uint64`. Kotlin primitive and unsigned array
+  carriers map to dense arrays. `ByteArray` maps to `binary` by default and to
+  `array<int8>` when its type use is marked with Fory `ArrayType`.
+  `array<float16>` and `array<bfloat16>` use Java core `Float16Array` and
+  `BFloat16Array`.
+- Kotlin xlang `duration` uses `kotlin.time.Duration`. Infinite values are not
+  representable by the xlang duration payload and must raise a serialization
+  error.
 - `list<T>` and `array<T>` remain distinct schema kinds. In schema-compatible struct/class field
   matching only, a direct top-level `list<T>` field may be read as a direct top-level `array<T>`
   field, and a direct top-level `array<T>` field may be read as a direct top-level `list<T>` field,
@@ -169,7 +154,7 @@ artifact remains cross-built for Scala 2.13 and Scala 3.
 | `bool`                                | `Boolean`                                                                                |
 | `int8`, `int16`, `int32`, `int64`     | `Byte`, `Short`, `Int`, `Long`                                                           |
 | `uint8`, `uint16`, `uint32`, `uint64` | `Int`, `Int`, `Long`, `Long` plus unsigned Fory type metadata                            |
-| `float16`, `bfloat16`                 | JVM half-float and bfloat16 carriers                                                     |
+| `float16`, `bfloat16`                 | JVM `Float16` and `BFloat16` carriers                                                    |
 | `float32`, `float64`                  | `Float`, `Double`                                                                        |
 | `string`                              | `String`                                                                                 |
 | `binary`                              | `Array[Byte]`                                                                            |
