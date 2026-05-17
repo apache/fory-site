@@ -134,6 +134,24 @@ cd packages/hps
 npm run build
 ```
 
+## Dart
+
+在 `pubspec.yaml` 中添加 Apache Fory™ Dart：
+
+```yaml
+dependencies:
+  fory: ^0.17.0
+
+dev_dependencies:
+  build_runner: ^2.4.13
+```
+
+定义带注解的类型后生成序列化器：
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
 ## C\#
 
 安装 `Apache.Fory` NuGet 包。它同时包含运行时以及 `[ForyObject]` 类型所需的源代码生成器。

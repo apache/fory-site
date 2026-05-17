@@ -92,7 +92,7 @@ report for details: https://fory.apache.org/docs/benchmarks/swift/
 Fory JavaScript demonstrates strong performance compared to Protocol Buffers and
 JSON across representative Node.js workloads.
 
-<img src="../benchmarks/javascript/throughput.png" width="90%"/>
+![JavaScript Throughput](../benchmarks/javascript/throughput.png)
 
 Note: Results depend on hardware, dataset, and runtime versions. See the
 [JavaScript benchmark report](../benchmarks/javascript/README.md) for details.
@@ -102,7 +102,7 @@ Note: Results depend on hardware, dataset, and runtime versions. See the
 Fory Dart demonstrates strong performance compared to Protocol Buffers across
 representative object and list workloads.
 
-<img src="../benchmarks/dart/throughput.png" width="90%"/>
+![Dart Throughput](../benchmarks/dart/throughput.png)
 
 Note: Results depend on hardware, dataset, and runtime versions. See the
 [Dart benchmark report](../benchmarks/dart/README.md) for details.

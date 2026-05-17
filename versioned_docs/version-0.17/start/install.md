@@ -134,6 +134,24 @@ cd packages/hps
 npm run build
 ```
 
+## Dart
+
+Add Apache Fory™ Dart to `pubspec.yaml`:
+
+```yaml
+dependencies:
+  fory: ^0.17.0
+
+dev_dependencies:
+  build_runner: ^2.4.13
+```
+
+Generate serializers after defining annotated types:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
 ## C\#
 
 Install the `Apache.Fory` NuGet package. It includes both the runtime and the source generator for `[ForyObject]` types.

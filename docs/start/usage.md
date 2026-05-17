@@ -6,325 +6,34 @@ sidebar_position: 1
 
 This section provides quick examples for getting started with Apache Fory™.
 
-## Native Serialization
+## Choose A Mode
 
-**Always use native mode when working with a single language.** Native mode delivers optimal performance by avoiding the type metadata overhead required for cross-language compatibility.
+Apache Fory™ has two wire modes:
 
-Xlang mode introduces additional metadata encoding costs and restricts serialization to types that are common across all supported languages. Language-specific types will be rejected during serialization in xlang mode.
+- **Xlang mode** is the default and the portable format for payloads shared across languages. Use it for cross-language services and for runtimes that expose only xlang mode: Dart, JavaScript/TypeScript, C#, and Swift.
+- **Native mode** is selected with `xlang=false` or the equivalent builder option in Java, Scala, Kotlin, Python, C++, Go, and Rust. Use it for same-language traffic because it follows the runtime's native type system, supports a broader language-specific object surface, and is optimized for that runtime.
 
-### Java Serialization
+Xlang/default usage uses schema-compatible mode by default. Native mode uses schema-consistent payloads by default unless compatible mode is enabled explicitly.
 
-When you do not need cross-language support, use Java mode for optimal performance.
+## Xlang Mode
 
-This example creates a reusable Java-mode runtime, registers a user class, and then performs a basic serialize/deserialize round trip. In production code, keep the `Fory` instance alive and reuse it across requests instead of rebuilding it for every object.
+Use xlang mode when bytes need to cross runtime boundaries. Register custom types with the same numeric ID or namespace/type name on every peer.
 
-```java
-import org.apache.fory.*;
-import org.apache.fory.config.*;
-
-public class Example {
-  public static class Person {
-    String name;
-    int age;
-  }
-
-  public static void main(String[] args) {
-    // Create a Fory instance once and reuse it.
-    BaseFory fory = Fory.builder()
-      .withLanguage(Language.JAVA)
-      .requireClassRegistration(true)
-      // Replace `build` with `buildThreadSafeFory` for thread-safe usage.
-      .build();
-    fory.register(Person.class);
-
-    Person person = new Person();
-    person.name = "chaokunyang";
-    person.age = 28;
-
-    byte[] bytes = fory.serialize(person);
-    Person result = (Person) fory.deserialize(bytes);
-    System.out.println(result.name + " " + result.age);
-  }
-}
-```
-
-For detailed Java usage including compatibility modes, compression, and advanced features, see [Java Serialization Guide](../guide/java/index.md).
-
-### Python Serialization
-
-Python native mode provides a high-performance drop-in replacement for `pickle` and `cloudpickle`.
-
-The example below uses a dataclass with explicit integer typing so Fory can preserve the intended schema efficiently. As with other runtimes, create the `Fory` instance once, register your types once, and then reuse it for repeated serialization.
-
-```python
-from dataclasses import dataclass
-import pyfory
-
-@dataclass
-class Person:
-    name: str
-    age: pyfory.int32
-
-fory = pyfory.Fory()
-fory.register_type(Person)
-
-person = Person(name="chaokunyang", age=28)
-data = fory.serialize(person)
-result = fory.deserialize(data)
-print(result.name, result.age)
-```
-
-For detailed Python usage including type hints, compatibility modes, and advanced features, see [Python Guide](../guide/python/index.md).
-
-### Go Serialization
-
-Go native mode is the default. Register your structs once, then reuse the same `Fory` instance.
-
-The Go runtime works naturally with exported struct fields and explicit type registration. This snippet shows the standard flow: create `Fory`, register a struct type, serialize a value, and deserialize into a destination struct.
-
-```go
-package main
-
-import (
-    "fmt"
-
-    "github.com/apache/fory/go/fory"
-)
-
-type Person struct {
-    Name string
-    Age  int32
-}
-
-func main() {
-    f := fory.New()
-    if err := f.RegisterStruct(Person{}, 1); err != nil {
-        panic(err)
-    }
-
-    person := &Person{Name: "chaokunyang", Age: 28}
-    data, err := f.Serialize(person)
-    if err != nil {
-        panic(err)
-    }
-
-    var result Person
-    if err := f.Deserialize(data, &result); err != nil {
-        panic(err)
-    }
-
-    fmt.Printf("%s %d\n", result.Name, result.Age)
-}
-```
-
-For detailed Go usage including configuration, struct tags, and schema evolution, see [Go Guide](../guide/go/index.md).
-
-### C# Serialization
-
-C# native serialization uses the `Apache.Fory` runtime together with `[ForyObject]` model types.
-
-In C#, the usual pattern is to mark your model with `[ForyObject]`, build a runtime once, and register the type before use. The example demonstrates the strongly typed `Serialize` and `Deserialize<T>` APIs that fit normal .NET application code.
-
-```csharp
-using Apache.Fory;
-
-[ForyObject]
-public sealed class Person
-{
-    public string Name { get; set; } = string.Empty;
-    public int Age { get; set; }
-}
-
-Fory fory = Fory.Builder().Build();
-fory.Register<Person>(1);
-
-Person person = new() { Name = "chaokunyang", Age = 28 };
-byte[] data = fory.Serialize(person);
-Person result = fory.Deserialize<Person>(data);
-
-Console.WriteLine($"{result.Name} {result.Age}");
-```
-
-For detailed C# usage including source generators, references, and schema evolution, see [C# Guide](../guide/csharp/index.md).
-
-### Swift Serialization
-
-Swift native serialization uses `@ForyObject` models and the `Fory` runtime directly.
-
-Swift uses macro-based model definitions, so the example starts by annotating the type with `@ForyObject`, then registers the type ID and performs a typed round trip. This is the recommended starting point for app-side Swift usage.
-
-```swift
-import Fory
-
-@ForyObject
-struct Person: Equatable {
-    var name: String = ""
-    var age: Int32 = 0
-}
-
-let fory = Fory()
-fory.register(Person.self, id: 1)
-
-let person = Person(name: "chaokunyang", age: 28)
-let data = try fory.serialize(person)
-let result: Person = try fory.deserialize(data)
-
-print("\(result.name) \(result.age)")
-```
-
-For detailed Swift usage including polymorphism, schema evolution, and troubleshooting, see [Swift Guide](../guide/swift/).
-
-### Rust Serialization
-
-Rust native mode uses `Fory::default()` and derive macros for compile-time type-safe serialization. The normal pattern is to derive `ForyObject`, register the type once, and then reuse the configured runtime for repeated serialization.
-
-```rust
-use fory::{Error, Fory, ForyObject};
-
-#[derive(ForyObject, Debug, PartialEq)]
-struct Person {
-    name: String,
-    age: i32,
-}
-
-fn main() -> Result<(), Error> {
-    let mut fory = Fory::default();
-    fory.register::<Person>(1)?;
-
-    let person = Person {
-        name: "chaokunyang".to_string(),
-        age: 28,
-    };
-
-    let bytes = fory.serialize(&person)?;
-    let result: Person = fory.deserialize(&bytes)?;
-    assert_eq!(person, result);
-    Ok(())
-}
-```
-
-For detailed Rust usage including references, polymorphism, and row format support, see [Rust Guide](../guide/rust/index.md).
-
-### C++ Serialization
-
-C++ native mode uses the `FORY_STRUCT` macro to describe serializable fields and a configured `Fory` runtime to encode and decode values. For single-language C++ usage, set `xlang(false)` explicitly so the runtime stays in native mode.
-
-```cpp
-#include "fory/serialization/fory.h"
-
-using namespace fory::serialization;
-
-struct Person {
-  std::string name;
-  int32_t age;
-
-  bool operator==(const Person &other) const {
-    return name == other.name && age == other.age;
-  }
-
-  FORY_STRUCT(Person, name, age);
-};
-
-int main() {
-  auto fory = Fory::builder().xlang(false).build();
-  fory.register_struct<Person>(1);
-
-  Person person{"chaokunyang", 28};
-
-  auto bytes = fory.serialize(person);
-  auto result = fory.deserialize<Person>(bytes.value());
-  assert(result.ok());
-  assert(person == result.value());
-  return 0;
-}
-```
-
-For detailed C++ usage including `FORY_STRUCT`, thread safety, and schema evolution, see [C++ Guide](../guide/cpp/index.md).
-
-### Scala Serialization
-
-Scala native mode provides optimized serialization for Scala-specific types including case classes, collections, and `Option`.
-
-For Scala projects, register the Scala serializers first so Fory understands Scala-specific data structures correctly. After that, you can register your case classes and use the same core API as the Java runtime.
-
-```scala
-import org.apache.fory.Fory
-import org.apache.fory.config.Language
-import org.apache.fory.serializer.scala.ScalaSerializers
-
-case class Person(name: String, age: Int)
-
-object Example {
-  def main(args: Array[String]): Unit = {
-    val fory = Fory.builder()
-      .withLanguage(Language.JAVA)
-      .requireClassRegistration(true)
-      .build()
-    ScalaSerializers.registerSerializers(fory)
-    fory.register(classOf[Person])
-
-    val bytes = fory.serialize(Person("chaokunyang", 28))
-    val result = fory.deserialize(bytes).asInstanceOf[Person]
-    println(s"${result.name} ${result.age}")
-  }
-}
-```
-
-For detailed Scala usage including collection serialization and integration patterns, see [Scala Guide](../guide/scala/index.md).
-
-### Kotlin Serialization
-
-Kotlin native mode provides optimized serialization for Kotlin-specific types including data classes, nullable types, and Kotlin collections.
-
-Kotlin follows the same builder flow as Java, with an extra registration step for Kotlin-specific serializers. The example uses a data class and shows the minimal setup needed for efficient native serialization.
-
-```kotlin
-import org.apache.fory.Fory
-import org.apache.fory.config.Language
-import org.apache.fory.serializer.kotlin.KotlinSerializers
-
-data class Person(val name: String, val age: Int)
-
-fun main() {
-    val fory = Fory.builder()
-        .withLanguage(Language.JAVA)
-        .requireClassRegistration(true)
-        .build()
-    KotlinSerializers.registerSerializers(fory)
-    fory.register(Person::class.java)
-
-    val bytes = fory.serialize(Person("chaokunyang", 28))
-    val result = fory.deserialize(bytes) as Person
-    println("${result.name} ${result.age}")
-}
-```
-
-For detailed Kotlin usage including null safety and default value support, see [kotlin/README.md](https://github.com/apache/fory/blob/main/kotlin/README.md).
-
-## Cross-Language Serialization
-
-**Only use xlang mode when you need cross-language data exchange.** Xlang mode adds type metadata overhead for cross-language compatibility and only supports types that can be mapped across all languages.
-
-The examples below use the same `Person` schema across multiple runtimes. In every language, enable xlang mode and register the type with the same ID or the same fully qualified name.
+Dual-mode runtimes set the xlang option explicitly in the examples below. Dart, JavaScript/TypeScript, C#, and Swift are xlang-only, so their examples do not show an xlang switch.
 
 ### Java
 
-Java xlang usage is the baseline pattern for JVM services. Enable `Language.XLANG`, register the type with a stable ID or name, and make sure every peer language uses the same mapping.
-
 ```java
-import org.apache.fory.*;
-import org.apache.fory.config.*;
+import org.apache.fory.Fory;
 
 public class XlangExample {
   public record Person(String name, int age) {}
 
   public static void main(String[] args) {
     Fory fory = Fory.builder()
-      .withLanguage(Language.XLANG)
-      .build();
-
-    fory.register(Person.class, 1);
-    // fory.register(Person.class, "example.Person");
+        .withXlang(true)
+        .build();
+    fory.register(Person.class, "example", "Person");
 
     Person person = new Person("chaokunyang", 28);
     byte[] bytes = fory.serialize(person);
@@ -334,9 +43,63 @@ public class XlangExample {
 }
 ```
 
-### Go
+### Python
 
-Go xlang mode is enabled through `WithXlang(true)`. The important part is not the Go syntax itself, but keeping the registered type identity aligned with every other language that reads or writes the payload.
+```python
+from dataclasses import dataclass
+import pyfory
+
+@dataclass
+class Person:
+    name: str
+    age: pyfory.Int32
+
+fory = pyfory.Fory(xlang=True)
+fory.register(Person, typename="example.Person")
+
+person = Person(name="chaokunyang", age=28)
+data = fory.serialize(person)
+result = fory.deserialize(data)
+print(result.name, result.age)
+```
+
+### Dart
+
+```dart
+import 'package:fory/fory.dart';
+
+part 'person.fory.dart';
+
+@ForyStruct()
+class Person {
+  Person();
+
+  String name = '';
+
+  @ForyField(type: Int32Type())
+  int age = 0;
+}
+
+void main() {
+  final fory = Fory();
+  PersonFory.register(
+    fory,
+    Person,
+    namespace: 'example',
+    typeName: 'Person',
+  );
+
+  final person = Person()
+    ..name = 'chaokunyang'
+    ..age = 28;
+
+  final bytes = fory.serialize(person);
+  final result = fory.deserialize<Person>(bytes);
+  print('${result.name} ${result.age}');
+}
+```
+
+### Go
 
 ```go
 package main
@@ -375,57 +138,122 @@ func main() {
 
 ### Rust
 
-Rust follows the same cross-language contract, but expresses it through derived traits and explicit registration on the `Fory` instance. Once the type ID matches the other runtimes, the payload can move across language boundaries safely.
-
 ```rust
-use fory::{Fory, ForyObject};
-use std::error::Error;
+use fory::{Error, Fory, ForyObject};
 
-#[derive(ForyObject, Debug)]
+#[derive(ForyObject, Debug, PartialEq)]
 struct Person {
     name: String,
     age: i32,
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let mut fory = Fory::default().xlang(true);
-    fory.register::<Person>(1)?;
-    // fory.register_by_name::<Person>("example.Person")?;
+fn main() -> Result<(), Error> {
+    let mut fory = Fory::builder().xlang(true).build();
+    fory.register_by_name::<Person>("example", "Person")?;
 
     let person = Person {
         name: "chaokunyang".to_string(),
         age: 28,
     };
-    let bytes = fory.serialize(&person);
+
+    let bytes = fory.serialize(&person)?;
     let result: Person = fory.deserialize(&bytes)?;
-    println!("{} {}", result.name, result.age);
+    assert_eq!(person, result);
     Ok(())
 }
 ```
 
-### JavaScript
+### C++
 
-JavaScript cross-language support is schema-driven. Instead of registering a class, you describe the payload shape with `Type.object(...)`, then use the returned serializer pair to encode and decode values.
+```cpp
+#include <cassert>
+#include <string>
 
-These packages are not published to npm yet. Build them from the Apache Fory repository first, then use the following API shape.
+#include "fory/serialization/fory.h"
 
-```javascript
+using namespace fory::serialization;
+
+struct Person {
+  std::string name;
+  int32_t age;
+
+  bool operator==(const Person &other) const {
+    return name == other.name && age == other.age;
+  }
+
+  FORY_STRUCT(Person, name, age);
+};
+
+int main() {
+  auto fory = Fory::builder().xlang(true).build();
+  fory.register_struct<Person>(1);
+
+  Person person{"chaokunyang", 28};
+  auto bytes = fory.serialize(person).value();
+  auto result = fory.deserialize<Person>(bytes).value();
+  assert(person == result);
+  return 0;
+}
+```
+
+### Scala
+
+```scala
+import org.apache.fory.Fory
+import org.apache.fory.scala.ForyScala
+
+case class Person(name: String, age: Int)
+
+object Example {
+  def main(args: Array[String]): Unit = {
+    val fory: Fory = ForyScala.builder()
+      .withXlang(true)
+      .build()
+    fory.register(classOf[Person])
+
+    val bytes = fory.serialize(Person("chaokunyang", 28))
+    val result = fory.deserialize(bytes).asInstanceOf[Person]
+    println(s"${result.name} ${result.age}")
+  }
+}
+```
+
+### Kotlin
+
+```kotlin
+import org.apache.fory.ThreadSafeFory
+import org.apache.fory.kotlin.ForyKotlin
+
+data class Person(val name: String, val age: Int)
+
+fun main() {
+    val fory: ThreadSafeFory = ForyKotlin.builder()
+        .withXlang(true)
+        .requireClassRegistration(true)
+        .buildThreadSafeFory()
+    fory.register(Person::class.java)
+
+    val bytes = fory.serialize(Person("chaokunyang", 28))
+    val result = fory.deserialize(bytes) as Person
+    println("${result.name} ${result.age}")
+}
+```
+
+### JavaScript / TypeScript
+
+```typescript
 import Fory, { Type } from "@apache-fory/core";
 
-/**
- * `@apache-fory/hps` uses V8 fast calls directly from JIT.
- * Use Node.js 20+ when enabling it.
- * If installation fails, replace it with `const hps = null;`.
- */
-import hps from "@apache-fory/hps";
+const personType = Type.struct(
+  { typeName: "example.Person" },
+  {
+    name: Type.string(),
+    age: Type.int32(),
+  },
+);
 
-const description = Type.object("example.Person", {
-  name: Type.string(),
-  age: Type.int32(),
-});
-
-const fory = new Fory({ hps });
-const { serialize, deserialize } = fory.registerSerializer(description);
+const fory = new Fory();
+const { serialize, deserialize } = fory.register(personType);
 
 const payload = serialize({ name: "chaokunyang", age: 28 });
 const result = deserialize(payload);
@@ -433,8 +261,6 @@ console.log(result);
 ```
 
 ### C\#
-
-C# cross-language code looks similar to native usage, but the runtime is explicitly configured for xlang and compatible mode. Use the same type ID or namespace/name mapping as your Java, Go, Swift, or Rust peers.
 
 ```csharp
 using Apache.Fory;
@@ -446,34 +272,28 @@ public sealed class Person
     public int Age { get; set; }
 }
 
-Fory fory = Fory.Builder()
-    .Xlang(true)
-    .Compatible(true)
-    .Build();
-
+Fory fory = Fory.Builder().Build();
 fory.Register<Person>(1);
 
 Person person = new() { Name = "chaokunyang", Age = 28 };
-byte[] payload = fory.Serialize(person);
-Person result = fory.Deserialize<Person>(payload);
+byte[] data = fory.Serialize(person);
+Person result = fory.Deserialize<Person>(data);
 
 Console.WriteLine($"{result.Name} {result.Age}");
 ```
 
 ### Swift
 
-Swift cross-language serialization uses the same `@ForyObject` model style as native mode, but you create the runtime with `xlang: true`. Stable registration IDs are still the key requirement for interoperability.
-
 ```swift
 import Fory
 
-@ForyObject
+@ForyStruct
 struct Person: Equatable {
     var name: String = ""
     var age: Int32 = 0
 }
 
-let fory = Fory(xlang: true, trackRef: false, compatible: true)
+let fory = Fory()
 fory.register(Person.self, id: 1)
 
 let person = Person(name: "chaokunyang", age: 28)
@@ -483,20 +303,91 @@ let result: Person = try fory.deserialize(data)
 print("\(result.name) \(result.age)")
 ```
 
-### Key Points
-
-- Enable xlang mode in every runtime (`Language.XLANG`, `WithXlang(true)`, `Xlang(true)`, `Fory(xlang: true, ...)`, and so on).
-- Register types with **consistent IDs or names** across all languages.
-- ID-based registration is more compact and faster, but it requires coordination to avoid conflicts.
-- Name-based registration is easier to manage across teams, but it produces slightly larger payloads.
-- Only use types that have cross-language mappings; see [Type Mapping](../specification/xlang_type_mapping.md).
-
-For examples with circular references, shared references, and polymorphism across languages, see:
+For more cross-language rules and examples, see:
 
 - [Cross-Language Serialization Guide](../guide/xlang/index.md)
-- [Go Guide - Cross Language](../guide/go/cross-language.md)
-- [C# Guide - Cross Language](../guide/csharp/cross-language.md)
-- [Swift Guide - Cross Language](../guide/swift/cross_language)
+- [Java Guide](../guide/java/index.md)
+- [Python Guide](../guide/python/index.md)
+- [Dart Guide](../guide/dart/index.md)
+- [Go Guide](../guide/go/index.md)
+- [Rust Guide](../guide/rust/index.md)
+- [C++ Guide](../guide/cpp/index.md)
+- [C# Guide](../guide/csharp/index.md)
+- [Swift Guide](../guide/swift/index.md)
+
+## Native Mode
+
+Use native mode only when every reader and writer is the same runtime family. Native mode supports broader language-specific object models than portable xlang mappings and is optimized for the owning runtime.
+
+Java and Python native modes are first-class same-language entry points. Use Java native mode when replacing JDK serialization, Kryo, FST, Hessian, or Java-only Protocol Buffers payloads. Use Python native mode when replacing `pickle` or `cloudpickle` for Python-only payloads.
+
+Dart, JavaScript/TypeScript, C#, and Swift do not expose native mode.
+
+### Java
+
+```java
+Fory fory = Fory.builder()
+    .withXlang(false)
+    .requireClassRegistration(true)
+    .build();
+```
+
+Register Java classes and use `serialize` / `deserialize` as usual. See the [Java Guide](../guide/java/index.md) for Java object hooks, `Externalizable`, dynamic object graphs, object copy, and Java native-mode zero-copy buffers.
+
+### Python
+
+```python
+import pyfory
+
+fory = pyfory.Fory(xlang=False, ref=False, strict=True)
+```
+
+Register Python classes and use `serialize` / `deserialize` as usual. See the [Python Guide](../guide/python/index.md) for native-mode pickle replacement behavior and security settings.
+
+### Go
+
+```go
+f := fory.New(fory.WithXlang(false))
+```
+
+Use native mode for Go-only structs, pointers, interfaces, and Go-specific type behavior. See the [Go Guide](../guide/go/index.md) for struct tags and native-mode configuration.
+
+### Rust
+
+```rust
+let mut fory = Fory::builder().xlang(false).build();
+```
+
+Use native mode for Rust-only payloads that rely on Rust-specific object behavior. See the [Rust Guide](../guide/rust/index.md) for derive, references, and supported types.
+
+### C++
+
+```cpp
+auto fory = Fory::builder().xlang(false).build();
+```
+
+Use native mode for C++-only traffic that does not need portable xlang type mappings. See the [C++ Guide](../guide/cpp/index.md) for `FORY_STRUCT`, configuration, and schema metadata.
+
+### Scala
+
+```scala
+val fory = ForyScala.builder()
+  .withXlang(false)
+  .build()
+```
+
+Use native mode for Scala/JVM-only traffic that needs Scala case classes, collections, tuples, options, or enums on the JVM runtime path. See the [Scala Guide](../guide/scala/index.md).
+
+### Kotlin
+
+```kotlin
+val fory = ForyKotlin.builder()
+    .withXlang(false)
+    .requireClassRegistration(true)
+    .buildThreadSafeFory()
+```
+
+Use native mode for Kotlin/JVM-only traffic that needs Kotlin data classes, nullable types, ranges, unsigned values, or Kotlin collections on the JVM runtime path. See the [Kotlin Guide](../guide/kotlin/index.md).
 
 ## Row Format Encoding
 
