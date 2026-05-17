@@ -44,7 +44,7 @@ import java.util.*;
 
 public class Example1 {
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withXlang(true).withCompatible(true).build();
+    Fory fory = Fory.builder().withXlang(true).build();
     List<Object> list = ofArrayList(true, false, "str", -1.1, 1, new int[100], new double[20]);
     byte[] bytes = fory.serialize(list);
     // bytes can be deserialized by other languages
@@ -66,7 +66,7 @@ public class Example1 {
 import pyfory
 import numpy as np
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 object_list = [True, False, "str", -1.1, 1,
                np.full(100, 0, dtype=np.int32), np.full(20, 0.0, dtype=np.double)]
 data = fory.serialize(object_list)
@@ -89,7 +89,7 @@ import "fmt"
 
 func main() {
   list := []any{true, false, "str", -1.1, 1, make([]int32, 10), make([]float64, 20)}
-  fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithCompatible(true))
+  fory := forygo.NewFory(forygo.WithXlang(true))
   bytes, err := fory.Marshal(list)
   if err != nil {
     panic(err)
@@ -120,17 +120,9 @@ func main() {
 ### JavaScript
 
 ```javascript
-import Fory from "@apache-fory/fory";
+import Fory from "@apache-fory/core";
 
-/**
- * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit,
- * ensure that the version of Node is 20 or above.
- * Experimental feature, installation success cannot be guaranteed at this moment.
- * If you are unable to install the module, replace it with `const hps = null;`
- **/
-import hps from "@apache-fory/hps";
-
-const fory = new Fory({ hps });
+const fory = new Fory();
 const input = fory.serialize("hello fory");
 const result = fory.deserialize(input);
 console.log(result);
@@ -142,7 +134,7 @@ console.log(result);
 use fory::Fory;
 
 fn run() {
-    let fory = Fory::builder().xlang(true).compatible(true).build();
+    let fory = Fory::builder().xlang(true).build();
     let bin = fory.serialize(&"hello".to_string()).expect("serialize success");
     let obj: String = fory.deserialize(&bin).expect("deserialize success");
     assert_eq!("hello".to_string(), obj);
@@ -203,7 +195,7 @@ public class Example2 {
 
   // mvn exec:java -Dexec.mainClass="org.apache.fory.examples.Example2"
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withXlang(true).withCompatible(true).build();
+    Fory fory = Fory.builder().withXlang(true).build();
     fory.register(SomeClass1.class, "example.SomeClass1");
     fory.register(SomeClass2.class, "example.SomeClass2");
     byte[] bytes = fory.serialize(createObject());
@@ -247,7 +239,7 @@ class SomeClass2:
 
 
 if __name__ == "__main__":
-    f = pyfory.Fory(xlang=True, compatible=True)
+    f = pyfory.Fory(xlang=True)
     f.register_type(SomeClass1, typename="example.SomeClass1")
     f.register_type(SomeClass2, typename="example.SomeClass2")
     obj1 = SomeClass1(f1=True, f2={-1: 2})
@@ -298,7 +290,7 @@ func main() {
     F11 []int16
     F12 []int16
   }
-  serializer := forygo.NewFory(forygo.WithXlang(true), forygo.WithCompatible(true))
+  serializer := forygo.NewFory(forygo.WithXlang(true))
   if err := serializer.RegisterStructByName(SomeClass1{}, "example.SomeClass1"); err != nil {
     panic(err)
   }
@@ -336,22 +328,17 @@ func main() {
 ### JavaScript
 
 ```javascript
-import Fory, { Type, InternalSerializerType } from "@apache-fory/fory";
-
-/**
- * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit,
- * ensure that the version of Node is 20 or above.
- * Experimental feature, installation success cannot be guaranteed at this moment.
- * If you are unable to install the module, replace it with `const hps = null;`
- **/
-import hps from "@apache-fory/hps";
+import Fory, { Type } from "@apache-fory/core";
 
 // Describe data structures using JSON schema
-const description = Type.object("example.foo", {
-  foo: Type.string(),
-});
-const fory = new Fory({ hps });
-const { serialize, deserialize } = fory.registerSerializer(description);
+const description = Type.struct(
+  { typeName: "example.foo" },
+  {
+    foo: Type.string(),
+  },
+);
+const fory = new Fory();
+const { serialize, deserialize } = fory.register(description);
 const input = serialize({ foo: "hello fory" });
 const result = deserialize(input);
 console.log(result);
@@ -408,7 +395,7 @@ fn complex_struct() {
         c6: 4.0,
     };
 
-    let mut fory = Fory::builder().xlang(true).compatible(true).build();
+    let mut fory = Fory::builder().xlang(true).build();
     fory
         .register_by_name::<Animal>("example", "foo2")
         .expect("register Animal");
@@ -449,8 +436,10 @@ public class ReferenceExample {
 
   // mvn exec:java -Dexec.mainClass="org.apache.fory.examples.ReferenceExample"
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withXlang(true).withCompatible(true)
-      .withRefTracking(true).build();
+    Fory fory = Fory.builder()
+        .withXlang(true)
+        .withRefTracking(true)
+        .build();
     fory.register(SomeClass.class, "example.SomeClass");
     byte[] bytes = fory.serialize(createObject());
     // bytes can be deserialized by other languages
@@ -470,7 +459,7 @@ class SomeClass:
     f2: Dict[str, str]
     f3: Dict[str, str]
 
-fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 fory.register_type(SomeClass, typename="example.SomeClass")
 obj = SomeClass()
 obj.f2 = {"k1": "v1", "k2": "v2"}
@@ -494,10 +483,7 @@ func main() {
     F2 map[string]string
     F3 map[string]string
   }
-  fory := forygo.NewFory(
-    forygo.WithXlang(true), forygo.WithCompatible(true),
-    forygo.WithTrackRef(true),
-  )
+  fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
   if err := fory.RegisterStruct(SomeClass{}, 65); err != nil {
     panic(err)
   }
@@ -520,22 +506,15 @@ func main() {
 ### JavaScript
 
 ```javascript
-import Fory, { Type } from "@apache-fory/fory";
-/**
- * @apache-fory/hps use v8's fast-calls-api that can be called directly by jit,
- * ensure that the version of Node is 20 or above.
- * Experimental feature, installation success cannot be guaranteed at this moment.
- * If you are unable to install the module, replace it with `const hps = null;`
- **/
-import hps from "@apache-fory/hps";
+import Fory, { Type } from "@apache-fory/core";
 
-const description = Type.object("example.foo", {
+const description = Type.struct("example.foo", {
   foo: Type.string(),
-  bar: Type.object("example.foo"),
+  bar: Type.struct("example.foo").setTrackingRef(true),
 });
 
-const fory = new Fory({ hps });
-const { serialize, deserialize } = fory.registerSerializer(description);
+const fory = new Fory({ ref: true });
+const { serialize, deserialize } = fory.register(description);
 const data: any = {
   foo: "hello fory",
 };

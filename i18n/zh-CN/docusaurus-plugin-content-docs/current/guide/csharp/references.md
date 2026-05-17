@@ -1,6 +1,6 @@
 ---
-title: 引用
-sidebar_position: 6
+title: References
+sidebar_position: 7
 id: references
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-当启用 `TrackRef(true)` 时，Apache Fory™ C# 可以保留共享引用和循环引用。
+Apache Fory™ C# can preserve shared and circular references when `TrackRef(true)` is enabled.
 
-## 启用引用跟踪
+## Enable Reference Tracking
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -29,12 +29,12 @@ Fory fory = Fory.Builder()
     .Build();
 ```
 
-启用后：
+When enabled:
 
-- 共享对象身份会被保留。
-- 循环对象图可以安全地序列化和反序列化。
+- Shared object identity is preserved.
+- Circular object graphs can be serialized/deserialized safely.
 
-## 循环引用示例
+## Circular Reference Example
 
 ```csharp
 using Apache.Fory;
@@ -61,12 +61,12 @@ Node decoded = fory.Deserialize<Node>(payload);
 System.Diagnostics.Debug.Assert(object.ReferenceEquals(decoded, decoded.Next));
 ```
 
-## 何时使用 `TrackRef(false)`
+## When to Use `TrackRef(false)`
 
-对于树状、无环且不关心引用身份的数据，`TrackRef(false)` 往往更快。
+`TrackRef(false)` can be faster for tree-like, acyclic data where reference identity does not matter.
 
-## 相关主题
+## Related Topics
 
-- [配置](configuration.md)
-- [基础序列化](basic-serialization.md)
-- [线程安全](thread-safety.md)
+- [Configuration](configuration.md)
+- [Basic Serialization](basic-serialization.md)
+- [Thread Safety](thread-safety.md)

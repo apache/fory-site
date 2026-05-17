@@ -1,6 +1,6 @@
 ---
-title: 类型注册
-sidebar_position: 3
+title: Type Registration
+sidebar_position: 5
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,22 +19,22 @@ license: |
   limitations under the License.
 ---
 
-本页介绍用户定义类型的注册 API。
+This page covers registration APIs for user-defined types.
 
-## 为什么必须注册
+## Why Registration Is Required
 
-用户类型，例如 `struct`、`class`、enum/union 和 ext 类型，在序列化和反序列化前必须先注册。
+User types (`struct`, `class`, enum/union, ext types) must be registered before serialization/deserialization.
 
-如果缺少注册，反序列化会失败，并抛出：
+If a type is missing, deserialization fails with:
 
 - `Type not registered: ...`
 
-## 按数值 ID 注册
+## Register by Numeric ID
 
-请为序列化端和反序列化端使用同一个稳定 ID。
+Use a stable ID shared by serializer and deserializer peers.
 
 ```swift
-@ForyObject
+@ForyStruct
 struct User {
     var name: String = ""
     var age: Int32 = 0
@@ -44,33 +44,33 @@ let fory = Fory()
 fory.register(User.self, id: 1)
 ```
 
-## 按名称注册
+## Register by Name
 
-### 使用全限定名
+### Fully-qualified name
 
 ```swift
 try fory.register(User.self, name: "com.example.User")
 ```
 
-`name` 会按 `.` 拆分：
+`name` is split by `.`:
 
 - namespace: `com.example`
 - type name: `User`
 
-### 显式指定命名空间和类型名
+### Explicit namespace + name
 
 ```swift
 try fory.register(User.self, namespace: "com.example", name: "User")
 ```
 
-## 一致性规则
+## Consistency Rules
 
-在不同对端之间保持注册映射一致：
+Keep registration mapping consistent across peers:
 
-- ID 模式：同一个逻辑类型在所有对端都使用相同数值 ID
-- 名称模式：同一个逻辑类型在所有对端都使用相同 namespace 和 type name
-- 不要对同一逻辑类型在不同服务里混用 ID 映射和名称映射
+- ID mode: same type uses same numeric ID on all peers
+- Name mode: same type uses same namespace and type name on all peers
+- Do not mix ID and name mapping for the same logical type across services
 
-## 动态类型与注册
+## Dynamic Types and Registration
 
-当你序列化 `Any`、`AnyObject`、`any Serializer` 这类动态值，且其中包含用户定义类型时，具体运行时类型仍然需要提前注册。
+When serializing dynamic values (`Any`, `AnyObject`, `any Serializer`) that contain user-defined types, the concrete runtime types must still be registered.

@@ -1,6 +1,6 @@
 ---
 title: Schema Evolution
-sidebar_position: 6
+sidebar_position: 8
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,14 +19,16 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ supports schema evolution in Compatible mode, allowing fields to be added/removed while maintaining compatibility.
+Apache Fory™ supports schema evolution in compatible mode, allowing fields to be added or removed
+while maintaining compatibility. Xlang mode enables compatible mode by default. In native mode,
+set `compatible=True` explicitly when Python-only payloads need schema evolution.
 
-## Enable Compatible Mode
+## Xlang Default
 
 ```python
 import pyfory
 
-f = pyfory.Fory(xlang=True, compatible=True)
+f = pyfory.Fory(xlang=True)
 ```
 
 ## Disable Evolution for Stable Classes
@@ -60,9 +62,9 @@ from dataclasses import dataclass
 @dataclass
 class User:
     name: str
-    age: int
+    age: pyfory.Int32
 
-f = pyfory.Fory(xlang=True, compatible=True)
+f = pyfory.Fory(xlang=True)
 f.register(User, typename="User")
 data = f.dumps(User("Alice", 30))
 
@@ -70,7 +72,7 @@ data = f.dumps(User("Alice", 30))
 @dataclass
 class User:
     name: str
-    age: int
+    age: pyfory.Int32
     email: str = "unknown@example.com"  # New field with default
 
 # Can still deserialize old data

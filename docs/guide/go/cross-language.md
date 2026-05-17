@@ -1,6 +1,6 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 80
+sidebar_position: 20
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,12 +21,12 @@ license: |
 
 Fory Go enables seamless data exchange with Java, Python, C++, Rust, and JavaScript. This guide covers cross-language compatibility and type mapping.
 
-## Enabling Cross-Language Mode
+## Create an Xlang Runtime
 
-Cross-language (xlang) mode must be explicitly enabled:
+Go defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```go
-f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 ```
 
 ## Type Registration for Cross-Language
@@ -41,7 +41,7 @@ type User struct {
     Name string
 }
 
-f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(User{}, 1)
 data, _ := f.Serialize(&User{ID: 1, Name: "Alice"})
 ```
@@ -53,7 +53,7 @@ public class User {
     public long id;
     public String name;
 }
-Fory fory = Fory.builder().withXlang(true).withCompatible(true).build();
+Fory fory = Fory.builder().withXlang(true).build();
 fory.register(User.class, 1);
 User user = fory.deserialize(data, User.class);
 ```
@@ -69,7 +69,7 @@ class User:
     id: pyfory.Int64
     name: str
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 fory.register(User, type_id=1)
 user = fory.deserialize(data)
 ```
@@ -118,7 +118,7 @@ type Order struct {
     Items    []string
 }
 
-f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(Order{}, 1)
 
 order := &Order{
@@ -141,7 +141,7 @@ public class Order {
     public List<String> items;
 }
 
-Fory fory = Fory.builder().withXlang(true).withCompatible(true).build();
+Fory fory = Fory.builder().withXlang(true).build();
 fory.register(Order.class, 1);
 
 Order order = fory.deserialize(data, Order.class);
@@ -161,7 +161,7 @@ class Message:
     content: str
     timestamp: pyfory.Int64
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 fory.register(Message, type_id=1)
 
 msg = Message(id=1, content="Hello from Python", timestamp=1234567890)
@@ -177,7 +177,7 @@ type Message struct {
     Timestamp int64
 }
 
-f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(Message{}, 1)
 
 var msg Message
@@ -226,7 +226,7 @@ type Company struct {
     Address Address
 }
 
-f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(Address{}, 1)
 f.RegisterStruct(Company{}, 2)
 ```

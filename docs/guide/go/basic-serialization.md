@@ -28,7 +28,7 @@ Create a Fory instance and register your types before serialization:
 ```go
 import "github.com/apache/fory/go/fory"
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register struct with a type ID
 f.RegisterStruct(User{}, 1)
@@ -40,6 +40,11 @@ f.RegisterStructByName(User{}, "example.User")
 // Register enum types
 f.RegisterEnum(Color(0), 3)
 ```
+
+`fory.New()` uses xlang mode with compatible schema evolution. The example sets
+`fory.WithXlang(true)` explicitly so the mode choice is visible. For Go-only
+payloads that need native mode, configure `fory.WithXlang(false)` explicitly in
+the native-mode examples.
 
 **Important**: The Fory instance should be reused across serialization calls. Creating a new instance involves allocating internal buffers, type caches, and resolvers, which is expensive. The default Fory instance is not thread-safe; for concurrent usage, use the thread-safe wrapper (see [Thread Safety](thread-safety.md)).
 
@@ -201,7 +206,7 @@ type Node struct {
 }
 
 // Use WithTrackRef for pointer fields
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(Node{}, 1)
 
 root := &Node{
@@ -362,7 +367,7 @@ type Item struct {
 }
 
 func main() {
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterStruct(Order{}, 1)
     f.RegisterStruct(Item{}, 2)
 

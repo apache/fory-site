@@ -19,25 +19,31 @@ license: |
   limitations under the License.
 ---
 
-This page covers `ForyConfig` and recommended runtime presets.
+This page covers `Config` and recommended runtime presets.
 
-## ForyConfig
+## Config
 
 `Fory` is configured with:
 
 ```swift
-public struct ForyConfig {
-    public var xlang: Bool
-    public var trackRef: Bool
-    public var compatible: Bool
+public struct Config {
+  public let trackRef: Bool
+  public let compatible: Bool
+  public let checkClassVersion: Bool
+  public let maxCollectionSize: Int
+  public let maxBinarySize: Int
+  public let maxDepth: Int
 }
 ```
 
 Default configuration:
 
 ```swift
-let fory = Fory() // xlang=true, ref=false, compatible=true
+let fory = Fory() // ref=false, compatible=true
 ```
+
+Swift supports the xlang wire format only, so there is no `xlang` option in
+`Config` or the `Fory` initializer.
 
 ## Threading
 
@@ -45,17 +51,6 @@ let fory = Fory() // xlang=true, ref=false, compatible=true
 Reuse one instance per thread and do not use the same instance concurrently.
 
 ## Options
-
-### `xlang`
-
-Controls cross-language protocol mode.
-
-- `true`: Use xlang wire format (default)
-- `false`: Use Swift-native mode
-
-```swift
-let fory = Fory(xlang: true, compatible: true)
-```
 
 ### `trackRef`
 
@@ -65,7 +60,7 @@ Enables shared/circular reference tracking for reference-trackable types.
 - `true`: Preserve object identity for class/reference graphs
 
 ```swift
-let fory = Fory(xlang: true, ref: true, compatible: true)
+let fory = Fory(ref: true)
 ```
 
 ### `compatible`
@@ -76,7 +71,25 @@ Enables compatible schema mode for evolution across versions.
 - `true`: Compatible mode (supports add/remove/reorder fields)
 
 ```swift
-let fory = Fory(xlang: true, ref: false, compatible: true)
+let fory = Fory()
+```
+
+### `checkClassVersion`
+
+Controls class-version validation in schema-consistent mode. When omitted, it
+defaults to `true` when `compatible=false` and `false` when `compatible=true`.
+
+```swift
+let fory = Fory(compatible: false, checkClassVersion: true)
+```
+
+### Size and Depth Limits
+
+`maxCollectionSize`, `maxBinarySize`, and `maxDepth` bound decoded payload size
+and nesting depth.
+
+```swift
+let fory = Fory(maxCollectionSize: 1_000_000, maxBinarySize: 64 * 1024 * 1024, maxDepth: 5)
 ```
 
 ## Recommended Presets
@@ -84,17 +97,17 @@ let fory = Fory(xlang: true, ref: false, compatible: true)
 ### Local, strict schema
 
 ```swift
-let fory = Fory(xlang: false, ref: false, compatible: false)
+let fory = Fory(ref: false, compatible: false)
 ```
 
 ### Cross-language service payloads
 
 ```swift
-let fory = Fory(xlang: true, ref: false, compatible: true)
+let fory = Fory()
 ```
 
 ### Graph/object identity workloads
 
 ```swift
-let fory = Fory(xlang: true, ref: true, compatible: true)
+let fory = Fory(ref: true)
 ```

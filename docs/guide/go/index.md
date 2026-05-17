@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory Go is a high-performance, cross-language serialization library for Go. It provides automatic object graph serialization with support for circular references, polymorphism, and cross-language compatibility.
+Apache Fory Go is a high-performance serialization library for Go. It supports xlang mode for cross-language payloads and native mode for Go-only payloads, with automatic object graph serialization, circular references, polymorphism, and schema-aware serializers.
 
 ## Why Fory Go?
 
@@ -58,8 +58,8 @@ type User struct {
 }
 
 func main() {
-    // Create a Fory instance
-    f := fory.New()
+    // Create an xlang Fory instance.
+    f := fory.New(fory.WithXlang(true))
 
     // Register struct with a type ID
     if err := f.RegisterStruct(User{}, 1); err != nil {
@@ -84,16 +84,13 @@ func main() {
 }
 ```
 
-## Default Serialization Path
+## Xlang Mode And Native Mode
 
-Fory Go works out-of-the-box with ordinary Go structs. The standard runtime path caches type
-metadata and keeps hot serialization paths optimized, so most applications can use it directly
-without any extra build step:
+Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Go wire mode, and Go examples that use it set `fory.WithXlang(true)` explicitly so the mode choice is visible.
 
-```go
-f := fory.New()
-data, _ := f.Serialize(myStruct)
-```
+Use native mode for Go-only traffic. Native mode is selected with `fory.WithXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps Go object serialization on the Go runtime path. It is optimized for Go structs, pointers, interfaces, and Go-specific type behavior that does not need a portable xlang mapping.
+
+See [Cross-Language Serialization](cross-language.md) for Go xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode options.
 
 ## Configuration
 
@@ -101,8 +98,8 @@ Fory Go uses a functional options pattern for configuration:
 
 ```go
 f := fory.New(
+    fory.WithXlang(true),
     fory.WithTrackRef(true),      // Enable reference tracking
-    fory.WithCompatible(true),    // Enable schema evolution
     fory.WithMaxDepth(20),       // Set max nesting depth
 )
 ```
@@ -127,7 +124,7 @@ Fory Go is fully compatible with other Fory implementations. Data serialized in 
 
 ```go
 // Go serialization
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(User{}, 1)
 data, _ := f.Serialize(&User{ID: 1, Name: "Alice"})
 // 'data' can be deserialized by Java, Python, etc.
@@ -139,14 +136,14 @@ See [Cross-Language Serialization](cross-language.md) for type mapping and compa
 
 | Topic                                         | Description                            |
 | --------------------------------------------- | -------------------------------------- |
-| [Configuration](configuration.md)             | Options and settings                   |
 | [Basic Serialization](basic-serialization.md) | Core APIs and usage patterns           |
+| [Configuration](configuration.md)             | Options and settings                   |
+| [Cross-Language](cross-language.md)           | Multi-language serialization           |
+| [Schema Metadata](schema-metadata.md)         | Field-level configuration              |
 | [Type Registration](type-registration.md)     | Registering types for serialization    |
 | [Supported Types](supported-types.md)         | Complete type support reference        |
 | [References](references.md)                   | Circular references and shared objects |
-| [Struct Tags](struct-tags.md)                 | Field-level configuration              |
 | [Schema Evolution](schema-evolution.md)       | Forward/backward compatibility         |
-| [Cross-Language](cross-language.md)           | Multi-language serialization           |
 | [Thread Safety](thread-safety.md)             | Concurrent usage patterns              |
 | [Troubleshooting](troubleshooting.md)         | Common issues and solutions            |
 

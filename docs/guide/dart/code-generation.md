@@ -1,7 +1,7 @@
 ---
 title: Code Generation
 sidebar_position: 3
-id: dart_code_generation
+id: code_generation
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -111,5 +111,5 @@ If you cannot annotate a type (e.g., it comes from a package you do not own), wr
 ## Related Topics
 
 - [Type Registration](type-registration.md)
-- [Field Configuration](field-configuration.md)
+- [Schema Metadata](schema-metadata.md)
 - [Schema Evolution](schema-evolution.md)

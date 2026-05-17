@@ -1,6 +1,6 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 8
+sidebar_position: 3
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,21 +21,21 @@ license: |
 
 Apache Fory™ supports seamless data exchange across multiple languages including Java, Python, C++, Go, and JavaScript.
 
-## Enable Cross-Language Mode
+## Create an Xlang Runtime
+
+Rust defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```rust
 use fory::Fory;
 
-// Enable cross-language mode
-let mut fory = Fory::builder()
-    .compatible(true)
-    .xlang(true).build();
+// Use xlang mode
+let mut fory = Fory::builder().xlang(true).build();
 
 // Register types with consistent IDs across languages
-fory.register::<MyStruct>(100);
+fory.register::<MyStruct>(100)?;
 
 // Or use name-based registration
-fory.register_by_name::<MyStruct>("com.example", "MyStruct");
+fory.register_by_name::<MyStruct>("com.example", "MyStruct")?;
 ```
 
 ## Type Registration for Cross-Language
@@ -45,11 +45,9 @@ fory.register_by_name::<MyStruct>("com.example", "MyStruct");
 For fast, compact serialization with consistent IDs across languages:
 
 ```rust
-let mut fory = Fory::builder()
-    .compatible(true)
-    .xlang(true).build();
+let mut fory = Fory::builder().xlang(true).build();
 
-fory.register::<User>(100);  // Same ID in Java, Python, etc.
+fory.register::<User>(100)?;  // Same ID in Java, Python, etc.
 ```
 
 ### Register by Name
@@ -57,7 +55,7 @@ fory.register::<User>(100);  // Same ID in Java, Python, etc.
 For more flexible type naming:
 
 ```rust
-fory.register_by_name::<User>("com.example", "User");
+fory.register_by_name::<User>("com.example", "User")?;
 ```
 
 ## Cross-Language Example
@@ -74,11 +72,9 @@ struct Person {
     age: i32,
 }
 
-let mut fory = Fory::builder()
-    .compatible(true)
-    .xlang(true).build();
+let mut fory = Fory::builder().xlang(true).build();
 
-fory.register::<Person>(100);
+fory.register::<Person>(100)?;
 
 let person = Person {
     name: "Alice".to_string(),
@@ -101,7 +97,7 @@ public class Person {
 }
 
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
+    .withXlang(true)
     .withRefTracking(true)
     .build();
 
@@ -121,7 +117,7 @@ class Person:
     name: str
     age: pyfory.Int32
 
-fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 fory.register_type(Person, type_id=100)  # Same ID as Rust
 
 person = fory.deserialize(bytes_from_rust)
@@ -175,7 +171,7 @@ explicit array field attribute when the schema is dense `array<T>`.
 ## Best Practices
 
 1. **Use consistent type IDs** across all languages
-2. **Enable compatible mode** for schema evolution
+2. **Keep compatible mode** for schema evolution
 3. **Register all types** before serialization
 4. **Test cross-language** compatibility during development
 
@@ -188,6 +184,6 @@ explicit array field attribute when the schema is dense `array<T>`.
 
 ## Related Topics
 
-- [Configuration](configuration.md) - XLANG mode configuration
+- [Configuration](configuration.md) - xlang mode configuration
 - [Schema Evolution](schema-evolution.md) - Compatible mode
 - [Type Registration](type-registration.md) - Registration methods

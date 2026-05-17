@@ -25,9 +25,9 @@ how protobuf concepts map to Fory, and how to use protobuf-only Fory extension o
 ## What This Page Covers
 
 - Choosing protobuf vs Fory for your use case
-- Syntax and semantic differences that matter during migration
+- Syntax and semantic differences that matter during adoption
 - Supported Fory extension options in protobuf files
-- Practical migration patterns from protobuf to Fory
+- Practical transition patterns from protobuf to Fory
 
 ## Quick Decision Guide
 
@@ -280,7 +280,7 @@ message TreeNode {
 }
 ```
 
-## Migration Guide: Protobuf to Fory
+## Porting Protobuf Schemas To Fory
 
 ### Step 1: Translate Schema Syntax
 
@@ -305,12 +305,12 @@ languages.
 
 ### Step 5: Run Compatibility Checks
 
-For staged migrations, keep both formats in parallel and verify payload-level
+For staged transitions, keep both formats in parallel and verify payload-level
 parity with integration tests.
 
 ## Coexistence Strategy
 
-You can run protobuf and Fory in parallel during migration:
+You can run protobuf and Fory in parallel during a staged transition:
 
 ```java
 public byte[] serialize(Object obj, Format format) {

@@ -1,5 +1,5 @@
 ---
-title: 配置
+title: Configuration
 sidebar_position: 2
 id: configuration
 license: |
@@ -19,10 +19,10 @@ license: |
   limitations under the License.
 ---
 
-本页介绍 Apache Fory™ C# 的 `ForyBuilder` 选项和默认配置值。
-`Config` 是由 `ForyBuilder` 创建的不可变运行时快照。
+This page covers `ForyBuilder` options and default configuration values for Apache Fory™ C#.
+`Config` is an immutable runtime snapshot created by `ForyBuilder`.
 
-## 构建运行时
+## Build a Runtime
 
 ```csharp
 using Apache.Fory;
@@ -31,24 +31,24 @@ Fory fory = Fory.Builder().Build();
 ThreadSafeFory threadSafe = Fory.Builder().BuildThreadSafe();
 ```
 
-## 默认配置
+## Default Configuration
 
-`Fory.Builder().Build()` 使用以下默认值：
+`Fory.Builder().Build()` uses:
 
-| 选项                 | 默认值   | 说明                               |
-| -------------------- | -------- | ---------------------------------- |
-| `TrackRef`           | `false`  | 默认关闭引用跟踪                   |
-| `Compatible`         | `false`  | Schema 一致模式，不写入演进元数据  |
-| `CheckStructVersion` | `false`  | 默认关闭结构体 schema hash 校验    |
-| `MaxDepth`           | `20`     | 动态对象图的最大嵌套深度           |
+| Option               | Default | Description                                  |
+| -------------------- | ------- | -------------------------------------------- |
+| `TrackRef`           | `false` | Reference tracking disabled                  |
+| `Compatible`         | `true`  | Compatible schema-evolution metadata enabled |
+| `CheckStructVersion` | `false` | Struct schema hash checks disabled           |
+| `MaxDepth`           | `20`    | Max dynamic nesting depth                    |
 
-## 构建器选项
+## Builder Options
 
-C# 始终使用与 xlang 兼容的帧头，因此 `ForyBuilder` 不提供单独的 `Xlang(...)` 开关。
+C# always uses xlang-compatible framing, so `ForyBuilder` does not expose a mode toggle.
 
 ### `TrackRef(bool enabled = false)`
 
-为共享对象图和循环对象图启用引用跟踪。
+Enables reference tracking for shared/circular object graphs.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -58,7 +58,9 @@ Fory fory = Fory.Builder()
 
 ### `Compatible(bool enabled = false)`
 
-启用 Schema 演进模式。
+Enables schema evolution mode. C# uses the xlang wire format only, so compatible mode is enabled by
+default for independently deployed peers. Passing `false` opts into schema-consistent payloads when
+every writer and reader uses the same schema.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -68,7 +70,7 @@ Fory fory = Fory.Builder()
 
 ### `CheckStructVersion(bool enabled = false)`
 
-为生成的结构体序列化器启用严格的 schema hash 校验。
+Enables strict schema hash validation for generated struct serializers.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -78,7 +80,7 @@ Fory fory = Fory.Builder()
 
 ### `MaxDepth(int value)`
 
-设置动态对象图允许的最大嵌套深度。
+Sets max nesting depth for dynamic object graphs.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -86,11 +88,11 @@ Fory fory = Fory.Builder()
     .Build();
 ```
 
-`value` 必须大于 `0`。
+`value` must be greater than `0`.
 
-## 常见配置
+## Common Configurations
 
-### 追求速度的 Schema 一致服务
+### Schema-consistent service
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -99,16 +101,15 @@ Fory fory = Fory.Builder()
     .Build();
 ```
 
-### 兼容的跨语言服务
+### Compatible cross-language service
 
 ```csharp
 Fory fory = Fory.Builder()
-    .Compatible(true)
     .TrackRef(true)
     .Build();
 ```
 
-### 线程安全的服务实例
+### Thread-safe service instance
 
 ```csharp
 ThreadSafeFory fory = Fory.Builder()
@@ -117,8 +118,8 @@ ThreadSafeFory fory = Fory.Builder()
     .BuildThreadSafe();
 ```
 
-## 相关主题
+## Related Topics
 
-- [基础序列化](basic_serialization)
-- [Schema 演进](schema_evolution)
-- [线程安全](thread_safety)
+- [Basic Serialization](basic-serialization.md)
+- [Schema Evolution](schema-evolution.md)
+- [Thread Safety](thread-safety.md)

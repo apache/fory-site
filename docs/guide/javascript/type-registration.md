@@ -142,38 +142,10 @@ const order = deserialize(bytes);
 
 Store and reuse this pair — it is the fast path.
 
-## Field Options
+## Field Metadata
 
-### Nullable fields
-
-If a field can be `null`, mark it explicitly. Passing `null` to a non-nullable field throws.
-
-```ts
-Type.string().setNullable(true);
-```
-
-### Reference tracking on a field
-
-Needed when the same object instance can appear in multiple fields (see [References](references.md)):
-
-```ts
-Type.struct("example.node").setTrackingRef(true);
-```
-
-This only has an effect when `new Fory({ ref: true })` is also set.
-
-### Polymorphic fields
-
-Use `Type.any()` when a field can hold different types at runtime:
-
-```ts
-const eventType = Type.struct("example.event", {
-  kind: Type.string(),
-  payload: Type.any(),
-});
-```
-
-For fine-grained control over how a specific struct field handles its runtime type, you can call `.setDynamic(Dynamic.FALSE)` (always treat as the declared type) or `.setDynamic(Dynamic.TRUE)` (always write the runtime type). The default (`Dynamic.AUTO`) is correct for the vast majority of cases.
+Field nullability, reference tracking, dynamic field behavior, numeric widths, and per-struct
+schema-evolution metadata are covered in [Schema Metadata](schema-metadata.md).
 
 ## Choosing IDs vs Names
 
@@ -196,5 +168,6 @@ For a message to round-trip between JavaScript and another runtime, both sides m
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md)
+- [Schema Metadata](schema-metadata.md)
 - [Schema Evolution](schema-evolution.md)
 - [Cross-Language](cross-language.md)

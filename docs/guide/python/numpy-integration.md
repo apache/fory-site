@@ -1,6 +1,6 @@
 ---
 title: NumPy & Pandas
-sidebar_position: 8
+sidebar_position: 10
 id: numpy_integration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -29,7 +29,7 @@ Large arrays use zero-copy when possible:
 import pyfory
 import numpy as np
 
-f = pyfory.Fory()
+f = pyfory.Fory(xlang=False)
 
 # Numpy arrays are supported natively
 arrays = {

@@ -1,6 +1,6 @@
 ---
 title: Security Best Practices
-sidebar_position: 9
+sidebar_position: 6
 id: security
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -30,7 +30,6 @@ import pyfory
 
 # Recommended production settings
 f = pyfory.Fory(
-    xlang=False,   # or True for cross-language
     ref=True,      # Handle circular references
     strict=True,   # IMPORTANT: Prevent malicious data
     max_depth=100  # Prevent deep recursion attacks
@@ -61,7 +60,6 @@ if os.getenv('ENV') == 'development':
 else:
     # Production configuration (security hardened)
     fory = pyfory.Fory(
-        xlang=False,
         ref=True,
         strict=True,     # CRITICAL: Require registration
         max_depth=100    # Reasonable limit

@@ -1,6 +1,6 @@
 ---
-title: 支持类型
-sidebar_position: 40
+title: Supported Types
+sidebar_position: 50
 id: supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Fory Go 支持广泛的 Go 类型序列化。本指南说明支持类型及其跨语言映射。
+Fory Go supports a wide range of Go types for serialization. This guide covers all supported types and their cross-language mappings.
 
-## 基础类型
+## Primitive Types
 
 | Go Type          | Fory TypeId  | Encoding              | Notes                             |
 | ---------------- | ------------ | --------------------- | --------------------------------- |
@@ -48,7 +48,7 @@ Fory uses variable-length integer encoding (varint) for better compression:
 - Platform `int` maps to `int32` on 32-bit, `int64` on 64-bit systems
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // All integer types supported
 var i8 int8 = 127
@@ -59,9 +59,14 @@ var i64 int64 = 9223372036854775807
 data, _ := f.Serialize(i64)  // Uses varint encoding
 ```
 
-## 集合类型
+## Collection Types
 
-### Slice
+### Root And Dynamic Slices
+
+When a slice is serialized as a root or dynamic value, primitive slices use the
+dense array wire tags for compact transport. In struct fields, unannotated Go
+slices are logical `list<T>` fields; use `fory:"type=array(element=...)"` when a
+struct field is dense numeric `array<T>` data.
 
 | Go Type         | Fory TypeId   | Notes                 |
 | --------------- | ------------- | --------------------- |
@@ -77,9 +82,9 @@ data, _ := f.Serialize(i64)  // Uses varint encoding
 | `[]I` (any/any) | LIST          | Any interface type    |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
-// Primitive slices (optimized)
+// Primitive root slice (optimized dense array payload)
 ints := []int32{1, 2, 3, 4, 5}
 data, _ := f.Serialize(ints)
 
@@ -96,7 +101,7 @@ dynamic := []any{1, "hello", true}
 data, _ = f.Serialize(dynamic)
 ```
 
-### Map
+### Maps
 
 | Go Type              | Fory TypeId | Notes                   |
 | -------------------- | ----------- | ----------------------- |
@@ -113,7 +118,7 @@ data, _ = f.Serialize(dynamic)
 | `map[any]any`        | MAP         | Dynamic keys and values |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // String key maps
 m1 := map[string]string{"key": "value"}
@@ -157,7 +162,7 @@ data, _ := f.Serialize(s)
 ```go
 import "time"
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Timestamp
 t := time.Now()
@@ -191,7 +196,7 @@ type User struct {
     password string  // NOT serialized (unexported)
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(User{}, 1)
 
 user := &User{ID: 1, Name: "Alice", Age: 30, password: "secret"}
@@ -213,7 +218,7 @@ type Company struct {
     Founded int32
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(Address{}, 1)
 f.RegisterStruct(Company{}, 2)
 ```
@@ -226,7 +231,7 @@ f.RegisterStruct(Company{}, 2)
 | `**T`   | Nested pointers supported                |
 
 ```go
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 
 type Node struct {
     Value int32
@@ -263,7 +268,7 @@ f.Deserialize(data, &result)
 | `any`   | UNION (31)  | Polymorphic values |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Serialize any
 var value any = "hello"
@@ -289,7 +294,7 @@ func (c Circle) Area() float64 {
     return 3.14159 * c.Radius * c.Radius
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(Circle{}, 1)
 
 var shape Shape = Circle{Radius: 5.0}
@@ -303,7 +308,7 @@ data, _ := f.Serialize(shape)
 | `[]byte` | BINARY (37) | Variable-length bytes |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 data := []byte{0x01, 0x02, 0x03, 0x04}
 serialized, _ := f.Serialize(data)
@@ -325,7 +330,7 @@ const (
     StatusComplete Status = 2
 )
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterEnum(Status(0), 1)
 
 status := StatusActive
@@ -362,7 +367,7 @@ The following Go types are **not supported**:
 
 Attempting to serialize these types will result in an error.
 
-## 相关主题
+## Related Topics
 
 - [Type Registration](type-registration.md)
 - [Cross-Language Serialization](cross-language.md)

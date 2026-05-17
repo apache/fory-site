@@ -143,38 +143,38 @@ The shared scalar IDs are:
 
 Java native built-ins start at ID `69`:
 
-| ID  | Name                         | Java type or serializer owner            |
-| --- | ---------------------------- | ---------------------------------------- |
-| 69  | `VOID_ID`                    | `java.lang.Void`                         |
-| 70  | `CHAR_ID`                    | `java.lang.Character`                    |
-| 71  | `PRIMITIVE_VOID_ID`          | `void`                                   |
-| 72  | `PRIMITIVE_BOOL_ID`          | `boolean`                                |
-| 73  | `PRIMITIVE_INT8_ID`          | `byte`                                   |
-| 74  | `PRIMITIVE_CHAR_ID`          | `char`                                   |
-| 75  | `PRIMITIVE_INT16_ID`         | `short`                                  |
-| 76  | `PRIMITIVE_INT32_ID`         | `int`                                    |
-| 77  | `PRIMITIVE_FLOAT32_ID`       | `float`                                  |
-| 78  | `PRIMITIVE_INT64_ID`         | `long`                                   |
-| 79  | `PRIMITIVE_FLOAT64_ID`       | `double`                                 |
-| 80  | `PRIMITIVE_BOOLEAN_ARRAY_ID` | `boolean[]`                              |
-| 81  | `PRIMITIVE_BYTE_ARRAY_ID`    | `byte[]`                                 |
-| 82  | `PRIMITIVE_CHAR_ARRAY_ID`    | `char[]`                                 |
-| 83  | `PRIMITIVE_SHORT_ARRAY_ID`   | `short[]`                                |
-| 84  | `PRIMITIVE_INT_ARRAY_ID`     | `int[]`                                  |
-| 85  | `PRIMITIVE_FLOAT_ARRAY_ID`   | `float[]`                                |
-| 86  | `PRIMITIVE_LONG_ARRAY_ID`    | `long[]`                                 |
-| 87  | `PRIMITIVE_DOUBLE_ARRAY_ID`  | `double[]`                               |
-| 88  | `STRING_ARRAY_ID`            | `String[]`                               |
-| 89  | `OBJECT_ARRAY_ID`            | `Object[]` and object array serializers  |
-| 90  | `ARRAYLIST_ID`               | `java.util.ArrayList`                    |
-| 91  | `HASHMAP_ID`                 | `java.util.HashMap`                      |
-| 92  | `HASHSET_ID`                 | `java.util.HashSet`                      |
-| 93  | `CLASS_ID`                   | `java.lang.Class`                        |
-| 94  | `EMPTY_OBJECT_ID`            | Empty-object serializer                  |
-| 95  | `LAMBDA_STUB_ID`             | Lambda replacement stub                  |
-| 96  | `JDK_PROXY_STUB_ID`          | JDK proxy replacement stub               |
-| 97  | `REPLACE_STUB_ID`            | `writeReplace`/`readResolve` replacement |
-| 98  | `NONEXISTENT_META_SHARED_ID` | Unknown class placeholder                |
+| ID  | Name                         | Java type or serializer owner           |
+| --- | ---------------------------- | --------------------------------------- |
+| 69  | `VOID_ID`                    | `java.lang.Void`                        |
+| 70  | `CHAR_ID`                    | `java.lang.Character`                   |
+| 71  | `PRIMITIVE_VOID_ID`          | `void`                                  |
+| 72  | `PRIMITIVE_BOOL_ID`          | `boolean`                               |
+| 73  | `PRIMITIVE_INT8_ID`          | `byte`                                  |
+| 74  | `PRIMITIVE_CHAR_ID`          | `char`                                  |
+| 75  | `PRIMITIVE_INT16_ID`         | `short`                                 |
+| 76  | `PRIMITIVE_INT32_ID`         | `int`                                   |
+| 77  | `PRIMITIVE_FLOAT32_ID`       | `float`                                 |
+| 78  | `PRIMITIVE_INT64_ID`         | `long`                                  |
+| 79  | `PRIMITIVE_FLOAT64_ID`       | `double`                                |
+| 80  | `PRIMITIVE_BOOLEAN_ARRAY_ID` | `boolean[]`                             |
+| 81  | `PRIMITIVE_BYTE_ARRAY_ID`    | `byte[]`                                |
+| 82  | `PRIMITIVE_CHAR_ARRAY_ID`    | `char[]`                                |
+| 83  | `PRIMITIVE_SHORT_ARRAY_ID`   | `short[]`                               |
+| 84  | `PRIMITIVE_INT_ARRAY_ID`     | `int[]`                                 |
+| 85  | `PRIMITIVE_FLOAT_ARRAY_ID`   | `float[]`                               |
+| 86  | `PRIMITIVE_LONG_ARRAY_ID`    | `long[]`                                |
+| 87  | `PRIMITIVE_DOUBLE_ARRAY_ID`  | `double[]`                              |
+| 88  | `STRING_ARRAY_ID`            | `String[]`                              |
+| 89  | `OBJECT_ARRAY_ID`            | `Object[]` and object array serializers |
+| 90  | `ARRAYLIST_ID`               | `java.util.ArrayList`                   |
+| 91  | `HASHMAP_ID`                 | `java.util.HashMap`                     |
+| 92  | `HASHSET_ID`                 | `java.util.HashSet`                     |
+| 93  | `CLASS_ID`                   | `java.lang.Class`                       |
+| 94  | `EMPTY_OBJECT_ID`            | Empty-object serializer                 |
+| 95  | `LAMBDA_STUB_ID`             | Lambda replacement type ID              |
+| 96  | `JDK_PROXY_STUB_ID`          | JDK proxy replacement type ID           |
+| 97  | `REPLACE_STUB_ID`            | `writeReplace`/`readResolve` type ID    |
+| 98  | `NONEXISTENT_META_SHARED_ID` | Unknown-class marker type ID            |
 
 ### Registered, Named, and Unregistered Classes
 
@@ -661,7 +661,7 @@ and Java serialization hooks:
 
 - `writeReplace`/`readResolve` values use replacement metadata and payloads
   owned by the replacement serializer.
-- JDK proxy and lambda stubs use their registered native stub IDs.
+- JDK proxy and lambda replacements use their registered native type IDs.
 - Types that require Java Object Serialization compatibility may be delegated to
   serializers that reproduce the required Java semantics inside a Fory object
   slot.
@@ -672,10 +672,10 @@ metadata rules in this document.
 ## Unknown Classes
 
 When meta sharing is enabled and a reader does not have a local class for a
-remote ClassDef, Java may materialize an unknown-class placeholder using
-`NONEXISTENT_META_SHARED_ID`. The placeholder stores enough field data to
-preserve and copy the unknown value according to the unknown-class serializer.
-It does not make the unknown Java class available to user code.
+remote ClassDef, Java may materialize an unknown-class value using
+`NONEXISTENT_META_SHARED_ID`. The value stores enough field data to preserve and
+copy the unknown value according to the unknown-class serializer. It does not
+make the unknown Java class available to user code.
 
 ## Out-of-Band Buffers
 

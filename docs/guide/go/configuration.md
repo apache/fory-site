@@ -28,24 +28,24 @@ Fory Go uses a functional options pattern for configuration. This allows you to 
 ```go
 import "github.com/apache/fory/go/fory"
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 ```
 
 Default settings:
 
-| Option     | Default | Description                    |
-| ---------- | ------- | ------------------------------ |
-| TrackRef   | false   | Reference tracking disabled    |
-| MaxDepth   | 20      | Maximum nesting depth          |
-| IsXlang    | false   | Cross-language mode disabled   |
-| Compatible | false   | Schema evolution mode disabled |
+| Option     | Default | Description                                  |
+| ---------- | ------- | -------------------------------------------- |
+| TrackRef   | false   | Reference tracking disabled                  |
+| MaxDepth   | 20      | Maximum nesting depth                        |
+| IsXlang    | true    | Xlang mode enabled                           |
+| Compatible | true    | Compatible schema-evolution metadata enabled |
 
 ### With Options
 
 ```go
 f := fory.New(
+    fory.WithXlang(true),
     fory.WithTrackRef(true),
-    fory.WithCompatible(true),
     fory.WithMaxDepth(10),
 )
 ```
@@ -57,7 +57,7 @@ f := fory.New(
 Enable reference tracking to handle circular references and shared objects:
 
 ```go
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 ```
 
 **When enabled:**
@@ -84,10 +84,11 @@ See [References](references.md) for details.
 
 ### WithCompatible
 
-Enable compatible mode for schema evolution:
+Enable compatible mode explicitly. Xlang mode enables it by default; use this option when
+native-mode Go-only payloads need schema evolution:
 
 ```go
-f := fory.New(fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(false), fory.WithCompatible(true))
 ```
 
 **When enabled:**
@@ -97,7 +98,7 @@ f := fory.New(fory.WithCompatible(true))
 - Field names or ids are used for matching (order-independent)
 - Larger serialized output due to metadata
 
-**When disabled (default):**
+**When disabled:**
 
 - Compact serialization without field metadata
 - Faster serialization and smaller output
@@ -111,7 +112,7 @@ See [Schema Evolution](schema-evolution.md) for details.
 Set the maximum nesting depth to prevent stack overflow:
 
 ```go
-f := fory.New(fory.WithMaxDepth(30))
+f := fory.New(fory.WithXlang(true), fory.WithMaxDepth(30))
 ```
 
 - Default: 20
@@ -120,10 +121,11 @@ f := fory.New(fory.WithMaxDepth(30))
 
 ### WithXlang
 
-Enable cross-language serialization mode:
+Select the wire mode:
 
 ```go
-f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
+native := fory.New(fory.WithXlang(false))
+xlang := fory.New(fory.WithXlang(true))
 ```
 
 **When enabled:**
@@ -132,11 +134,12 @@ f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
 - Compatible with Java, Python, C++, Rust, JavaScript
 - Type IDs follow xlang specification
 
-**When disabled (default):**
+**When disabled:**
 
 - Go-native serialization mode
-- Support more Go-native types
+- Supports more Go-native type behavior
 - Not compatible with other language implementations
+- Defaults to schema-consistent mode unless `WithCompatible(true)` is set
 
 ## Thread Safety
 
@@ -147,8 +150,8 @@ import "github.com/apache/fory/go/fory/threadsafe"
 
 // Create thread-safe Fory with same options
 f := threadsafe.New(
+    fory.WithXlang(true),
     fory.WithTrackRef(true),
-    fory.WithCompatible(true),
 )
 
 // Safe for concurrent use from multiple goroutines
@@ -188,7 +191,7 @@ See [Thread Safety](thread-safety.md) for details.
 The default `Fory` instance reuses its internal buffer:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 data1, _ := f.Serialize(value1)
 // WARNING: data1 becomes invalid after next Serialize call!
@@ -203,7 +206,7 @@ copy(safeCopy, data1)
 The thread-safe wrapper automatically copies data, so this is not a concern:
 
 ```go
-f := threadsafe.New()
+f := threadsafe.New(fory.WithXlang(true))
 data1, _ := f.Serialize(value1)
 data2, _ := f.Serialize(value2)
 // Both data1 and data2 are valid
@@ -214,7 +217,7 @@ data2, _ := f.Serialize(value2)
 For high-throughput scenarios, you can manage buffers manually:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 buf := fory.NewByteBuffer(nil)
 
 // Serialize to existing buffer
@@ -231,12 +234,12 @@ buf.Reset()
 
 ## Configuration Examples
 
-### Simple Data (Default)
+### Simple Xlang Data
 
 For simple structs without circular references:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 type Config struct {
     Host string
@@ -252,7 +255,7 @@ data, _ := f.Serialize(&Config{Host: "localhost", Port: 8080})
 For data with circular references:
 
 ```go
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 
 type Node struct {
     Value int32
@@ -286,13 +289,13 @@ type UserV2 struct {
     Email string  // New field
 }
 
-// Serialize with V1
-f1 := fory.New(fory.WithCompatible(true))
+// Serialize with V1 in native mode plus compatible schema evolution.
+f1 := fory.New(fory.WithXlang(false), fory.WithCompatible(true))
 f1.RegisterStruct(UserV1{}, 1)
 data, _ := f1.Serialize(&UserV1{ID: 1, Name: "Alice"})
 
 // Deserialize into V2 - Email will have zero value
-f2 := fory.New(fory.WithCompatible(true))
+f2 := fory.New(fory.WithXlang(false), fory.WithCompatible(true))
 f2.RegisterStruct(UserV2{}, 1)
 var user UserV2
 f2.Deserialize(data, &user)
@@ -309,6 +312,7 @@ type Request struct {
 }
 
 f := threadsafe.New(
+    fory.WithXlang(true),
     fory.WithMaxDepth(30),
 )
 f.RegisterStruct(Request{}, 1)

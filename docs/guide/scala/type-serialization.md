@@ -19,7 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This page covers serialization of Scala-specific types.
+This page covers serialization of Scala-specific JVM types in native mode. For
+cross-language Scala models, use the xlang path described in
+[Schema IDL And Xlang](schema-idl.md).
 
 ## Setup
 
@@ -29,7 +31,7 @@ All examples assume the following setup:
 import org.apache.fory.Fory
 import org.apache.fory.scala.ForyScala
 
-val fory = ForyScala.builder()
+val fory = ForyScala.builder().withXlang(false)
   .build()
 ```
 

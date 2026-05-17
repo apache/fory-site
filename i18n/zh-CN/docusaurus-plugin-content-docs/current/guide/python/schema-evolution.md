@@ -1,6 +1,6 @@
 ---
-title: Schema 演化
-sidebar_position: 6
+title: Schema Evolution
+sidebar_position: 8
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,59 +19,82 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ 在兼容模式下支持 schema 演化，允许在保持兼容性的同时添加/删除字段。
+Apache Fory™ supports schema evolution in compatible mode, allowing fields to be added or removed
+while maintaining compatibility. Xlang mode enables compatible mode by default. In native mode,
+set `compatible=True` explicitly when Python-only payloads need schema evolution.
 
-## 启用兼容模式
+## Xlang Default
 
 ```python
 import pyfory
 
-f = pyfory.Fory(xlang=True, compatible=True)
+f = pyfory.Fory(xlang=True)
 ```
 
-## Schema 演化示例
+## Disable Evolution for Stable Classes
+
+If a dataclass schema is stable and will not change, you can disable evolution for that class to avoid compatible metadata overhead. Use `pyfory.dataclass` with `evolving=False`:
+
+```python
+import pyfory
+
+@pyfory.dataclass(evolving=False)
+class StableMessage:
+    id: int
+    name: str
+```
+
+`pyfory.dataclass` also supports `slots=True`:
+
+```python
+@pyfory.dataclass(slots=True)
+class SlotMessage:
+    id: int
+```
+
+## Schema Evolution Example
 
 ```python
 import pyfory
 from dataclasses import dataclass
 
-# 版本 1：原始类
+# Version 1: Original class
 @dataclass
 class User:
     name: str
-    age: int
+    age: pyfory.Int32
 
-f = pyfory.Fory(xlang=True, compatible=True)
+f = pyfory.Fory(xlang=True)
 f.register(User, typename="User")
 data = f.dumps(User("Alice", 30))
 
-# 版本 2：添加新字段（向后兼容）
+# Version 2: Add new field (backward compatible)
 @dataclass
 class User:
     name: str
-    age: int
-    email: str = "unknown@example.com"  # 带默认值的新字段
+    age: pyfory.Int32
+    email: str = "unknown@example.com"  # New field with default
 
-# 仍然可以反序列化旧数据
+# Can still deserialize old data
 user = f.loads(data)
 print(user.email)  # "unknown@example.com"
 ```
 
-## 支持的变更
+## Supported Changes
 
-- **添加新字段**：带默认值
-- **删除字段**：具有额外字段的旧数据将被跳过
-- **重新排序字段**：字段按名称匹配，而不是位置
+- **Add new fields**: With default values
+- **Remove fields**: Old data with extra fields will be skipped
+- **Reorder fields**: Fields are matched by name, not position
 
-## 最佳实践
+## Best Practices
 
-1. **始终为新字段提供默认值**
-2. **使用 typename 实现跨语言兼容性**
-3. **在部署前测试 schema 变更**
-4. **为团队记录 schema 版本**
+1. **Always provide default values** for new fields
+2. **Use typename for cross-language compatibility**
+3. **Test schema changes** before deploying
+4. **Document schema versions** for your team
 
-## 相关主题
+## Related Topics
 
-- [配置](configuration.md) - 兼容模式设置
-- [跨语言](cross-language.md) - 跨语言的 schema 演化
-- [类型注册](type-registration.md) - 注册模式
+- [Configuration](configuration.md) - Compatible mode settings
+- [Cross-Language](cross-language.md) - Schema evolution across languages
+- [Type Registration](type-registration.md) - Registration patterns

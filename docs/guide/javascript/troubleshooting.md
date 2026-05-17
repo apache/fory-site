@@ -23,9 +23,10 @@ This page covers common problems when using Fory JavaScript.
 
 ## Cannot deserialize a non-cross-language payload
 
-The Fory JavaScript runtime only reads Fory cross-language payloads. If the producer is a Java or Go service using a language-native format, the JavaScript side cannot decode it.
+The Fory JavaScript runtime only reads Fory cross-language payloads. If the producer is a Java or Go service using a native-mode format, the JavaScript side cannot decode it.
 
-Fix: switch the producer to the cross-language mode. For Java, use `.withXlang(true).withCompatible(true)`; for Go, use `WithXlang(true), WithCompatible(true)`.
+Fix: switch the producer to xlang payloads. Java and Go use xlang by default; keep compatible mode
+enabled unless every peer uses the same schema.
 
 ## `maxDepth must be an integer >= 2`
 

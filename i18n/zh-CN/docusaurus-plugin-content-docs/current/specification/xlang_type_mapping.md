@@ -1,5 +1,5 @@
 ---
-title: Xlang 类型映射
+title: Xlang Type Mapping
 sidebar_position: 7
 id: xlang_type_mapping
 license: |
@@ -19,22 +19,19 @@ license: |
   limitations under the License.
 ---
 
-说明：
+Note:
 
-- 类型定义请参见 [Type Systems in Spec](xlang_serialization_spec.md#type-systems)
-- `int16_t[n]/vector<T>` 表示 `int16_t[n]/vector<int16_t>` 这一类数组/向量形式
-- 跨语言序列化协议仍在演进，生产环境请先做严格兼容验证
+- For type definition, see [Type Systems in Spec](xlang_serialization_spec.md#type-systems)
+- `int16_t[n]/vector<T>` indicates `int16_t[n]/vector<int16_t>`
+- The cross-language serialization is not stable, do not use it in your production environment.
 
-## 用户类型 ID
+## User Type IDs
 
-注册用户类型（struct/ext/enum/union）时：
+When registering user types (struct/ext/enum/union), the internal type ID is written as the 8-bit
+kind, and the user type ID is written separately as an unsigned varint32. There is no bit
+shift/packing, and `user_type_id` can be in the range `0~0xFFFFFFFE`.
 
-- type 字段先写入 8-bit internal kind
-- 用户类型 ID (`user_type_id`) 单独以 `varuint32` 写入
-- 不做 bit shift 或 packing
-- `user_type_id` 范围可用 `0 ~ 0xFFFFFFFE`
-
-示例：
+**Examples:**
 
 | User ID | Type              | Internal ID | Encoded User ID | Decimal |
 | ------- | ----------------- | ----------- | --------------- | ------- |
@@ -44,96 +41,172 @@ license: |
 | 1       | COMPATIBLE_STRUCT | 28          | 1               | 1       |
 | 2       | NAMED_STRUCT      | 29          | 2               | 2       |
 
-读取类型 ID 时：
+When reading type IDs:
 
-- 先读取 internal type ID
-- 若属于用户注册类型，再继续读取 `user_type_id(varuint32)`
+- Read internal type ID from the type ID field.
+- If the internal type is a user-registered kind, read `user_type_id` as varuint32.
 
-## 类型映射
+## Type Mapping
 
-| Fory Type               | Fory Type ID | Java            | Python                   | Javascript          | C++                            | Golang           | Rust              |
-| ----------------------- | ------------ | --------------- | ------------------------ | ------------------- | ------------------------------ | ---------------- | ----------------- |
-| bool                    | 1            | bool/Boolean    | bool                     | Boolean             | bool                           | bool             | bool              |
-| int8                    | 2            | byte/Byte       | int/pyfory.int8          | Type.int8()         | int8_t                         | int8             | i8                |
-| int16                   | 3            | short/Short     | int/pyfory.int16         | Type.int16()        | int16_t                        | int16            | i16               |
-| int32                   | 4            | int/Integer     | int/pyfory.fixed_int32   | Type.int32()        | int32_t                        | int32            | i32               |
-| varint32                | 5            | int/Integer     | int/pyfory.int32         | Type.varint32()     | int32_t                        | int32            | i32               |
-| int64                   | 6            | long/Long       | int/pyfory.fixed_int64   | Type.int64()        | int64_t                        | int64            | i64               |
-| varint64                | 7            | long/Long       | int/pyfory.int64         | Type.varint64()     | int64_t                        | int64            | i64               |
-| tagged_int64            | 8            | long/Long       | int/pyfory.tagged_int64  | Type.tagged_int64() | int64_t                        | int64            | i64               |
-| uint8                   | 9            | short/Short     | int/pyfory.uint8         | Type.uint8()        | uint8_t                        | uint8            | u8                |
-| uint16                  | 10           | int/Integer     | int/pyfory.uint16        | Type.uint16()       | uint16_t                       | uint16           | u16               |
-| uint32                  | 11           | long/Long       | int/pyfory.fixed_uint32  | Type.uint32()       | uint32_t                       | uint32           | u32               |
-| var_uint32              | 12           | long/Long       | int/pyfory.uint32        | Type.varUInt32()    | uint32_t                       | uint32           | u32               |
-| uint64                  | 13           | long/Long       | int/pyfory.fixed_uint64  | Type.uint64()       | uint64_t                       | uint64           | u64               |
-| var_uint64              | 14           | long/Long       | int/pyfory.uint64        | Type.varUInt64()    | uint64_t                       | uint64           | u64               |
-| tagged_uint64           | 15           | long/Long       | int/pyfory.tagged_uint64 | Type.taggedUInt64() | uint64_t                       | uint64           | u64               |
-| float8                  | 16           | /               | /                        | /                   | /                              | /                | /                 |
-| float16                 | 17           | Float16         | float/pyfory.float16     | Type.float16()      | fory::float16_t                | fory.float16     | fory::f16         |
-| bfloat16                | 18           | /               | /                        | /                   | /                              | /                | /                 |
-| float32                 | 19           | float/Float     | float/pyfory.float32     | Type.float32()      | float                          | float32          | f32               |
-| float64                 | 20           | double/Double   | float/pyfory.float64     | Type.float64()      | double                         | float64          | f64               |
-| string                  | 21           | String          | str                      | String              | string                         | string           | String/str        |
-| list                    | 22           | List/Collection | list/tuple               | array               | vector                         | slice            | Vec               |
-| set                     | 23           | Set             | set                      | /                   | set                            | fory.Set         | Set               |
-| map                     | 24           | Map             | dict                     | Map                 | unordered_map                  | map              | HashMap           |
-| enum                    | 25           | Enum subclasses | enum subclasses          | /                   | enum                           | /                | enum              |
-| named_enum              | 26           | Enum subclasses | enum subclasses          | /                   | enum                           | /                | enum              |
-| struct                  | 27           | pojo/record     | data class               | object              | struct/class                   | struct           | struct            |
-| compatible_struct       | 28           | pojo/record     | data class               | object              | struct/class                   | struct           | struct            |
-| named_struct            | 29           | pojo/record     | data class               | object              | struct/class                   | struct           | struct            |
-| named_compatible_struct | 30           | pojo/record     | data class               | object              | struct/class                   | struct           | struct            |
-| ext                     | 31           | pojo/record     | data class               | object              | struct/class                   | struct           | struct            |
-| named_ext               | 32           | pojo/record     | data class               | object              | struct/class                   | struct           | struct            |
-| union                   | 33           | Union           | typing.Union             | /                   | `std::variant<Ts...>`          | /                | tagged union enum |
-| none                    | 36           | null            | None                     | null                | `std::monostate`               | nil              | `()`              |
-| duration                | 37           | Duration        | timedelta                | Number              | duration                       | Duration         | Duration          |
-| timestamp               | 38           | Instant         | datetime                 | Number              | std::chrono::nanoseconds       | Time             | DateTime          |
-| date                    | 39           | Date            | datetime                 | Number              | fory::serialization::Date      | Time             | DateTime          |
-| decimal                 | 40           | BigDecimal      | Decimal                  | bigint              | /                              | /                | /                 |
-| binary                  | 41           | byte[]          | bytes                    | /                   | `uint8_t[n]/vector<T>`         | `[n]uint8/[]T`   | `Vec<uint8_t>`    |
-| array                   | 42           | array           | np.ndarray               | /                   | /                              | array/slice      | Vec               |
-| bool_array              | 43           | bool[]          | ndarray(np.bool\_)       | /                   | `bool[n]`                      | `[n]bool/[]T`    | `Vec<bool>`       |
-| int8_array              | 44           | byte[]          | ndarray(int8)            | /                   | `int8_t[n]/vector<T>`          | `[n]int8/[]T`    | `Vec<i8>`         |
-| int16_array             | 45           | short[]         | ndarray(int16)           | /                   | `int16_t[n]/vector<T>`         | `[n]int16/[]T`   | `Vec<i16>`        |
-| int32_array             | 46           | int[]           | ndarray(int32)           | /                   | `int32_t[n]/vector<T>`         | `[n]int32/[]T`   | `Vec<i32>`        |
-| int64_array             | 47           | long[]          | ndarray(int64)           | /                   | `int64_t[n]/vector<T>`         | `[n]int64/[]T`   | `Vec<i64>`        |
-| uint8_array             | 48           | short[]         | ndarray(uint8)           | /                   | `uint8_t[n]/vector<T>`         | `[n]uint8/[]T`   | `Vec<u8>`         |
-| uint16_array            | 49           | int[]           | ndarray(uint16)          | /                   | `uint16_t[n]/vector<T>`        | `[n]uint16/[]T`  | `Vec<u16>`        |
-| uint32_array            | 50           | long[]          | ndarray(uint32)          | /                   | `uint32_t[n]/vector<T>`        | `[n]uint32/[]T`  | `Vec<u32>`        |
-| uint64_array            | 51           | long[]          | ndarray(uint64)          | /                   | `uint64_t[n]/vector<T>`        | `[n]uint64/[]T`  | `Vec<u64>`        |
-| float8_array            | 52           | /               | /                        | /                   | /                              | /                | /                 |
-| float16_array           | 53           | Float16List     | ndarray(float16)         | /                   | `fory::float16_t[n]/vector<T>` | `[n]float16/[]T` | `Vec<fory::f16>`  |
-| bfloat16_array          | 54           | /               | /                        | /                   | /                              | /                | /                 |
-| float32_array           | 55           | float[]         | ndarray(float32)         | /                   | `float[n]/vector<T>`           | `[n]float32/[]T` | `Vec<f32>`        |
-| float64_array           | 56           | double[]        | ndarray(float64)         | /                   | `double[n]/vector<T>`          | `[n]float64/[]T` | `Vec<f64>`        |
+The first column names the Fory schema expression or canonical wire tag. Scalar
+encoding rows such as `fixed int32` and `tagged int64` are not FDL type names;
+FDL spells them as an encoding modifier plus a semantic integer type.
 
-## 类型信息（当前尚未完整实现）
+| Fory schema / wire tag             | Fory Type ID | Java                                      | Python                                    | Javascript                            | C++                                                 | Golang                                         | Rust                              |
+| ---------------------------------- | ------------ | ----------------------------------------- | ----------------------------------------- | ------------------------------------- | --------------------------------------------------- | ---------------------------------------------- | --------------------------------- |
+| bool                               | 1            | bool/Boolean                              | bool                                      | Boolean                               | bool                                                | bool                                           | bool                              |
+| int8                               | 2            | byte/Byte                                 | int/pyfory.Int8                           | Type.int8()                           | int8_t                                              | int8                                           | i8                                |
+| int16                              | 3            | short/Short                               | int/pyfory.Int16                          | Type.int16()                          | int16_t                                             | int16                                          | i16                               |
+| fixed int32                        | 4            | int/Integer                               | int/pyfory.FixedInt32                     | `Type.int32({ encoding: "fixed" })`   | int32_t                                             | int32                                          | i32                               |
+| int32                              | 5            | int/Integer                               | int/pyfory.Int32                          | Type.int32()                          | int32_t                                             | int32                                          | i32                               |
+| fixed int64                        | 6            | long/Long                                 | int/pyfory.FixedInt64                     | `Type.int64({ encoding: "fixed" })`   | int64_t                                             | int64                                          | i64                               |
+| int64                              | 7            | long/Long                                 | int/pyfory.Int64                          | Type.int64()                          | int64_t                                             | int64                                          | i64                               |
+| tagged int64                       | 8            | long/Long                                 | int/pyfory.TaggedInt64                    | `Type.int64({ encoding: "tagged" })`  | int64_t                                             | int64                                          | i64                               |
+| uint8                              | 9            | short/Short                               | int/pyfory.UInt8                          | Type.uint8()                          | uint8_t                                             | uint8                                          | u8                                |
+| uint16                             | 10           | int/Integer                               | int/pyfory.UInt16                         | Type.uint16()                         | uint16_t                                            | uint16                                         | u16                               |
+| fixed uint32                       | 11           | long/Long                                 | int/pyfory.FixedUInt32                    | `Type.uint32({ encoding: "fixed" })`  | uint32_t                                            | uint32                                         | u32                               |
+| uint32                             | 12           | long/Long                                 | int/pyfory.UInt32                         | Type.uint32()                         | uint32_t                                            | uint32                                         | u32                               |
+| fixed uint64                       | 13           | long/Long                                 | int/pyfory.FixedUInt64                    | `Type.uint64({ encoding: "fixed" })`  | uint64_t                                            | uint64                                         | u64                               |
+| uint64                             | 14           | long/Long                                 | int/pyfory.UInt64                         | Type.uint64()                         | uint64_t                                            | uint64                                         | u64                               |
+| tagged uint64                      | 15           | long/Long                                 | int/pyfory.TaggedUInt64                   | `Type.uint64({ encoding: "tagged" })` | uint64_t                                            | uint64                                         | u64                               |
+| float8                             | 16           | /                                         | /                                         | /                                     | /                                                   | /                                              | /                                 |
+| float16                            | 17           | Float16                                   | native float / pyfory.Float16 annotation  | `number`                              | `fory::float16_t`                                   | `float16.Float16`                              | `Float16`                         |
+| bfloat16                           | 18           | BFloat16                                  | native float / pyfory.BFloat16 annotation | `number`                              | `fory::bfloat16_t`                                  | `bfloat16.BFloat16`                            | `BFloat16`                        |
+| float32                            | 19           | float/Float                               | float/pyfory.Float32                      | Type.float32()                        | float                                               | float32                                        | f32                               |
+| float64                            | 20           | double/Double                             | float/pyfory.Float64                      | Type.float64()                        | double                                              | float64                                        | f64                               |
+| string                             | 21           | String                                    | str                                       | String                                | string                                              | string                                         | String/str                        |
+| list                               | 22           | List/Collection                           | list/tuple                                | array                                 | vector                                              | slice                                          | Vec                               |
+| set                                | 23           | Set                                       | set                                       | /                                     | set                                                 | fory.Set                                       | Set                               |
+| map                                | 24           | Map                                       | dict                                      | Map                                   | unordered_map                                       | map                                            | HashMap                           |
+| enum                               | 25           | Enum subclasses                           | enum subclasses                           | /                                     | enum                                                | /                                              | enum                              |
+| named_enum                         | 26           | Enum subclasses                           | enum subclasses                           | /                                     | enum                                                | /                                              | enum                              |
+| struct                             | 27           | pojo/record                               | data class                                | object                                | struct/class                                        | struct                                         | struct                            |
+| compatible_struct                  | 28           | pojo/record                               | data class                                | object                                | struct/class                                        | struct                                         | struct                            |
+| named_struct                       | 29           | pojo/record                               | data class                                | object                                | struct/class                                        | struct                                         | struct                            |
+| named_compatible_struct            | 30           | pojo/record                               | data class                                | object                                | struct/class                                        | struct                                         | struct                            |
+| ext                                | 31           | pojo/record                               | data class                                | object                                | struct/class                                        | struct                                         | struct                            |
+| named_ext                          | 32           | pojo/record                               | data class                                | object                                | struct/class                                        | struct                                         | struct                            |
+| union                              | 33           | Union                                     | typing.Union                              | /                                     | `std::variant<Ts...>`                               | /                                              | tagged union enum                 |
+| none                               | 36           | null                                      | None                                      | null                                  | `std::monostate`                                    | nil                                            | `()`                              |
+| duration                           | 37           | Duration                                  | timedelta                                 | Number                                | duration                                            | Duration                                       | Duration                          |
+| timestamp                          | 38           | Instant                                   | datetime                                  | Number                                | std::chrono::nanoseconds                            | Time                                           | Timestamp                         |
+| date                               | 39           | LocalDate                                 | datetime.date                             | Date                                  | fory::serialization::Date                           | fory.Date                                      | Date                              |
+| decimal                            | 40           | BigDecimal                                | Decimal                                   | Decimal                               | /                                                   | fory.Decimal                                   | fory::Decimal                     |
+| binary                             | 41           | byte[]                                    | bytes                                     | /                                     | `uint8_t[n]/vector<T>`                              | `[n]uint8/[]T`                                 | `Vec<u8>`                         |
+| `array<bool>` (bool_array)         | 43           | bool[]                                    | BoolArray / ndarray(np.bool\_)            | BoolArray / Type.boolArray()          | `bool[n]`                                           | `[n]bool/[]T`                                  | `Vec<bool>`                       |
+| `array<int8>` (int8_array)         | 44           | `@Int8Type byte[]`                        | Int8Array / ndarray(int8)                 | Type.int8Array()                      | `int8_t[n]/vector<T>`                               | `[n]int8/[]T`                                  | `Vec<i8>`                         |
+| `array<int16>` (int16_array)       | 45           | short[]                                   | Int16Array / ndarray(int16)               | Type.int16Array()                     | `int16_t[n]/vector<T>`                              | `[n]int16/[]T`                                 | `Vec<i16>`                        |
+| `array<int32>` (int32_array)       | 46           | int[]                                     | Int32Array / ndarray(int32)               | Type.int32Array()                     | `int32_t[n]/vector<T>`                              | `[n]int32/[]T`                                 | `Vec<i32>`                        |
+| `array<int64>` (int64_array)       | 47           | long[]                                    | Int64Array / ndarray(int64)               | Type.int64Array()                     | `int64_t[n]/vector<T>`                              | `[n]int64/[]T`                                 | `Vec<i64>`                        |
+| `array<uint8>` (uint8_array)       | 48           | `@UInt8Type byte[]`                       | UInt8Array / ndarray(uint8)               | Type.uint8Array()                     | `uint8_t[n]/vector<T>`                              | `[n]uint8/[]T`                                 | `Vec<u8>`                         |
+| `array<uint16>` (uint16_array)     | 49           | `@UInt16Type short[]`                     | UInt16Array / ndarray(uint16)             | Type.uint16Array()                    | `uint16_t[n]/vector<T>`                             | `[n]uint16/[]T`                                | `Vec<u16>`                        |
+| `array<uint32>` (uint32_array)     | 50           | `@UInt32Type int[]`                       | UInt32Array / ndarray(uint32)             | Type.uint32Array()                    | `uint32_t[n]/vector<T>`                             | `[n]uint32/[]T`                                | `Vec<u32>`                        |
+| `array<uint64>` (uint64_array)     | 51           | `@UInt64Type long[]`                      | UInt64Array / ndarray(uint64)             | Type.uint64Array()                    | `uint64_t[n]/vector<T>`                             | `[n]uint64/[]T`                                | `Vec<u64>`                        |
+| `array<float8>` (float8_array)     | 52           | /                                         | /                                         | /                                     | /                                                   | /                                              | /                                 |
+| `array<float16>` (float16_array)   | 53           | `Float16Array` / `@Float16Type short[]`   | Float16Array / ndarray(float16)           | Float16Array / Type.float16Array()    | `fory::float16_t[n]/std::vector<fory::float16_t>`   | `[N]float16.Float16` / `[]float16.Float16`     | `Vec<Float16>` / `[Float16; N]`   |
+| `array<bfloat16>` (bfloat16_array) | 54           | `BFloat16Array` / `@BFloat16Type short[]` | BFloat16Array / ndarray(bfloat16)         | BFloat16Array / Type.bfloat16Array()  | `fory::bfloat16_t[n]/std::vector<fory::bfloat16_t>` | `[N]bfloat16.BFloat16` / `[]bfloat16.BFloat16` | `Vec<BFloat16>` / `[BFloat16; N]` |
+| `array<float32>` (float32_array)   | 55           | float[]                                   | Float32Array / ndarray(float32)           | Type.float32Array()                   | `float[n]/vector<T>`                                | `[n]float32/[]T`                               | `Vec<f32>`                        |
+| `array<float64>` (float64_array)   | 56           | double[]                                  | Float64Array / ndarray(float64)           | Type.float64Array()                   | `double[n]/vector<T>`                               | `[n]float64/[]T`                               | `Vec<f64>`                        |
 
-由于不同语言类型系统存在差异，部分类型无法一一对应映射。
+Notes:
 
-如果某语言中的一个类型可能对应多个 Fory 类型（例如 Java `long` 可能对应 `int64/varint64/tagged_int64`），
-说明该语言缺少更细粒度区分，此时调用方需要额外提供类型信息。
+- Python `pyfory.Float16` and `pyfory.BFloat16` are reserved annotation markers; scalar values deserialize as native Python `float`.
+- Python `BoolArray`, `Int8Array`, `Int16Array`, `Int32Array`, `Int64Array`, `UInt8Array`, `UInt16Array`, `UInt32Array`, `UInt64Array`, `Float16Array`, `BFloat16Array`, `Float32Array`, and `Float64Array` are public dense-array wrappers with list-like sequence behavior.
+- JavaScript `BoolArray`, fallback `Float16Array`, and `BFloat16Array` are public dense-array wrappers backed by `Uint8Array` or `Uint16Array`. Scalar `float16` and `bfloat16` values use `number`. A JavaScript runtime with native `Float16Array` may return that native carrier for `array<float16>`.
+- Java plain `byte[]` maps to `binary`. Numeric byte arrays use type-use annotations:
+  `@Int8Type byte[]` for `array<int8>` and `@UInt8Type byte[]` for `array<uint8>`.
+- Dart uses `double` plus `Float16Type` or `Bfloat16Type` metadata for scalar
+  `float16` and `bfloat16`, `BoolList` for `array<bool>`, typed-data lists for integer/float32/float64 arrays, and
+  `Float16List` / `Bfloat16List` for `array<float16>` / `array<bfloat16>`. Plain Dart `List<bool>`
+  maps to `list<bool>` unless a field uses `@ArrayField(element: BoolType())` or
+  `@ForyField(type: ArrayType(element: BoolType()))` with a `BoolList` carrier.
+- `Float16[]` and `BFloat16[]` remain object arrays in xlang mode and serialize with the `list` wire type.
+- `ARRAY (42)` is reserved for a future dedicated multi-dimensional array encoding and is not part
+  of the current xlang type-mapping surface.
+- Current xlang uses `*_ARRAY` for one-dimensional primitive arrays and nested `list` for
+  multi-dimensional arrays.
+- Kotlin KSP xlang maps `UByte`, `UShort`, `UInt`, and `ULong` to `uint8`,
+  `uint16`, `uint32`, and `uint64`. Kotlin primitive and unsigned array
+  carriers map to dense arrays. `ByteArray` maps to `binary` by default and to
+  `array<int8>` when its type use is marked with Fory `ArrayType`.
+  `array<float16>` and `array<bfloat16>` use Java core `Float16Array` and
+  `BFloat16Array`.
+- Kotlin xlang `duration` uses `kotlin.time.Duration`. Infinite values are not
+  representable by the xlang duration payload and must raise a serialization
+  error.
+- `list<T>` and `array<T>` remain distinct schema kinds. In schema-compatible struct/class field
+  matching only, a direct top-level `list<T>` field may be read as a direct top-level `array<T>`
+  field, and a direct top-level `array<T>` field may be read as a direct top-level `list<T>` field,
+  when `T` is one of the dense bool/numeric array domains. Integer list element encodings in the
+  same signedness and width domain match the corresponding dense array element domain. The rule does
+  not apply inside nested collection, map, array, union, or generic positions. A peer `list<T>`
+  payload that declares nullable or ref-tracked elements must raise a compatible-read error when the
+  local matched field is `array<T>`.
 
-## 类型注解
+### Scala IDL Mapping
 
-当某类型作为其他类的字段时，可以通过字段级或类型级元数据提示具体编码语义。不同语言的配置方式：
+The Scala schema IDL target emits Scala 3 source only. The `fory-scala` runtime
+artifact remains cross-built for Scala 2.13 and Scala 3.
 
-- Java：注解
-- C++：宏与模板
-- Go：struct tag
-- Python：type hint
-- Rust：宏
+| Fory schema kind                      | Scala generated carrier                                                                  |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `optional T`                          | `Option[T]`                                                                              |
+| `bool`                                | `Boolean`                                                                                |
+| `int8`, `int16`, `int32`, `int64`     | `Byte`, `Short`, `Int`, `Long`                                                           |
+| `uint8`, `uint16`, `uint32`, `uint64` | `Int`, `Int`, `Long`, `Long` plus unsigned Fory type metadata                            |
+| `float16`, `bfloat16`                 | JVM `Float16` and `BFloat16` carriers                                                    |
+| `float32`, `float64`                  | `Float`, `Double`                                                                        |
+| `string`                              | `String`                                                                                 |
+| `binary`                              | `Array[Byte]`                                                                            |
+| `list<T>`, `set<T>`, `map<K, V>`      | `List[T]`, `Set[T]`, `Map[K, V]`                                                         |
+| `array<bool>`                         | `Array[Boolean]`                                                                         |
+| `array<int8>`, `array<uint8>`         | `Array[Byte]` with signed/unsigned descriptor metadata                                   |
+| `array<int16>`, `array<uint16>`       | `Array[Short]` with signed/unsigned descriptor metadata                                  |
+| `array<int32>`, `array<uint32>`       | `Array[Int]` with signed/unsigned descriptor metadata                                    |
+| `array<int64>`, `array<uint64>`       | `Array[Long]` with signed/unsigned descriptor metadata                                   |
+| `array<float16>`, `array<bfloat16>`   | `Array[Short]` with reduced-precision descriptor metadata                                |
+| `array<float32>`, `array<float64>`    | `Array[Float]`, `Array[Double]`                                                          |
+| `date`, `timestamp`, `duration`       | `java.time.LocalDate`, `java.time.Instant`, `java.time.Duration`                         |
+| `decimal`                             | `java.math.BigDecimal`                                                                   |
+| `message`                             | Scala 3 `case class` by default; normal class only for message/union construction cycles |
+| `enum`                                | Scala 3 `enum` with stable Fory enum IDs on case-level `@ForyEnumId` annotations         |
+| `union`                               | Scala 3 ADT `enum derives ForySerializer`                                                |
+| `any`                                 | `AnyRef`                                                                                 |
 
-示例：
+Generated Scala descriptor metadata is produced by Scala 3 macro derivation
+from Scala compile-time types, including nested generics, `Option`, arrays,
+scalar encoding annotations, nullability, and `@Ref`. Java reflection is not the
+source of truth for generated Scala TypeDef metadata. Scala `@Ref` metadata is
+represented by the shared `org.apache.fory.annotation.Ref` annotation; `@Ref`
+is the JVM owner for reference tracking metadata.
+
+## Type info
+
+Due to differences between type systems of languages, those types can't be mapped one-to-one between languages.
+
+If one host-language type corresponds to multiple Fory scalar encodings, for
+example Java `long` can represent fixed, varint, or tagged `int64`, the user
+must provide encoding metadata when the default is not the intended schema.
+
+## Type annotation
+
+If the type is a field of another class, users can provide meta hints for fields of a type, or for the whole type.
+Such information can be provided in other languages too:
+
+- java: use annotation.
+- cpp: use macro and template.
+- golang: use struct tag.
+- python: use typehint.
+- rust: use macro.
+
+Here is en example:
 
 - Java:
 
   ```java
   class Foo {
-    @Int32Type(varint = true)
-    int f1;
-    List<@Int32Type(varint = true) Integer> f2;
+    private @Int32Type int f1;
+    private List<@Int32Type Integer> f2;
   }
   ```
 
@@ -141,6 +214,6 @@ license: |
 
   ```python
   class Foo:
-      f1: pyfory.varint32
-      f2: List[pyfory.varint32]
+      f1: pyfory.Int32
+      f2: List[pyfory.Int32]
   ```

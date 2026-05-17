@@ -1,7 +1,7 @@
 ---
 title: Basic Serialization
-sidebar_position: 2
-id: dart_basic_serialization
+sidebar_position: 1
+id: basic_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -143,4 +143,4 @@ If you skip registration, you will get a `Type ... is not registered` error at r
 
 - [Configuration](configuration.md)
 - [Type Registration](type-registration.md)
-- [Field Configuration](field-configuration.md)
+- [Schema Metadata](schema-metadata.md)

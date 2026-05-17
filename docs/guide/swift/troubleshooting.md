@@ -44,9 +44,11 @@ Fix:
 
 ### `Invalid data: xlang bitmap mismatch`
 
-Cause: serializer and deserializer use different `xlang` settings.
+Cause: the input was produced by a peer runtime that did not write the xlang
+wire format Swift expects.
 
-Fix: configure both sides with matching `xlang` mode.
+Fix: configure the peer serializer to write xlang format. Swift already uses
+xlang format and has no native-mode switch.
 
 ### `Invalid data: class version hash mismatch`
 

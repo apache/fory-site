@@ -1,7 +1,7 @@
 ---
 title: Custom Serializers
-sidebar_position: 5
-id: dart_custom_serializers
+sidebar_position: 9
+id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

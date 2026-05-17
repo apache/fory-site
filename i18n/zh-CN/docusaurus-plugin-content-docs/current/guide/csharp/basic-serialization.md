@@ -1,5 +1,5 @@
 ---
-title: 基础序列化
+title: Basic Serialization
 sidebar_position: 1
 id: basic_serialization
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-本页介绍 Apache Fory™ C# 的强类型序列化 API。
+This page covers typed serialization APIs in Apache Fory™ C#.
 
-## 对象图序列化
+## Object Graph Serialization
 
-在类或结构体上使用 `[ForyObject]`，并在使用前完成注册。
+Use `[ForyObject]` on your classes/structs and register them before use.
 
 ```csharp
 using Apache.Fory;
@@ -62,23 +62,23 @@ byte[] payload = fory.Serialize(person);
 Person decoded = fory.Deserialize<Person>(payload);
 ```
 
-## 强类型 API
+## Typed API
 
-### 使用字节数组进行 Serialize / Deserialize
+### Serialize / Deserialize with byte arrays
 
 ```csharp
 byte[] payload = fory.Serialize(value);
 MyType decoded = fory.Deserialize<MyType>(payload);
 ```
 
-### 从 `ReadOnlySpan<byte>` 反序列化
+### Deserialize from `ReadOnlySpan<byte>`
 
 ```csharp
 ReadOnlySpan<byte> span = payload;
 MyType decoded = fory.Deserialize<MyType>(span);
 ```
 
-### 以流式方式消费帧
+### Stream-style frame consumption
 
 ```csharp
 using System.Buffers;
@@ -88,9 +88,9 @@ MyType first = fory.Deserialize<MyType>(ref sequence);
 MyType second = fory.Deserialize<MyType>(ref sequence);
 ```
 
-## 通过泛型对象 API 处理动态载荷
+## Dynamic Payloads via Generic Object API
 
-当编译期类型未知或载荷包含异构对象时，可以配合 `object?` 使用泛型 API。
+When the compile-time type is unknown or heterogeneous, use the generic API with `object?`.
 
 ```csharp
 Dictionary<object, object?> value = new()
@@ -106,7 +106,7 @@ object? decoded = fory.Deserialize<object?>(payload);
 
 ## Buffer Writer API
 
-直接序列化到 `IBufferWriter<byte>` 目标。
+Serialize directly into `IBufferWriter<byte>` targets.
 
 ```csharp
 using System.Buffers;
@@ -118,14 +118,14 @@ ArrayBufferWriter<byte> dynamicWriter = new();
 fory.Serialize<object?>(dynamicWriter, value);
 ```
 
-## 说明
+## Notes
 
-- 复用同一个 `Fory` 或 `ThreadSafeFory` 实例可以获得更好的性能。
-- 基础类型和集合类型不需要用户手动注册。
-- 用户自定义的 `[ForyObject]` 类型和自定义序列化器类型应显式注册。
+- Reuse the same `Fory` or `ThreadSafeFory` instance for better performance.
+- Primitive types and collections do not require user registration.
+- User `[ForyObject]` and custom serializer types should be registered explicitly.
 
-## 相关主题
+## Related Topics
 
-- [类型注册](type-registration.md)
-- [支持的类型](supported-types.md)
-- [引用](references.md)
+- [Type Registration](type-registration.md)
+- [Supported Types](supported-types.md)
+- [References](references.md)

@@ -35,22 +35,22 @@ Reference tracking enables:
 
 ```java
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
-    .withRefTracking(true)
+        .withXlang(true)
+        .withRefTracking(true)
     .build();
 ```
 
 ### Python
 
 ```python
-fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 ```
 
 ### Go
 
 ```go
 fory := forygo.NewFory(
-    forygo.WithXlang(true), forygo.WithCompatible(true),
+    forygo.WithXlang(true),
     forygo.WithTrackRef(true),
 )
 ```
@@ -58,14 +58,14 @@ fory := forygo.NewFory(
 ### C++
 
 ```cpp
-auto fory = fory::Fory::builder().xlang(true).compatible(true).track_ref(true).build();
+auto fory = fory::serialization::Fory::builder().xlang(true).track_ref(true).build();
 ```
 
 ### Rust
 
 ```rust
 let fory = Fory::builder()
-    .xlang(true).compatible(true)
+    .xlang(true)
     .track_ref(true).build();
 ```
 
@@ -75,9 +75,8 @@ let fory = Fory::builder()
 import org.apache.fory.scala.ForyScala
 
 val fory = ForyScala.builder()
-  .withXlang(true)
-  .withCompatible(true)
-  .withRefTracking(true)
+      .withXlang(true)
+      .withRefTracking(true)
   .build()
 ```
 
@@ -115,8 +114,8 @@ Key behavior:
 ```java
 // Reference tracking enabled, but non-nullable fields still skip ref flags
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
-    .withRefTracking(true)
+        .withXlang(true)
+        .withRefTracking(true)
     .build();
 ```
 
@@ -174,7 +173,7 @@ FORY_STRUCT(Document,
 ```
 
 To disable reference tracking for C++ entirely, set
-`Fory::builder().track_ref(false).build()` on the serializer.
+`Fory::builder().xlang(true).track_ref(false).build()` on the serializer.
 
 #### Rust: Field Attributes
 

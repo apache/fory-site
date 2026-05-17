@@ -1,6 +1,6 @@
 ---
 title: Row Format
-sidebar_position: 14
+sidebar_position: 11
 id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -166,16 +166,16 @@ struct Foo {
   FORY_STRUCT(Foo, f1, f2, f3, f4);
 };
 
-fory::encoder::RowEncoder<Foo> encoder;
-encoder.Encode(foo);
-auto row = encoder.GetWriter().ToRow();
+fory::row::encoder::RowEncoder<Foo> encoder;
+encoder.encode(foo);
+auto row = encoder.get_writer().to_row();
 
 // Zero-copy random access
-auto f2_array = row->GetArray(1);
-auto f4_array = row->GetArray(3);
-auto bar10 = f4_array->GetStruct(10);
-int64_t value = bar10->GetArray(1)->GetInt64(5);
-std::string str = bar10->GetString(0);
+auto f2_array = row->get_array(1);
+auto f4_array = row->get_array(3);
+auto bar10 = f4_array->get_struct(10);
+int64_t value = bar10->get_array(1)->get_int64(5);
+std::string str = bar10->get_string(0);
 ```
 
 ## Performance Comparison
@@ -189,6 +189,6 @@ std::string str = bar10->GetString(0);
 
 ## Related Topics
 
-- [Cross-Language Serialization](cross-language.md) - XLANG mode
+- [Cross-Language Serialization](cross-language.md) - xlang mode
 - [Advanced Features](advanced-features.md) - Zero-copy serialization
 - [Row Format Specification](https://fory.apache.org/docs/specification/row_format_spec) - Protocol details

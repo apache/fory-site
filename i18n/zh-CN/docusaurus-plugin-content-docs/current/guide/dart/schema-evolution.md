@@ -1,7 +1,7 @@
 ---
-title: Schema 演进
+title: Schema Evolution
 sidebar_position: 8
-id: dart_schema_evolution
+id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,31 +19,32 @@ license: |
   limitations under the License.
 ---
 
-Schema 演进让应用的不同版本之间也能安全交换消息。例如，v2 写出的消息仍然可以被 v1 读取，反过来也一样。
+Schema evolution lets different versions of your app exchange messages safely — a v2 writer can produce a message that a v1 reader can still decode, and vice versa.
 
-## 两种模式
+## Compatible And Schema-Consistent Evolution
 
-### 兼容模式（推荐给会演进的服务）
+### Compatible Mode
 
-当服务可能同时运行不同版本时启用它，例如滚动发布期间，或者客户端无法立即升级时。
-
-```dart
-final fory = Fory(compatible: true);
-```
-
-在兼容模式下，Fory 会在每条消息中写入足够的字段元信息，使读端能够跳过未知字段，并为缺失字段使用默认值。请用稳定字段 ID 来锚定跨版本 Schema。
-
-### Schema 一致模式（默认）
-
-通信双方必须拥有同一个模型。Fory 会校验双方 Schema 是否一致，并拒绝来自其他 Schema 版本的消息。适用于所有服务总是一起升级，并且你希望尽早把 Schema 不匹配直接报错的场景。
+Compatible mode is the Dart default. Keep this default when services may run different versions at
+the same time, for example during a rolling deployment or when clients are not updated immediately.
 
 ```dart
-final fory = Fory(); // compatible: false by default
+final fory = Fory();
 ```
 
-## 为演进做好准备
+In compatible mode, Fory includes enough field metadata in each message so that the reader can skip unknown fields and use defaults for missing ones. Use stable field IDs (see below) to anchor the schema across changes.
 
-为了安全地使用兼容模式，请给结构体添加 `@ForyStruct(evolving: true)`（默认值），并在第一次对外发送载荷之前，为每个字段都分配稳定的 `@ForyField(id: ...)`：
+### Schema-Consistent Mode
+
+Both sides must have the same model. Fory validates that the schemas match and will reject messages from a different schema version. Use this when all services are always updated together and you want schema mismatches to be caught as fast errors.
+
+```dart
+final fory = Fory(compatible: false);
+```
+
+## Setting Up for Evolution
+
+To use compatible mode safely, mark your structs with `@ForyStruct(evolving: true)` (the default) and assign a stable `@ForyField(id: ...)` to every field **before you ship your first payload**:
 
 ```dart
 @ForyStruct(evolving: true)
@@ -58,35 +59,35 @@ class UserProfile {
 }
 ```
 
-如果载荷已经在生产环境中存在之后你才补加字段 ID，那么旧消息里不会包含这些 ID，Schema 演进也就无法正确工作。
+If you add field IDs after payloads are already in production, existing stored messages won't have them and evolution won't work correctly.
 
-## 哪些变更是安全的
+## What You Can Safely Change
 
-**安全变更**（双方兼容）：
+**Safe changes** (compatible on both sides):
 
-- 新增一个带新字段 ID 的可选字段
-- 重命名字段，只要 `@ForyField(id: ...)` 保持不变
-- 删除字段，对端会忽略缺失值并使用 Dart 默认值
+- Add a new optional field with a new, unused field ID.
+- Rename a field — as long as the `@ForyField(id: ...)` stays the same.
+- Remove a field — the peer will just ignore the missing value and use the Dart default.
 
-**危险变更**（可能破坏已有消息）：
+**Unsafe changes** (may break existing messages):
 
-- 把一个已有字段 ID 复用给另一个不同字段
-- 将字段类型改为不兼容类型，例如 `Int32` 改成 `String`
-- 在消息进入生产环境后修改某个类型的注册身份，即 `id`、`namespace` 或 `typeName`
-- 不改字段 ID，却改变字段的逻辑含义
+- Reuse an existing field ID for a different field.
+- Change a field's type to an incompatible type (e.g., `@ForyField(type: Int32Type()) int` → `String`).
+- Change the registration identity (`id`, `namespace`, or `typeName`) of a type after messages are in production.
+- Change a field's logical meaning without changing its ID.
 
-## 跨语言说明
+## Cross-Language Notes
 
-只有在**所有**交换消息的运行时都一致满足以下条件时，Schema 演进才会生效：
+Evolution only works when **all** runtimes that exchange messages agree on:
 
-1. 使用相同的 `compatible` 设置。
-2. 使用相同的类型注册身份，即相同的数字 ID，或者相同的 `namespace + typeName`。
-3. 对字段 ID 的逻辑含义有相同理解。
+1. The same `compatible` setting.
+2. The same type registration identity (numeric ID or `namespace + typeName`).
+3. The logical meaning of field IDs.
 
-部署前请用真实 round trip 覆盖滚动升级场景。
+Test rolling-upgrade scenarios with real round trips before deploying.
 
-## 相关主题
+## Related Topics
 
-- [配置](configuration.md)
-- [字段配置](field-configuration.md)
-- [跨语言](cross-language.md)
+- [Configuration](configuration.md)
+- [Schema Metadata](schema-metadata.md)
+- [Cross-Language](cross-language.md)

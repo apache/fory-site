@@ -1,6 +1,6 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 12
+sidebar_position: 4
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,17 +21,16 @@ license: |
 
 Apache Fory™ supports seamless data exchange between Java and other languages (Python, Rust, Go, JavaScript, etc.) through the xlang serialization format. This enables multi-language microservices, polyglot data pipelines, and cross-platform data sharing.
 
-## Enable Cross-Language Mode
+## Create an Xlang Runtime
 
-To serialize data for consumption by other languages, enable xlang mode:
+Java defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```java
 import org.apache.fory.*;
 import org.apache.fory.config.*;
 
-// Create Fory instance with XLANG mode
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
+    .withXlang(true)
     .withRefTracking(true)  // Enable reference tracking for complex graphs
     .build();
 ```
@@ -85,7 +84,7 @@ public record Person(String name, int age) {}
 public class Example {
     public static void main(String[] args) {
         Fory fory = Fory.builder()
-            .withXlang(true).withCompatible(true)
+            .withXlang(true)
             .withRefTracking(true)
             .build();
 
@@ -111,8 +110,7 @@ class Person:
     name: str
     age: pyfory.Int32
 
-# Create Fory in xlang mode
-fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 
 # Register with the SAME name as Java
 fory.register_type(Person, typename="example.Person")
@@ -124,7 +122,7 @@ print(f"{person.name}, {person.age}")  # Output: Bob, 25
 
 ## Handling Circular and Shared References
 
-Cross-language mode supports circular and shared references when reference tracking is enabled:
+Xlang mode supports circular and shared references when reference tracking is enabled:
 
 ```java
 public class Node {
@@ -134,7 +132,7 @@ public class Node {
 }
 
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
+    .withXlang(true)
     .withRefTracking(true)  // Required for circular references
     .build();
 
@@ -198,10 +196,10 @@ private @BFloat16Type short[] values;
 
 ```java
 public record UserData(
-    String name,           // ✅ Compatible
-    int age,               // ✅ Compatible
-    List<String> tags,     // ✅ Compatible
-    Map<String, Integer> scores  // ✅ Compatible
+    String name,           // compatible
+    int age,               // compatible
+    List<String> tags,     // compatible
+    Map<String, Integer> scores  // compatible
 ) {}
 ```
 
@@ -209,15 +207,15 @@ public record UserData(
 
 ```java
 public record UserData(
-    Optional<String> name,    // ❌ Not cross-language compatible
-    BigDecimal balance,       // ❌ Limited support
-    EnumSet<Status> statuses  // ❌ Java-specific collection
+    Optional<String> name,    // not cross-language compatible
+    BigDecimal balance,       // limited support
+    EnumSet<Status> statuses  // Java-specific collection
 ) {}
 ```
 
 ## Performance Considerations
 
-Cross-language mode has additional overhead compared to Java-only mode:
+Xlang mode has additional overhead compared to Java native mode:
 
 - **Type metadata encoding**: Adds extra bytes per type
 - **Type resolution**: Requires name/ID lookup during deserialization
@@ -226,12 +224,12 @@ Cross-language mode has additional overhead compared to Java-only mode:
 
 - Use **ID-based registration** when possible (smaller encoding)
 - **Disable reference tracking** if you don't need circular references (`withRefTracking(false)`)
-- **Use Java mode** (`withXlang(false)`) when only Java serialization is needed
+- **Use native mode** (`withXlang(false)`) when only Java serialization is needed
 
 ## Cross-Language Best Practices
 
 1. **Consistent Registration**: Ensure all services register types with identical IDs/names
-2. **Version Compatibility**: Use compatible mode for schema evolution across services
+2. **Version Compatibility**: Keep compatible mode for schema evolution across services
 
 ## Troubleshooting Cross-Language Serialization
 
@@ -247,7 +245,7 @@ Cross-language mode has additional overhead compared to Java-only mode:
 
 ### Data corruption or unexpected values
 
-- Verify both sides enable xlang mode
+- Verify both sides use xlang payloads
 - Ensure both sides have compatible Fory versions
 
 ## See Also

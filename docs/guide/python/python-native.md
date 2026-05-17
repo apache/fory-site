@@ -1,6 +1,6 @@
 ---
 title: Python Native Mode
-sidebar_position: 5
+sidebar_position: 2
 id: native_mode
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,13 +19,16 @@ license: |
   limitations under the License.
 ---
 
-`pyfory` provides a Python-native serialization mode that offers the same functionality as pickle/cloudpickle, but with **significantly better performance, smaller data size, and enhanced security features**.
+`pyfory` provides a Python native mode for same-language Python traffic. It covers the pickle and
+cloudpickle-style object surface while keeping xlang mode, the default, focused on cross-language
+payloads. Native mode is optimized for Python's type system and is the mode to use when replacing
+pickle or cloudpickle for Python-only payloads.
 
 ## Overview
 
-The binary protocol and API are similar to Fory's xlang mode, but Python-native mode can serialize any Python object—including global functions, local functions, lambdas, local classes and types with customized serialization using `__getstate__/__reduce__/__reduce_ex__`, which are not allowed in xlang mode.
+The binary protocol and API are similar to Fory's xlang mode, but Python native mode can serialize any Python object—including global functions, local functions, lambdas, local classes and types with customized serialization using `__getstate__/__reduce__/__reduce_ex__`, which are not allowed in xlang mode.
 
-To use Python-native mode, create `Fory` with `xlang=False`:
+To use Python native mode, create `Fory` with `xlang=False`:
 
 ```python
 import pyfory
@@ -34,12 +37,15 @@ fory = pyfory.Fory(xlang=False, ref=False, strict=True)
 
 ## Drop-in Replacement for Pickle/Cloudpickle
 
-`pyfory` can serialize any Python object with the following configuration:
+`pyfory` can serialize Python objects that are outside the xlang type system with the following
+configuration. Use this mode when the payload stays in Python and you want Fory as the
+pickle/cloudpickle replacement:
 
 - **For circular references**: Set `ref=True` to enable reference tracking
 - **For functions/classes**: Set `strict=False` to allow deserialization of dynamic types
 
-**⚠️ Security Warning**: When `strict=False`, Fory will deserialize arbitrary types, which can pose security risks if data comes from untrusted sources. Only use `strict=False` in controlled environments where you trust the data source completely.
+Security warning: when `strict=False`, Fory can deserialize arbitrary Python types. Use this only
+with trusted data, and provide a `policy=` deserialization policy when dynamic types are required.
 
 ### Common Usage
 
@@ -65,6 +71,11 @@ person = Person("Bob", 25)
 data = fory.dumps(person)
 print(fory.loads(data))  # Person(name='Bob', age=25)
 ```
+
+Native mode can replace pickle and cloudpickle for Python-only object graphs and can serialize
+richer values than JSON, including functions, local classes, methods, and objects that implement
+`__reduce__`, `__reduce_ex__`, `__getstate__`, or `__setstate__`. These Python-specific features
+are not valid xlang payloads.
 
 ## Serialize Global Functions
 
@@ -200,6 +211,6 @@ print(f"Pickle: {timeit.timeit(lambda: pickle.dumps(obj), number=1000):.3f}s")
 
 ## Related Topics
 
-- [Configuration](configuration.md) - Python mode configuration
+- [Configuration](configuration.md) - Python native mode configuration
 - [Out-of-Band Serialization](out-of-band.md) - Zero-copy buffers
 - [Security](security.md) - DeserializationPolicy

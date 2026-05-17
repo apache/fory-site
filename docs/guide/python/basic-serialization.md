@@ -19,7 +19,8 @@ license: |
   limitations under the License.
 ---
 
-This page covers basic serialization patterns in pyfory.
+This page covers the Python xlang quickstart. `pyfory.Fory()` defaults to xlang mode with
+compatible schema evolution; examples set `xlang=True` explicitly so the mode choice is visible.
 
 ## Basic Object Serialization
 
@@ -28,10 +29,9 @@ Serialize and deserialize Python objects with a simple API:
 ```python
 import pyfory
 
-# Create Fory instance
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 
-# Serialize any Python object
+# Serialize xlang-compatible values
 data = fory.dumps({"name": "Alice", "age": 30, "scores": [95, 87, 92]})
 
 # Deserialize back to Python object
@@ -43,7 +43,7 @@ print(obj)  # {'name': 'Alice', 'age': 30, 'scores': [95, 87, 92]}
 
 ## Custom Class Serialization
 
-Fory automatically handles dataclasses and custom types:
+Use dataclasses and type annotations for stable xlang payloads:
 
 ```python
 import pyfory
@@ -53,13 +53,12 @@ from typing import List, Dict
 @dataclass
 class Person:
     name: str
-    age: int
-    scores: List[int]
+    age: pyfory.Int32
+    scores: List[pyfory.Int32]
     metadata: Dict[str, str]
 
-# Python mode - supports all Python types including dataclasses
-fory = pyfory.Fory(xlang=False, ref=True)
-fory.register(Person)
+fory = pyfory.Fory(xlang=True, ref=True)
+fory.register(Person, typename="example.Person")
 person = Person("Bob", 25, [88, 92, 85], {"team": "engineering"})
 data = fory.serialize(person)
 result = fory.deserialize(data)
@@ -68,56 +67,23 @@ print(result)  # Person(name='Bob', age=25, ...)
 
 ## Reference Tracking & Circular References
 
-Handle shared references and circular dependencies safely:
+Handle repeated references safely when the payload uses xlang-compatible types:
 
 ```python
 import pyfory
 
-f = pyfory.Fory(ref=True)  # Enable reference tracking
+f = pyfory.Fory(xlang=True, ref=True)
 
-# Handle circular references safely
-class Node:
-    def __init__(self, value):
-        self.value = value
-        self.children = []
-        self.parent = None
+shared = ["shared"]
+value = [shared, shared]
 
-root = Node("root")
-child = Node("child")
-child.parent = root  # Circular reference
-root.children.append(child)
-
-# Serializes without infinite recursion
-data = f.serialize(root)
+data = f.serialize(value)
 result = f.deserialize(data)
-assert result.children[0].parent is result  # Reference preserved
+assert result[0] is result[1]
 ```
 
-## API Reference
-
-### Serialization Methods
-
-```python
-# Serialize to bytes
-data: bytes = fory.serialize(obj)
-data: bytes = fory.dumps(obj)  # Alias
-
-# Deserialize from bytes
-obj = fory.deserialize(data)
-obj = fory.loads(data)  # Alias
-```
-
-### With Out-of-Band Buffers
-
-```python
-# Serialize with buffer callback
-buffer_objects = []
-data = fory.serialize(obj, buffer_callback=buffer_objects.append)
-
-# Deserialize with buffers
-buffers = [obj.getbuffer() for obj in buffer_objects]
-obj = fory.deserialize(data, buffers=buffers)
-```
+For arbitrary Python object graphs, local classes, functions, and methods, use
+[Python Native Mode](python-native.md).
 
 ## Performance Tips
 
@@ -128,13 +94,13 @@ obj = fory.deserialize(data, buffers=buffers)
 
 ```python
 # Good: Reuse instance
-fory = pyfory.Fory()
+fory = pyfory.Fory(xlang=True)
 for obj in objects:
     data = fory.dumps(obj)
 
 # Bad: Create new instance each time
 for obj in objects:
-    fory = pyfory.Fory()  # Wasteful!
+    fory = pyfory.Fory(xlang=True)  # Wasteful!
     data = fory.dumps(obj)
 ```
 
@@ -143,3 +109,4 @@ for obj in objects:
 - [Configuration](configuration.md) - Fory parameters
 - [Type Registration](type-registration.md) - Registration patterns
 - [Python Native Mode](python-native.md) - Functions and lambdas
+- [Out-of-Band Serialization](out-of-band.md) - Buffer callback APIs

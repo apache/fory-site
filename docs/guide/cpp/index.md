@@ -21,17 +21,17 @@ license: |
 
 **Apache Fory™** is a blazing fast multi-language serialization framework powered by **JIT compilation** and **zero-copy** techniques, providing up to **ultra-fast performance** while maintaining ease of use and safety.
 
-The C++ implementation provides high-performance serialization with compile-time type safety using modern C++17 features and template metaprogramming.
+The C++ implementation provides high-performance serialization with compile-time type safety using modern C++17 features and template metaprogramming. It supports both xlang mode for cross-language payloads and native mode for C++-only payloads.
 
 ## Why Apache Fory™ C++?
 
-- **🔥 Blazingly Fast**: Fast serialization and optimized binary protocols
-- **🌍 Cross-Language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
-- **🎯 Type-Safe**: Compile-time type checking with macro-based struct registration
-- **🔄 Reference Tracking**: Automatic tracking of shared and circular references
-- **📦 Schema Evolution**: Compatible mode for independent schema changes
-- **⚡ Two Formats**: Object graph serialization and zero-copy row-based format
-- **🧵 Thread Safety**: Both single-threaded (fastest) and thread-safe variants
+- **Fast binary encoding**: Fast serialization and optimized binary protocols
+- **Cross-language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
+- **Type-safe**: Compile-time type checking with macro-based struct registration
+- **Reference tracking**: Automatic tracking of shared and circular references
+- **Schema evolution**: Compatible mode for independent schema changes
+- **Two formats**: Object graph serialization and zero-copy row-based format
+- **Thread safety**: Both single-threaded and thread-safe variants
 
 ## Installation
 
@@ -155,9 +155,9 @@ struct Person {
 FORY_STRUCT(Person, name, age, hobbies);
 
 int main() {
-  // Create a Fory instance
+  // Create an xlang Fory instance
   auto fory = Fory::builder()
-      .xlang(true).compatible(true)          // Enable cross-language mode
+      .xlang(true)
       .track_ref(false)     // Disable reference tracking for simple types
       .build();
 
@@ -206,6 +206,14 @@ struct Derived : Base {
 };
 ```
 
+## Xlang Mode And Native Mode
+
+Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default C++ wire mode, and C++ examples that use it set `.xlang(true)` explicitly so the mode choice is visible.
+
+Use native mode for C++-only traffic. Native mode is selected with `.xlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps C++ object serialization on the C++ runtime path. It is optimized for C++ types and avoids portable xlang type-mapping constraints when the payload never leaves C++.
+
+See [Cross-Language Serialization](cross-language.md) for C++ xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode builder options.
+
 ## Thread Safety
 
 Apache Fory™ C++ provides two variants for different threading needs:
@@ -214,18 +222,14 @@ Apache Fory™ C++ provides two variants for different threading needs:
 
 ```cpp
 // Single-threaded Fory - fastest, NOT thread-safe
-auto fory = Fory::builder()
-    .xlang(true).compatible(true)
-    .build();
+auto fory = Fory::builder().xlang(true).build();
 ```
 
 ### Thread-Safe
 
 ```cpp
 // Thread-safe Fory - uses context pools
-auto fory = Fory::builder()
-    .xlang(true).compatible(true)
-    .build_thread_safe();
+auto fory = Fory::builder().xlang(true).build_thread_safe();
 
 // Can be used from multiple threads safely
 std::thread t1([&]() {
@@ -258,9 +262,9 @@ std::thread t2([&]() {
 
 - [Configuration](configuration.md) - Builder options and modes
 - [Basic Serialization](basic-serialization.md) - Object graph serialization
+- [Cross-Language](cross-language.md) - xlang mode and interoperability
+- [Schema Metadata](schema-metadata.md) - Field-level metadata (nullable, ref tracking)
 - [Schema Evolution](schema-evolution.md) - Compatible mode and schema changes
 - [Type Registration](type-registration.md) - Registering types
-- [Field Configuration](field-configuration.md) - Field-level metadata (nullable, ref tracking)
 - [Supported Types](supported-types.md) - All supported types
-- [Cross-Language](cross-language.md) - XLANG mode
 - [Row Format](row-format.md) - Zero-copy row-based format

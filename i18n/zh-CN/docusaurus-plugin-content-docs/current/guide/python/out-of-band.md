@@ -1,6 +1,6 @@
 ---
-title: 带外序列化
-sidebar_position: 7
+title: Out-of-Band Serialization
+sidebar_position: 9
 id: out_of_band
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,18 +19,18 @@ license: |
   limitations under the License.
 ---
 
-Fory 支持 pickle5 兼容的带外缓冲区序列化，用于高效零拷贝处理大型数据结构。
+Fory supports pickle5-compatible out-of-band buffer serialization for efficient zero-copy handling of large data structures.
 
-## 概述
+## Overview
 
-带外序列化将元数据与实际数据缓冲区分离，允许：
+Out-of-band serialization separates metadata from the actual data buffers, allowing for:
 
-- **零拷贝传输**：使用 `memoryview` 通过网络或 IPC 发送数据时
-- **提高性能**：用于大型数据集
-- **Pickle5 兼容性**：使用 `pickle.PickleBuffer`
-- **灵活的流支持**：写入任何可写对象（文件、BytesIO、套接字等）
+- **Zero-copy transfers** when sending data over networks or IPC using `memoryview`
+- **Improved performance** for large datasets
+- **Pickle5 compatibility** using `pickle.PickleBuffer`
+- **Flexible stream support** - write to any writable object (files, BytesIO, sockets, etc.)
 
-## 基础带外序列化
+## Basic Out-of-Band Serialization
 
 ```python
 import pyfory
@@ -38,25 +38,25 @@ import numpy as np
 
 fory = pyfory.Fory(xlang=False, ref=False, strict=False)
 
-# 大型 numpy 数组
+# Large numpy array
 array = np.arange(10000, dtype=np.float64)
 
-# 使用带外缓冲区序列化
+# Serialize with out-of-band buffers
 buffer_objects = []
 serialized_data = fory.serialize(array, buffer_callback=buffer_objects.append)
 
-# 将缓冲区对象转换为 memoryview 以进行零拷贝传输
-# 对于连续缓冲区（bytes、numpy 数组），这是零拷贝
-# 对于非连续数据，可能会创建副本以确保连续性
+# Convert buffer objects to memoryview for zero-copy transmission
+# For contiguous buffers (bytes, numpy arrays), this is zero-copy
+# For non-contiguous data, a copy may be created to ensure contiguity
 buffers = [obj.getbuffer() for obj in buffer_objects]
 
-# 使用带外缓冲区反序列化（接受 memoryview、bytes 或 Buffer）
+# Deserialize with out-of-band buffers (accepts memoryview, bytes, or Buffer)
 deserialized_array = fory.deserialize(serialized_data, buffers=buffers)
 
 assert np.array_equal(array, deserialized_array)
 ```
 
-## 使用 Pandas DataFrame 的带外序列化
+## Out-of-Band with Pandas DataFrames
 
 ```python
 import pyfory
@@ -65,27 +65,27 @@ import numpy as np
 
 fory = pyfory.Fory(xlang=False, ref=False, strict=False)
 
-# 创建带数值列的 DataFrame
+# Create a DataFrame with numeric columns
 df = pd.DataFrame({
     'a': np.arange(1000, dtype=np.float64),
     'b': np.arange(1000, dtype=np.int64),
     'c': ['text'] * 1000
 })
 
-# 使用带外缓冲区序列化
+# Serialize with out-of-band buffers
 buffer_objects = []
 serialized_data = fory.serialize(df, buffer_callback=buffer_objects.append)
 buffers = [obj.getbuffer() for obj in buffer_objects]
 
-# 反序列化
+# Deserialize
 deserialized_df = fory.deserialize(serialized_data, buffers=buffers)
 
 assert df.equals(deserialized_df)
 ```
 
-## 选择性带外序列化
+## Selective Out-of-Band Serialization
 
-通过提供回调来控制哪些缓冲区带外传输，该回调返回 `True` 保持数据内联或返回 `False` 带外发送：
+Control which buffers go out-of-band by providing a callback that returns `True` to keep data in-band or `False` to send it out-of-band:
 
 ```python
 import pyfory
@@ -103,20 +103,20 @@ counter = 0
 def selective_callback(buffer_object):
     global counter
     counter += 1
-    # 只有偶数编号的缓冲区带外发送
+    # Only send even-numbered buffers out-of-band
     if counter % 2 == 0:
         buffer_objects.append(buffer_object)
-        return False  # 带外
-    return True  # 内联
+        return False  # Out-of-band
+    return True  # In-band
 
 serialized = fory.serialize(data, buffer_callback=selective_callback)
 buffers = [obj.getbuffer() for obj in buffer_objects]
 deserialized = fory.deserialize(serialized, buffers=buffers)
 ```
 
-## Pickle5 兼容性
+## Pickle5 Compatibility
 
-Fory 的带外序列化完全兼容 pickle 协议 5：
+Fory's out-of-band serialization is fully compatible with pickle protocol 5:
 
 ```python
 import pyfory
@@ -124,23 +124,23 @@ import pickle
 
 fory = pyfory.Fory(xlang=False, ref=False, strict=False)
 
-# 自动支持 PickleBuffer 对象
+# PickleBuffer objects are automatically supported
 data = b"Large binary data"
 pickle_buffer = pickle.PickleBuffer(data)
 
-# 使用缓冲区回调序列化以进行带外处理
+# Serialize with buffer callback for out-of-band handling
 buffer_objects = []
 serialized = fory.serialize(pickle_buffer, buffer_callback=buffer_objects.append)
 buffers = [obj.getbuffer() for obj in buffer_objects]
 
-# 使用缓冲区反序列化
+# Deserialize with buffers
 deserialized = fory.deserialize(serialized, buffers=buffers)
 assert bytes(deserialized.raw()) == data
 ```
 
-## 将缓冲区写入不同的流
+## Writing Buffers to Different Streams
 
-`BufferObject.write_to()` 方法接受任何可写流对象：
+The `BufferObject.write_to()` method accepts any writable stream object:
 
 ```python
 import pyfory
@@ -151,29 +151,29 @@ fory = pyfory.Fory(xlang=False, ref=False, strict=False)
 
 array = np.arange(1000, dtype=np.float64)
 
-# 收集带外缓冲区
+# Collect out-of-band buffers
 buffer_objects = []
 serialized = fory.serialize(array, buffer_callback=buffer_objects.append)
 
-# 写入不同的流类型
+# Write to different stream types
 for buffer_obj in buffer_objects:
-    # 写入 BytesIO（内存流）
+    # Write to BytesIO (in-memory stream)
     bytes_stream = io.BytesIO()
     buffer_obj.write_to(bytes_stream)
 
-    # 写入文件
+    # Write to file
     with open('/tmp/buffer_data.bin', 'wb') as f:
         buffer_obj.write_to(f)
 
-    # 获取零拷贝 memoryview（用于连续缓冲区）
+    # Get zero-copy memoryview (for contiguous buffers)
     mv = buffer_obj.getbuffer()
     assert isinstance(mv, memoryview)
 ```
 
-**注意**：对于连续内存缓冲区（如 bytes、numpy 数组），`getbuffer()` 返回零拷贝 `memoryview`。对于非连续数据，可能会创建副本以确保连续性。
+**Note**: For contiguous memory buffers (like bytes, numpy arrays), `getbuffer()` returns a zero-copy `memoryview`. For non-contiguous data, a copy may be created to ensure contiguity.
 
-## 相关主题
+## Related Topics
 
-- [NumPy 集成](numpy-integration.md) - NumPy 数组序列化
-- [基础序列化](basic-serialization.md) - 标准序列化
-- [配置](configuration.md) - Fory 参数
+- [NumPy Integration](numpy-integration.md) - NumPy array serialization
+- [Basic Serialization](basic-serialization.md) - Standard serialization
+- [Configuration](configuration.md) - Fory parameters

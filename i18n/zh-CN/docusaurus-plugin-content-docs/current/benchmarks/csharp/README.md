@@ -1,8 +1,8 @@
-# C# 基准性能报告
+# C# Benchmark Performance Report
 
-_生成于 2026-03-11 02:14:01_
+_Generated on 2026-05-08 17:54:45_
 
-## 如何生成本报告
+## How to Generate This Report
 
 ```bash
 cd benchmarks/csharp
@@ -10,120 +10,80 @@ dotnet run -c Release --project ./Fory.CSharpBenchmark.csproj -- --output build/
 python3 benchmark_report.py --json-file build/benchmark_results.json --output-dir report
 ```
 
-## 硬件与操作系统信息
+## Benchmark Plot
 
-| 键                                 | 值                                                                                                                           |
+The plot shows throughput (ops/sec); higher is better.
+
+![Throughput](throughput.png)
+
+## Hardware & OS Info
+
+| Key                                | Value                                                                                                                        |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 操作系统                           | Darwin 24.6.0 Darwin Kernel Version 24.6.0: Wed Oct 15 21:12:15 PDT 2025; root:xnu-11417.140.69.703.14~1/RELEASE_ARM64_T6041 |
-| 系统架构                           | Arm64                                                                                                                        |
-| 机器架构                           | Arm64                                                                                                                        |
-| 运行时版本                         | 8.0.24                                                                                                                       |
-| 基准日期（UTC）                    | 2026-03-10T18:14:00.0852460Z                                                                                                 |
-| 预热秒数                           | 1                                                                                                                            |
-| 持续秒数                           | 3                                                                                                                            |
-| CPU 逻辑核心数（基准采集）         | 12                                                                                                                           |
-| CPU 核心数（物理）                 | 12                                                                                                                           |
-| CPU 核心数（逻辑）                 | 12                                                                                                                           |
-| 总内存（GB）                       | 48.0                                                                                                                         |
+| OS                                 | Darwin 24.6.0 Darwin Kernel Version 24.6.0: Wed Oct 15 21:12:15 PDT 2025; root:xnu-11417.140.69.703.14~1/RELEASE_ARM64_T6041 |
+| OS Architecture                    | Arm64                                                                                                                        |
+| Machine                            | Arm64                                                                                                                        |
+| Runtime Version                    | 8.0.24                                                                                                                       |
+| Benchmark Date (UTC)               | 2026-05-08T08:17:48.7871870Z                                                                                                 |
+| Warmup Seconds                     | 1                                                                                                                            |
+| Duration Seconds                   | 3                                                                                                                            |
+| CPU Logical Cores (from benchmark) | 12                                                                                                                           |
+| CPU Cores (Physical)               | 12                                                                                                                           |
+| CPU Cores (Logical)                | 12                                                                                                                           |
+| Total RAM (GB)                     | 48.0                                                                                                                         |
 
-## 基准覆盖范围
+## Benchmark Coverage
 
-| 键                  | 值                                                                     |
+| Key                 | Value                                                                  |
 | ------------------- | ---------------------------------------------------------------------- |
-| 输入 JSON 中的用例  | 36 / 36                                                                |
-| 序列化器            | fory, msgpack, protobuf                                                |
-| 数据类型            | struct, sample, mediacontent, structlist, samplelist, mediacontentlist |
-| 操作                | serialize, deserialize                                                 |
+| Cases in input JSON | 36 / 36                                                                |
+| Serializers         | fory, msgpack, protobuf                                                |
+| Datatypes           | struct, sample, mediacontent, structlist, samplelist, mediacontentlist |
+| Operations          | serialize, deserialize                                                 |
 
-## 基准图表
+## Benchmark Results
 
-下列各类图表均展示吞吐量（ops/sec）。
+### Timing Results (nanoseconds)
 
-### 总吞吐量
+| Datatype          | Operation   | fory (ns) | protobuf (ns) | msgpack (ns) | Fastest |
+| ----------------- | ----------- | --------- | ------------- | ------------ | ------- |
+| NumericStruct     | Serialize   | 50.3      | 170.8         | 107.8        | fory    |
+| NumericStruct     | Deserialize | 82.4      | 252.0         | 143.4        | fory    |
+| Sample            | Serialize   | 263.2     | 607.1         | 377.1        | fory    |
+| Sample            | Deserialize | 199.4     | 1191.7        | 785.6        | fory    |
+| MediaContent      | Serialize   | 379.7     | 509.6         | 417.6        | fory    |
+| MediaContent      | Deserialize | 450.3     | 846.6         | 791.4        | fory    |
+| NumericStructList | Serialize   | 183.7     | 641.8         | 447.8        | fory    |
+| NumericStructList | Deserialize | 288.3     | 974.3         | 702.1        | fory    |
+| SampleList        | Serialize   | 1205.7    | 3559.1        | 1864.1       | fory    |
+| SampleList        | Deserialize | 895.1     | 5710.3        | 2757.4       | fory    |
+| MediaContentList  | Serialize   | 1495.4    | 2473.6        | 1812.4       | fory    |
+| MediaContentList  | Deserialize | 1946.7    | 3789.3        | 3778.4       | fory    |
 
-<p align="center">
-<img src="throughput.png" width="90%" />
-</p>
+### Throughput Results (ops/sec)
 
-### `MediaContent` 基准
+| Datatype          | Operation   | fory TPS   | protobuf TPS | msgpack TPS | Fastest |
+| ----------------- | ----------- | ---------- | ------------ | ----------- | ------- |
+| NumericStruct     | Serialize   | 19,881,457 | 5,853,473    | 9,276,378   | fory    |
+| NumericStruct     | Deserialize | 12,137,374 | 3,968,585    | 6,973,504   | fory    |
+| Sample            | Serialize   | 3,799,418  | 1,647,119    | 2,652,142   | fory    |
+| Sample            | Deserialize | 5,016,006  | 839,129      | 1,272,975   | fory    |
+| MediaContent      | Serialize   | 2,633,704  | 1,962,428    | 2,394,549   | fory    |
+| MediaContent      | Deserialize | 2,220,537  | 1,181,222    | 1,263,568   | fory    |
+| NumericStructList | Serialize   | 5,445,002  | 1,558,156    | 2,232,996   | fory    |
+| NumericStructList | Deserialize | 3,469,207  | 1,026,402    | 1,424,322   | fory    |
+| SampleList        | Serialize   | 829,415    | 280,973      | 536,448     | fory    |
+| SampleList        | Deserialize | 1,117,133  | 175,122      | 362,663     | fory    |
+| MediaContentList  | Serialize   | 668,732    | 404,272      | 551,755     | fory    |
+| MediaContentList  | Deserialize | 513,699    | 263,899      | 264,664     | fory    |
 
-<p align="center">
-<img src="mediacontent.png" width="90%" />
-</p>
+### Serialized Data Sizes (bytes)
 
-### `MediaContentList` 基准
-
-<p align="center">
-<img src="mediacontentlist.png" width="90%" />
-</p>
-
-### Sample
-
-<p align="center">
-<img src="sample.png" width="90%" />
-</p>
-
-### Samplelist
-
-<p align="center">
-<img src="samplelist.png" width="90%" />
-</p>
-
-### Struct
-
-<p align="center">
-<img src="struct.png" width="90%" />
-</p>
-
-### Structlist
-
-<p align="center">
-<img src="structlist.png" width="90%" />
-</p>
-
-## 基准结果
-
-### 延迟结果（纳秒）
-
-| 数据类型         | 操作        | fory (ns) | protobuf (ns) | msgpack (ns) | 最快    |
-| ---------------- | ----------- | --------- | ------------- | ------------ | ------- |
-| Struct           | Serialize   | 39.2      | 121.5         | 66.0         | fory    |
-| Struct           | Deserialize | 58.3      | 180.1         | 102.6        | fory    |
-| Sample           | Serialize   | 269.2     | 562.6         | 339.6        | fory    |
-| Sample           | Deserialize | 175.6     | 1084.9        | 531.8        | fory    |
-| MediaContent     | Serialize   | 306.3     | 434.7         | 351.5        | fory    |
-| MediaContent     | Deserialize | 379.4     | 718.8         | 676.9        | fory    |
-| StructList       | Serialize   | 136.1     | 468.5         | 266.9        | fory    |
-| StructList       | Deserialize | 221.1     | 687.0         | 488.5        | fory    |
-| SampleList       | Serialize   | 1198.9    | 2811.9        | 1635.7       | fory    |
-| SampleList       | Deserialize | 791.5     | 5174.5        | 2629.2       | fory    |
-| MediaContentList | Serialize   | 1393.9    | 2199.4        | 1710.9       | fory    |
-| MediaContentList | Deserialize | 1719.5    | 3373.1        | 3401.2       | fory    |
-
-### 吞吐结果（ops/sec）
-
-| 数据类型         | 操作        | fory TPS   | protobuf TPS | msgpack TPS | 最快    |
-| ---------------- | ----------- | ---------- | ------------ | ----------- | ------- |
-| Struct           | Serialize   | 25,535,535 | 8,233,006    | 15,153,903  | fory    |
-| Struct           | Deserialize | 17,164,793 | 5,553,220    | 9,745,096   | fory    |
-| Sample           | Serialize   | 3,715,302  | 1,777,405    | 2,944,981   | fory    |
-| Sample           | Deserialize | 5,696,108  | 921,760      | 1,880,420   | fory    |
-| MediaContent     | Serialize   | 3,264,890  | 2,300,297    | 2,845,038   | fory    |
-| MediaContent     | Deserialize | 2,635,449  | 1,391,138    | 1,477,346   | fory    |
-| StructList       | Serialize   | 7,347,503  | 2,134,576    | 3,746,866   | fory    |
-| StructList       | Deserialize | 4,522,114  | 1,455,557    | 2,046,988   | fory    |
-| SampleList       | Serialize   | 834,086    | 355,633      | 611,365     | fory    |
-| SampleList       | Deserialize | 1,263,450  | 193,254      | 380,338     | fory    |
-| MediaContentList | Serialize   | 717,408    | 454,670      | 584,497     | fory    |
-| MediaContentList | Deserialize | 581,554    | 296,459      | 294,015     | fory    |
-
-### 序列化数据大小（字节）
-
-| 数据类型         | fory | protobuf | msgpack |
-| ---------------- | ---- | -------- | ------- |
-| Struct           | 58   | 61       | 55      |
-| Sample           | 446  | 460      | 562     |
-| MediaContent     | 365  | 307      | 479     |
-| StructList       | 184  | 315      | 284     |
-| SampleList       | 1980 | 2315     | 2819    |
-| MediaContentList | 1535 | 1550     | 2404    |
+| Datatype          | fory | protobuf | msgpack |
+| ----------------- | ---- | -------- | ------- |
+| NumericStruct     | 78   | 93       | 87      |
+| Sample            | 445  | 460      | 562     |
+| MediaContent      | 362  | 307      | 479     |
+| NumericStructList | 255  | 475      | 444     |
+| SampleList        | 1978 | 2315     | 2819    |
+| MediaContentList  | 1531 | 1550     | 2404    |

@@ -1,7 +1,7 @@
 ---
-title: 故障排查
-sidebar_position: 10
-id: dart_troubleshooting
+title: Troubleshooting
+sidebar_position: 11
+id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,68 +19,110 @@ license: |
   limitations under the License.
 ---
 
-本页汇总 Dart 运行时中常见的问题及其修复方式。
+This page covers common Dart runtime issues and fixes.
 
 ## `Only xlang payloads are supported by the Dart runtime.`
 
-写端发送的是 native-mode（非 xlang）载荷。请确保每个服务都走跨语言兼容路径：
+The writer is sending a native-mode payload. Make sure every peer writes the xlang wire format:
 
-- **Java**：在 Fory builder 上添加 `.withLanguage(Language.XLANG)`。
-- **Go**：在 Fory 选项中使用 `WithXlang(true)`。
-- **其他运行时**：查看各自文档，确认如何启用跨语言模式。
+- **Java**: configure the peer runtime for xlang mode instead of native mode.
+- **Go**: configure the peer runtime for xlang mode.
+- **Other runtimes**: check their respective guides for xlang mode.
 
 ## `Type ... is not registered.`
 
-Fory 不知道如何序列化或反序列化这个类型。可按以下方式修复：
+Fory does not know how to serialize or deserialize this type. Fix it by:
 
-1. 如果还没生成代码，先运行：`dart run build_runner build --delete-conflicting-outputs`
-2. 在调用 `serialize` 或 `deserialize` **之前**，先调用生成的 `register` 函数，或者 `registerSerializer`
-3. 注册消息中可能出现的**所有**类型，而不仅仅是根类型。例如，如果 `Order` 包含 `Address`，那两者都要注册
+1. Running code generation if you haven't: `dart run build_runner build --delete-conflicting-outputs`
+2. Calling the generated `register` function (or `registerSerializer`) for the type **before** calling `serialize` or `deserialize`.
+3. Registering **all** types that appear in a message, not just the root type. For example, if `Order` contains an `Address`, register both.
 
-## 生成的 part 文件缺失或已过期
+## Generated part file is missing or stale
 
-重新生成代码：
+Regenerate code:
 
 ```bash
 cd dart/packages/fory
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-如果你移动了文件或重命名了类型，请在重新执行分析或测试前先重新构建。
+If you moved files or renamed types, rebuild before re-running analysis or tests.
 
 ## `Deserialized value has type ..., expected ...`
 
-载荷描述的类型与 `deserialize<T>` 中的 `T` 不一致。常见原因包括：
+The payload describes a different type than `T` in `deserialize<T>`. Common causes:
 
-- 写端注册该类型时使用的 ID 或名称，与读端不一致
-- 载荷来自另一条代码路径，根对象类型不同
-- 你正在反序列化异构容器。应先按 `Object?` 或 `List<Object?>` 解码，再做类型转换
+- You registered the type on the writing side with a different ID or name than on the reading side.
+- The payload was produced by a different code path that serializes a different root object.
+- You are trying to deserialize a heterogeneous container — decode it as `Object?` or `List<Object?>` first, then cast.
 
-## 反序列化后对象不再是同一个实例
+## Objects aren't the same instance after deserialization
 
-默认情况下，Fory 不会跟踪对象标识，因此两个字段如果指向同一个对象，round trip 后会变成两个独立副本。
+Fory does not track object identity by default, so two fields pointing to the same object will produce two independent copies after a round trip.
 
-如果需要保留对象标识：
+To preserve identity:
 
-- 对 `@ForyStruct` 内部字段，在对应字段上加 `@ForyField(ref: true)`
-- 对顶层集合，调用 `fory.serialize(...)` 时传入 `trackRef: true`
-- 在自定义序列化器中，使用 `context.writeRef` / `context.readRef`，并在读取嵌套字段之前先调用 `context.reference(obj)`
+- For fields inside a `@ForyStruct`, add `@ForyField(ref: true)` to those fields.
+- For a top-level collection, pass `trackRef: true` to `fory.serialize(...)`.
+- In a custom serializer, use `context.writeRef` / `context.readRef` and call `context.reference(obj)` before reading nested fields.
 
-## 跨语言字段不匹配（数据缺失或值错误）
+## Cross-language field mismatch (missing data or wrong values)
 
-典型症状：往返另一种语言后，字段变成默认值，或者类型错误。
+Symptoms: fields come back as default values or wrong types after a round trip to another language.
 
-检查清单：
+Checklist:
 
-1. 双方使用相同的注册身份，即相同数字 ID，**或**相同的 `namespace + typeName`
-2. 在第一份载荷发送前，就已经分配了稳定 `@ForyField(id: ...)`
-3. 数字宽度兼容。当对端字段是 Java `int`、Go `int32` 或 C# `int` 时，在 Dart 端使用 `Int32`
-4. 日期时间字段使用 `Timestamp` / `LocalDate`，而不是原始 `DateTime`
-5. 如果用到 Schema 演进，则**双方**都要开启 `compatible: true`
+1. Same registration identity on both sides (same numeric ID **or** same `namespace + typeName`).
+2. Stable `@ForyField(id: ...)` assigned before the first payload was produced.
+3. Compatible numeric widths — use `@ForyField(type: Int32Type())` in Dart when the peer field is `int` (Java), `int32` (Go), or `int` (C#).
+4. `Timestamp` / `LocalDate` instead of raw `DateTime` for date/time fields.
+5. Compatible schema evolution on both sides. Dart enables it by default; make sure peers have not explicitly selected schema-consistent mode.
 
-## 本地运行测试
+## Int64 or Uint64 values fail on web
 
-主 Dart 包：
+On Dart VM builds, Dart `int` can represent signed 64-bit values. On Dart web
+builds, Dart `int` values are backed by JavaScript numbers and are only precise
+inside the JS-safe integer range:
+
+```text
+-9007199254740991 <= value <= 9007199254740991
+```
+
+If a generated serializer writes an `int64` field declared as Dart `int`,
+web builds reject values outside that range instead of silently writing
+corrupted bytes. To exchange full signed 64-bit values on web, declare the
+field as Fory's `Int64` wrapper:
+
+```dart
+@ForyStruct()
+class LedgerEntry {
+  LedgerEntry();
+
+  Int64 sequence = Int64(0); // full signed 64-bit range on VM and web
+}
+```
+
+For unsigned 64-bit values, prefer `Uint64` rather than Dart `int`. Dart `int`
+cannot represent the full `uint64` range on either VM or web:
+
+```dart
+@ForyStruct()
+class FileBlock {
+  FileBlock();
+
+  Uint64 offset = Uint64(0); // full unsigned 64-bit range
+}
+```
+
+`@ForyField(type: Int64Type(...))` changes the wire encoding for a Dart `int`
+field, but it does not remove the web integer precision limit. Use `Int64` for
+full-range signed values and `Uint64` for full-range unsigned values. See
+[Web Platform Support](web-platform-support.md) for the full browser support
+matrix and runtime guidance.
+
+## Running Tests Locally
+
+Main Dart package:
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
@@ -88,7 +130,7 @@ dart analyze
 dart test
 ```
 
-集成测试包：
+Integration test package:
 
 ```bash
 cd dart/packages/fory-test
@@ -96,8 +138,9 @@ dart run build_runner build --delete-conflicting-outputs
 dart test
 ```
 
-## 相关主题
+## Related Topics
 
-- [跨语言](cross-language.md)
-- [代码生成](code-generation.md)
-- [自定义序列化器](custom-serializers.md)
+- [Cross-Language](cross-language.md)
+- [Code Generation](code-generation.md)
+- [Custom Serializers](custom-serializers.md)
+- [Web Platform Support](web-platform-support.md)

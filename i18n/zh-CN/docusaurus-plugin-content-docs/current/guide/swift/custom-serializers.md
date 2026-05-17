@@ -1,6 +1,6 @@
 ---
-title: 自定义序列化器
-sidebar_position: 4
+title: Custom Serializers
+sidebar_position: 9
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,16 +19,16 @@ license: |
   limitations under the License.
 ---
 
-对于不适合使用 `@ForyObject` 的类型，或需要特殊编码逻辑的场景，可以手动实现 `Serializer`。
+For types that cannot or should not use Fory model macros, implement `Serializer` manually.
 
-## 适用场景
+## When to Use Custom Serializers
 
-- 外部类型需要严格的编码兼容性
-- 需要更紧凑或特殊的编码布局
-- 旧载荷迁移路径
-- 性能敏感的热点路径
+- External types with strict wire compatibility requirements
+- Specialized compact encodings
+- Existing payload adaptation paths
+- Highly tuned hot-path serialization
 
-## 实现 `Serializer`
+## Implementing `Serializer`
 
 ```swift
 import Foundation
@@ -53,14 +53,14 @@ struct UUIDBox: Serializer, Equatable {
     static func foryReadData(_ context: ReadContext) throws -> UUIDBox {
         let raw = try String.foryReadData(context)
         guard let uuid = UUID(uuidString: raw) else {
-            throw ForyError.invalidData("invalid UUID string: \\(raw)")
+            throw ForyError.invalidData("invalid UUID string: \(raw)")
         }
         return UUIDBox(value: uuid)
     }
 }
 ```
 
-## 注册并使用
+## Register and Use
 
 ```swift
 let fory = Fory()
@@ -73,12 +73,12 @@ let output: UUIDBox = try fory.deserialize(data)
 assert(input == output)
 ```
 
-## 如何选择 `staticTypeId`
+## Choosing `staticTypeId`
 
-手动实现的自定义类型，需要让 `staticTypeId` 与实际编码形态匹配。
+For manually implemented custom types, use `staticTypeId` that matches the wire kind you are implementing.
 
-常见选择：
+Typical choices:
 
-- `.structType`：常规结构化对象
-- `.enumType` / `.typedUnion`：枚举或联合类型
-- `.ext`：扩展或自定义类型
+- `.structType`: regular structured object
+- `.enumType` / `.typedUnion`: enum-like values
+- `.ext`: extension/custom kind

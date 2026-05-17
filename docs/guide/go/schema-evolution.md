@@ -19,19 +19,26 @@ license: |
   limitations under the License.
 ---
 
-Schema evolution allows your data structures to change over time while maintaining compatibility with previously serialized data. Fory Go supports this through compatible mode.
+Schema evolution allows your data structures to change over time while maintaining compatibility with previously serialized data. Fory Go supports this through compatible mode. Xlang mode uses compatible schema evolution by default; native mode uses schema-consistent payloads by default and enables compatible mode explicitly.
 
-## Enabling Compatible Mode
+## Compatible Mode Defaults
 
-Enable compatible mode when creating a Fory instance:
+For cross-language and default Go payloads, use the default runtime:
 
 ```go
-f := fory.New(fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
+```
+
+For Go-only native-mode payloads that need schema evolution, enable compatible
+mode explicitly:
+
+```go
+f := fory.New(fory.WithXlang(false), fory.WithCompatible(true))
 ```
 
 ## How It Works
 
-### Without Compatible Mode (Default)
+### Schema-Consistent Native Mode
 
 - Compact serialization without metadata
 - Struct hash is checked during deserialization
@@ -77,7 +84,7 @@ type UserV2 struct {
     Email string  // New field
 }
 
-f := fory.New(fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(UserV1{}, 1)
 
 // Serialize with V1
@@ -85,7 +92,7 @@ userV1 := &UserV1{ID: 1, Name: "Alice"}
 data, _ := f.Serialize(userV1)
 
 // Deserialize with V2
-f2 := fory.New(fory.WithCompatible(true))
+f2 := fory.New(fory.WithXlang(true))
 f2.RegisterStruct(UserV2{}, 1)
 
 var userV2 UserV2
@@ -114,7 +121,7 @@ type ConfigV2 struct {
     // Debug field removed
 }
 
-f := fory.New(fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(ConfigV1{}, 1)
 
 // Serialize with V1
@@ -122,7 +129,7 @@ config := &ConfigV1{Host: "localhost", Port: 8080, Timeout: 30, Debug: true}
 data, _ := f.Serialize(config)
 
 // Deserialize with V2
-f2 := fory.New(fory.WithCompatible(true))
+f2 := fory.New(fory.WithXlang(true))
 f2.RegisterStruct(ConfigV2{}, 1)
 
 var configV2 ConfigV2
@@ -189,8 +196,14 @@ This is treated as removing `UserName` and adding `Username`, resulting in data 
 ### 1. Use Compatible Mode for Persistent Data
 
 ```go
-// For data stored in databases, files, or caches
-f := fory.New(fory.WithCompatible(true))
+// Default xlang payloads already use compatible mode.
+f := fory.New(fory.WithXlang(true))
+```
+
+For Go-only native-mode data stored in databases, files, or caches, enable compatible mode:
+
+```go
+f := fory.New(fory.WithXlang(false), fory.WithCompatible(true))
 ```
 
 ### 2. Provide Default Values
@@ -227,7 +240,7 @@ type MessageV1 struct {
     Content string
 }
 
-f := fory.New(fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(MessageV1{}, 1)
 data, _ := f.Serialize(&MessageV1{ID: 1, Content: "Hello"})
 ```
@@ -241,10 +254,7 @@ public class Message {
     String author;  // New field in Java
 }
 
-Fory fory = Fory.builder()
-    .withXlang(true)
-    .withCompatible(true)
-    .build();
+Fory fory = Fory.builder().withXlang(true).build();
 fory.register(Message.class, 1);
 Message msg = fory.deserialize(data, Message.class);
 // msg.author will be null
@@ -268,7 +278,7 @@ Compatible mode mainly affects serialized size:
 - Cross-service communication
 - Long-lived caches
 
-Use schema consistent mode for:
+Use native schema-consistent mode for:
 
 - In-memory operations
 - Same-version communication
@@ -276,10 +286,10 @@ Use schema consistent mode for:
 
 ## Error Handling
 
-### Hash Mismatch (Schema Consistent Mode)
+### Hash Mismatch (Native Schema-Consistent Mode)
 
 ```go
-f := fory.New()  // Compatible mode disabled
+f := fory.New(fory.WithXlang(false))  // Compatible mode disabled
 
 // Schema changed without compatible mode
 err := f.Deserialize(oldData, &newStruct)
@@ -323,7 +333,7 @@ type ProductV2 struct {
 
 func main() {
     // Serialize with V1
-    f1 := fory.New(fory.WithCompatible(true))
+    f1 := fory.New(fory.WithXlang(true))
     f1.RegisterStruct(ProductV1{}, 1)
 
     product := &ProductV1{ID: 1, Name: "Widget", Price: 9.99}
@@ -331,7 +341,7 @@ func main() {
     fmt.Printf("V1 serialized: %d bytes\n", len(data))
 
     // Deserialize with V2
-    f2 := fory.New(fory.WithCompatible(true))
+    f2 := fory.New(fory.WithXlang(true))
     f2.RegisterStruct(ProductV2{}, 1)
 
     var productV2 ProductV2

@@ -1,6 +1,6 @@
 ---
 title: Type Registration
-sidebar_position: 4
+sidebar_position: 6
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -45,7 +45,7 @@ struct Person {
 FORY_STRUCT(Person, name, age);
 
 int main() {
-  auto fory = Fory::builder().xlang(true).compatible(true).build();
+  auto fory = Fory::builder().xlang(true).build();
 
   // Register with a unique type ID
   fory.register_struct<Person>(100);
@@ -93,12 +93,12 @@ FORY_ENUM(Priority, LOW, MEDIUM, HIGH);
 // FORY_ENUM must be defined at namespace scope.
 
 // Global namespace enum (prefix with ::)
-enum LegacyStatus { UNKNOWN = -1, OK = 0, ERROR = 1 };
-FORY_ENUM(::LegacyStatus, UNKNOWN, OK, ERROR);
+enum SparseStatus { UNKNOWN = -1, OK = 0, ERROR = 1 };
+FORY_ENUM(::SparseStatus, UNKNOWN, OK, ERROR);
 
 // Register after FORY_ENUM
 fory.register_enum<Priority>(1);
-fory.register_enum<LegacyStatus>(2);
+fory.register_enum<SparseStatus>(2);
 ```
 
 **When to use `FORY_ENUM`:**
@@ -112,7 +112,7 @@ fory.register_enum<LegacyStatus>(2);
 For `ThreadSafeFory`, register types before spawning threads:
 
 ```cpp
-auto fory = Fory::builder().xlang(true).compatible(true).build_thread_safe();
+auto fory = Fory::builder().xlang(true).build_thread_safe();
 
 // Register all types first
 fory.register_struct<TypeA>(100);
@@ -137,7 +137,7 @@ For cross-language compatibility, ensure:
 ### Java
 
 ```java
-Fory fory = Fory.builder().withXlang(true).withCompatible(true).build();
+Fory fory = Fory.builder().withXlang(true).build();
 fory.register(Person.class, 100);
 fory.register(Address.class, 101);
 ```
@@ -147,7 +147,7 @@ fory.register(Address.class, 101);
 ```python
 import pyfory
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 fory.register(Person, type_id=100)
 fory.register(Address, type_id=101)
 ```
@@ -155,7 +155,7 @@ fory.register(Address, type_id=101)
 ### C++
 
 ```cpp
-auto fory = Fory::builder().xlang(true).compatible(true).build();
+auto fory = Fory::builder().xlang(true).build();
 fory.register_struct<Person>(100);
 fory.register_struct<Address>(101);
 ```
@@ -164,40 +164,68 @@ fory.register_struct<Address>(101);
 
 Built-in types have pre-assigned type IDs and don't need registration:
 
-| Type ID | Type                 |
-| ------- | -------------------- |
-| 0       | NONE                 |
-| 1       | BOOL                 |
-| 2       | INT8                 |
-| 3       | INT16                |
-| 4       | INT32                |
-| 5       | VAR_INT32            |
-| 6       | INT64                |
-| 7       | VAR_INT64            |
-| 8       | SLI_INT64            |
-| 9       | FLOAT16              |
-| 10      | FLOAT32              |
-| 11      | FLOAT64              |
-| 12      | STRING               |
-| 13      | LIST                 |
-| 14      | MAP                  |
-| 15      | SET                  |
-| 16      | TIMESTAMP            |
-| 17      | DURATION             |
-| 18      | DATE                 |
-| 19      | DECIMAL              |
-| 20      | BINARY               |
-| 21      | ARRAY                |
-| 22      | BOOL_ARRAY           |
-| 23-28   | INT_ARRAY variants   |
-| 29-31   | FLOAT_ARRAY variants |
-| 32      | STRUCT               |
-| 33      | COMPATIBLE_STRUCT    |
-| 34      | NAMED_STRUCT         |
-| 35      | NAMED*COMPATIBLE*... |
-| 36      | EXT                  |
-| 37      | NAMED_EXT            |
-| 63      | UNKNOWN              |
+| Type ID | Type                    |
+| ------- | ----------------------- |
+| 0       | UNKNOWN                 |
+| 1       | BOOL                    |
+| 2       | INT8                    |
+| 3       | INT16                   |
+| 4       | INT32                   |
+| 5       | VARINT32                |
+| 6       | INT64                   |
+| 7       | VARINT64                |
+| 8       | TAGGED_INT64            |
+| 9       | UINT8                   |
+| 10      | UINT16                  |
+| 11      | UINT32                  |
+| 12      | VAR_UINT32              |
+| 13      | UINT64                  |
+| 14      | VAR_UINT64              |
+| 15      | TAGGED_UINT64           |
+| 16      | FLOAT8                  |
+| 17      | FLOAT16                 |
+| 18      | BFLOAT16                |
+| 19      | FLOAT32                 |
+| 20      | FLOAT64                 |
+| 21      | STRING                  |
+| 22      | LIST                    |
+| 23      | SET                     |
+| 24      | MAP                     |
+| 25      | ENUM                    |
+| 26      | NAMED_ENUM              |
+| 27      | STRUCT                  |
+| 28      | COMPATIBLE_STRUCT       |
+| 29      | NAMED_STRUCT            |
+| 30      | NAMED_COMPATIBLE_STRUCT |
+| 31      | EXT                     |
+| 32      | NAMED_EXT               |
+| 33      | UNION                   |
+| 34      | TYPED_UNION             |
+| 35      | NAMED_UNION             |
+| 36      | NONE                    |
+| 37      | DURATION                |
+| 38      | TIMESTAMP               |
+| 39      | DATE                    |
+| 40      | DECIMAL                 |
+| 41      | BINARY                  |
+| 42      | ARRAY                   |
+| 43      | BOOL_ARRAY              |
+| 44      | INT8_ARRAY              |
+| 45      | INT16_ARRAY             |
+| 46      | INT32_ARRAY             |
+| 47      | INT64_ARRAY             |
+| 48      | UINT8_ARRAY             |
+| 49      | UINT16_ARRAY            |
+| 50      | UINT32_ARRAY            |
+| 51      | UINT64_ARRAY            |
+| 52      | FLOAT8_ARRAY            |
+| 53      | FLOAT16_ARRAY           |
+| 54      | BFLOAT16_ARRAY          |
+| 55      | FLOAT32_ARRAY           |
+| 56      | FLOAT64_ARRAY           |
+| 64      | CHAR                    |
+| 65      | CHAR16                  |
+| 66      | CHAR32                  |
 
 ## Error Handling
 

@@ -1,5 +1,5 @@
 ---
-title: Protobuf IDL 支持
+title: Protobuf IDL Support
 sidebar_position: 10
 id: protobuf_idl_support
 license: |
@@ -19,50 +19,55 @@ license: |
   limitations under the License.
 ---
 
-本页说明 Apache Fory 如何处理 Protocol Buffers（`.proto`）schema、protobuf 概念如何映射到 Fory，以及 protobuf 专用 Fory 扩展选项的使用方式。
+This page explains how Apache Fory works with Protocol Buffers (`.proto`) schemas,
+how protobuf concepts map to Fory, and how to use protobuf-only Fory extension options.
 
-## 本页内容
+## What This Page Covers
 
-- 如何在具体场景下选择 protobuf 或 Fory
-- 迁移时需要关注的语法与语义差异
-- `.proto` 文件中支持的 Fory 扩展选项
-- 从 protobuf 迁移到 Fory 的实践路径
+- Choosing protobuf vs Fory for your use case
+- Syntax and semantic differences that matter during adoption
+- Supported Fory extension options in protobuf files
+- Practical transition patterns from protobuf to Fory
 
-## 快速决策指南
+## Quick Decision Guide
 
-| 场景                                                  | 建议格式         |
-| ----------------------------------------------------- | ---------------- |
-| 主要构建 gRPC API，依赖 protobuf 工具链               | Protocol Buffers |
-| 需要极致对象图性能与引用跟踪                          | Fory             |
-| 需要在序列化数据中表达循环/共享引用                   | Fory             |
-| 需要强 unknown-field 语义保证线格式兼容               | Protocol Buffers |
-| 希望直接使用原生 struct/class，而非 protobuf 包装类型 | Fory             |
+| Situation                                                     | Recommended Format |
+| ------------------------------------------------------------- | ------------------ |
+| You are building gRPC APIs and rely on protobuf tooling       | Protocol Buffers   |
+| You need maximum object-graph performance and ref tracking    | Fory               |
+| You need circular/shared references in serialized data        | Fory               |
+| You need strong unknown-field behavior for wire compatibility | Protocol Buffers   |
+| You need native structs/classes instead of protobuf wrappers  | Fory               |
 
-## Protobuf 与 Fory 对比
+## Protobuf vs Fory at a Glance
 
-| 维度      | Protocol Buffers      | Fory                   |
-| --------- | --------------------- | ---------------------- |
-| 主要目标  | RPC/消息契约          | 高性能对象序列化       |
-| 编码模型  | Tag-Length-Value      | Fory 二进制协议        |
-| 引用跟踪  | 非内建                | 一等支持（`ref`）      |
-| 循环引用  | 不支持                | 支持                   |
-| 未知字段  | 保留                  | 不保留                 |
-| 生成类型  | protobuf 专用模型类型 | 语言原生构造           |
-| gRPC 生态 | 原生成熟              | 持续建设中（活跃开发） |
+| Aspect             | Protocol Buffers              | Fory                                  |
+| ------------------ | ----------------------------- | ------------------------------------- |
+| Primary purpose    | RPC/message contracts         | High-performance object serialization |
+| Encoding model     | Tag-length-value              | Fory binary protocol                  |
+| Reference tracking | Not built-in                  | First-class (`ref`)                   |
+| Circular refs      | Not supported                 | Supported                             |
+| Unknown fields     | Preserved                     | Not preserved                         |
+| Generated types    | Protobuf-specific model types | Native language constructs            |
+| gRPC ecosystem     | Native                        | In progress (active development)      |
 
-Fory 的 gRPC 支持仍在持续开发中。当前生产级 gRPC 工作流里，protobuf 仍是更成熟的默认选择。
+Fory gRPC support is under active development. For production gRPC
+workflows today, protobuf remains the mature/default choice.
 
-## 为什么使用 Apache Fory
+## Why Use Apache Fory
 
-- **代码更贴近语言习惯**：Fory IDL 生成的类和结构体可直接作为业务领域对象使用。
-- **序列化性能更高**：在 Fory 基准中，Fory 在对象序列化场景中可显著快于 protobuf。
-- **对象图表达更自然**：共享引用和循环引用是内建能力，无需通过业务层 ID 关联绕过。
+- Idiomatic generated code: Fory IDL generates language-idiomatic classes and
+  structs that can be used directly as domain objects.
+- Faster serialization: In Fory benchmarks, Fory can be around 10x faster than
+  protobuf for object serialization workloads.
+- Better graph modeling: Shared and circular references are first-class features
+  instead of application-level ID-link workarounds.
 
-性能细节请参见 [性能参考](#性能参考)。
+See benchmark details under [Performance References](#performance-references).
 
-## 语法与语义映射
+## Syntax and Semantic Mapping
 
-### Package 与文件级选项
+### Package and File Options
 
 **Protocol Buffers**
 
@@ -79,9 +84,10 @@ option go_package = "example.com/models";
 package example.models;
 ```
 
-Fory 使用统一 package 命名空间做跨语言注册。语言特定的包路径仍可在代码生成阶段单独配置。
+Fory uses one package namespace for cross-language registration. Language-specific
+package placement is still configurable in code generation.
 
-### Message 与 Enum 定义
+### Message and Enum Definitions
 
 **Protocol Buffers**
 
@@ -119,15 +125,16 @@ enum Status [id=102] {
 }
 ```
 
-关键差异：
+Key differences:
 
-- Fory 可直接分配稳定类型 ID（`[id=...]`）。
-- Fory 使用 `list<T>`（`repeated T` 为兼容别名）。
-- 枚举命名更偏向语言习惯，而非 protobuf 前缀风格。
+- Fory can assign stable type IDs directly (`[id=...]`).
+- Fory uses `list<T>` (with `repeated T` as alias).
+- Enum naming conventions are language-driven instead of protobuf prefix style.
 
-### `oneof` 到 `union`
+### `oneof` to `union`
 
-protobuf 的 `oneof` 会被翻译为嵌套 Fory `union`，并增加一个可选字段指向该 union。
+Protobuf `oneof` is translated to a nested Fory `union` plus an optional field
+referencing that union.
 
 **Protocol Buffers**
 
@@ -140,7 +147,7 @@ message Event {
 }
 ```
 
-**转换后的 Fory 结构**
+**Fory-style shape after translation**
 
 ```protobuf
 message Event {
@@ -152,42 +159,42 @@ message Event {
 }
 ```
 
-说明：
+Notes:
 
-- union case ID 来自原 `oneof` 字段号。
-- 自动生成的 union 引用字段使用 `oneof` 中最小字段号。
+- Union case IDs are derived from the original `oneof` field numbers.
+- The synthetic union field uses the smallest `oneof` case number.
 
-### Import 与 Well-Known Types
+### Imports and Well-Known Types
 
-支持 protobuf import。常见 well-known types 会直接映射：
+Protobuf imports are supported. Common well-known types map directly:
 
 - `google.protobuf.Timestamp` -> `timestamp`
 - `google.protobuf.Duration` -> `duration`
 - `google.protobuf.Any` -> `any`
 
-## 类型映射要点
+## Type Mapping Highlights
 
-| Protobuf Type                            | Fory 映射                     |
-| ---------------------------------------- | ----------------------------- |
-| `bool`                                   | `bool`                        |
-| `int32`, `uint32`                        | 可变长 32 位整型家族          |
-| `sint32`                                 | zigzag 32 位整型              |
-| `int64`, `uint64`                        | 可变长 64 位整型家族          |
-| `sint64`                                 | zigzag 64 位整型              |
-| `fixed32`, `fixed64`                     | 定长无符号整型家族            |
-| `sfixed32`, `sfixed64`                   | 定长有符号整型家族            |
-| `float`, `double`                        | `float32`, `float64`          |
-| `string`, `bytes`                        | `string`, `bytes`             |
-| `repeated T`                             | `list<T>`                     |
-| `map<K, V>`                              | `map<K, V>`                   |
-| `optional T`                             | `optional T`                  |
-| `oneof`                                  | `union` + 可选 union 引用字段 |
-| `int64 [(fory).type = "tagged_int64"]`   | `tagged_int64` 编码           |
-| `uint64 [(fory).type = "tagged_uint64"]` | `tagged_uint64` 编码          |
+| Protobuf Type                            | Fory Mapping                             |
+| ---------------------------------------- | ---------------------------------------- |
+| `bool`                                   | `bool`                                   |
+| `int32`, `uint32`                        | variable-length 32-bit integer kinds     |
+| `sint32`                                 | zigzag 32-bit integer                    |
+| `int64`, `uint64`                        | variable-length 64-bit integer kinds     |
+| `sint64`                                 | zigzag 64-bit integer                    |
+| `fixed32`, `fixed64`                     | fixed-width unsigned integer kinds       |
+| `sfixed32`, `sfixed64`                   | fixed-width signed integer kinds         |
+| `float`, `double`                        | `float32`, `float64`                     |
+| `string`, `bytes`                        | `string`, `bytes`                        |
+| `repeated T`                             | `list<T>`                                |
+| `map<K, V>`                              | `map<K, V>`                              |
+| `optional T`                             | `optional T`                             |
+| `oneof`                                  | `union` + optional union reference field |
+| `int64 [(fory).type = "tagged int64"]`   | `tagged int64` encoding                  |
+| `uint64 [(fory).type = "tagged uint64"]` | `tagged uint64` encoding                 |
 
-## Fory 扩展选项（Protobuf）
+## Fory Extension Options (Protobuf)
 
-`.proto` 文件中的 Fory 专用选项使用 `(fory).` 前缀。
+Fory-specific options in `.proto` use the `(fory).` prefix.
 
 ```protobuf
 option (fory).enable_auto_type_id = true;
@@ -198,46 +205,47 @@ message TreeNode {
 }
 ```
 
-### 文件级选项
+### File-Level Options
 
-| 选项                                 | 类型   | 说明                                                |
-| ------------------------------------ | ------ | --------------------------------------------------- |
-| `(fory).use_record_for_java_message` | bool   | 对该文件所有 message 生成 Java record               |
-| `(fory).polymorphism`                | bool   | 默认开启多态序列化元信息                            |
-| `(fory).enable_auto_type_id`         | bool   | 缺失时自动生成类型 ID（编译器默认 true）            |
-| `(fory).evolving`                    | bool   | message 的默认 schema 演进行为                      |
-| `(fory).go_nested_type_style`        | string | Go 嵌套命名风格：`underscore`（默认）或 `camelcase` |
+| Option                               | Type   | Description                                                                                  |
+| ------------------------------------ | ------ | -------------------------------------------------------------------------------------------- |
+| `(fory).use_record_for_java_message` | bool   | Generate Java records for all messages in this file                                          |
+| `(fory).polymorphism`                | bool   | Enable polymorphic serialization metadata by default                                         |
+| `(fory).enable_auto_type_id`         | bool   | Auto-generate type IDs when omitted (compiler default is true)                               |
+| `(fory).evolving`                    | bool   | Default schema-evolution behavior for messages                                               |
+| `(fory).go_nested_type_style`        | string | Go nested naming style: `underscore` (default) or `camelcase`                                |
+| `(fory).swift_namespace_style`       | string | Swift namespace style: `enum` (default) or `flatten`; applies only when package is non-empty |
 
-### Message 与 Enum 级选项
+### Message and Enum Options
 
-| 选项                         | 作用对象      | 类型   | 说明                          |
-| ---------------------------- | ------------- | ------ | ----------------------------- |
-| `(fory).id`                  | message, enum | int    | 显式类型 ID（用于注册）       |
-| `(fory).alias`               | message, enum | string | 自动 ID 哈希使用的别名        |
-| `(fory).evolving`            | message       | bool   | 覆盖文件级演进设置            |
-| `(fory).use_record_for_java` | message       | bool   | 为该 message 生成 Java record |
-| `(fory).deprecated`          | message, enum | bool   | 标记类型为弃用                |
-| `(fory).namespace`           | message       | string | 覆盖默认 package 命名空间     |
+| Option                       | Applies To    | Type   | Description                              |
+| ---------------------------- | ------------- | ------ | ---------------------------------------- |
+| `(fory).id`                  | message, enum | int    | Explicit type ID for registration        |
+| `(fory).alias`               | message, enum | string | Alternate name used for auto-ID hashing  |
+| `(fory).evolving`            | message       | bool   | Override file-level evolution setting    |
+| `(fory).use_record_for_java` | message       | bool   | Generate Java record for this message    |
+| `(fory).deprecated`          | message, enum | bool   | Mark type as deprecated                  |
+| `(fory).namespace`           | message       | string | Override default package-based namespace |
 
-### 字段级选项
+### Field-Level Options
 
-| 选项                         | 类型   | 说明                                                  |
+| Option                       | Type   | Description                                           |
 | ---------------------------- | ------ | ----------------------------------------------------- |
-| `(fory).ref`                 | bool   | 为该字段启用引用跟踪                                  |
-| `(fory).nullable`            | bool   | 将字段视为可空（`optional`）                          |
-| `(fory).weak_ref`            | bool   | 生成弱指针语义（C++/Rust 代码生成）                   |
-| `(fory).thread_safe_pointer` | bool   | ref 字段在 Rust 中的指针类型（`Arc` vs `Rc`）         |
-| `(fory).deprecated`          | bool   | 标记字段为弃用                                        |
-| `(fory).type`                | string | 基础类型覆盖，目前支持 `tagged_int64`/`tagged_uint64` |
+| `(fory).ref`                 | bool   | Enable reference tracking for this field              |
+| `(fory).nullable`            | bool   | Treat field as nullable (`optional`)                  |
+| `(fory).weak_ref`            | bool   | Generate weak pointer semantics (C++/Rust codegen)    |
+| `(fory).thread_safe_pointer` | bool   | Rust pointer flavor for ref fields (`Arc` vs `Rc`)    |
+| `(fory).deprecated`          | bool   | Mark field as deprecated                              |
+| `(fory).type`                | string | Primitive override for tagged 64-bit integer encoding |
 
-引用相关行为：
+Reference option behavior:
 
-- `weak_ref = true` 隐含开启 ref 跟踪。
-- 对 `repeated` 字段，`(fory).ref = true` 作用于列表元素。
-- 对 `map<K, V>` 字段，`(fory).ref = true` 作用于 map value。
-- `weak_ref` 与 `thread_safe_pointer` 是 C++/Rust 代码生成提示。
+- `weak_ref = true` implies ref tracking.
+- For `repeated` fields, `(fory).ref = true` applies to list elements.
+- For `map<K, V>` fields, `(fory).ref = true` applies to map values.
+- `weak_ref` and `thread_safe_pointer` are codegen hints for C++/Rust.
 
-### 典型选项组合示例
+### Option Examples by Shape
 
 ```protobuf
 message Graph {
@@ -248,11 +256,12 @@ message Graph {
 }
 ```
 
-## 引用跟踪 vs Protobuf ID 关联
+## Reference Tracking vs Protobuf IDs
 
-protobuf 本身不保留共享/循环对象图。借助 Fory protobuf 扩展，可以显式启用对象图语义。
+Protobuf itself does not preserve shared/cyclic object graphs. With Fory
+protobuf extensions, you can opt into graph semantics.
 
-**不使用 Fory ref 选项（protobuf 风格 ID 关联）：**
+**Without Fory ref options (protobuf-style IDs):**
 
 ```protobuf
 message TreeNode {
@@ -262,7 +271,7 @@ message TreeNode {
 }
 ```
 
-**使用 Fory ref 选项（对象图语义）：**
+**With Fory ref options (object graph):**
 
 ```protobuf
 message TreeNode {
@@ -271,34 +280,37 @@ message TreeNode {
 }
 ```
 
-## 迁移指南：Protobuf 到 Fory
+## Porting Protobuf Schemas To Fory
 
-### 第 1 步：转换 schema 语法
+### Step 1: Translate Schema Syntax
 
-- 保持 package 名称稳定。
-- 将 `repeated T` 改为 `list<T>`（或保留 `repeated` 别名）。
-- 在需要稳定数值注册的位置添加显式 `[id=...]`。
+- Keep package names stable.
+- Replace `repeated T` with `list<T>` (or keep `repeated` alias).
+- Add explicit `[id=...]` where you need stable numeric registration.
 
-### 第 2 步：处理 `oneof` 与特殊类型
+### Step 2: Convert `oneof` and Special Types
 
-- `oneof` -> `union` + 可选 union 字段。
-- 将 protobuf well-known types 映射到 Fory 基础类型（`timestamp`、`duration`、`any`）。
+- `oneof` -> `union` + optional union field.
+- Map protobuf well-known types to Fory primitives (`timestamp`, `duration`, `any`).
 
-### 第 3 步：用 `ref` 替换 protobuf 的对象图绕过方案
+### Step 3: Replace Protobuf Workarounds with `ref`
 
-若 protobuf 里通过手工 ID 关联表达对象图，迁移到 Fory 后应改用 `ref` 修饰符（必要时使用 `ref(weak=true)`）。
+Where protobuf used manual ID links for object graphs, switch to Fory `ref`
+modifiers (and optional `ref(weak=true)` where needed).
 
-### 第 4 步：更新构建与代码生成
+### Step 4: Update Build/Codegen
 
-将 protobuf 代码生成步骤替换为 Fory 编译器针对目标语言的生成命令。
+Replace protobuf generation steps with the Fory compiler invocation for target
+languages.
 
-### 第 5 步：执行兼容性验证
+### Step 5: Run Compatibility Checks
 
-分阶段迁移时，可并行保留两种格式，并通过集成测试验证 payload 级一致性。
+For staged transitions, keep both formats in parallel and verify payload-level
+parity with integration tests.
 
-## 共存策略
+## Coexistence Strategy
 
-迁移期间可以并行运行 protobuf 与 Fory：
+You can run protobuf and Fory in parallel during a staged transition:
 
 ```java
 public byte[] serialize(Object obj, Format format) {
@@ -309,13 +321,16 @@ public byte[] serialize(Object obj, Format format) {
 }
 ```
 
-可在服务边界设置转换层，并优先迁移内部对象图较重的链路。
+Use translators at service boundaries while internal object-graph heavy paths
+migrate first.
 
-## 性能参考
+## Performance References
 
 - Benchmarks: https://fory.apache.org/docs/introduction/benchmark
 - Benchmark code: https://github.com/apache/fory/tree/main/benchmarks
 
-## 总结
+## Summary
 
-当主要关注 API 契约与 gRPC 生态时，建议使用 protobuf。若主要关注对象图性能、原生数据模型与引用语义，建议使用 Fory。
+Use protobuf when your primary concern is API contracts and gRPC ecosystem
+integration. Use Fory when object-graph performance, native models, and
+reference semantics are the primary concern.

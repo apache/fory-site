@@ -1,6 +1,6 @@
 ---
-title: 故障排查
-sidebar_position: 110
+title: Troubleshooting
+sidebar_position: 120
 id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-本指南汇总了使用 Fory Go 时的常见问题与解决方案。
+This guide covers common issues and solutions when using Fory Go.
 
-## 错误类型
+## Error Types
 
 Fory Go uses typed errors with specific error kinds:
 
@@ -36,7 +36,7 @@ func (e Error) Kind() ErrorKind { return e.kind }
 func (e Error) Error() string   { return e.message }
 ```
 
-### 错误种类
+### Error Kinds
 
 | Kind                           | Value | Description                     |
 | ------------------------------ | ----- | ------------------------------- |
@@ -52,7 +52,7 @@ func (e Error) Error() string   { return e.message }
 | `ErrKindHashMismatch`          | 9     | Struct hash mismatch            |
 | `ErrKindInvalidTag`            | 10    | Invalid fory struct tag         |
 
-## 常见错误与解决方案
+## Common Errors and Solutions
 
 ### ErrKindUnknownType
 
@@ -115,7 +115,8 @@ f2.RegisterStruct(User{}, 1)  // Same ID!
 1. **Enable compatible mode**:
 
 ```go
-f := fory.New(fory.WithCompatible(true))
+// Add WithCompatible(true) to the same option set on every peer.
+f := fory.New(/* existing options */, fory.WithCompatible(true))
 ```
 
 2. **Ensure struct definitions match**:
@@ -189,7 +190,7 @@ f.Deserialize(fullData, &target)
 
 **Error**: `invalid reference ID`
 
-**Cause**: Reference to non-existent object in serialized data.
+**Cause**: Reference to non-existent or unknown object in serialized data.
 
 **Solutions**:
 
@@ -211,10 +212,10 @@ f2 := fory.New(fory.WithTrackRef(true))  // Must match!
 
 **Common causes**:
 
-1. **Invalid tag ID**: ID must be >= -1
+1. **Invalid tag ID**: ID must be non-negative
 
 ```go
-// Wrong: negative ID (other than -1)
+// Wrong: negative ID
 type Bad struct {
     Field int `fory:"id=-5"`
 }
@@ -247,7 +248,7 @@ type Good struct {
 
 **Symptom**: Data deserializes but fields have wrong values.
 
-**Cause**: Different field ordering between languages. In non-compatible mode, fields are sorted by their snake_case names. CamelCase field names (e.g., `FirstName`) are converted to snake_case (e.g., `first_name`) for sorting.
+**Cause**: Different field ordering between languages. In schema-consistent mode, fields are sorted by their snake_case names. CamelCase field names (e.g., `FirstName`) are converted to snake_case (e.g., `first_name`) for sorting.
 
 **Solutions**:
 
@@ -280,7 +281,7 @@ Ensure the same field IDs are used across all languages for corresponding fields
 
 ```go
 // Go
-f.RegisterNamedStruct(User{}, "example.User")
+f.RegisterStructByName(User{}, "example.User")
 
 // Java - must match exactly
 fory.register(User.class, "example.User");
@@ -417,12 +418,12 @@ FORY_GO_JAVA_CI=1 mvn test -Dtest=org.apache.fory.xlang.GoXlangTest
 
 ```go
 func TestSchemaEvolution(t *testing.T) {
-    f1 := fory.New(fory.WithCompatible(true))
+    f1 := fory.New()
     f1.RegisterStruct(UserV1{}, 1)
 
     data, _ := f1.Serialize(&UserV1{ID: 1, Name: "Alice"})
 
-    f2 := fory.New(fory.WithCompatible(true))
+    f2 := fory.New()
     f2.RegisterStruct(UserV2{}, 1)
 
     var result UserV2
@@ -440,7 +441,7 @@ If you encounter issues not covered here:
 3. **Create minimal reproduction**: Isolate the problem
 4. **Report the issue**: Include Go version, Fory version, and minimal code
 
-## 相关主题
+## Related Topics
 
 - [Configuration](configuration.md)
 - [Cross-Language Serialization](cross-language.md)

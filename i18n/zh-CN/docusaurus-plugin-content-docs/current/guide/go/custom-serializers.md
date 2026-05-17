@@ -1,6 +1,6 @@
 ---
-title: 自定义序列化器
-sidebar_position: 35
+title: Custom Serializers
+sidebar_position: 90
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,16 +19,16 @@ license: |
   limitations under the License.
 ---
 
-自定义序列化器允许你精确控制类型的序列化与反序列化过程。 This is useful for types that require special handling, optimization, or cross-language compatibility.
+Custom serializers allow you to define exactly how a type is serialized and deserialized. This is useful for types that require special handling, optimization, or cross-language compatibility.
 
-## 何时使用自定义序列化器
+## When to Use Custom Serializers
 
 - **Special encoding**: Types that need a specific binary format
 - **Third-party types**: Types from external libraries that Fory doesn't handle automatically
 - **Optimization**: When you can serialize more efficiently than the default reflection-based approach
 - **Cross-language compatibility**: When you need precise control over the binary format for interoperability
 
-## ExtensionSerializer 接口
+## ExtensionSerializer Interface
 
 Custom serializers implement the `ExtensionSerializer` interface:
 
@@ -48,7 +48,7 @@ type ExtensionSerializer interface {
 }
 ```
 
-## 基础示例
+## Basic Example
 
 Here's a simple custom serializer for a type with an integer field:
 
@@ -75,11 +75,11 @@ func (s *MyExtSerializer) ReadData(ctx *fory.ReadContext, value reflect.Value) {
 }
 
 // Register the custom serializer
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 err := f.RegisterExtension(MyExt{}, 100, &MyExtSerializer{})
 ```
 
-## Context 方法
+## Context Methods
 
 The `WriteContext` and `ReadContext` provide access to serialization resources:
 
@@ -92,11 +92,11 @@ The `WriteContext` and `ReadContext` provide access to serialization resources:
 | `TypeResolver()` | Returns the type resolver for nested types     |
 | `RefResolver()`  | Returns the reference resolver for ref support |
 
-## ByteBuffer 方法
+## ByteBuffer Methods
 
 The `ByteBuffer` provides methods for reading and writing primitive types:
 
-### 写入方法
+### Writing Methods
 
 | Method                     | Description                                   |
 | -------------------------- | --------------------------------------------- |
@@ -111,7 +111,7 @@ The `ByteBuffer` provides methods for reading and writing primitive types:
 | `WriteVarint64(v int64)`   | Write a variable-length signed 64-bit integer |
 | `WriteBinary(data []byte)` | Write raw bytes                               |
 
-### 读取方法
+### Reading Methods
 
 All read methods take an `*Error` parameter for deferred error checking:
 
@@ -168,7 +168,7 @@ func (s *Point3DSerializer) ReadData(ctx *fory.ReadContext, value reflect.Value)
     }))
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterExtension(Point3D{}, 101, &Point3DSerializer{})
 ```
 
@@ -242,10 +242,10 @@ f.RegisterExtension(MyType{}, 100, &MySerializer{})
 More flexible but more serialization cost, type name included in serialized data:
 
 ```go
-f.RegisterNamedExtension(MyType{}, "myapp.MyType", &MySerializer{})
+f.RegisterExtensionByName(MyType{}, "myapp.MyType", &MySerializer{})
 ```
 
-## 最佳实践
+## Best Practices
 
 1. **Keep it simple**: Only serialize what you need
 2. **Use variable-length integers**: `WriteVarint32`/`WriteVarint64` for integers that are often small
@@ -260,7 +260,7 @@ f.RegisterNamedExtension(MyType{}, "myapp.MyType", &MySerializer{})
 
 ```go
 func TestMySerializer(t *testing.T) {
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterExtension(MyType{}, 100, &MySerializer{})
 
     original := MyType{Field: "test"}
@@ -278,7 +278,7 @@ func TestMySerializer(t *testing.T) {
 }
 ```
 
-## 相关主题
+## Related Topics
 
 - [Type Registration](type-registration.md)
 - [Supported Types](supported-types.md)

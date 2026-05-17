@@ -33,14 +33,14 @@ Apache Fory™ Row Format is a binary format optimized for:
 
 ## When to Use Row Format
 
-| Use Case                      | Row Format | Object Graph |
-| ----------------------------- | ---------- | ------------ |
-| Analytics/OLAP                | ✅         | ❌           |
-| Random field access           | ✅         | ❌           |
-| Full object serialization     | ❌         | ✅           |
-| Complex object graphs         | ❌         | ✅           |
-| Reference tracking            | ❌         | ✅           |
-| Cross-language (simple types) | ✅         | ✅           |
+| Use Case                      | Row Format    | Object Graph  |
+| ----------------------------- | ------------- | ------------- |
+| Analytics/OLAP                | Supported     | Not supported |
+| Random field access           | Supported     | Not supported |
+| Full object serialization     | Not supported | Supported     |
+| Complex object graphs         | Not supported | Supported     |
+| Reference tracking            | Not supported | Supported     |
+| Cross-language (simple types) | Supported     | Supported     |
 
 ## Quick Start
 

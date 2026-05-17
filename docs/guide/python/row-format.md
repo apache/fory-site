@@ -156,16 +156,16 @@ struct Foo {
   FORY_STRUCT(Foo, f1, f2, f3, f4);
 };
 
-fory::encoder::RowEncoder<Foo> encoder;
-encoder.Encode(foo);
-auto row = encoder.GetWriter().ToRow();
+fory::row::encoder::RowEncoder<Foo> encoder;
+encoder.encode(foo);
+auto row = encoder.get_writer().to_row();
 
 // Zero-copy random access without full deserialization
-auto f2_array = row->GetArray(1);                    // Access f2 list
-auto f4_array = row->GetArray(3);                    // Access f4 list
-auto bar10 = f4_array->GetStruct(10);                // Access 11th Bar
-int64_t value = bar10->GetArray(1)->GetInt64(5);    // Access 6th element of bar.f2
-std::string str = bar10->GetString(0);               // Access bar.f1
+auto f2_array = row->get_array(1);                   // Access f2 list
+auto f4_array = row->get_array(3);                   // Access f4 list
+auto bar10 = f4_array->get_struct(10);               // Access 11th Bar
+int64_t value = bar10->get_array(1)->get_int64(5);   // Access 6th element of bar.f2
+std::string str = bar10->get_string(0);              // Access bar.f1
 ```
 
 ## Installation
@@ -186,6 +186,6 @@ pip install pyfory[format]
 
 ## Related Topics
 
-- [Cross-Language Serialization](cross-language.md) - XLANG mode
+- [Cross-Language Serialization](cross-language.md) - xlang mode
 - [Basic Serialization](basic-serialization.md) - Object serialization
 - [Row Format Specification](https://fory.apache.org/docs/specification/row_format_spec) - Protocol details

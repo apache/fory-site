@@ -1,6 +1,6 @@
 ---
 title: Configuration
-sidebar_position: 2
+sidebar_position: 3
 id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,7 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This page covers Fory configuration parameters and language modes.
+This page covers Python runtime configuration. `pyfory.Fory()` defaults to xlang mode with
+compatible schema evolution. Native mode is selected explicitly with `xlang=False` and defaults to
+schema-consistent payloads.
 
 ## Fory Class
 
@@ -29,10 +31,10 @@ The main serialization interface:
 class Fory:
     def __init__(
         self,
-        xlang: bool = False,
+        xlang: bool = True,
         ref: bool = False,
         strict: bool = True,
-        compatible: bool = False,
+        compatible: Optional[bool] = None,
         max_depth: int = 50,
         policy: DeserializationPolicy = None,
         field_nullable: bool = False,
@@ -53,17 +55,17 @@ class ThreadSafeFory:
 
 ## Parameters
 
-| Parameter         | Type                            | Default | Description                                                                                                                                                                                |
-| ----------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `xlang`           | `bool`                          | `False` | Enable cross-language serialization. When `False`, enables Python-native mode supporting all Python objects. When `True`, enables cross-language mode compatible with Java, Go, Rust, etc. |
-| `ref`             | `bool`                          | `False` | Enable reference tracking for shared/circular references. Disable for better performance if your data has no shared references.                                                            |
-| `strict`          | `bool`                          | `True`  | Require type registration for security. **Highly recommended** for production. Only disable in trusted environments.                                                                       |
-| `compatible`      | `bool`                          | `False` | Enable schema evolution in cross-language mode, allowing fields to be added/removed while maintaining compatibility.                                                                       |
-| `max_depth`       | `int`                           | `50`    | Maximum deserialization depth for security, preventing stack overflow attacks.                                                                                                             |
-| `policy`          | `DeserializationPolicy \| None` | `None`  | Deserialization policy used for security checks. Strongly recommended when `strict=False`.                                                                                                 |
-| `field_nullable`  | `bool`                          | `False` | Treat dataclass fields as nullable by default (regardless of `xlang`).                                                                                                                     |
-| `meta_compressor` | `Any`                           | `None`  | Optional metadata compressor used for compatible-mode metadata encoding.                                                                                                                   |
-| `fory_factory`    | `Callable \| None`              | `None`  | `ThreadSafeFory` factory hook. When set, `ThreadSafeFory` creates instances via this callback; otherwise it forwards `**kwargs` to `Fory` construction.                                    |
+| Parameter         | Type                            | Default | Description                                                                                                                                             |
+| ----------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `xlang`           | `bool`                          | `True`  | Use xlang mode. Set `False` for Python native mode.                                                                                                     |
+| `ref`             | `bool`                          | `False` | Enable reference tracking for shared/circular references. Disable for better performance if your data has no shared references.                         |
+| `strict`          | `bool`                          | `True`  | Require type registration for security. Keep this enabled for production unless a policy owns trust decisions.                                          |
+| `compatible`      | `bool \| None`                  | `None`  | Schema evolution mode. `None` follows the wire mode: xlang defaults to compatible mode, while native mode defaults to schema-consistent mode.           |
+| `max_depth`       | `int`                           | `50`    | Maximum deserialization depth for security, preventing stack overflow attacks.                                                                          |
+| `policy`          | `DeserializationPolicy \| None` | `None`  | Deserialization policy used for security checks. Strongly recommended when `strict=False`.                                                              |
+| `field_nullable`  | `bool`                          | `False` | Treat dataclass fields as nullable by default.                                                                                                          |
+| `meta_compressor` | `Any`                           | `None`  | Optional metadata compressor used for compatible-mode metadata encoding.                                                                                |
+| `fory_factory`    | `Callable \| None`              | `None`  | `ThreadSafeFory` factory hook. When set, `ThreadSafeFory` creates instances via this callback; otherwise it forwards `**kwargs` to `Fory` construction. |
 
 ## Key Methods
 
@@ -76,108 +78,89 @@ obj = fory.deserialize(data)
 data: bytes = fory.dumps(obj)
 obj = fory.loads(data)
 
-# Type registration by id (for Python mode)
+# Type registration by id
 fory.register(MyClass, type_id=123)
 fory.register(MyClass, type_id=123, serializer=custom_serializer)
 
-# Type registration by name (for cross-language mode)
+# Type registration by name
 fory.register(MyClass, typename="my.package.MyClass")
 fory.register(MyClass, typename="my.package.MyClass", serializer=custom_serializer)
 ```
 
-## Language Modes Comparison
+## Xlang And Native Mode Comparison
 
-| Feature               | Python Mode (`xlang=False`)          | Cross-Language Mode (`xlang=True, compatible=True`) |
-| --------------------- | ------------------------------------ | --------------------------------------------------- |
-| **Use Case**          | Pure Python applications             | Multi-language systems                              |
-| **Compatibility**     | Python only                          | Java, Go, Rust, C++, JavaScript, etc.               |
-| **Supported Types**   | All Python types                     | Cross-language compatible types only                |
-| **Functions/Lambdas** | ✓ Supported                          | ✗ Not allowed                                       |
-| **Local Classes**     | ✓ Supported                          | ✗ Not allowed                                       |
-| **Dynamic Classes**   | ✓ Supported                          | ✗ Not allowed                                       |
-| **Schema Evolution**  | ✓ Supported (with `compatible=True`) | ✓ Supported (with `compatible=True`)                |
-| **Performance**       | Extremely fast                       | Very fast                                           |
-| **Data Size**         | Compact                              | Compact with type metadata                          |
+| Feature             | Native mode (`xlang=False`)                    | Xlang mode (default)                  |
+| ------------------- | ---------------------------------------------- | ------------------------------------- |
+| Use case            | Python-only applications                       | Multi-language systems                |
+| Compatibility       | Python only                                    | Java, Go, Rust, C++, JavaScript, etc. |
+| Supported types     | Python object surface                          | Cross-language compatible types       |
+| Functions/lambdas   | Supported with trusted dynamic deserialization | Not allowed                           |
+| Local classes       | Supported with trusted dynamic deserialization | Not allowed                           |
+| Dynamic classes     | Supported with trusted dynamic deserialization | Not allowed                           |
+| Schema mode default | Schema-consistent                              | Compatible                            |
 
-## Python Mode (`xlang=False`)
+## Xlang Mode
 
-Python mode supports all Python types including functions, classes, and closures:
+Xlang mode is the default and restricts payloads to types compatible across Fory runtimes:
 
 ```python
 import pyfory
 
-# Full Python compatibility mode
+fory = pyfory.Fory(xlang=True, ref=True)
+fory.register(MyDataClass, typename="com.example.MyDataClass")
+data = fory.serialize(MyDataClass(field1="value", field2=42))
+```
+
+Use `compatible=False` only when every xlang peer updates schema together and you want
+schema-consistent xlang payloads.
+
+## Native Mode
+
+```python
+import pyfory
+
 fory = pyfory.Fory(xlang=False, ref=True, strict=False)
-
-# Supports ALL Python objects:
-data = fory.dumps({
-    'function': lambda x: x * 2,        # Functions and lambdas
-    'class': type('Dynamic', (), {}),    # Dynamic classes
-    'method': str.upper,                # Methods
-    'nested': {'circular_ref': None}    # Circular references (when ref=True)
-})
-
-# Drop-in replacement for pickle/cloudpickle
-import pickle
-obj = [1, 2, {"nested": [3, 4]}]
-assert fory.loads(fory.dumps(obj)) == pickle.loads(pickle.dumps(obj))
 ```
 
-## Cross-Language Mode (`xlang=True, compatible=True`)
-
-Cross-language mode restricts types to those compatible across all Fory implementations:
-
-```python
-import pyfory
-
-# Cross-language compatibility mode
-f = pyfory.Fory(xlang=True, compatible=True, ref=True)
-
-# Only supports cross-language compatible types
-f.register(MyDataClass, typename="com.example.MyDataClass")
-
-# Data can be read by Java, Go, Rust, etc.
-data = f.serialize(MyDataClass(field1="value", field2=42))
-```
+Native mode supports Python-specific object features such as functions, local classes, methods,
+`__reduce__`, and `__getstate__`. It defaults to schema-consistent mode. Set
+`compatible=True` only when Python-only deployments need schema evolution.
 
 ## Example Configurations
 
-### Production Configuration
+### Xlang Service
 
 ```python
 import pyfory
 
-# Recommended settings for production
 fory = pyfory.Fory(
-    xlang=False,        # Use True if you need cross-language support
-    ref=False,          # Enable if you have shared/circular references
-    strict=True,        # CRITICAL: Always True in production
-    compatible=False,   # Native mode; xlang=True defaults to compatible=True
-    max_depth=20        # Adjust based on your data structure depth
+    xlang=True,
+    ref=False,
+    strict=True,
+    max_depth=20,
 )
 
-# Register all types upfront
-fory.register(UserModel, type_id=100)
-fory.register(OrderModel, type_id=101)
-fory.register(ProductModel, type_id=102)
+fory.register(UserModel, typename="example.User")
 ```
 
-### Development Configuration
+### Native Mode With Dynamic Types
 
 ```python
 import pyfory
 
-# Development settings (more permissive)
 fory = pyfory.Fory(
     xlang=False,
     ref=True,
-    strict=False,    # Allow any type for development
-    max_depth=1000   # Higher limit for development
+    strict=False,
+    max_depth=1000,
 )
 ```
+
+Use `strict=False` only for trusted data, preferably with a `policy=` deserialization policy.
 
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Using configured Fory
 - [Type Registration](type-registration.md) - Registration patterns
+- [Python Native Mode](python-native.md) - Python-only object serialization
 - [Security](security.md) - Security best practices

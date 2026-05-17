@@ -19,12 +19,12 @@ license: |
   limitations under the License.
 ---
 
-Fory supports schema evolution through compatible mode.
+Fory supports schema evolution through compatible mode, which is enabled by default in Swift.
 
-## Enable Compatible Mode
+## Default Compatible Mode
 
 ```swift
-let fory = Fory(xlang: true, ref: false, compatible: true)
+let fory = Fory()
 ```
 
 ## Example: Evolving a Struct
@@ -46,10 +46,10 @@ struct PersonV2 {
     var phone: String? = nil // added field
 }
 
-let writer = Fory(xlang: true, compatible: true)
+let writer = Fory()
 writer.register(PersonV1.self, id: 1)
 
-let reader = Fory(xlang: true, compatible: true)
+let reader = Fory()
 reader.register(PersonV2.self, id: 1)
 
 let v1 = PersonV1(name: "alice", age: 30, address: "main st")

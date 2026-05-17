@@ -1,6 +1,6 @@
 ---
 title: Trait Object Serialization
-sidebar_position: 6
+sidebar_position: 7
 id: polymorphism
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -64,10 +64,10 @@ struct Zoo {
     star_animal: Box<dyn Animal>,
 }
 
-let mut fory = Fory::builder().compatible(true).build();
-fory.register::<Dog>(100);
-fory.register::<Cat>(101);
-fory.register::<Zoo>(102);
+let mut fory = Fory::builder().xlang(false).compatible(true).build();
+fory.register::<Dog>(100)?;
+fory.register::<Cat>(101)?;
+fory.register::<Zoo>(102)?;
 
 let zoo = Zoo {
     star_animal: Box::new(Dog {
@@ -76,7 +76,7 @@ let zoo = Zoo {
     }),
 };
 
-let bytes = fory.serialize(&zoo);
+let bytes = fory.serialize(&zoo)?;
 let decoded: Zoo = fory.deserialize(&bytes)?;
 
 assert_eq!(decoded.star_animal.name(), "Buddy");
@@ -107,7 +107,7 @@ let dog_rc: Rc<dyn Animal> = Rc::new(Dog {
 let dog_any: Rc<dyn Any> = dog_rc.clone();
 
 // Serialize the Any wrapper
-let bytes = fory.serialize(&dog_any);
+let bytes = fory.serialize(&dog_any)?;
 let decoded: Rc<dyn Any> = fory.deserialize(&bytes)?;
 
 // Downcast back to the concrete type
@@ -129,7 +129,7 @@ let dog_arc: Arc<dyn Animal> = Arc::new(Dog {
 // Convert to Arc<dyn Any>
 let dog_any: Arc<dyn Any> = dog_arc.clone();
 
-let bytes = fory.serialize(&dog_any);
+let bytes = fory.serialize(&dog_any)?;
 let decoded: Arc<dyn Any> = fory.deserialize(&bytes)?;
 
 // Downcast to concrete type
@@ -153,10 +153,10 @@ struct AnimalShelter {
     registry: HashMap<String, Arc<dyn Animal>>,
 }
 
-let mut fory = Fory::builder().compatible(true).build();
-fory.register::<Dog>(100);
-fory.register::<Cat>(101);
-fory.register::<AnimalShelter>(102);
+let mut fory = Fory::builder().xlang(false).compatible(true).build();
+fory.register::<Dog>(100)?;
+fory.register::<Cat>(101)?;
+fory.register::<AnimalShelter>(102)?;
 
 let shelter = AnimalShelter {
     animals_rc: vec![
@@ -174,7 +174,7 @@ let shelter = AnimalShelter {
     ]),
 };
 
-let bytes = fory.serialize(&shelter);
+let bytes = fory.serialize(&shelter)?;
 let decoded: AnimalShelter = fory.deserialize(&bytes)?;
 
 assert_eq!(decoded.animals_rc[0].name(), "Rex");
@@ -197,7 +197,7 @@ let dog_rc: Rc<dyn Animal> = Rc::new(Dog {
 });
 let wrapper = AnimalRc::from(dog_rc);
 
-let bytes = fory.serialize(&wrapper);
+let bytes = fory.serialize(&wrapper)?;
 let decoded: AnimalRc = fory.deserialize(&bytes)?;
 
 // Unwrap back to Rc<dyn Animal>
@@ -211,7 +211,7 @@ let dog_arc: Arc<dyn Animal> = Arc::new(Dog {
 });
 let wrapper = AnimalArc::from(dog_arc);
 
-let bytes = fory.serialize(&wrapper);
+let bytes = fory.serialize(&wrapper)?;
 let decoded: AnimalArc = fory.deserialize(&bytes)?;
 
 let unwrapped: Arc<dyn Animal> = decoded.unwrap();

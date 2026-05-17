@@ -1,7 +1,7 @@
 ---
-title: 零拷贝序列化
-sidebar_position: 4
-id: xlang_zero_copy
+title: Zero-Copy Serialization
+sidebar_position: 50
+id: zero_copy
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,24 +19,24 @@ license: |
   limitations under the License.
 ---
 
-零拷贝序列化允许大型二进制数据（字节数组、数值数组）以带外方式序列化，避免内存复制并减少序列化开销。
+Zero-copy serialization allows large binary data (byte arrays, numeric arrays) to be serialized out-of-band, avoiding memory copies and reducing serialization overhead.
 
-## 何时使用零拷贝
+## When to Use Zero-Copy
 
-在以下情况下使用零拷贝序列化：
+Use zero-copy serialization when:
 
-- 序列化大型字节数组或二进制数据块
-- 处理数值数组（int[]、double[] 等）
-- 通过高性能网络传输数据
-- 内存效率至关重要
+- Serializing large byte arrays or binary blobs
+- Working with numeric arrays (int[], double[], etc.)
+- Transferring data over high-performance networks
+- Memory efficiency is critical
 
-## 工作原理
+## How It Works
 
-1. **序列化**：大型缓冲区被提取出来，并通过回调单独返回
-2. **传输**：主序列化数据和缓冲区对象分别传输
-3. **反序列化**：提供缓冲区以重建原始对象
+1. **Serialization**: Large buffers are extracted and returned separately via a callback
+2. **Transport**: The main serialized data and buffer objects are transmitted separately
+3. **Deserialization**: Buffers are provided back to reconstruct the original object
 
-这避免了将大型数据复制到主序列化缓冲区中。
+This avoids copying large data into the main serialization buffer.
 
 ## Java
 
@@ -51,26 +51,26 @@ import java.util.stream.Collectors;
 
 public class ZeroCopyExample {
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withLanguage(Language.XLANG).build();
+    Fory fory = Fory.builder().withXlang(true).build();
 
-    // 包含大型数组的数据
+    // Data with large arrays
     List<Object> list = List.of(
         "str",
-        new byte[1000],    // 大型字节数组
-        new int[100],      // 大型 int 数组
-        new double[100]    // 大型 double 数组
+        new byte[1000],    // Large byte array
+        new int[100],      // Large int array
+        new double[100]    // Large double array
     );
 
-    // 在序列化期间收集缓冲区对象
+    // Collect buffer objects during serialization
     Collection<BufferObject> bufferObjects = new ArrayList<>();
     byte[] bytes = fory.serialize(list, e -> !bufferObjects.add(e));
 
-    // 转换为缓冲区以便传输
+    // Convert to buffers for transport
     List<MemoryBuffer> buffers = bufferObjects.stream()
         .map(BufferObject::toBuffer)
         .collect(Collectors.toList());
 
-    // 使用缓冲区反序列化
+    // Deserialize with buffers
     Object result = fory.deserialize(bytes, buffers);
     System.out.println(result);
   }
@@ -84,24 +84,24 @@ import array
 import pyfory
 import numpy as np
 
-fory = pyfory.Fory()
+fory = pyfory.Fory(xlang=True)
 
-# 包含大型数组的数据
+# Data with large arrays
 data = [
     "str",
-    bytes(bytearray(1000)),           # 大型字节数组
-    array.array("i", range(100)),     # 大型 int 数组
-    np.full(100, 0.0, dtype=np.double) # 大型 numpy 数组
+    bytes(bytearray(1000)),           # Large byte array
+    array.array("i", range(100)),     # Large int array
+    np.full(100, 0.0, dtype=np.double) # Large numpy array
 ]
 
-# 在序列化期间收集缓冲区对象
+# Collect buffer objects during serialization
 serialized_objects = []
 serialized_data = fory.serialize(data, buffer_callback=serialized_objects.append)
 
-# 转换为缓冲区以便传输
+# Convert to buffers for transport
 buffers = [obj.to_buffer() for obj in serialized_objects]
 
-# 使用缓冲区反序列化
+# Deserialize with buffers
 result = fory.deserialize(serialized_data, buffers=buffers)
 print(result)
 ```
@@ -115,73 +115,69 @@ import forygo "github.com/apache/fory/go/fory"
 import "fmt"
 
 func main() {
-  fory := forygo.NewFory()
+  serializer := forygo.NewFory(forygo.WithXlang(true))
 
-  // 包含大型数组的数据
-  list := []interface{}{
+  // Data with large arrays
+  list := []any{
     "str",
-    make([]byte, 1000), // 大型字节数组
+    make([]byte, 1000), // Large byte array
   }
 
-  buf := fory.NewByteBuffer(nil)
-  var bufferObjects []fory.BufferObject
+  buf := forygo.NewByteBuffer(nil)
+  var bufferObjects []forygo.BufferObject
 
-  // 在序列化期间收集缓冲区对象
-  fory.Serialize(buf, list, func(o fory.BufferObject) bool {
+  // Collect buffer objects during serialization
+  if err := serializer.SerializeWithCallback(buf, list, func(o forygo.BufferObject) bool {
     bufferObjects = append(bufferObjects, o)
     return false
-  })
+  }); err != nil {
+    panic(err)
+  }
 
-  // 转换为缓冲区以便传输
-  var buffers []*fory.ByteBuffer
+  // Convert to buffers for transport
+  var buffers []*forygo.ByteBuffer
   for _, o := range bufferObjects {
     buffers = append(buffers, o.ToBuffer())
   }
 
-  // 使用缓冲区反序列化
-  var newList []interface{}
-  if err := fory.Deserialize(buf, &newList, buffers); err != nil {
+  // Deserialize with buffers
+  var newList []any
+  if err := serializer.DeserializeWithCallbackBuffers(buf, &newList, buffers); err != nil {
     panic(err)
   }
   fmt.Println(newList)
 }
 ```
 
-## JavaScript
+## Use Cases
 
-```javascript
-// 零拷贝支持即将推出
-```
+### High-Performance Data Transfer
 
-## 使用场景
-
-### 高性能数据传输
-
-在通过网络发送大型数据集时：
+When sending large datasets over the network:
 
 ```java
-// 发送方
+// Sender
 Collection<BufferObject> buffers = new ArrayList<>();
 byte[] metadata = fory.serialize(dataObject, e -> !buffers.add(e));
 
-// 分别发送元数据和缓冲区
+// Send metadata and buffers separately
 network.sendMetadata(metadata);
 for (BufferObject buf : buffers) {
     network.sendBuffer(buf.toBuffer());
 }
 
-// 接收方
+// Receiver
 byte[] metadata = network.receiveMetadata();
 List<MemoryBuffer> buffers = network.receiveBuffers();
 Object data = fory.deserialize(metadata, buffers);
 ```
 
-### 内存映射文件
+### Memory-Mapped Files
 
-零拷贝与内存映射文件配合良好：
+Zero-copy works well with memory-mapped files:
 
 ```java
-// 写入
+// Write
 Collection<BufferObject> buffers = new ArrayList<>();
 byte[] data = fory.serialize(largeObject, e -> !buffers.add(e));
 writeToFile("data.bin", data);
@@ -189,19 +185,19 @@ for (int i = 0; i < buffers.size(); i++) {
     writeToFile("buffer" + i + ".bin", buffers.get(i).toBuffer());
 }
 
-// 读取
+// Read
 byte[] data = readFromFile("data.bin");
 List<MemoryBuffer> buffers = readBufferFiles();
 Object result = fory.deserialize(data, buffers);
 ```
 
-## 性能考虑
+## Performance Considerations
 
-1. **阈值**：由于回调开销，小数组可能不会从零拷贝中受益
-2. **网络**：当缓冲区可以在不复制的情况下发送时，零拷贝最有益
-3. **内存**：通过避免缓冲区复制来减少峰值内存使用
+1. **Threshold**: Small arrays may not benefit from zero-copy due to callback overhead
+2. **Network**: Zero-copy is most beneficial when buffers can be sent without copying
+3. **Memory**: Reduces peak memory usage by avoiding buffer copies
 
-## 另请参阅
+## See Also
 
-- [序列化](serialization.md) - 标准序列化示例
-- [Python 带外指南](../python/out-of-band.md) - Python 特定的零拷贝详情
+- [Serialization](serialization.md) - Standard serialization examples
+- [Python Out-of-Band Guide](../python/out-of-band.md) - Python-specific zero-copy details

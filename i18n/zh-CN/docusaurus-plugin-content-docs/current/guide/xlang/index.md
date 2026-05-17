@@ -1,7 +1,7 @@
 ---
-title: 跨语言序列化指南
+title: Xlang Serialization Guide
 sidebar_position: 0
-id: xlang_serialization_index
+id: serialization_index
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,45 +19,52 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ xlang（跨语言）序列化实现了不同编程语言之间的无缝数据交换。在一种语言中序列化数据，并在另一种语言中反序列化——无需 IDL 定义、schema 编译或手动数据转换。
+Apache Fory™ xlang serialization is the default wire format for cross-language payloads. Serialize
+data in one language and deserialize it in another without manual conversion. You can use direct
+language model types for small contracts, or use Fory IDL and code generation when a schema-first
+workflow is a better fit.
 
-## 特性
+## Features
 
-- **无需 IDL**：自动序列化任何对象，无需 Protocol Buffers、Thrift 或其他 IDL 定义
-- **多语言支持**：Java、Python、C++、Go、Rust、JavaScript 之间无缝互操作
-- **引用支持**：跨语言边界支持共享引用和循环引用
-- **Schema 演化**：类定义变更时的前向/后向兼容性
-- **零拷贝**：大型二进制数据的带外序列化
-- **高性能**：JIT 编译和优化的二进制协议
+- **No IDL required**: Serialize objects directly with language model types.
+- **Multi-language support**: Java, Python, C++, Go, Rust, JavaScript/TypeScript, C#, Swift, and Dart interoperate through the same xlang format.
+- **Reference support**: Shared and circular references work across language boundaries when reference tracking is enabled in each runtime.
+- **Schema evolution**: Compatible mode is the xlang default so readers can tolerate added, removed, or reordered fields.
+- **Out-of-band buffers**: Language runtimes can expose zero-copy buffer paths for large binary data.
+- **High performance**: Runtimes use generated serializers, JIT serializers, or optimized code paths where available.
 
-## 支持的语言
+## Supported Languages
 
-| 语言       | 状态 | 包                               |
-| ---------- | ---- | -------------------------------- |
-| Java       | ✅   | `org.apache.fory:fory-core`      |
-| Python     | ✅   | `pyfory`                         |
-| C++        | ✅   | Bazel/CMake 构建                 |
-| Go         | ✅   | `github.com/apache/fory/go/fory` |
-| Rust       | ✅   | `fory` crate                     |
-| JavaScript | ✅   | `@apache-fory/fory`              |
+| Language              | Status    | Package or target                |
+| --------------------- | --------- | -------------------------------- |
+| Java                  | Supported | `org.apache.fory:fory-core`      |
+| Python                | Supported | `pyfory`                         |
+| C++                   | Supported | Bazel/CMake build                |
+| Go                    | Supported | `github.com/apache/fory/go/fory` |
+| Rust                  | Supported | `fory` crate                     |
+| JavaScript/TypeScript | Supported | `@apache-fory/core`              |
+| C#                    | Supported | `Apache.Fory`                    |
+| Swift                 | Supported | Swift Package Manager target     |
+| Dart                  | Supported | `fory` package                   |
 
-## 何时使用 Xlang 模式
+## When to Use Xlang Mode
 
-**使用 xlang 模式的场景：**
+Use xlang mode when:
 
-- 构建多语言微服务
-- 创建多语言数据管道
-- 在前端（JavaScript）和后端（Java/Python/Go）之间共享数据
+- Building multi-language microservices
+- Creating polyglot data pipelines
+- Sharing data between frontend (JavaScript) and backend (Java/Python/Go)
 
-**使用语言原生模式的场景：**
+Use native mode for same-language traffic in Java, Scala, Kotlin, Python, C++,
+Go, or Rust:
 
-- 所有序列化/反序列化都在同一语言中进行
-- 需要最大性能（原生模式更快）
-- 需要特定语言功能（Python pickle 兼容性、Java 序列化钩子）
+- All serialization/deserialization happens in the same language
+- You need language-specific features such as Python pickle-style objects or Java serialization hooks
+- You want native-mode schema-consistent payloads for same-language services
 
-## 快速示例
+## Quick Example
 
-### Java（生产者）
+### Java (Producer)
 
 ```java
 import org.apache.fory.*;
@@ -68,19 +75,17 @@ public class Person {
     public int age;
 }
 
-Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .build();
+Fory fory = Fory.builder().withXlang(true).build();
 fory.register(Person.class, "example.Person");
 
 Person person = new Person();
 person.name = "Alice";
 person.age = 30;
 byte[] bytes = fory.serialize(person);
-// 将 bytes 发送到 Python、Go、Rust 等
+// Send bytes to Python, Go, Rust, etc.
 ```
 
-### Python（消费者）
+### Python (Consumer)
 
 ```python
 import pyfory
@@ -89,37 +94,74 @@ from dataclasses import dataclass
 @dataclass
 class Person:
     name: str
-    age: pyfory.Int32Type
+    age: pyfory.Int32
 
-fory = pyfory.Fory()
+fory = pyfory.Fory(xlang=True)
 fory.register_type(Person, typename="example.Person")
 
-# 从 Java 接收 bytes
+# Receive bytes from Java
 person = fory.deserialize(bytes_from_java)
 print(f"{person.name}, {person.age}")  # Alice, 30
 ```
 
-## 文档
+## Fory IDL
 
-| 主题                                                                      | 描述                             |
-| ------------------------------------------------------------------------- | -------------------------------- |
-| [入门指南](getting-started.md)                                            | 所有语言的安装和基本设置         |
-| [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping) | 跨语言类型映射参考               |
-| [序列化](serialization.md)                                                | 内置类型、自定义类型、引用处理   |
-| [零拷贝](zero-copy.md)                                                    | 大型数据的带外序列化             |
-| [行格式](row_format.md)                                                   | 具有随机访问的缓存友好二进制格式 |
-| [故障排查](troubleshooting.md)                                            | 常见问题及解决方案               |
+For schema-first projects, Fory also provides **Fory IDL** and code generation.
 
-## 特定语言指南
+- Compiler docs: [Fory IDL Overview](../../compiler/index.md)
+- Best for large multi-language message contracts and long-lived schemas
 
-有关特定语言的详细信息和 API 参考：
+### Minimal IDL Example
 
-- [Java 跨语言指南](../java/cross-language.md)
-- [Python 跨语言指南](../python/cross-language.md)
-- [C++ 跨语言指南](../cpp/cross-language.md)
-- [Rust 跨语言指南](../rust/cross-language.md)
+Create `person.fdl`:
 
-## 规范
+```protobuf
+package example;
 
-- [Xlang 序列化规范](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec) - 二进制协议详情
-- [类型映射规范](https://fory.apache.org/docs/next/specification/xlang_type_mapping) - 完整的类型映射参考
+message Person {
+    string name = 1;
+    int32 age = 2;
+    optional string email = 3;
+}
+```
+
+Generate code:
+
+```bash
+foryc person.fdl --lang java,python,go,rust,cpp --output ./generated
+```
+
+This generates native language types with consistent field/type mappings across all targets.
+
+## When to Fory IDL
+
+| Option                             | Use When                                                               | Why                                                                              |
+| ---------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Native xlang types (no IDL)        | You only have a few message types and want to move quickly             | Avoids the integration/setup cost of introducing and operating the compiler      |
+| Fory IDL (schema-first + codegen)  | You have many messages across multiple languages/teams/services        | Provides a single contract, stronger consistency, and easier long-term evolution |
+| Hybrid (start native, move to IDL) | Project starts small but message count and cross-team dependency grows | Lets you keep early velocity, then standardize once schema complexity increases  |
+
+## Documentation
+
+| Topic                                                     | Description                                      |
+| --------------------------------------------------------- | ------------------------------------------------ |
+| [Getting Started](getting-started.md)                     | Installation and basic setup for all languages   |
+| [Type Mapping](../../specification/xlang_type_mapping.md) | Cross-language type mapping reference            |
+| [Serialization](serialization.md)                         | Built-in types, custom types, reference handling |
+| [Zero-Copy](zero-copy.md)                                 | Out-of-band serialization for large data         |
+| [Row Format](row_format.md)                               | Cache-friendly binary format with random access  |
+| [Troubleshooting](troubleshooting.md)                     | Common issues and solutions                      |
+
+## Language-Specific Guides
+
+For language-specific details and API reference:
+
+- [Java Cross-Language Guide](../java/cross-language.md)
+- [Python Cross-Language Guide](../python/cross-language.md)
+- [C++ Cross-Language Guide](../cpp/cross-language.md)
+- [Rust Cross-Language Guide](../rust/cross-language.md)
+
+## Specifications
+
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md) - Binary protocol details
+- [Type Mapping Specification](../../specification/xlang_type_mapping.md) - Complete type mapping reference

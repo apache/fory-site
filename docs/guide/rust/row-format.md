@@ -1,6 +1,6 @@
 ---
 title: Row Format
-sidebar_position: 9
+sidebar_position: 10
 id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -71,7 +71,7 @@ let profile = UserProfile {
 };
 
 // Serialize to row format
-let row_data = to_row(&profile);
+let row_data = to_row(&profile).unwrap();
 
 // Zero-copy deserialization - no object allocation!
 let row = from_row::<UserProfile>(&row_data);
@@ -85,13 +85,13 @@ assert_eq!(row.is_active(), true);
 // Access collections efficiently
 let scores = row.scores();
 assert_eq!(scores.size(), 4);
-assert_eq!(scores.get(0), 95);
-assert_eq!(scores.get(1), 87);
+assert_eq!(scores.get(0).unwrap(), 95);
+assert_eq!(scores.get(1).unwrap(), 87);
 
 let prefs = row.preferences();
 assert_eq!(prefs.keys().size(), 2);
-assert_eq!(prefs.keys().get(0), "language");
-assert_eq!(prefs.values().get(0), "en");
+assert_eq!(prefs.keys().get(0).unwrap(), "language");
+assert_eq!(prefs.values().get(0).unwrap(), "en");
 ```
 
 ## How It Works

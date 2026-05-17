@@ -1,5 +1,5 @@
 ---
-title: Cross-Language Serialization Guide
+title: Xlang Serialization Guide
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,41 +19,48 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ xlang (cross-language) serialization enables seamless data exchange between different programming languages. Serialize data in one language and deserialize it in another without manual data conversion. You can use either direct native types (no IDL) or a schema-first Fory IDL workflow.
+Apache Fory™ xlang serialization is the default wire format for cross-language payloads. Serialize
+data in one language and deserialize it in another without manual conversion. You can use direct
+language model types for small contracts, or use Fory IDL and code generation when a schema-first
+workflow is a better fit.
 
 ## Features
 
-- **No IDL Required**: Serialize objects directly with native language types
-- **Multi-Language Support**: Java, Python, C++, Go, Rust, JavaScript all interoperate seamlessly
-- **Reference Support**: Shared and circular references work across language boundaries
-- **Schema Evolution**: Forward/backward compatibility when class definitions change
-- **Zero-Copy**: Out-of-band serialization for large binary data
-- **High Performance**: JIT compilation and optimized binary protocol
+- **No IDL required**: Serialize objects directly with language model types.
+- **Multi-language support**: Java, Python, C++, Go, Rust, JavaScript/TypeScript, C#, Swift, and Dart interoperate through the same xlang format.
+- **Reference support**: Shared and circular references work across language boundaries when reference tracking is enabled in each runtime.
+- **Schema evolution**: Compatible mode is the xlang default so readers can tolerate added, removed, or reordered fields.
+- **Out-of-band buffers**: Language runtimes can expose zero-copy buffer paths for large binary data.
+- **High performance**: Runtimes use generated serializers, JIT serializers, or optimized code paths where available.
 
 ## Supported Languages
 
-| Language   | Status | Package                          |
-| ---------- | ------ | -------------------------------- |
-| Java       | ✅     | `org.apache.fory:fory-core`      |
-| Python     | ✅     | `pyfory`                         |
-| C++        | ✅     | Bazel/CMake build                |
-| Go         | ✅     | `github.com/apache/fory/go/fory` |
-| Rust       | ✅     | `fory` crate                     |
-| JavaScript | ✅     | `@apache-fory/fory`              |
+| Language              | Status    | Package or target                |
+| --------------------- | --------- | -------------------------------- |
+| Java                  | Supported | `org.apache.fory:fory-core`      |
+| Python                | Supported | `pyfory`                         |
+| C++                   | Supported | Bazel/CMake build                |
+| Go                    | Supported | `github.com/apache/fory/go/fory` |
+| Rust                  | Supported | `fory` crate                     |
+| JavaScript/TypeScript | Supported | `@apache-fory/core`              |
+| C#                    | Supported | `Apache.Fory`                    |
+| Swift                 | Supported | Swift Package Manager target     |
+| Dart                  | Supported | `fory` package                   |
 
 ## When to Use Xlang Mode
 
-**Use xlang mode when:**
+Use xlang mode when:
 
 - Building multi-language microservices
 - Creating polyglot data pipelines
 - Sharing data between frontend (JavaScript) and backend (Java/Python/Go)
 
-**Use language-native mode when:**
+Use native mode for same-language traffic in Java, Scala, Kotlin, Python, C++,
+Go, or Rust:
 
 - All serialization/deserialization happens in the same language
-- Maximum performance is required (native mode is faster)
-- You need language-specific features (Python pickle compatibility, Java serialization hooks)
+- You need language-specific features such as Python pickle-style objects or Java serialization hooks
+- You want native-mode schema-consistent payloads for same-language services
 
 ## Quick Example
 
@@ -68,9 +75,7 @@ public class Person {
     public int age;
 }
 
-Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
-    .build();
+Fory fory = Fory.builder().withXlang(true).build();
 fory.register(Person.class, "example.Person");
 
 Person person = new Person();
@@ -91,7 +96,7 @@ class Person:
     name: str
     age: pyfory.Int32
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 fory.register_type(Person, typename="example.Person")
 
 # Receive bytes from Java

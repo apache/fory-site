@@ -1,7 +1,7 @@
 ---
 title: Supported Types
 sidebar_position: 7
-id: dart_supported_types
+id: supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -154,6 +154,6 @@ width is one of the most common cross-language bugs.
 
 ## Related Topics
 
-- [Field Configuration](field-configuration.md)
+- [Schema Metadata](schema-metadata.md)
 - [Cross-Language](cross-language.md)
 - [Schema Evolution](schema-evolution.md)

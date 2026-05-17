@@ -1,6 +1,6 @@
 ---
 title: Supported Types
-sidebar_position: 40
+sidebar_position: 50
 id: supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -48,7 +48,7 @@ Fory uses variable-length integer encoding (varint) for better compression:
 - Platform `int` maps to `int32` on 32-bit, `int64` on 64-bit systems
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // All integer types supported
 var i8 int8 = 127
@@ -82,7 +82,7 @@ struct field is dense numeric `array<T>` data.
 | `[]I` (any/any) | LIST          | Any interface type    |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Primitive root slice (optimized dense array payload)
 ints := []int32{1, 2, 3, 4, 5}
@@ -118,7 +118,7 @@ data, _ = f.Serialize(dynamic)
 | `map[any]any`        | MAP         | Dynamic keys and values |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // String key maps
 m1 := map[string]string{"key": "value"}
@@ -162,7 +162,7 @@ data, _ := f.Serialize(s)
 ```go
 import "time"
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Timestamp
 t := time.Now()
@@ -196,7 +196,7 @@ type User struct {
     password string  // NOT serialized (unexported)
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(User{}, 1)
 
 user := &User{ID: 1, Name: "Alice", Age: 30, password: "secret"}
@@ -218,7 +218,7 @@ type Company struct {
     Founded int32
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(Address{}, 1)
 f.RegisterStruct(Company{}, 2)
 ```
@@ -231,7 +231,7 @@ f.RegisterStruct(Company{}, 2)
 | `**T`   | Nested pointers supported                |
 
 ```go
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 
 type Node struct {
     Value int32
@@ -268,7 +268,7 @@ f.Deserialize(data, &result)
 | `any`   | UNION (31)  | Polymorphic values |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Serialize any
 var value any = "hello"
@@ -294,7 +294,7 @@ func (c Circle) Area() float64 {
     return 3.14159 * c.Radius * c.Radius
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(Circle{}, 1)
 
 var shape Shape = Circle{Radius: 5.0}
@@ -308,7 +308,7 @@ data, _ := f.Serialize(shape)
 | `[]byte` | BINARY (37) | Variable-length bytes |
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 data := []byte{0x01, 0x02, 0x03, 0x04}
 serialized, _ := f.Serialize(data)
@@ -330,7 +330,7 @@ const (
     StatusComplete Status = 2
 )
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterEnum(Status(0), 1)
 
 status := StatusActive

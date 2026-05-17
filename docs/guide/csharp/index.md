@@ -87,12 +87,12 @@ User decoded = fory.Deserialize<User>(payload);
 | --------------------------------------------- | --------------------------------------------- |
 | [Configuration](configuration.md)             | Builder options and runtime modes             |
 | [Basic Serialization](basic-serialization.md) | Typed and dynamic serialization APIs          |
+| [Cross-Language](cross-language.md)           | Interoperability guidance                     |
+| [Schema Metadata](schema-metadata.md)         | `[ForyField]` ids and schema type descriptors |
 | [Type Registration](type-registration.md)     | Registering user types and custom serializers |
 | [Custom Serializers](custom-serializers.md)   | Implementing `Serializer<T>`                  |
-| [Field Configuration](field-configuration.md) | `[ForyField]` ids and schema type descriptors |
 | [References](references.md)                   | Shared/circular reference handling            |
 | [Schema Evolution](schema-evolution.md)       | Compatible mode behavior                      |
-| [Cross-Language](cross-language.md)           | Interoperability guidance                     |
 | [Supported Types](supported-types.md)         | Built-in and generated type support           |
 | [Thread Safety](thread-safety.md)             | `Fory` vs `ThreadSafeFory` usage              |
 | [Troubleshooting](troubleshooting.md)         | Common errors and debugging steps             |

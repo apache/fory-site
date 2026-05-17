@@ -70,7 +70,7 @@ struct Person {
 FORY_STRUCT(Person, name, age, address, hobbies, metadata);
 
 int main() {
-  auto fory = Fory::builder().xlang(true).compatible(true).build();
+  auto fory = Fory::builder().xlang(true).build();
   fory.register_struct<Address>(100);
   fory.register_struct<Person>(200);
 
@@ -93,7 +93,7 @@ int main() {
 ### Serialize to New Vector
 
 ```cpp
-auto fory = Fory::builder().xlang(true).compatible(true).build();
+auto fory = Fory::builder().xlang(true).build();
 fory.register_struct<MyStruct>(1);
 
 MyStruct obj{/* ... */};

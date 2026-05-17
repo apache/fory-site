@@ -1,7 +1,7 @@
 ---
 title: Type Registration
-sidebar_position: 4
-id: dart_type_registration
+sidebar_position: 6
+id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with

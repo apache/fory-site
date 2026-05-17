@@ -1,7 +1,7 @@
 ---
-title: 跨语言序列化
-sidebar_position: 9
-id: dart_cross_language
+title: Cross-Language Serialization
+sidebar_position: 4
+id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,25 +19,25 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ Dart 生成的二进制格式与 Java、Go、C#、Python、Rust 和 Swift 的 Fory 运行时保持一致。你可以在 Dart 中写消息，在 Java 中读取，或者反过来，整个过程都不需要额外的转换层。
+Apache Fory™ Dart serializes to the same binary format as the Java, Go, C#, Python, Rust, and Swift Fory runtimes. You can write a message in Dart and read it in Java — or any other direction — without any conversion layer.
 
-## 设置
+## Setup
 
-像平常一样创建 `Fory` 实例即可。Dart 中不需要单独开启“跨语言模式”：
+Create a `Fory` instance as normal. There is no separate xlang option to enable in Dart:
 
 ```dart
-final fory = Fory(); // 或者在需要 Schema 演进时使用 Fory(compatible: true)
+final fory = Fory(); // xlang payloads with compatible schema evolution
 ```
 
-关键要求是：通信两端必须用同一身份注册同一个类型。
+The key requirement is that both sides register the same type using the same identity.
 
-## 注册身份
+## Registration Identity
 
-最重要的规则是：**每一端都要使用相同的类型身份**。你有两种选择：
+The most important rule: **use the same type identity on every side**. You have two options:
 
-### 数字 ID
+### Numeric ID
 
-更适合小团队、强协同的场景：
+Simpler for small, tightly-coordinated teams:
 
 ```dart
 // Dart
@@ -46,7 +46,7 @@ ModelsFory.register(fory, Person, id: 100);
 
 ### Namespace + Type Name
 
-更适合多个团队分别定义类型的场景：
+Better when multiple teams define types independently:
 
 ```dart
 // Dart
@@ -58,9 +58,9 @@ ModelsFory.register(
 );
 ```
 
-不要在不同运行时上对同一个类型混用这两种策略。
+Do not mix the two strategies for the same type across runtimes.
 
-## Dart 到 Java 示例
+## Dart to Java Example
 
 ### Dart
 
@@ -74,37 +74,39 @@ class Person {
   Person();
 
   String name = '';
-  Int32 age = Int32(0);
+
+  @ForyField(type: Int32Type())
+  int age = 0;
 }
 
 final fory = Fory();
 PersonFory.register(fory, Person, id: 100);
 final bytes = fory.serialize(Person()
   ..name = 'Alice'
-  ..age = Int32(30));
+  ..age = 30);
 ```
 
 ### Java
 
 ```java
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .build();
+        .withXlang(true)
+        .build();
 
 fory.register(Person.class, 100);
 Person value = (Person) fory.deserialize(bytesFromDart);
 ```
 
-## Dart 到 C# 示例
+## Dart to C# Example
 
 ### Dart
 
 ```dart
-final fory = Fory(compatible: true);
+final fory = Fory();
 PersonFory.register(fory, Person, id: 100);
 final bytes = fory.serialize(Person()
   ..name = 'Alice'
-  ..age = Int32(30));
+  ..age = 30);
 ```
 
 ### CSharp
@@ -125,7 +127,7 @@ fory.Register<Person>(100);
 Person person = fory.Deserialize<Person>(payloadFromDart);
 ```
 
-## Dart 到 Go 示例
+## Dart to Go Example
 
 ### Dart
 
@@ -134,7 +136,7 @@ final fory = Fory();
 PersonFory.register(fory, Person, id: 100);
 final bytes = fory.serialize(Person()
   ..name = 'Alice'
-  ..age = Int32(30));
+  ..age = 30);
 ```
 
 ### Go
@@ -152,33 +154,59 @@ var person Person
 _ = f.Deserialize(bytesFromDart, &person)
 ```
 
-## 字段匹配规则
+## Field Matching Rules
 
-Fory 会按字段名或稳定字段 ID 匹配字段。为了获得稳健的跨语言互操作性：
+Fory matches fields by name or by stable field ID. For robust cross-language interop:
 
-1. 各端对同一类型使用相同的类型身份，即相同的数字 ID 或相同的 `namespace + typeName`。
-2. 在首次对外发送载荷之前，为所有字段分配稳定的 `@ForyField(id: ...)`。
-3. 保持字段名一致，或者依赖字段 ID，因为 Dart 通常使用 `lowerCamelCase`，Go 为导出字段使用 `PascalCase`，C# 也常用 `PascalCase` 属性。
-4. 使用兼容的数字类型：当对端为 Java `int`、Go `int32` 或 C# `int` 时，在 Dart 中使用 `Int32`；Dart 的 `double` 对应 64 位浮点；32 位浮点请使用 `Float32`。
-5. 日期时间字段优先使用 `Timestamp` 和 `LocalDate`，不要直接用原始 `DateTime`。
-6. 发布前一定要在所有目标语言间完成真实 round trip 验证。
+1. Use the same type identity on every side (same numeric ID or same `namespace + typeName`).
+2. Assign stable `@ForyField(id: ...)` values to all fields before shipping the first payload.
+3. Keep field names consistent or rely on IDs, since Dart typically uses `lowerCamelCase` while Go uses `PascalCase` for exported fields and C# often uses `PascalCase` properties.
+4. Use explicit numeric field metadata: `@ForyField(type: Int32Type())` in Dart for Java `int`, Go `int32`, and C# `int`; `double` in Dart for 64-bit floats; `double` plus `Float16Type` or `Bfloat16Type` for 16-bit floats; `Float32` for 32-bit; `Int64` / `Uint64` for full-range 64-bit values.
+5. Use `Timestamp`, `LocalDate`, and `Duration` for temporal fields rather than raw `DateTime`.
+6. Validate real round trips across all languages before shipping.
 
-## Dart 的类型映射说明
+## Type Mapping Notes for Dart
 
-由于 Dart `int` 本身并不承诺精确的跨语言编码宽度，所以一旦跨语言解释需要精确定义，就应优先使用包装类型或数字字段注解：
+Because Dart `int` is not itself a promise about the exact xlang wire width, prefer explicit field metadata when exact cross-language interpretation matters:
 
-- `Int32` 对应 xlang `int32`
-- `UInt32` 对应 xlang `uint32`
-- `Float16` 和 `Float32` 对应用于较小宽度的浮点数
-- `Timestamp` 和 `LocalDate` 用于显式的时间语义
+- `@ForyField(type: Int32Type())` for xlang `int32`
+- `@ForyField(type: Uint32Type())` for xlang `uint32`
+- `@ForyField(type: Int8Type())` / `@ForyField(type: Int16Type())` / `@ForyField(type: Uint8Type())` / `@ForyField(type: Uint16Type())` for narrower integer widths
+- `Int64` and `Uint64` for full-range 64-bit values on web
+- `double` fields annotated with `Float16Type` or `Bfloat16Type` for 16-bit
+  floating-point scalars, and `Float32` for single-precision values
+- `Float16List` and `Bfloat16List` for 16-bit floating-point array payloads
+- `Timestamp`, `LocalDate`, and `Duration` for explicit temporal semantics
 
-参见 [支持的类型](supported-types.md) 和 [xlang type mapping](../../specification/xlang_type_mapping.md)。
+### Lists and Dense Arrays
 
-## 验证
+`List<T>` always represents Fory `list<T>` unless a field has explicit array
+metadata. Use `array<T>` only for dense one-dimensional bool or numeric data.
 
-在生产环境依赖跨语言契约之前，请让每一种支持的运行时都完成端到端验证。
+| Fory schema       | Dart field carrier and annotation                   |
+| ----------------- | --------------------------------------------------- |
+| `list<bool>`      | `List<bool>`                                        |
+| `array<bool>`     | `@ArrayField(element: BoolType()) BoolList`         |
+| `array<int8>`     | `@ArrayField(element: Int8Type()) Int8List`         |
+| `array<int16>`    | `@ArrayField(element: Int16Type()) Int16List`       |
+| `array<int32>`    | `@ArrayField(element: Int32Type()) Int32List`       |
+| `array<int64>`    | `@ArrayField(element: Int64Type()) Int64List`       |
+| `array<uint8>`    | `@ArrayField(element: Uint8Type()) Uint8List`       |
+| `array<uint16>`   | `@ArrayField(element: Uint16Type()) Uint16List`     |
+| `array<uint32>`   | `@ArrayField(element: Uint32Type()) Uint32List`     |
+| `array<uint64>`   | `@ArrayField(element: Uint64Type()) Uint64List`     |
+| `array<float16>`  | `@ArrayField(element: Float16Type()) Float16List`   |
+| `array<bfloat16>` | `@ArrayField(element: Bfloat16Type()) Bfloat16List` |
+| `array<float32>`  | `@ArrayField(element: Float32Type()) Float32List`   |
+| `array<float64>`  | `@ArrayField(element: Float64Type()) Float64List`   |
 
-运行 Dart 端：
+See [Supported Types](supported-types.md) and [xlang type mapping](../../specification/xlang_type_mapping.md).
+
+## Validation
+
+Before relying on a cross-language contract in production, test a payload end-to-end through every runtime you support.
+
+Run the Dart side:
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
@@ -186,8 +214,8 @@ dart analyze
 dart test
 ```
 
-## 相关主题
+## Related Topics
 
-- [类型注册](type-registration.md)
-- [Schema 演进](schema-evolution.md)
-- [跨语言指南](../xlang/index.md)
+- [Type Registration](type-registration.md)
+- [Schema Evolution](schema-evolution.md)
+- [Cross-language guide](../xlang/index.md)

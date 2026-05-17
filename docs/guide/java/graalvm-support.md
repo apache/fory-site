@@ -1,6 +1,6 @@
 ---
 title: GraalVM Support
-sidebar_position: 13
+sidebar_position: 14
 id: graalvm_support
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -66,7 +66,7 @@ public class Example {
   static Fory fory;
 
   static {
-    fory = Fory.builder().build();
+    fory = Fory.builder().withXlang(false).build();
     fory.register(MyClass.class);
     fory.register(AnotherClass.class);
     // Compile all serializers at build time
@@ -105,12 +105,12 @@ class, for example:
 Args = --initialize-at-build-time=com.example.Example
 ```
 
-| Scenario                        | Without Feature              | With Feature       |
-| ------------------------------- | ---------------------------- | ------------------ |
-| Public classes with no-arg ctor | ✅ Works                     | ✅ Works           |
-| Private constructors            | ❌ Needs reflect-config.json | ✅ Auto-registered |
-| Private inner records           | ❌ Needs reflect-config.json | ✅ Auto-registered |
-| Dynamic proxies                 | ❌ Needs manual config       | ✅ Auto-registered |
+| Scenario                        | Without Feature           | With Feature    |
+| ------------------------------- | ------------------------- | --------------- |
+| Public classes with no-arg ctor | Works                     | Works           |
+| Private constructors            | Needs reflect-config.json | Auto-registered |
+| Private inner records           | Needs reflect-config.json | Auto-registered |
+| Dynamic proxies                 | Needs manual config       | Auto-registered |
 
 ### Example with Private Record
 
@@ -122,7 +122,7 @@ public class Example {
   static Fory fory;
 
   static {
-    fory = Fory.builder().build();
+    fory = Fory.builder().withXlang(false).build();
     fory.register(PrivateRecord.class);
     fory.ensureSerializersCompiled();
   }
@@ -146,7 +146,7 @@ public class ProxyExample {
   static Fory fory;
 
   static {
-    fory = Fory.builder().build();
+    fory = Fory.builder().withXlang(false).build();
     // Register the exact interface list used by Proxy.newProxyInstance(...)
     GraalvmSupport.registerProxySupport(MyService.class, Audited.class);
     fory.ensureSerializersCompiled();

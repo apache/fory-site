@@ -85,7 +85,7 @@ Fory Swift 在标量对象和列表两类工作负载下，相比 Protobuf 和 M
 
 Fory JavaScript 在具有代表性的 Node.js 工作负载下，相比 Protocol Buffers 与 JSON 展现出较强性能表现。
 
-<img src="../benchmarks/javascript/throughput.png" width="90%"/>
+![JavaScript 吞吐图](../benchmarks/javascript/throughput.png)
 
 注意：结果取决于硬件、数据集和运行时版本。详细信息请参见 [JavaScript 性能测试报告](../benchmarks/javascript/README.md)。
 
@@ -93,6 +93,6 @@ Fory JavaScript 在具有代表性的 Node.js 工作负载下，相比 Protocol 
 
 Fory Dart 在具有代表性的对象和列表工作负载下，相比 Protocol Buffers 展现出较强性能表现。
 
-<img src="../benchmarks/dart/throughput.png" width="90%"/>
+![Dart 吞吐图](../benchmarks/dart/throughput.png)
 
 注意：结果取决于硬件、数据集和运行时版本。详细信息请参见 [Dart 性能测试报告](../benchmarks/dart/README.md)。

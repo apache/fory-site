@@ -54,9 +54,9 @@ struct Address {
     country: String,
 }
 
-let mut fory = Fory::default();
-fory.register::<Address>(100);
-fory.register::<Person>(200);
+let mut fory = Fory::builder().xlang(true).build();
+fory.register_by_name::<Address>("example", "Address").unwrap();
+fory.register_by_name::<Person>("example", "Person").unwrap();
 
 let person = Person {
     name: "John Doe".to_string(),
@@ -72,7 +72,7 @@ let person = Person {
     ]),
 };
 
-let bytes = fory.serialize(&person);
+let bytes = fory.serialize(&person).unwrap();
 let decoded: Person = fory.deserialize(&bytes)?;
 assert_eq!(person, decoded);
 ```
@@ -162,7 +162,7 @@ fory = { version = "0.13", features = ["chrono"] }
 ```rust
 use fory::{Fory, Reader};
 
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(true).build();
 fory.register::<MyStruct>(1)?;
 
 let obj = MyStruct { /* ... */ };

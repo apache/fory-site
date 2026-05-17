@@ -1,5 +1,5 @@
 ---
-title: 支持的类型
+title: Supported Types
 sidebar_position: 9
 id: supported_types
 license: |
@@ -19,42 +19,45 @@ license: |
   limitations under the License.
 ---
 
-本页汇总 Apache Fory™ C# 的内置类型支持和生成类型支持。
+This page summarizes built-in and generated type support in Apache Fory™ C#.
 
-## 基础类型
+## Primitive Types
 
-| C# 类型 | 说明 |
-| ------- | ---- |
-| `bool` | 支持 |
-| `sbyte`, `short`, `int`, `long` | 支持 |
-| `byte`, `ushort`, `uint`, `ulong` | 支持 |
-| `float`, `double` | 支持 |
-| `string` | 支持 |
-| `byte[]` | 支持 |
-| 可空基础类型，例如 `int?` | 支持 |
+| C# Type                                  | Notes     |
+| ---------------------------------------- | --------- |
+| `bool`                                   | Supported |
+| `sbyte`, `short`, `int`, `long`          | Supported |
+| `byte`, `ushort`, `uint`, `ulong`        | Supported |
+| `float`, `double`                        | Supported |
+| `Half`, `BFloat16`                       | Supported |
+| `string`                                 | Supported |
+| `byte[]`                                 | Supported |
+| Nullable primitives (for example `int?`) | Supported |
 
-## 数组
+## Arrays
 
-- 基础数值数组，例如 `bool[]`、`int[]`、`ulong[]`
+- Primitive numeric arrays (`bool[]`, `int[]`, `ulong[]`, etc.)
+- `Half[]`, `List<Half>` with `S.Array<S.Float16>` for `array<float16>`
+- `BFloat16[]`, `List<BFloat16>` with `S.Array<S.BFloat16>` for `array<bfloat16>`
 - `byte[]`
-- 通过集合序列化器支持的一般数组 `T[]`
+- General arrays (`T[]`) through collection serializers
 
-## 集合
+## Collections
 
-### 类 List
+### List-like
 
 - `List<T>`
 - `LinkedList<T>`
 - `Queue<T>`
 - `Stack<T>`
 
-### 类 Set
+### Set-like
 
 - `HashSet<T>`
 - `SortedSet<T>`
 - `ImmutableHashSet<T>`
 
-### 类 Map
+### Map-like
 
 - `Dictionary<TKey, TValue>`
 - `SortedDictionary<TKey, TValue>`
@@ -62,36 +65,36 @@ license: |
 - `ConcurrentDictionary<TKey, TValue>`
 - `NullableKeyDictionary<TKey, TValue>`
 
-## 时间类型
+## Time Types
 
-| C# 类型 | 编码类型 |
-| ------- | -------- |
-| `DateOnly` | `Date` |
-| `DateTime` | `Timestamp` |
+| C# Type          | Wire Type   |
+| ---------------- | ----------- |
+| `DateOnly`       | `Date`      |
+| `DateTime`       | `Timestamp` |
 | `DateTimeOffset` | `Timestamp` |
-| `TimeSpan` | `Duration` |
+| `TimeSpan`       | `Duration`  |
 
-## 用户类型
+## User Types
 
-- 通过 source generator 生成序列化器的 `[ForyObject]` 类、结构体、枚举
-- 通过 `Register<T, TSerializer>(...)` 注册的自定义序列化器类型
-- `Union` / `Union2<...>` 强类型联合支持
+- `[ForyObject]` classes/structs/enums via source-generated serializers
+- Custom serializer types registered through `Register<T, TSerializer>(...)`
+- `Union` / `Union2<...>` typed union support
 
-## 动态类型
+## Dynamic Types
 
-通过 `Serialize<object?>` / `Deserialize<object?>` 处理动态对象载荷时，支持：
+Dynamic object payloads via `Serialize<object?>` / `Deserialize<object?>` support:
 
-- 基础值和对象值
-- 动态列表、集合、映射
-- 嵌套的动态结构
+- Primitive/object values
+- Dynamic lists/sets/maps
+- Nested dynamic structures
 
-## 说明
+## Notes
 
-- 用户自定义类型应显式注册。
-- 跨语言使用时，请遵循 [xlang 指南](../xlang/index.md)。
+- User-defined types should be registered explicitly.
+- For cross-language usage, follow the [xlang guide](../xlang/index.md).
 
-## 相关主题
+## Related Topics
 
-- [基础序列化](basic-serialization.md)
-- [类型注册](type-registration.md)
-- [跨语言](cross-language.md)
+- [Basic Serialization](basic-serialization.md)
+- [Type Registration](type-registration.md)
+- [Cross-Language](cross-language.md)

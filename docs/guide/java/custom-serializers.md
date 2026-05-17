@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 4
+sidebar_position: 12
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -68,7 +68,7 @@ public final class FooSerializer extends Serializer<Foo> implements Shareable {
 Register it with a `Config`-based constructor when the serializer is shareable:
 
 ```java
-Fory fory = Fory.builder().build();
+Fory fory = Fory.builder().withXlang(false).build();
 fory.registerSerializer(Foo.class, new FooSerializer(fory.getConfig()));
 ```
 
@@ -195,7 +195,7 @@ public final class CustomMapSerializer<T extends Map<?, ?>> extends MapSerialize
 ## Registration
 
 ```java
-Fory fory = Fory.builder().build();
+Fory fory = Fory.builder().withXlang(false).build();
 
 fory.registerSerializer(Foo.class, new FooSerializer(fory.getConfig()));
 fory.registerSerializer(

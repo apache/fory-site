@@ -1,6 +1,6 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 8
+sidebar_position: 3
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -23,9 +23,9 @@ Apache Fory™ C# supports cross-language serialization with other Fory runtimes
 
 ## Cross-Language Runtime
 
-C# always writes and reads the xlang frame header. There is no separate `Xlang(...)` builder
-option, so interoperability code only needs to configure the remaining runtime behavior such as
-compatibility mode and reference tracking.
+C# always writes and reads the xlang frame header. There is no mode switch, so interoperability code
+only needs to configure the remaining runtime behavior such as compatibility mode and reference
+tracking.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -71,8 +71,8 @@ byte[] payload = fory.Serialize(person);
 
 ```java
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
-    .withRefTracking(true)
+        .withXlang(true)
+        .withRefTracking(true)
     .build();
 
 fory.register(Person.class, 100);
@@ -84,7 +84,7 @@ Person value = (Person) fory.deserialize(payloadFromCSharp);
 ```python
 import pyfory
 
-fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 fory.register_type(Person, type_id=100)
 value = fory.deserialize(payload_from_csharp)
 ```

@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 public class ZeroCopyExample {
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withXlang(true).withCompatible(true).build();
+    Fory fory = Fory.builder().withXlang(true).build();
 
     // Data with large arrays
     List<Object> list = List.of(
@@ -84,7 +84,7 @@ import array
 import pyfory
 import numpy as np
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 
 # Data with large arrays
 data = [
@@ -115,7 +115,7 @@ import forygo "github.com/apache/fory/go/fory"
 import "fmt"
 
 func main() {
-  serializer := forygo.NewFory(forygo.WithXlang(true), forygo.WithCompatible(true))
+  serializer := forygo.NewFory(forygo.WithXlang(true))
 
   // Data with large arrays
   list := []any{
@@ -147,12 +147,6 @@ func main() {
   }
   fmt.Println(newList)
 }
-```
-
-## JavaScript
-
-```javascript
-// Zero-copy support coming soon
 ```
 
 ## Use Cases

@@ -1,6 +1,6 @@
 ---
 title: Schema Evolution
-sidebar_position: 7
+sidebar_position: 8
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -47,11 +47,11 @@ struct PersonV2 {
     metadata: HashMap<String, String>,
 }
 
-let mut fory1 = Fory::builder().compatible(true).build();
-fory1.register::<PersonV1>(1);
+let mut fory1 = Fory::builder().xlang(false).compatible(true).build();
+fory1.register::<PersonV1>(1)?;
 
-let mut fory2 = Fory::builder().compatible(true).build();
-fory2.register::<PersonV2>(1);
+let mut fory2 = Fory::builder().xlang(false).compatible(true).build();
+fory2.register::<PersonV2>(1)?;
 
 let person_v1 = PersonV1 {
     name: "Alice".to_string(),
@@ -60,7 +60,7 @@ let person_v1 = PersonV1 {
 };
 
 // Serialize with V1
-let bytes = fory1.serialize(&person_v1);
+let bytes = fory1.serialize(&person_v1)?;
 
 // Deserialize with V2 - missing fields get default values
 let person_v2: PersonV2 = fory2.deserialize(&bytes)?;
@@ -120,7 +120,7 @@ enum Value {
     Object { name: String, value: i32 },
 }
 
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(false).build();
 fory.register::<Value>(1)?;
 
 let value = Value::Object { name: "score".to_string(), value: 100 };
@@ -155,7 +155,7 @@ enum NewEvent {
     KeyPress(String),  // New variant
 }
 
-let mut fory = Fory::builder().compatible(true).build();
+let mut fory = Fory::builder().xlang(false).compatible(true).build();
 
 // Serialize with old schema
 let old_bytes = fory.serialize(&OldEvent::Click { x: 100, y: 200 })?;
@@ -180,7 +180,7 @@ assert!(matches!(new_event, NewEvent::Click { x: 100, y: 200, timestamp: 0 }));
 
 ## Tuple Support
 
-Apache Fory™ supports tuples up to 22 elements out of the box with efficient serialization in both compatible and non-compatible modes.
+Apache Fory™ supports tuples up to 22 elements out of the box with efficient serialization in both compatible and schema-consistent modes.
 
 **Features:**
 
@@ -188,15 +188,15 @@ Apache Fory™ supports tuples up to 22 elements out of the box with efficient s
 - Heterogeneous type support (each element can be a different type)
 - Schema evolution in Compatible mode (handles missing/extra elements)
 
-**Serialization modes:**
+**Schema modes:**
 
-1. **Non-compatible mode**: Serializes elements sequentially without collection headers for minimal overhead
+1. **Schema-consistent mode**: Serializes elements sequentially without collection headers for minimal overhead
 2. **Compatible mode**: Uses collection protocol with type metadata for schema evolution
 
 ```rust
 use fory::{Fory, Error};
 
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(false).build();
 
 // Tuple with heterogeneous types
 let data: (i32, String, bool, Vec<i32>) = (

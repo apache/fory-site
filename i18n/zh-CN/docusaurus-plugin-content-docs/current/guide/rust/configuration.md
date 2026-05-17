@@ -1,5 +1,5 @@
 ---
-title: 配置
+title: Configuration
 sidebar_position: 2
 id: configuration
 license: |
@@ -19,107 +19,117 @@ license: |
   limitations under the License.
 ---
 
-本页涵盖 Fory 配置选项和序列化模式。
+This page covers Rust runtime configuration. `Fory::builder().xlang(true).build()` selects xlang mode with
+compatible schema evolution. Native mode is selected explicitly with `.xlang(false)` and defaults to
+schema-consistent payloads.
 
-## 序列化模式
+## Wire Modes
 
-Apache Fory™ 支持两种序列化模式：
+Apache Fory™ supports two serialization modes:
 
-### SchemaConsistent 模式（默认）
+### Xlang Mode
 
-类型声明必须在对等方之间完全匹配：
-
-```rust
-let fory = Fory::default(); // 默认为 SchemaConsistent
-```
-
-### Compatible 模式
-
-允许独立的 schema 演化：
+Xlang mode is selected with `.xlang(true)` and uses the cross-language wire
+format. Compatible schema evolution is the xlang default and is recommended for
+cross-language services because schemas can diverge more easily across
+languages:
 
 ```rust
-let fory = Fory::default().compatible(true);
+let fory = Fory::builder().xlang(true).build();
 ```
 
-## 配置选项
-
-### 最大动态对象嵌套深度
-
-Apache Fory™ 提供针对反序列化期间深度嵌套动态对象导致的栈溢出保护。默认情况下，trait 对象和容器的最大嵌套深度设置为 5 层。
-
-**默认配置：**
+Use `.compatible(false)` only for xlang payloads where every peer updates the
+same schema together:
 
 ```rust
-let fory = Fory::default(); // max_dyn_depth = 5
+let fory = Fory::builder().xlang(true).compatible(false).build();
 ```
 
-**自定义深度限制：**
+### Native Mode
+
+For Rust-only payloads, native mode is explicit and schema-consistent by default:
 
 ```rust
-let fory = Fory::default().max_dyn_depth(10); // 允许最多 10 层
+let fory = Fory::builder().xlang(false).build();
 ```
 
-**何时调整：**
+Add `.compatible(true)` only when Rust-only deployments need schema evolution.
 
-- **增加**：用于合法的深度嵌套数据结构
-- **减少**：用于更严格的安全要求或浅层数据结构
+## Configuration
 
-**受保护的类型：**
+### Maximum Dynamic Object Nesting Depth
 
-- `Box<dyn Any>`、`Rc<dyn Any>`、`Arc<dyn Any>`
-- `Box<dyn Trait>`、`Rc<dyn Trait>`、`Arc<dyn Trait>`（trait 对象）
-- `RcWeak<T>`、`ArcWeak<T>`
-- 集合类型（Vec、HashMap、HashSet）
-- Compatible 模式下的嵌套结构体类型
+Apache Fory™ provides protection against stack overflow from deeply nested dynamic objects during deserialization. By default, the maximum nesting depth is set to 5 levels for trait objects and containers.
 
-注意：静态数据类型（非动态类型）本质上是安全的，不受深度限制约束，因为它们的结构在编译时就已知。
-
-### 跨语言模式
-
-启用跨语言序列化：
+**Default configuration:**
 
 ```rust
-let fory = Fory::default()
-    .compatible(true)
-    .xlang(true);
+let fory = Fory::builder().xlang(true).build(); // max_dyn_depth = 5
 ```
 
-## 构建器模式
+**Custom depth limit:**
+
+```rust
+let fory = Fory::builder().xlang(true).max_dyn_depth(10).build(); // Allow up to 10 levels
+```
+
+**When to adjust:**
+
+- **Increase**: For legitimate deeply nested data structures
+- **Decrease**: For stricter security requirements or shallow data structures
+
+**Protected types:**
+
+- `Box<dyn Any>`, `Rc<dyn Any>`, `Arc<dyn Any>`
+- `Box<dyn Trait>`, `Rc<dyn Trait>`, `Arc<dyn Trait>` (trait objects)
+- `RcWeak<T>`, `ArcWeak<T>`
+- Collection types (Vec, HashMap, HashSet)
+- Nested struct types in Compatible mode
+
+Note: Static data types (non-dynamic types) are secure by nature and not subject to depth limits, as their structure is known at compile time.
+
+### Explicit Xlang Examples
+
+Set `.xlang(true)` explicitly for xlang serialization examples:
+
+```rust
+let fory = Fory::builder().xlang(true).build();
+```
+
+## Builder Pattern
 
 ```rust
 use fory::Fory;
 
-// 默认配置
-let fory = Fory::default();
+// Default xlang configuration
+let fory = Fory::builder().xlang(true).build();
 
-// 用于 schema 演化的兼容模式
-let fory = Fory::default().compatible(true);
+// Native mode for Rust-only traffic
+let fory = Fory::builder().xlang(false).build();
 
-// 跨语言模式
-let fory = Fory::default()
-    .compatible(true)
-    .xlang(true);
+// Native mode with schema evolution
+let fory = Fory::builder().xlang(false).compatible(true).build();
 
-// 自定义深度限制
-let fory = Fory::default().max_dyn_depth(10);
+// Custom depth limit
+let fory = Fory::builder().xlang(true).max_dyn_depth(10).build();
 
-// 组合配置
-let fory = Fory::default()
-    .compatible(true)
+// Combined configuration
+let fory = Fory::builder()
     .xlang(true)
-    .max_dyn_depth(10);
+    .compatible(true)
+    .max_dyn_depth(10).build();
 ```
 
-## 配置摘要
+## Configuration Summary
 
-| 选项                 | 描述                   | 默认值  |
-| -------------------- | ---------------------- | ------- |
-| `compatible(bool)`   | 启用 schema 演化       | `false` |
-| `xlang(bool)`        | 启用跨语言模式         | `false` |
-| `max_dyn_depth(u32)` | 动态类型的最大嵌套深度 | `5`     |
+| Option               | Description                             | Default                        |
+| -------------------- | --------------------------------------- | ------------------------------ |
+| `compatible(bool)`   | Enable schema evolution                 | xlang: `true`; native: `false` |
+| `xlang(bool)`        | Use xlang mode                          | `true`                         |
+| `max_dyn_depth(u32)` | Maximum nesting depth for dynamic types | `5`                            |
 
-## 相关主题
+## Related Topics
 
-- [基础序列化](basic-serialization.md) - 使用已配置的 Fory
-- [Schema 演化](schema-evolution.md) - Compatible 模式详情
-- [跨语言](cross-language.md) - XLANG 模式
+- [Basic Serialization](basic-serialization.md) - Using configured Fory
+- [Schema Evolution](schema-evolution.md) - Compatible mode details
+- [Cross-Language](cross-language.md) - xlang mode

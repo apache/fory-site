@@ -180,14 +180,13 @@ StackOverflowError or RecursionError
 ```java
 // Java
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
     .withRefTracking(true)
     .build();
 ```
 
 ```python
 # Python
-fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
+fory = pyfory.Fory(ref=True)
 ```
 
 ### Duplicate Objects
@@ -198,7 +197,7 @@ fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
 
 **Solution:** Enable reference tracking if objects are shared within the graph.
 
-## Language Mode Issues
+## Xlang Type Issues
 
 ### Incompatible Types in Xlang Mode
 
@@ -240,10 +239,10 @@ metadata must still align exactly.
 1. Align the schemas carefully on every service and language: field names or field IDs,
    field order where schema-consistent mode requires it, type annotations, nullability,
    and type registration IDs/names.
-2. Or use compatible mode on every peer, for example `withCompatible(true)` in Java,
-   `compatible=True` in Python, `compatible(true)` in Rust, or `WithCompatible(true)` in Go.
+2. Xlang mode defaults to compatible mode in current runtimes. If a peer has explicitly selected
+   schema-consistent mode, remove that override or enable compatible mode on every peer.
    Compatible mode writes extra schema metadata, so payloads are larger, but it is recommended
-   for `xlang=true` services that may evolve independently.
+   for xlang services that may evolve independently.
 3. Use schema-consistent mode only when schemas do not change, or when all services deploy the
    schema change at the same time.
 
@@ -312,7 +311,7 @@ python deserializer.py data.bin
 
 1. **Not registering types**: Always register custom types before use
 2. **Inconsistent type names/IDs**: Use the same names/IDs across all languages
-3. **Forgetting xlang mode**: Use `.withXlang(true).withCompatible(true)` in Java
+3. **Mixing xlang and native payloads**: Keep every peer on the xlang wire format
 4. **Wrong type annotations**: Use markers such as `pyfory.Int32` in Python
 5. **Ignoring reference tracking**: Enable for circular/shared references
 

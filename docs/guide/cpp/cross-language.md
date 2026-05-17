@@ -1,6 +1,6 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 10
+sidebar_position: 3
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -25,16 +25,16 @@ This page explains how to use Fory for cross-language serialization between C++ 
 
 Apache Fory™ enables seamless data exchange between C++, Java, Python, Go, Rust, and JavaScript. The xlang (cross-language) mode ensures binary compatibility across all supported languages.
 
-## Enabling Cross-Language Mode
+## Create an Xlang Runtime
+
+C++ defaults to xlang mode. Compatible schema evolution is also the xlang default. Set the mode explicitly in xlang examples:
 
 ```cpp
 #include "fory/serialization/fory.h"
 
 using namespace fory::serialization;
 
-auto fory = Fory::builder()
-    .xlang(true).compatible(true)  // Enable cross-language mode
-    .build();
+auto fory = Fory::builder().xlang(true).build();
 ```
 
 ## Cross-Language Example
@@ -61,7 +61,7 @@ struct Message {
 FORY_STRUCT(Message, topic, timestamp, headers, payload);
 
 int main() {
-  auto fory = Fory::builder().xlang(true).compatible(true).build();
+  auto fory = Fory::builder().xlang(true).build();
   fory.register_struct<Message>(100);
 
   Message msg{
@@ -97,7 +97,7 @@ public class Message {
 public class Consumer {
     public static void main(String[] args) throws Exception {
         Fory fory = Fory.builder()
-            .withXlang(true).withCompatible(true)
+            .withXlang(true)
             .build();
         fory.register(Message.class, 100);  // Same ID as C++
 
@@ -121,7 +121,7 @@ class Message:
     headers: dict[str, str]
     payload: bytes
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 fory.register(Message, type_id=100)  # Same ID as C++
 
 with open("message.bin", "rb") as f:
@@ -255,14 +255,11 @@ fory.register(Order, type_id=102)
 
 ## Compatible Mode
 
-For schema evolution across language boundaries:
+Xlang mode already uses compatible schema evolution by default. Keep that default for schemas that
+may evolve independently:
 
 ```cpp
-// C++ with compatible mode
-auto fory = Fory::builder()
-    .xlang(true)
-    .compatible(true)  // Enable schema evolution
-    .build();
+auto fory = Fory::builder().xlang(true).build();
 ```
 
 Compatible mode allows:

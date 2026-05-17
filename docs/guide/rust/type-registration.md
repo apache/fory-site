@@ -1,6 +1,6 @@
 ---
 title: Type Registration
-sidebar_position: 3
+sidebar_position: 4
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -35,7 +35,7 @@ struct User {
     age: i32,
 }
 
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(false).build();
 fory.register::<User>(1)?;
 
 let user = User {
@@ -52,9 +52,7 @@ let decoded: User = fory.deserialize(&bytes)?;
 For cross-language compatibility, register with namespace and type name:
 
 ```rust
-let mut fory = Fory::builder()
-    .compatible(true)
-    .xlang(true).build();
+let mut fory = Fory::builder().xlang(true).build();
 
 // Register with symbolic type identity
 fory.register_by_name::<MyStruct>("com.example", "MyStruct")?;
@@ -65,7 +63,7 @@ fory.register_by_name::<MyStruct>("com.example", "MyStruct")?;
 For types that need custom serialization logic:
 
 ```rust
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(false).build();
 fory.register_serializer::<CustomType>(100)?;
 ```
 
@@ -75,13 +73,13 @@ Rust registration APIs use explicit IDs or explicit namespace/type names. Keep t
 
 ```rust
 // Serializer side
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(false).build();
 fory.register::<TypeA>(1)?;
 fory.register::<TypeB>(2)?;
 fory.register::<TypeC>(3)?;
 
 // Deserializer side - MUST use the same ID mapping
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(false).build();
 fory.register::<TypeA>(1)?;
 fory.register::<TypeB>(2)?;
 fory.register::<TypeC>(3)?;
@@ -95,7 +93,7 @@ Perform all registrations before spawning threads:
 use std::sync::Arc;
 use std::thread;
 
-let mut fory = Fory::default();
+let mut fory = Fory::builder().xlang(false).build();
 fory.register::<User>(1)?;
 fory.register::<Order>(2)?;
 
@@ -122,5 +120,5 @@ let handles: Vec<_> = (0..4)
 ## Related Topics
 
 - [Configuration](configuration.md) - Fory builder options
-- [Cross-Language](cross-language.md) - XLANG mode registration
+- [Cross-Language](cross-language.md) - xlang mode registration
 - [Custom Serializers](custom-serializers.md) - Custom serialization

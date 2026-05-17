@@ -1,6 +1,6 @@
 ---
-title: 默认值
-sidebar_position: 3
+title: Default Values
+sidebar_position: 4
 id: default_values
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,68 +19,67 @@ license: |
   limitations under the License.
 ---
 
-在使用兼容模式时，Fory 支持在反序列化期间处理 Kotlin 数据类的默认值。此特性使得数据类 schema 演化时能够保持前向/后向兼容性。
+Fory supports Kotlin data class default values during native-mode deserialization when compatible mode is enabled. This feature enables forward/backward compatibility when data class schemas evolve.
 
-## 概述
+## Overview
 
-当 Kotlin 数据类具有带默认值的参数时，Fory 可以：
+When a Kotlin data class has parameters with default values, Fory can:
 
-1. **检测默认值**：使用 Kotlin 反射
-2. **应用默认值**：当序列化数据中缺少字段时，在反序列化期间应用默认值
-3. **支持 schema 演化**：允许添加带默认值的新字段，而不会破坏现有的序列化数据
+1. **Detect default values** using Kotlin reflection
+2. **Apply default values** during deserialization when fields are missing from serialized data
+3. **Support schema evolution** by allowing new fields with defaults to be added without breaking existing serialized data
 
-## 用法
+## Usage
 
-在以下情况下，此特性会自动启用：
+This feature is available when:
 
-- 启用了兼容模式（`withCompatibleMode(CompatibleMode.COMPATIBLE)`）
-- 已注册 Kotlin 序列化器（`KotlinSerializers.registerSerializers(fory)`）
-- 序列化数据中缺少某个字段，但目标类中该字段存在并具有默认值
+- Native mode is explicitly configured with compatible mode
+  (`withXlang(false).withCompatible(true)`)
+- The runtime is built through `ForyKotlin.builder()` or `Fory.builder().withModule(ForyKotlin)`
+  with native mode enabled
+- A field is missing from the serialized data but exists in the target class with a default value
 
-## 示例
+## Example
 
 ```kotlin
-import org.apache.fory.Fory
-import org.apache.fory.config.CompatibleMode
-import org.apache.fory.serializer.kotlin.KotlinSerializers
+import org.apache.fory.kotlin.ForyKotlin
 
-// 原始数据类
+// Original data class
 data class User(val name: String, val age: Int)
 
-// 演化后的数据类，带有新字段和默认值
+// Evolved data class with new field and default value
 data class UserV2(val name: String, val age: Int, val email: String = "default@example.com")
 
 fun main() {
-    val fory = Fory.builder()
-        .withCompatibleMode(CompatibleMode.COMPATIBLE)
+    val fory = ForyKotlin.builder().withXlang(false)
+        .withCompatible(true)
         .build()
-    KotlinSerializers.registerSerializers(fory)
     fory.register(User::class.java)
     fory.register(UserV2::class.java)
 
-    // 使用旧 schema 序列化
+    // Serialize with old schema
     val oldUser = User("John", 30)
     val serialized = fory.serialize(oldUser)
 
-    // 使用新 schema 反序列化 - 缺失的字段获得默认值
+    // Deserialize with new schema - missing field gets default value
     val newUser = fory.deserialize(serialized) as UserV2
     println(newUser) // UserV2(name=John, age=30, email=default@example.com)
 }
 ```
 
-## 支持的默认值类型
+## Supported Default Value Types
 
-以下类型支持默认值：
+The following types are supported for default values:
 
-- **原始类型**：`Int`、`Long`、`Double`、`Float`、`Boolean`、`Byte`、`Short`、`Char`
-- **无符号类型**：`UInt`、`ULong`、`UByte`、`UShort`
-- **字符串**：`String`
-- **集合**：`List`、`Set`、`Map`（带默认实例）
-- **自定义对象**：任何可以通过反射实例化的对象
+- **Primitive types**: `Int`, `Long`, `Double`, `Float`, `Boolean`, `Byte`, `Short`, `Char`
+- **Unsigned types**: `UInt`, `ULong`, `UByte`, `UShort`
+- **String**: `String`
+- **Collections**: `List`, `Set`, `Map` (with default instances)
+- **Custom objects**: Any object that can be instantiated via reflection
 
-## 复杂的默认值
+## Complex Default Values
 
-默认值可以是复杂的表达式：
+Default values can be complex expressions:
 
 ```kotlin
 data class ConfigV1(val name: String)
@@ -93,10 +92,9 @@ data class ConfigV2(
     val retryCount: Int = 3
 )
 
-val fory = Fory.builder()
-    .withCompatibleMode(CompatibleMode.COMPATIBLE)
+val fory = ForyKotlin.builder().withXlang(false)
+    .withCompatible(true)
     .build()
-KotlinSerializers.registerSerializers(fory)
 
 val original = ConfigV1("myConfig")
 val serialized = fory.serialize(original)
@@ -109,9 +107,9 @@ val deserialized = fory.deserialize(serialized) as ConfigV2
 // deserialized.retryCount == 3
 ```
 
-## 可空字段与默认值
+## Nullable Fields with Defaults
 
-也支持带默认值的可空字段：
+Nullable fields with default values are also supported:
 
 ```kotlin
 data class PersonV1(val name: String)
@@ -127,11 +125,11 @@ val serialized = fory.serialize(original)
 
 val deserialized = fory.deserialize(serialized) as PersonV2
 // deserialized.name == "John"
-// deserialized.nickname == null (默认值)
-// deserialized.age == null (默认值)
+// deserialized.nickname == null (default)
+// deserialized.age == null (default)
 ```
 
-## 相关主题
+## Related Topics
 
-- [Schema 演化](../java/schema-evolution.md) - Java 中的前向/后向兼容性
-- [Fory 创建](fory-creation.md) - 使用兼容模式设置 Fory
+- [Schema Evolution](../java/schema-evolution.md) - Forward/backward compatibility in Java
+- [Configuration](configuration.md) - Setting up Fory with compatible mode

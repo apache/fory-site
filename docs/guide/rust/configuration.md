@@ -19,36 +19,41 @@ license: |
   limitations under the License.
 ---
 
-This page covers Fory configuration options and serialization modes.
+This page covers Rust runtime configuration. `Fory::builder().xlang(true).build()` selects xlang mode with
+compatible schema evolution. Native mode is selected explicitly with `.xlang(false)` and defaults to
+schema-consistent payloads.
 
-## Serialization Modes
+## Wire Modes
 
 Apache Fory™ supports two serialization modes:
 
-### Compatible Mode (xlang default)
+### Xlang Mode
 
-Compatible mode is recommended for cross-language services because schemas can diverge more
-easily across languages:
+Xlang mode is selected with `.xlang(true)` and uses the cross-language wire
+format. Compatible schema evolution is the xlang default and is recommended for
+cross-language services because schemas can diverge more easily across
+languages:
 
 ```rust
-let fory = Fory::builder().xlang(true).compatible(true).build();
+let fory = Fory::builder().xlang(true).build();
 ```
 
-### SchemaConsistent Mode
-
-Type declarations must match exactly between peers:
+Use `.compatible(false)` only for xlang payloads where every peer updates the
+same schema together:
 
 ```rust
 let fory = Fory::builder().xlang(true).compatible(false).build();
 ```
 
-### Compatible Mode
+### Native Mode
 
-For native Rust-only payloads, compatible mode is still explicit:
+For Rust-only payloads, native mode is explicit and schema-consistent by default:
 
 ```rust
-let fory = Fory::builder().compatible(true).build();
+let fory = Fory::builder().xlang(false).build();
 ```
+
+Add `.compatible(true)` only when Rust-only deployments need schema evolution.
 
 ## Configuration
 
@@ -59,13 +64,13 @@ Apache Fory™ provides protection against stack overflow from deeply nested dyn
 **Default configuration:**
 
 ```rust
-let fory = Fory::default(); // max_dyn_depth = 5
+let fory = Fory::builder().xlang(true).build(); // max_dyn_depth = 5
 ```
 
 **Custom depth limit:**
 
 ```rust
-let fory = Fory::builder().max_dyn_depth(10).build(); // Allow up to 10 levels
+let fory = Fory::builder().xlang(true).max_dyn_depth(10).build(); // Allow up to 10 levels
 ```
 
 **When to adjust:**
@@ -83,14 +88,12 @@ let fory = Fory::builder().max_dyn_depth(10).build(); // Allow up to 10 levels
 
 Note: Static data types (non-dynamic types) are secure by nature and not subject to depth limits, as their structure is known at compile time.
 
-### Cross-Language Mode
+### Explicit Xlang Examples
 
-Enable cross-language serialization:
+Set `.xlang(true)` explicitly for xlang serialization examples:
 
 ```rust
-let fory = Fory::builder()
-    .compatible(true)
-    .xlang(true).build();
+let fory = Fory::builder().xlang(true).build();
 ```
 
 ## Builder Pattern
@@ -98,37 +101,35 @@ let fory = Fory::builder()
 ```rust
 use fory::Fory;
 
-// Default configuration
-let fory = Fory::default();
+// Default xlang configuration
+let fory = Fory::builder().xlang(true).build();
 
-// Compatible mode for schema evolution
-let fory = Fory::builder().compatible(true).build();
+// Native mode for Rust-only traffic
+let fory = Fory::builder().xlang(false).build();
 
-// Cross-language mode
-let fory = Fory::builder()
-    .compatible(true)
-    .xlang(true).build();
+// Native mode with schema evolution
+let fory = Fory::builder().xlang(false).compatible(true).build();
 
 // Custom depth limit
-let fory = Fory::builder().max_dyn_depth(10).build();
+let fory = Fory::builder().xlang(true).max_dyn_depth(10).build();
 
 // Combined configuration
 let fory = Fory::builder()
-    .compatible(true)
     .xlang(true)
+    .compatible(true)
     .max_dyn_depth(10).build();
 ```
 
 ## Configuration Summary
 
-| Option               | Description                             | Default |
-| -------------------- | --------------------------------------- | ------- |
-| `compatible(bool)`   | Enable schema evolution                 | `false` |
-| `xlang(bool)`        | Enable cross-language mode              | `false` |
-| `max_dyn_depth(u32)` | Maximum nesting depth for dynamic types | `5`     |
+| Option               | Description                             | Default                        |
+| -------------------- | --------------------------------------- | ------------------------------ |
+| `compatible(bool)`   | Enable schema evolution                 | xlang: `true`; native: `false` |
+| `xlang(bool)`        | Use xlang mode                          | `true`                         |
+| `max_dyn_depth(u32)` | Maximum nesting depth for dynamic types | `5`                            |
 
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Using configured Fory
 - [Schema Evolution](schema-evolution.md) - Compatible mode details
-- [Cross-Language](cross-language.md) - XLANG mode
+- [Cross-Language](cross-language.md) - xlang mode

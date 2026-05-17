@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ provides blazingly fast Java object serialization with JIT compilation and zero-copy techniques. When only Java object serialization is needed, this mode delivers better performance compared to cross-language object graph serialization.
+Apache Fory™ provides blazingly fast Java object serialization with JIT compilation and zero-copy techniques. Java supports both xlang mode and native mode. Xlang mode is the default cross-language wire format and uses compatible schema evolution. Native mode is the Java-only wire format for same-language object serialization, JDK serialization replacement behavior, framework replacement, and Java-native object graph features.
 
 ## Features
 
@@ -68,7 +68,8 @@ public class Example {
     SomeClass object = new SomeClass();
     // Note that Fory instances should be reused between
     // multiple serializations of different objects.
-    Fory fory = Fory.builder().withXlang(false)
+    Fory fory = Fory.builder()
+      .withXlang(true)
       .requireClassRegistration(true)
       .build();
     // Registering types can reduce class name serialization overhead, but not mandatory.
@@ -91,7 +92,7 @@ public class Example {
   public static void main(String[] args) {
     SomeClass object = new SomeClass();
     ThreadSafeFory fory = Fory.builder()
-      .withXlang(false)
+      .withXlang(true)
       .buildThreadSafeFory();
     fory.register(SomeClass.class, 1);
     byte[] bytes = fory.serialize(object);
@@ -108,8 +109,8 @@ import org.apache.fory.config.*;
 
 public class Example {
   private static final ThreadSafeFory fory = Fory.builder()
-      .withXlang(false)
-      .buildThreadSafeFory();
+    .withXlang(true)
+    .buildThreadSafeFory();
 
   static {
     fory.register(SomeClass.class, 1);
@@ -123,6 +124,14 @@ public class Example {
 }
 ```
 
+## Xlang Mode And Native Mode
+
+Use xlang mode for cross-language payloads and schemas shared with non-Java runtimes. It is the default Java wire mode, and Java examples that use it set `.withXlang(true)` explicitly so the mode choice is visible.
+
+Use native mode for Java-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and owns Java-specific object behavior such as JDK serialization hooks, `Externalizable`, dynamic object graphs, object copy, and Java native-mode zero-copy buffers. It is optimized for the JVM type system and supports a broader Java object surface than xlang mode. If you are replacing JDK serialization, Kryo, FST, Hessian, or Java-only Protocol Buffers payloads, start with native mode.
+
+See [Native Mode](native-mode.md) for Java-only serialization details and [Cross-Language Serialization](cross-language.md) for Java xlang registration and interoperability rules.
+
 ## Thread Safety
 
 Fory provides two thread-safe runtime styles:
@@ -134,9 +143,8 @@ This is the default choice. It uses a fixed-size shared `ThreadPoolFory` sized t
 
 ```java
 ThreadSafeFory fory = Fory.builder()
-  .withXlang(false)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatible(false)
   .withAsyncCompilation(true)
   .buildThreadSafeFory();
 ```
@@ -150,7 +158,7 @@ platform thread, or when you want to pin that choice regardless of JDK version:
 
 ```java
 ThreadSafeFory fory = Fory.builder()
-  .withXlang(false)
+  .withXlang(true)
   .buildThreadLocalFory();
 fory.register(SomeClass.class, 1);
 byte[] bytes = fory.serialize(object);
@@ -166,9 +174,8 @@ pooled instance is already in use; the runtime does not key cached instances by 
 
 ```java
 ThreadSafeFory fory = Fory.builder()
-  .withXlang(false)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatible(false)
   .withAsyncCompilation(true)
   .buildThreadSafeForyPool(poolSize);
 ```
@@ -178,31 +185,28 @@ ThreadSafeFory fory = Fory.builder()
 ```java
 // Single-thread Fory
 Fory fory = Fory.builder()
-  .withXlang(false)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatible(false)
   .withAsyncCompilation(true)
   .build();
 
 // Thread-safe Fory (thread-safe Fory backed by a pool of Fory instances)
 ThreadSafeFory fory = Fory.builder()
-  .withXlang(false)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatible(false)
   .withAsyncCompilation(true)
   .buildThreadSafeFory();
 
 // Explicit thread-local runtime
 ThreadSafeFory threadLocalFory = Fory.builder()
-  .withXlang(false)
+  .withXlang(true)
   .buildThreadLocalFory();
 ```
 
 ## Next Steps
 
 - [Configuration](configuration.md) - Learn about ForyBuilder options
-- [Field Configuration](field-configuration.md) - `@ForyField`, `@Ignore`, and integer encoding annotations
-- [Enum Configuration](enum-configuration.md) - `serializeEnumByName` and `@ForyEnumId`
+- [Schema Metadata](schema-metadata.md) - `@ForyField`, `@Ignore`, integer encoding annotations, `serializeEnumByName`, and `@ForyEnumId`
 - [Basic Serialization](basic-serialization.md) - Detailed serialization patterns
 - [Object Copy](object-copy.md) - Deep-copy Java object graphs in memory
 - [Compression](compression.md) - Integer, long, and array compression options

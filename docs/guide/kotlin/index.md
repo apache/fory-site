@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ Kotlin provides optimized serializers for Kotlin types, built on top of Fory Java. Most standard Kotlin types work out of the box with the default Fory Java implementation, while Fory Kotlin adds additional support for Kotlin-specific types.
+Apache Fory™ Kotlin provides optimized serializers for Kotlin types, built on top of Fory Java. It supports xlang mode for cross-language payloads and native mode for Kotlin/JVM-only object serialization. Most standard Kotlin types work out of the box with the default Fory Java implementation, while Fory Kotlin adds additional support for Kotlin-specific types.
 
 Supported types include:
 
@@ -72,8 +72,10 @@ data class Person(val name: String, val id: Long, val github: String)
 data class Point(val x: Int, val y: Int, val z: Int)
 
 fun main() {
-    // Create Fory instance (should be reused)
+    // Create Fory instance (should be reused). Kotlin follows the Java default:
+    // xlang mode with compatible schema evolution.
     val fory: ThreadSafeFory = ForyKotlin.builder()
+        .withXlang(true)
         .requireClassRegistration(true)
         .buildThreadSafeFory()
 
@@ -85,6 +87,14 @@ fun main() {
     println(fory.deserialize(fory.serialize(Point(1, 2, 3))))
 }
 ```
+
+## Xlang Mode And Native Mode
+
+Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Kotlin wire mode through the JVM builder, and Kotlin examples that use it set `.withXlang(true)` explicitly so the mode choice is visible.
+
+Use native mode for Kotlin/JVM-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and inherits the JVM native-mode object serialization path from Fory Java while adding Kotlin-specific serializers for data classes, unsigned values, ranges, stdlib types, and generated serializers. It is optimized for JVM and Kotlin type systems and is the right path for same-language Kotlin/JVM framework replacement payloads.
+
+See [Configuration](configuration.md) for Kotlin builder setup and [Java Native Mode](../java/native-mode.md) for the full JVM native-mode behavior.
 
 ## Built on Fory Java
 
@@ -100,8 +110,9 @@ Fory Kotlin is built on top of Fory Java. Most configuration options, features, 
 
 ## Kotlin-Specific Documentation
 
-- [Fory Creation](fory-creation.md) - Kotlin-specific Fory setup requirements
+- [Configuration](configuration.md) - Kotlin-specific Fory setup requirements
 - [Type Serialization](type-serialization.md) - Serializing Kotlin types
+- [Schema Metadata](schema-metadata.md) - Kotlin annotations, nullability, references, and integer metadata
 - [Default Values](default-values.md) - Kotlin data class default values support
 - [Static Generated Serializers](static-generated-serializers.md) - KSP xlang/schema serializer generation
 - [Android Support](android-support.md) - Android setup, R8 behavior, and release-build validation

@@ -1,6 +1,6 @@
 ---
 title: Code Generation
-sidebar_position: 90
+sidebar_position: 100
 id: codegen
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -181,7 +181,7 @@ Generate for a package:
 fory -pkg ./models
 ```
 
-### Explicit Types (Legacy)
+### Explicit Types
 
 Specify types explicitly:
 
@@ -284,7 +284,7 @@ steps:
 Generated code integrates transparently:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Fory automatically uses generated serializer if available
 user := &User{ID: 1, Name: "Alice"}

@@ -185,6 +185,6 @@ Parent decoded = encoder.fromRow(row);
 
 ## See Also
 
-- [Row Format Specification](https://fory.apache.org/docs/next/specification/fory_row_format_spec) - Binary format details
+- [Row Format Specification](https://fory.apache.org/docs/specification/row_format_spec) - Binary format details
 - [Java Row Format Guide](../java/row-format.md) - Java-specific row format documentation
 - [Python Row Format Guide](../python/row-format.md) - Python-specific row format documentation

@@ -1,6 +1,6 @@
 ---
-title: 跨语言序列化
-sidebar_position: 8
+title: Cross-Language Serialization
+sidebar_position: 3
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,66 +19,62 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ 支持在多种语言（包括 Java、Python、C++、Go 和 JavaScript）之间无缝进行数据交换。
+Apache Fory™ supports seamless data exchange across multiple languages including Java, Python, C++, Go, and JavaScript.
 
-## 启用跨语言模式
+## Create an Xlang Runtime
 
-```rust
-use fory::Fory;
-
-// 启用跨语言模式
-let mut fory = Fory::default()
-    .compatible(true)
-    .xlang(true);
-
-// 使用跨语言一致的 ID 注册类型
-fory.register::<MyStruct>(100);
-
-// 或使用基于命名空间的注册
-fory.register_by_namespace::<MyStruct>("com.example", "MyStruct");
-```
-
-## 跨语言类型注册
-
-### 按 ID 注册
-
-对于使用跨语言一致 ID 的快速、紧凑序列化：
-
-```rust
-let mut fory = Fory::default()
-    .compatible(true)
-    .xlang(true);
-
-fory.register::<User>(100);  // 在 Java、Python 等中使用相同的 ID
-```
-
-### 按命名空间注册
-
-对于更灵活的类型命名：
-
-```rust
-fory.register_by_namespace::<User>("com.example", "User");
-```
-
-## 跨语言示例
-
-### Rust（序列化器）
+Rust defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```rust
 use fory::Fory;
-use fory::ForyObject;
 
-#[derive(ForyObject)]
+// Use xlang mode
+let mut fory = Fory::builder().xlang(true).build();
+
+// Register types with consistent IDs across languages
+fory.register::<MyStruct>(100)?;
+
+// Or use name-based registration
+fory.register_by_name::<MyStruct>("com.example", "MyStruct")?;
+```
+
+## Type Registration for Cross-Language
+
+### Register by ID
+
+For fast, compact serialization with consistent IDs across languages:
+
+```rust
+let mut fory = Fory::builder().xlang(true).build();
+
+fory.register::<User>(100)?;  // Same ID in Java, Python, etc.
+```
+
+### Register by Name
+
+For more flexible type naming:
+
+```rust
+fory.register_by_name::<User>("com.example", "User")?;
+```
+
+## Cross-Language Example
+
+### Rust (Serializer)
+
+```rust
+use fory::Fory;
+use fory::ForyStruct;
+
+#[derive(ForyStruct)]
 struct Person {
     name: String,
     age: i32,
 }
 
-let mut fory = Fory::default()
-    .compatible(true)
-    .xlang(true);
+let mut fory = Fory::builder().xlang(true).build();
 
-fory.register::<Person>(100);
+fory.register::<Person>(100)?;
 
 let person = Person {
     name: "Alice".to_string(),
@@ -86,10 +82,10 @@ let person = Person {
 };
 
 let bytes = fory.serialize(&person)?;
-// bytes 可以被 Java、Python 等反序列化
+// bytes can be deserialized by Java, Python, etc.
 ```
 
-### Java（反序列化器）
+### Java (Deserializer)
 
 ```java
 import org.apache.fory.*;
@@ -101,16 +97,16 @@ public class Person {
 }
 
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
+    .withXlang(true)
     .withRefTracking(true)
     .build();
 
-fory.register(Person.class, 100);  // 与 Rust 使用相同的 ID
+fory.register(Person.class, 100);  // Same ID as Rust
 
 Person person = (Person) fory.deserialize(bytesFromRust);
 ```
 
-### Python（反序列化器）
+### Python (Deserializer)
 
 ```python
 import pyfory
@@ -119,47 +115,75 @@ from dataclasses import dataclass
 @dataclass
 class Person:
     name: str
-    age: pyfory.int32
+    age: pyfory.Int32
 
-fory = pyfory.Fory(ref_tracking=True)
-fory.register_type(Person, type_id=100)  # 与 Rust 使用相同的 ID
+fory = pyfory.Fory(xlang=True, ref=True)
+fory.register_type(Person, type_id=100)  # Same ID as Rust
 
 person = fory.deserialize(bytes_from_rust)
 ```
 
-## 类型映射
+## Type Mapping
 
-有关跨语言完整类型映射，请参阅 [xlang_type_mapping.md](https://fory.apache.org/docs/specification/xlang_type_mapping)。
+See [xlang_type_mapping.md](../../specification/xlang_type_mapping.md) for complete type mapping across languages.
 
-### 常见类型映射
+### Common Type Mappings
 
-| Rust           | Java       | Python        |
-| -------------- | ---------- | ------------- |
-| `i32`          | `int`      | `int32`       |
-| `i64`          | `long`     | `int64`       |
-| `f32`          | `float`    | `float32`     |
-| `f64`          | `double`   | `float64`     |
-| `String`       | `String`   | `str`         |
-| `Vec<T>`       | `List<T>`  | `List[T]`     |
-| `HashMap<K,V>` | `Map<K,V>` | `Dict[K,V]`   |
-| `Option<T>`    | 可空 `T`   | `Optional[T]` |
+| Rust            | Java           | Python          |
+| --------------- | -------------- | --------------- |
+| `i32`           | `int`          | `int32`         |
+| `i64`           | `long`         | `int64`         |
+| `f32`           | `float`        | `float32`       |
+| `f64`           | `double`       | `float64`       |
+| `Float16`       | `Float16`      | `float16`       |
+| `BFloat16`      | `BFloat16`     | `bfloat16`      |
+| `String`        | `String`       | `str`           |
+| `Vec<T>`        | `List<T>`      | `List[T]`       |
+| `Vec<Float16>`  | `Float16List`  | `Float16Array`  |
+| `Vec<BFloat16>` | `BFloat16List` | `BFloat16Array` |
+| `[Float16; N]`  | `Float16List`  | `Float16Array`  |
+| `[BFloat16; N]` | `BFloat16List` | `BFloat16Array` |
+| `HashMap<K,V>`  | `Map<K,V>`     | `Dict[K,V]`     |
+| `Option<T>`     | nullable `T`   | `Optional[T]`   |
 
-## 最佳实践
+### Lists and Dense Arrays
 
-1. **使用一致的类型 ID**：在所有语言中使用相同的 ID
-2. **启用 compatible 模式**：用于 schema 演化
-3. **注册所有类型**：在序列化之前
-4. **测试跨语言**：在开发期间测试兼容性
+Rust `Vec<T>` maps to Fory `list<T>` by default for manual structs. Use an
+explicit array field attribute when the schema is dense `array<T>`.
 
-## 另请参阅
+| Fory schema       | Rust carrier and metadata      |
+| ----------------- | ------------------------------ |
+| `list<int32>`     | `Vec<i32>`                     |
+| `array<bool>`     | `#[fory(array)] Vec<bool>`     |
+| `array<int8>`     | `#[fory(array)] Vec<i8>`       |
+| `array<int16>`    | `#[fory(array)] Vec<i16>`      |
+| `array<int32>`    | `#[fory(array)] Vec<i32>`      |
+| `array<int64>`    | `#[fory(array)] Vec<i64>`      |
+| `array<uint8>`    | `#[fory(array)] Vec<u8>`       |
+| `array<uint16>`   | `#[fory(array)] Vec<u16>`      |
+| `array<uint32>`   | `#[fory(array)] Vec<u32>`      |
+| `array<uint64>`   | `#[fory(array)] Vec<u64>`      |
+| `array<float16>`  | `#[fory(array)] Vec<Float16>`  |
+| `array<bfloat16>` | `#[fory(array)] Vec<BFloat16>` |
+| `array<float32>`  | `#[fory(array)] Vec<f32>`      |
+| `array<float64>`  | `#[fory(array)] Vec<f64>`      |
 
-- [跨语言序列化规范](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec)
-- [类型映射参考](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
-- [Java 跨语言指南](../java/cross-language.md)
-- [Python 跨语言指南](../python/cross-language.md)
+## Best Practices
 
-## 相关主题
+1. **Use consistent type IDs** across all languages
+2. **Keep compatible mode** for schema evolution
+3. **Register all types** before serialization
+4. **Test cross-language** compatibility during development
 
-- [配置](configuration.md) - XLANG 模式配置
-- [Schema 演化](schema-evolution.md) - Compatible 模式
-- [类型注册](type-registration.md) - 注册方法
+## See Also
+
+- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Type Mapping Reference](../../specification/xlang_type_mapping.md)
+- [Java Cross-Language Guide](../java/cross-language.md)
+- [Python Cross-Language Guide](../python/cross-language.md)
+
+## Related Topics
+
+- [Configuration](configuration.md) - xlang mode configuration
+- [Schema Evolution](schema-evolution.md) - Compatible mode
+- [Type Registration](type-registration.md) - Registration methods
