@@ -1,6 +1,6 @@
 ---
-title: 跨语言序列化
-sidebar_position: 6
+title: Cross-Language Serialization
+sidebar_position: 3
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,27 +19,27 @@ license: |
   limitations under the License.
 ---
 
-本页介绍如何使用 Fory 在 C++ 和其他语言之间进行跨语言序列化。
+This page explains how to use Fory for cross-language serialization between C++ and other languages.
 
-## 概述
+## Overview
 
-Apache Fory™ 支持在 C++、Java、Python、Go、Rust 和 JavaScript 之间无缝交换数据。xlang（跨语言）模式确保所有支持语言之间的二进制兼容性。
+Apache Fory™ enables seamless data exchange between C++, Java, Python, Go, Rust, and JavaScript. The xlang (cross-language) mode ensures binary compatibility across all supported languages.
 
-## 启用跨语言模式
+## Create an Xlang Runtime
+
+C++ defaults to xlang mode. Compatible schema evolution is also the xlang default. Set the mode explicitly in xlang examples:
 
 ```cpp
 #include "fory/serialization/fory.h"
 
 using namespace fory::serialization;
 
-auto fory = Fory::builder()
-    .xlang(true)  // 启用跨语言模式
-    .build();
+auto fory = Fory::builder().xlang(true).build();
 ```
 
-## 跨语言示例
+## Cross-Language Example
 
-### C++ 生产者
+### C++ Producer
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -74,7 +74,7 @@ int main() {
   auto result = fory.serialize(msg);
   if (result.ok()) {
     auto bytes = std::move(result).value();
-    // 写入文件、通过网络发送等
+    // write to file, send over network, etc.
     std::ofstream file("message.bin", std::ios::binary);
     file.write(reinterpret_cast<const char*>(bytes.data()), bytes.size());
   }
@@ -82,11 +82,10 @@ int main() {
 }
 ```
 
-### Java 消费者
+### Java Consumer
 
 ```java
 import org.apache.fory.Fory;
-import org.apache.fory.config.Language;
 
 public class Message {
     public String topic;
@@ -98,9 +97,9 @@ public class Message {
 public class Consumer {
     public static void main(String[] args) throws Exception {
         Fory fory = Fory.builder()
-            .withLanguage(Language.XLANG)
+            .withXlang(true)
             .build();
-        fory.register(Message.class, 100);  // 与 C++ 相同的 ID
+        fory.register(Message.class, 100);  // Same ID as C++
 
         byte[] bytes = Files.readAllBytes(Path.of("message.bin"));
         Message msg = (Message) fory.deserialize(bytes);
@@ -111,7 +110,7 @@ public class Consumer {
 }
 ```
 
-### Python 消费者
+### Python Consumer
 
 ```python
 import pyfory
@@ -122,8 +121,8 @@ class Message:
     headers: dict[str, str]
     payload: bytes
 
-fory = pyfory.Fory()
-fory.register(Message, type_id=100)  # 与 C++ 相同的 ID
+fory = pyfory.Fory(xlang=True)
+fory.register(Message, type_id=100)  # Same ID as C++
 
 with open("message.bin", "rb") as f:
     data = f.read()
@@ -133,64 +132,90 @@ print(f"Topic: {msg.topic}")
 print(f"Timestamp: {msg.timestamp}")
 ```
 
-## 类型映射
+## Type Mapping
 
-### 基本类型
+### Primitive Types
 
-| C++ 类型  | Java 类型 | Python 类型 | Go 类型   | Rust 类型 |
-| --------- | --------- | ----------- | --------- | --------- |
-| `bool`    | `boolean` | `bool`      | `bool`    | `bool`    |
-| `int8_t`  | `byte`    | `int`       | `int8`    | `i8`      |
-| `int16_t` | `short`   | `int`       | `int16`   | `i16`     |
-| `int32_t` | `int`     | `int`       | `int32`   | `i32`     |
-| `int64_t` | `long`    | `int`       | `int64`   | `i64`     |
-| `float`   | `float`   | `float`     | `float32` | `f32`     |
-| `double`  | `double`  | `float`     | `float64` | `f64`     |
+| C++ Type           | Java Type  | Python Type       | Go Type             | Rust Type  |
+| ------------------ | ---------- | ----------------- | ------------------- | ---------- |
+| `bool`             | `boolean`  | `bool`            | `bool`              | `bool`     |
+| `int8_t`           | `byte`     | `int`             | `int8`              | `i8`       |
+| `int16_t`          | `short`    | `int`             | `int16`             | `i16`      |
+| `int32_t`          | `int`      | `int`             | `int32`             | `i32`      |
+| `int64_t`          | `long`     | `int`             | `int64`             | `i64`      |
+| `float`            | `float`    | `float`           | `float32`           | `f32`      |
+| `double`           | `double`   | `float`           | `float64`           | `f64`      |
+| `fory::float16_t`  | `Float16`  | `pyfory.Float16`  | `float16.Float16`   | `Float16`  |
+| `fory::bfloat16_t` | `BFloat16` | `pyfory.BFloat16` | `bfloat16.BFloat16` | `BFloat16` |
 
-### 字符串类型
+### String Types
 
-| C++ 类型      | Java 类型 | Python 类型 | Go 类型  | Rust 类型 |
+| C++ Type      | Java Type | Python Type | Go Type  | Rust Type |
 | ------------- | --------- | ----------- | -------- | --------- |
 | `std::string` | `String`  | `str`       | `string` | `String`  |
 
-### 集合类型
+### Collection Types
 
-| C++ 类型         | Java 类型  | Python 类型 | Go 类型          |
-| ---------------- | ---------- | ----------- | ---------------- |
-| `std::vector<T>` | `List<T>`  | `list`      | `[]T`            |
-| `std::set<T>`    | `Set<T>`   | `set`       | `map[T]struct{}` |
-| `std::map<K,V>`  | `Map<K,V>` | `dict`      | `map[K]V`        |
+| C++ Type                        | Java Type      | Python Type     | Go Type               | Rust Type       |
+| ------------------------------- | -------------- | --------------- | --------------------- | --------------- |
+| `std::vector<T>`                | `List<T>`      | `list`          | `[]T`                 | `Vec<T>`        |
+| `std::vector<fory::float16_t>`  | `Float16List`  | `Float16Array`  | `[]float16.Float16`   | `Vec<Float16>`  |
+| `std::vector<fory::bfloat16_t>` | `BFloat16List` | `BFloat16Array` | `[]bfloat16.BFloat16` | `Vec<BFloat16>` |
+| `std::set<T>`                   | `Set<T>`       | `set`           | `map[T]struct{}`      | `HashSet<T>`    |
+| `std::map<K,V>`                 | `Map<K,V>`     | `dict`          | `map[K]V`             | `HashMap<K,V>`  |
 
-### 时间类型
+### Lists and Dense Arrays
 
-| C++ 类型    | Java 类型   | Python 类型     | Go 类型         |
+`std::vector<T>` maps to Fory `list<T>` by default in handwritten C++ structs.
+Use the field metadata DSL's array node when the schema is dense `array<T>`.
+
+| Fory schema       | C++ metadata sketch                      |
+| ----------------- | ---------------------------------------- |
+| `list<int32>`     | `fory::F(id).list(fory::T::int32())`     |
+| `array<bool>`     | `fory::F(id).array(fory::T::bool_())`    |
+| `array<int8>`     | `fory::F(id).array(fory::T::int8())`     |
+| `array<int16>`    | `fory::F(id).array(fory::T::int16())`    |
+| `array<int32>`    | `fory::F(id).array(fory::T::int32())`    |
+| `array<int64>`    | `fory::F(id).array(fory::T::int64())`    |
+| `array<uint8>`    | `fory::F(id).array(fory::T::uint8())`    |
+| `array<uint16>`   | `fory::F(id).array(fory::T::uint16())`   |
+| `array<uint32>`   | `fory::F(id).array(fory::T::uint32())`   |
+| `array<uint64>`   | `fory::F(id).array(fory::T::uint64())`   |
+| `array<float16>`  | `fory::F(id).array(fory::T::float16())`  |
+| `array<bfloat16>` | `fory::F(id).array(fory::T::bfloat16())` |
+| `array<float32>`  | `fory::F(id).array(fory::T::float32())`  |
+| `array<float64>`  | `fory::F(id).array(fory::T::float64())`  |
+
+### Temporal Types
+
+| C++ Type    | Java Type   | Python Type     | Go Type         |
 | ----------- | ----------- | --------------- | --------------- |
 | `Timestamp` | `Instant`   | `datetime`      | `time.Time`     |
 | `Duration`  | `Duration`  | `timedelta`     | `time.Duration` |
-| `LocalDate` | `LocalDate` | `datetime.date` | `time.Time`     |
+| `Date`      | `LocalDate` | `datetime.date` | `time.Time`     |
 
-## 字段顺序要求
+## Field Order Requirements
 
-**关键：** 字段将按照其 snake_cased 字段名排序，转换后的名称必须在各语言之间保持一致
+**Critical:** Fields are sorted by snake_case field name. The converted names must match across languages.
 
 ### C++
 
 ```cpp
 struct Person {
-  std::string name;   // 字段 0
-  int32_t age;        // 字段 1
-  std::string email;  // 字段 2
+  std::string name;   // Field 0
+  int32_t age;        // Field 1
+  std::string email;  // Field 2
 };
-FORY_STRUCT(Person, name, age, email);  // 顺序很重要！
+FORY_STRUCT(Person, name, age, email);  // Order matters!
 ```
 
 ### Java
 
 ```java
 public class Person {
-    public String name;   // 字段 0
-    public int age;       // 字段 1
-    public String email;  // 字段 2
+    public String name;   // Field 0
+    public int age;       // Field 1
+    public String email;  // Field 2
 }
 ```
 
@@ -198,14 +223,14 @@ public class Person {
 
 ```python
 class Person:
-    name: str    # 字段 0
-    age: int     # 字段 1
-    email: str   # 字段 2
+    name: str    # Field 0
+    age: int     # Field 1
+    email: str   # Field 2
 ```
 
-## 类型 ID 一致性
+## Type ID Consistency
 
-所有语言必须使用相同的类型 ID：
+All languages must use the same type IDs:
 
 ```cpp
 // C++
@@ -228,44 +253,41 @@ fory.register(Address, type_id=101)
 fory.register(Order, type_id=102)
 ```
 
-## Compatible 模式
+## Compatible Mode
 
-用于跨语言边界的 schema 演化：
+Xlang mode already uses compatible schema evolution by default. Keep that default for schemas that
+may evolve independently:
 
 ```cpp
-// 使用 compatible 模式的 C++
-auto fory = Fory::builder()
-    .xlang(true)
-    .compatible(true)  // 启用 schema 演化
-    .build();
+auto fory = Fory::builder().xlang(true).build();
 ```
 
-Compatible 模式允许：
+Compatible mode allows:
 
-- 添加新字段（带默认值）
-- 删除未使用的字段
-- 重排字段顺序
+- Adding new fields (with defaults)
+- Removing unused fields
+- Reordering fields
 
-## 故障排查
+## Troubleshooting
 
-### 类型不匹配错误
+### Type Mismatch Errors
 
 ```
 Error: Type mismatch: expected 100, got 101
 ```
 
-**解决方案：** 确保类型 ID 在所有语言中匹配。
+**Solution:** Ensure type IDs match across all languages.
 
-### 编码错误
+### Encoding Errors
 
 ```
 Error: Invalid UTF-8 sequence
 ```
 
-**解决方案：** 确保所有语言中的字符串都是有效的 UTF-8。
+**Solution:** Ensure strings are valid UTF-8 in all languages.
 
-## 相关主题
+## Related Topics
 
-- [配置](configuration.md) - 构建器选项
-- [类型注册](type-registration.md) - 注册类型
-- [支持的类型](supported-types.md) - 类型兼容性
+- [Configuration](configuration.md) - Builder options
+- [Type Registration](type-registration.md) - Registering types
+- [Supported Types](supported-types.md) - Type compatibility

@@ -1,5 +1,5 @@
 ---
-title: 基础序列化
+title: Basic Serialization
 sidebar_position: 1
 id: basic_serialization
 license: |
@@ -19,23 +19,23 @@ license: |
   limitations under the License.
 ---
 
-本页介绍 Swift 中的对象图序列化和核心 API 用法。
+This page covers object graph serialization and core API usage in Swift.
 
-## 对象图序列化
+## Object Graph Serialization
 
-在结构体、类或枚举上使用 `@ForyObject`，注册类型后即可进行序列化和反序列化。
+Use `@ForyStruct`, `@ForyEnum`, or `@ForyUnion`, register types, then serialize and deserialize.
 
 ```swift
 import Foundation
 import Fory
 
-@ForyObject
+@ForyStruct
 struct Address: Equatable {
     var street: String = ""
     var zip: Int32 = 0
 }
 
-@ForyObject
+@ForyStruct
 struct Person: Equatable {
     var id: Int64 = 0
     var name: String = ""
@@ -65,9 +65,9 @@ let decoded: Person = try fory.deserialize(data)
 assert(decoded == person)
 ```
 
-## 与已有缓冲区配合使用
+## Working with Existing Buffers
 
-你可以把序列化结果追加到现有 `Data`，也可以从 `ByteBuffer` 反序列化。
+Append serialized bytes to an existing `Data` and deserialize from `ByteBuffer`.
 
 ```swift
 var output = Data()
@@ -78,31 +78,35 @@ let fromBuffer: Person = try fory.deserialize(from: inputBuffer)
 assert(fromBuffer == person)
 ```
 
-## 内置支持的类型
+## Built-in Supported Types
 
-### 基础标量类型
+### Primitive and scalar
 
 - `Bool`
-- `Int8`、`Int16`、`Int32`、`Int64`、`Int`
-- `UInt8`、`UInt16`、`UInt32`、`UInt64`、`UInt`
-- `Float`、`Double`
+- `Int8`, `Int16`, `Int32`, `Int64`, `Int`
+- `UInt8`, `UInt16`, `UInt32`, `UInt64`, `UInt`
+- `Float`, `Double`
 - `String`
 - `Data`
 
-### 日期与时间类型
+### Date and time
 
 - `Date`
-- `ForyDate`
-- `ForyTimestamp`
+- `LocalDate`
+- `Duration`
 
-### 集合类型
+Use `Date` for timestamp values and `LocalDate` for day-only dates. `LocalDate`
+supports epoch-day and `Date` conversions through `fromEpochDay(_:)`,
+`toEpochDay()`, `init(utcDate:)`, and `toUTCDate()`.
 
-- `[T]`，其中 `T: Serializer`
-- `Set<T>`，其中 `T: Serializer & Hashable`
-- `[K: V]`，其中 `K: Serializer & Hashable`、`V: Serializer`
-- 可选值变体 `T?`
+### Collections
 
-### 动态类型
+- `[T]` where `T: Serializer`
+- `Set<T>` where `T: Serializer & Hashable`
+- `[K: V]` where `K: Serializer & Hashable`, `V: Serializer`
+- Optional variants (`T?`)
+
+### Dynamic
 
 - `Any`
 - `AnyObject`

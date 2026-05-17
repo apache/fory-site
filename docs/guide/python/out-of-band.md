@@ -1,6 +1,6 @@
 ---
 title: Out-of-Band Serialization
-sidebar_position: 7
+sidebar_position: 9
 id: out_of_band
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

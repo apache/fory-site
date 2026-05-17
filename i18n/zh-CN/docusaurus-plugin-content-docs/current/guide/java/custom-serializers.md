@@ -1,6 +1,6 @@
 ---
-title: 自定义序列化器
-sidebar_position: 4
+title: Custom Serializers
+sidebar_position: 12
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,19 +19,21 @@ license: |
   limitations under the License.
 ---
 
-本页介绍当前 Java 自定义序列化器 API。
+This page covers the current Java custom serializer API.
 
-## 构造函数输入
+## Constructor Inputs
 
-自定义序列化器不应该持有 `Fory`。
+Custom serializers should not retain `Fory`.
 
-- 当序列化器只依赖不可变配置、并且可共享时，使用 `Config`。
-- 当序列化器需要类型元信息、泛型或嵌套动态分派时，使用 `TypeResolver`。
-- 如果序列化器持有 `TypeResolver`，它通常就不可共享，也不应实现 `Shareable`。
+- Use `Config` when the serializer only depends on immutable configuration and can be shared.
+- Use `TypeResolver` when the serializer needs type metadata, generics, or nested dynamic dispatch.
+- If a serializer retains `TypeResolver`, it is usually not shareable and should not implement
+  `Shareable`.
 
-## 基础序列化器
+## Basic Serializer
 
-运行时状态应通过 `WriteContext` 和 `ReadContext` 传递。只有在确实要做多次读写时，才把 buffer 提取到局部变量中。
+Use `WriteContext` and `ReadContext` for runtime state. Only get the buffer into a local variable
+when you perform multiple reads or writes.
 
 ```java
 import org.apache.fory.config.Config;
@@ -63,16 +65,17 @@ public final class FooSerializer extends Serializer<Foo> implements Shareable {
 }
 ```
 
-如果序列化器可共享，就使用基于 `Config` 的构造方式注册：
+Register it with a `Config`-based constructor when the serializer is shareable:
 
 ```java
-Fory fory = Fory.builder().build();
+Fory fory = Fory.builder().withXlang(false).build();
 fory.registerSerializer(Foo.class, new FooSerializer(fory.getConfig()));
 ```
 
-## 嵌套对象
+## Nested Objects
 
-如果序列化器需要写入或读取嵌套对象，请使用 context helper，而不要持有 `Fory`：
+If your serializer needs to write or read nested objects, use the context helpers instead of
+retaining `Fory`:
 
 ```java
 import org.apache.fory.config.Config;
@@ -101,18 +104,18 @@ public final class EnvelopeSerializer extends Serializer<Envelope> {
 }
 ```
 
-由于它不保留任何运行时局部可变状态，因此该序列化器可以实现 `Shareable`。
+This serializer can implement `Shareable` because it retains no runtime-local mutable state.
 
-## 集合序列化器
+## Collection Serializers
 
-对于 Java 集合，请继承 `CollectionSerializer` 或 `CollectionLikeSerializer`。
+For Java collections, extend `CollectionSerializer` or `CollectionLikeSerializer`.
 
-- `CollectionSerializer` 用于真正的 `Collection` 实现。
-- `CollectionLikeSerializer` 用于形态像集合、但并未实现 `Collection` 的类型。
-- 当集合可以使用标准元素代码生成路径时，保持 `supportCodegenHook == true`。
-- 只有在你需要完全控制元素 IO 时，才把 `supportCodegenHook` 设为 `false`。
+- Use `CollectionSerializer` for real `Collection` implementations.
+- Use `CollectionLikeSerializer` for collection-shaped types that do not implement `Collection`.
+- Keep `supportCodegenHook == true` when the collection can use the standard element codegen path.
+- Set `supportCodegenHook == false` only when you need to fully control element IO.
 
-示例：
+Example:
 
 ```java
 import java.util.ArrayList;
@@ -131,7 +134,7 @@ public final class CustomCollectionSerializer<T extends Collection<?>>
 
   @Override
   public Collection onCollectionWrite(WriteContext writeContext, T value) {
-    writeContext.getBuffer().writeVarUint32Small7(value.size());
+    writeContext.getBuffer().writeVarUInt32Small7(value.size());
     return value;
   }
 
@@ -143,16 +146,16 @@ public final class CustomCollectionSerializer<T extends Collection<?>>
   @Override
   public Collection newCollection(ReadContext readContext) {
     MemoryBuffer buffer = readContext.getBuffer();
-    int numElements = buffer.readVarUint32Small7();
+    int numElements = buffer.readVarUInt32Small7();
     setNumElements(numElements);
     return new ArrayList(numElements);
   }
 }
 ```
 
-## Map 序列化器
+## Map Serializers
 
-对于 Java map，请继承 `MapSerializer` 或 `MapLikeSerializer`。
+For Java maps, extend `MapSerializer` or `MapLikeSerializer`.
 
 ```java
 import java.util.LinkedHashMap;
@@ -170,7 +173,7 @@ public final class CustomMapSerializer<T extends Map<?, ?>> extends MapSerialize
 
   @Override
   public Map onMapWrite(WriteContext writeContext, T value) {
-    writeContext.getBuffer().writeVarUint32Small7(value.size());
+    writeContext.getBuffer().writeVarUInt32Small7(value.size());
     return value;
   }
 
@@ -182,17 +185,17 @@ public final class CustomMapSerializer<T extends Map<?, ?>> extends MapSerialize
   @Override
   public Map newMap(ReadContext readContext) {
     MemoryBuffer buffer = readContext.getBuffer();
-    int numElements = buffer.readVarUint32Small7();
+    int numElements = buffer.readVarUInt32Small7();
     setNumElements(numElements);
     return new LinkedHashMap(numElements);
   }
 }
 ```
 
-## 注册
+## Registration
 
 ```java
-Fory fory = Fory.builder().build();
+Fory fory = Fory.builder().withXlang(false).build();
 
 fory.registerSerializer(Foo.class, new FooSerializer(fory.getConfig()));
 fory.registerSerializer(
@@ -202,19 +205,23 @@ fory.registerSerializer(
     new CustomCollectionSerializer<>(fory.getTypeResolver(), CustomCollection.class));
 ```
 
-如果希望 Fory 按需懒加载地构造序列化器，可以注册工厂：
+If you want Fory to construct the serializer lazily, register a factory:
 
 ```java
 fory.registerSerializer(
     CustomMap.class, resolver -> new CustomMapSerializer<>(resolver, CustomMap.class));
 ```
 
-## 可共享性
+## Shareability
 
-当某个序列化器能够在等价运行时之间以及并发操作中安全复用时，就应实现 `Shareable` 标记接口。可共享序列化器不能保留操作状态、运行时局部可变状态，也不能在多次调用之间复用可变 scratch buffer。使用者可以通过 `serializer instanceof Shareable` 来判断其是否可共享。
+Implement the `Shareable` marker interface when the serializer can be safely reused across
+equivalent runtimes and concurrent operations. A shareable serializer must not retain operation
+state, runtime-local mutable state, or mutable scratch buffers shared across calls. Consumers can
+check shareability via `serializer instanceof Shareable`.
 
-在实践中：
+In practice:
 
-- 只依赖 `Config` 的序列化器通常是可共享的。
-- 基于 `TypeResolver` 的序列化器通常不可共享。
-- 操作状态应放在 `WriteContext`、`ReadContext` 和 `CopyContext` 中，而不是放在序列化器字段里。
+- `Config`-only serializers are often shareable.
+- `TypeResolver`-based serializers are usually not shareable.
+- Operation state belongs in `WriteContext`, `ReadContext`, and `CopyContext`, not in serializer
+  fields.

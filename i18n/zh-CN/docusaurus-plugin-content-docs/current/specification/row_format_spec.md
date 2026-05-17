@@ -1,5 +1,5 @@
 ---
-title: Row 格式
+title: Row Format
 sidebar_position: 2
 id: row_format_spec
 license: |
@@ -19,48 +19,50 @@ license: |
   limitations under the License.
 ---
 
-## 概述
+## Overview
 
-Apache Fory Row Format 是面向高性能数据处理的二进制布局，目标是“可随机访问 + 低拷贝 + 跨语言一致”。
+Apache Fory Row Format is a cache-friendly, random-access binary format designed for high-performance data processing. Unlike traditional serialization formats that require full deserialization, the row format enables:
 
-相较于必须整对象反序列化的格式，Row Format 支持：
+- **Random Field Access**: Read individual fields without deserializing the entire row
+- **Zero-Copy Operations**: Direct memory access without data transformation
+- **Cache-Friendly Layout**: Optimized memory layout for CPU cache efficiency
+- **Cross-Language Support**: Consistent binary format across Java, C++, and Python
 
-- **随机字段读取**：只读目标字段
-- **零拷贝访问**：在可行场景直接基于内存切片读取
-- **缓存友好布局**：降低 CPU cache miss
-- **跨语言一致性**：Java/C++/Python 可共享标准格式
+Fory provides two row format variants:
 
-Fory 提供两种变体：
+| Format          | Languages         | Use Case                       |
+| --------------- | ----------------- | ------------------------------ |
+| Standard Format | Java, C++, Python | Cross-language compatibility   |
+| Compact Format  | Java only         | Space efficiency, smaller rows |
 
-| 格式             | 支持语言             | 典型用途                         |
-| ---------------- | -------------------- | -------------------------------- |
-| Standard Format  | Java、C++、Python    | 跨语言一致、实现简单             |
-| Compact Format   | 仅 Java              | 更小体积、更高局部性             |
+## Format Comparison
 
-## 格式对比
+| Feature              | Standard Format               | Compact Format                      |
+| -------------------- | ----------------------------- | ----------------------------------- |
+| Field Slot Size      | Fixed 8 bytes                 | Natural width (1, 2, 4, or 8 bytes) |
+| Null Bitmap Size     | 8-byte aligned                | Byte-aligned, can borrow padding    |
+| Null Bitmap Position | Before field slots            | After field slots (at end)          |
+| Fixed-Size Structs   | Variable region (offset+size) | Inline in fixed region              |
+| Field Ordering       | Schema-defined order          | Sorted by alignment                 |
+| All Non-Nullable     | Bitmap still present          | Bitmap skipped entirely             |
+| Alignment            | Strict 8-byte                 | Relaxed (2, 4, or 8-byte)           |
 
-| 特性                   | Standard Format                   | Compact Format                         |
-| ---------------------- | --------------------------------- | -------------------------------------- |
-| 字段槽位大小           | 固定 8 字节                       | 按自然宽度（1/2/4/8 字节）             |
-| Null Bitmap            | 8 字节对齐                        | 字节对齐，可借用尾部 padding           |
-| Null Bitmap 位置       | 字段槽位之前                      | 字段槽位之后（尾部）                   |
-| 固定大小 struct        | 放在 variable region（offset+size） | 可内联到 fixed region                |
-| 字段顺序               | 按 schema 定义顺序                | 按对齐规则排序                         |
-| 全非空字段             | 仍保留 bitmap                     | 可完全省略 bitmap                      |
-| 对齐策略               | 严格 8 字节                       | 放宽（2/4/8 字节）                     |
+---
 
-## 标准 Row 格式
+## Standard Row Format
 
-标准格式强调跨语言统一与实现稳定：字段槽位统一 8 字节。
+The standard format prioritizes cross-language compatibility and simplicity with uniform 8-byte field slots.
 
-### 设计原则
+### Design Principles
 
-1. **8 字节对齐**：主要结构按 8-byte 对齐
-2. **固定槽位**：每字段固定 8-byte slot，便于常数时间寻址
-3. **位图标记 null**：通过 bitset 跟踪空值
-4. **相对偏移**：变长数据通过相对偏移定位
+1. **8-Byte Alignment**: All major structures are aligned to 8-byte boundaries for optimal memory access
+2. **Fixed-Width Field Slots**: Every field uses an 8-byte slot for uniform offset calculation
+3. **Null Bitmap**: Compact null tracking using bit vectors
+4. **Relative Offsets**: Variable-length data uses relative offsets for sub-buffer navigation
 
-### Row 二进制布局
+### Row Binary Layout
+
+A row stores structured data with the following layout:
 
 ```
 +----------------+------------------+------------------+-----+------------------+------------------+
@@ -71,59 +73,69 @@ Fory 提供两种变体：
 
 #### Null Bitmap
 
-- 大小：`((num_fields + 63) / 64) * 8` 字节（向上取整到 8-byte word）
-- 编码：每 bit 对应一个字段
-- bit=1 表示 null，bit=0 表示非 null
-- 第一字节 bit0 对应 field0
+The null bitmap tracks which fields contain null values:
 
-#### 字段槽位
+- **Size**: `((num_fields + 63) / 64) * 8` bytes (rounded up to nearest 8-byte word)
+- **Encoding**: Each bit corresponds to a field index
+  - Bit value `1` = field is null
+  - Bit value `0` = field is not null
+- **Bit Order**: Bit 0 of the first byte corresponds to field 0
 
-- 任意字段都占 8 字节 slot
-- 槽位偏移：`bitmap_size + field_index * 8`
-- 固定区总大小：`bitmap_size + num_fields * 8`
+**Example**: For 10 fields, bitmap size = `((10 + 63) / 64) * 8 = 8` bytes
 
-槽位内容：
+#### Field Slots
 
-| 字段类别         | 槽位内容                                  |
-| ---------------- | ----------------------------------------- |
-| 定长类型         | 值直接写入（不足补零）                    |
-| 变长类型         | `offset + size` 打包                      |
+Each field occupies a fixed 8-byte slot regardless of its actual data type:
 
-#### 变长字段编码
+- **Slot Offset**: `bitmap_size + field_index * 8`
+- **Total Fixed Region**: `bitmap_size + num_fields * 8` bytes
 
-变长字段（string/array/map/nested struct）在 slot 中写入：
+**Field Slot Contents by Type**:
+
+| Type Category  | Slot Contents                       |
+| -------------- | ----------------------------------- |
+| Fixed-width    | Value stored directly (zero-padded) |
+| Variable-width | Offset + Size encoding (see below)  |
+
+#### Variable-Width Data Encoding
+
+Variable-length fields (strings, arrays, maps, nested structs) store an offset-size pair in their slot:
 
 ```
 +---------------------------+---------------------------+
 |    Relative Offset        |         Size              |
 |       (32 bits)           |       (32 bits)           |
 +---------------------------+---------------------------+
+|<-------------- 64-bit field slot value -------------->|
 ```
 
-- 高 32 位：相对 row 起始地址偏移
-- 低 32 位：数据长度（字节）
+- **Relative Offset** (upper 32 bits): Offset from the row's base address
+- **Size** (lower 32 bits): Size of the variable-width data in bytes
 
-编码：
+**Encoding**:
 
 ```
 offset_and_size = (relative_offset << 32) | size
 ```
 
-解码：
+**Decoding**:
 
 ```
 relative_offset = (offset_and_size >> 32) & 0xFFFFFFFF
 size = offset_and_size & 0xFFFFFFFF
 ```
 
-#### Variable Data 区
+#### Variable Data Region
 
-- 位于 fixed region 之后
-- 变长字段按写入顺序顺排
-- 每个条目按 8-byte 对齐
-- padding 字节清零，保证输出确定性
+Variable-length data is stored after the fixed region:
 
-### Array 二进制布局
+- Data is written sequentially as fields are set
+- Each variable-length value is padded to 8-byte alignment
+- Padding bytes are zeroed for deterministic output
+
+### Array Binary Layout
+
+Arrays store homogeneous sequences of elements:
 
 ```
 +------------------+------------------+------------------+
@@ -134,223 +146,395 @@ size = offset_and_size & 0xFFFFFFFF
 
 #### Array Header
 
-| 字段            | 大小                            | 说明                    |
-| --------------- | ------------------------------- | ----------------------- |
-| Element Count   | 8 字节                          | 元素数量（uint64）      |
-| Null Bitmap     | `((count + 63) / 64) * 8` 字节 | 每元素 null 标记        |
+| Field         | Size                            | Description                 |
+| ------------- | ------------------------------- | --------------------------- |
+| Element Count | 8 bytes                         | Number of elements (uint64) |
+| Null Bitmap   | `((count + 63) / 64) * 8` bytes | Per-element null flags      |
+
+**Header Size**: `8 + ((num_elements + 63) / 64) * 8` bytes
 
 #### Array Element Data
 
-- 定长元素按自然宽度连续存储
-- 变长元素存 8-byte `offset+size`
-- 元素偏移：`header_size + element_index * element_size`
-- 数据区总大小按 8-byte 对齐
+Elements are stored contiguously after the header:
 
-#### Array 元素大小
+- **Fixed-width elements**: Stored with their natural width (1, 2, 4, or 8 bytes)
+- **Variable-width elements**: Stored as 8-byte offset+size pairs
 
-| 元素类型         | 元素占用                   |
-| ---------------- | -------------------------- |
-| bool/int8        | 1 byte                     |
-| int16            | 2 bytes                    |
-| int32/float32    | 4 bytes                    |
-| int64/float64    | 8 bytes                    |
-| string/binary    | 8 bytes（offset+size）     |
+**Element Offset**: `header_size + element_index * element_size`
 
-### Map 二进制布局
+**Data Region Size**: Rounded up to nearest 8-byte boundary
 
-Map 在 Row Format 中可视为键值对数组，并包含类型信息与可空位图。
+#### Array Element Sizes
 
-#### Map 结构
+| Element Type     | Element Size          |
+| ---------------- | --------------------- |
+| bool             | 1 byte                |
+| int8             | 1 byte                |
+| int16            | 2 bytes               |
+| int32            | 4 bytes               |
+| int64            | 8 bytes               |
+| float32          | 4 bytes               |
+| float64          | 8 bytes               |
+| string/binary    | 8 bytes (offset+size) |
+| array/map/struct | 8 bytes (offset+size) |
 
-推荐逻辑结构：
+### Map Binary Layout
 
-1. entry count
-2. key/value null bitmap（按实现可拆分）
-3. key data
-4. value data
+Maps store key-value pairs as two separate arrays:
 
-#### 嵌套 Struct 布局
+```
++------------------+------------------+------------------+
+|  Keys Array Size |   Keys Array     |   Values Array   |
++------------------+------------------+------------------+
+|     8 bytes      |   Variable size  |   Variable size  |
+```
 
-嵌套 struct 在标准格式中作为变长字段处理：
+#### Map Structure
 
-- slot 写 `offset+size`
-- value region 中存其完整 row 二进制
-- 可递归嵌套
+| Field           | Size     | Description                       |
+| --------------- | -------- | --------------------------------- |
+| Keys Array Size | 8 bytes  | Total size of keys array in bytes |
+| Keys Array      | Variable | Full array structure for keys     |
+| Values Array    | Variable | Full array structure for values   |
 
-## Compact Row Format（仅 Java）
+**Keys Array Offset**: `base_offset + 8`
+**Values Array Offset**: `base_offset + 8 + keys_array_size`
 
-Compact 格式针对 Java 本地执行链路做体积与局部性优化，不保证与标准格式完全同布局。
+Both keys and values arrays follow the standard array binary layout.
 
-### 设计原则
+### Nested Struct Layout
 
-1. 字段槽按自然宽度缩小
-2. 字段重排以减少 padding
-3. null bitmap 可省略或压缩
-4. 定长嵌套 struct 尽可能内联
+Nested structs are stored as complete row structures within the variable data region:
+
+1. Parent field slot contains offset+size pointing to nested row
+2. Nested row has its own null bitmap and field slots
+3. Supports arbitrary nesting depth
+
+```
+Parent Row:
++----------------+------------------+------------------+
+|  Null Bitmap   |  ... Slots ...   |  Nested Row Data |
++----------------+------------------+------------------+
+                        |                    ^
+                        |  offset+size       |
+                        +------------------->+
+
+Nested Row:
++----------------+------------------+------------------+
+|  Null Bitmap   |  Field Slots     |  Variable Data   |
++----------------+------------------+------------------+
+```
+
+---
+
+## Compact Row Format (Java Only)
+
+The compact format provides space-efficient encoding with additional optimizations. It is currently implemented in Java only.
+
+> **Note**: The compact format is still under development and may not be stable yet.
+
+### Design Principles
+
+1. **Natural Width Storage**: Fixed-size fields use their natural byte width instead of 8 bytes
+2. **Alignment-Based Field Sorting**: Fields are sorted by alignment requirements to minimize padding
+3. **Conditional Null Bitmap**: Null bitmap is omitted when all fields are non-nullable
+4. **Inline Fixed-Size Structs**: Nested structs with all fixed-size fields are stored inline
 
 ### Compact Row Binary Layout
 
-总体仍是“fixed + variable”双区结构，但 fixed region 更紧凑，null bitmap 可能后置。
+```
++------------------+------------------+-----+------------------+----------------+------------------+
+|  Field 0 Value   |  Field 1 Value   | ... |  Field N-1 Value | Null Bitmap    |  Variable Data   |
++------------------+------------------+-----+------------------+----------------+------------------+
+|  W0 bytes        |  W1 bytes        |     |  WN-1 bytes      | B bytes (opt)  |  Variable size   |
+```
 
-#### 与标准格式的关键差异
+#### Key Differences from Standard Format
 
-- slot 宽度非固定 8 字节
-- bitmap 可后置
-- 全非空时 bitmap 可省略
-- 可内联定长 nested struct
+1. **Field Slot Sizes**: Each field uses its natural width (Wi = type width or 8 for variable)
+2. **Null Bitmap Position**: Placed after field slots, can borrow alignment padding
+3. **Field Order**: Fields are sorted by alignment (8-byte → 4-byte → 2-byte → 1-byte → variable)
+4. **Conditional Bitmap**: Skipped entirely if all fields are non-nullable
 
-#### Null Bitmap（Compact）
+#### Null Bitmap (Compact)
 
-- 按字节对齐
-- 可能复用尾部 padding
-- 无可空字段时可完全移除
+- **Size**: `(num_nullable_fields + 7) / 8` bytes (byte-aligned, not 8-byte aligned)
+- **Skipped**: When all fields are primitive/non-nullable
+- **Position**: After all fixed-size field slots, can use alignment padding space
 
-#### 字段排序算法
+#### Field Sorting Algorithm
 
-典型排序目标：
+Fields are sorted to minimize padding and optimize alignment:
 
-- 优先高对齐需求字段
-- 次序兼顾读取热度与 padding 最小化
-- 保持可重复计算（deterministic）
+```
+Priority order (highest to lowest):
+1. Fields with 8-byte alignment (int64, float64, variable-width)
+2. Fields with 4-byte alignment (int32, float32)
+3. Fields with 2-byte alignment (int16)
+4. Fields with 1-byte alignment (int8, bool)
+```
 
-#### 定长 Struct 内联
+Within each alignment group, larger fields come first.
 
-若嵌套 struct 满足定长条件，可直接内联到 fixed region，减少一次间接寻址。
+#### Fixed-Size Struct Inlining
 
-#### 定宽计算
+Nested structs with all fixed-size fields are stored inline in the parent row:
 
-定宽字段总大小由字段类型宽度与对齐约束共同决定，实际布局由编译器/运行时规划器输出。
+**Standard Format** (nested struct with 2 int32 fields):
+
+```
+Parent slot: [offset (4 bytes) | size (4 bytes)]  → Points to nested row (8+ bytes elsewhere)
+```
+
+**Compact Format** (same nested struct):
+
+```
+Parent slot: [int32 field 0 | int32 field 1]  → 8 bytes total, inline
+```
+
+This eliminates the offset+size indirection for fixed-size nested structures.
+
+#### Fixed-Width Calculation
+
+A field's fixed width is determined recursively:
+
+- **Primitive types**: Natural byte width (1, 2, 4, or 8)
+- **Struct types**: Sum of all child fixed widths (if all children are fixed-width)
+- **Variable types** (string, array, map): Returns -1 (uses 8-byte offset+size slot)
+
+```
+fixed_width(field) =
+  if primitive: type_width
+  if struct and all_children_fixed: header_bytes + sum(fixed_width(child) for each child)
+  else: -1 (variable, uses 8-byte slot)
+```
 
 ### Compact Array Binary Layout
 
-与标准数组类似，但 header 与元素布局可采用更紧凑表示。
+```
++------------------+------------------+------------------+
+|  Element Count   |   Null Bitmap    |   Element Data   |
++------------------+------------------+------------------+
+|     4 bytes      | B bytes (opt)    |   Variable size  |
+```
 
 #### Compact Array Header
 
-包含：元素数量、null 信息（可选）、元素布局元信息（按实现）。
+| Field         | Size                          | Description                |
+| ------------- | ----------------------------- | -------------------------- |
+| Element Count | 4 bytes                       | Number of elements (int32) |
+| Null Bitmap   | `(count + 7) / 8` bytes (opt) | Per-element null flags     |
 
-#### 与标准数组关键差异
+**Header Size Calculation**:
 
-- 头部更短
-- 元素存储更贴近自然宽度
-- 在 Java 热路径下更节省内存带宽
+```
+header_size = 4 + (element_nullable ? (num_elements + 7) / 8 : 0)
 
-## 通用规范
+// Round to 8-byte boundary only if element width is 8-byte aligned
+if (fixed_width % 8 == 0):
+    header_size = round_to_8_bytes(header_size)
+```
 
-### 类型编码
+#### Key Differences from Standard Array
+
+1. **Element Count**: 4 bytes instead of 8 bytes
+2. **Null Bitmap**: Byte-aligned, skipped if elements are non-nullable
+3. **Fixed-Size Structs**: Inline storage for fixed-width struct elements
+
+---
+
+## Common Specifications
+
+The following specifications apply to both standard and compact formats.
+
+### Type Encoding
 
 #### Primitive Types
 
-基础类型按既定宽度和 endian 读写（默认 little-endian）。
+| Type    | Width   | Encoding                        |
+| ------- | ------- | ------------------------------- |
+| bool    | 1 byte  | `0x00` (false) or `0x01` (true) |
+| int8    | 1 byte  | Two's complement                |
+| int16   | 2 bytes | Two's complement, little-endian |
+| int32   | 4 bytes | Two's complement, little-endian |
+| int64   | 8 bytes | Two's complement, little-endian |
+| float32 | 4 bytes | IEEE 754 single precision       |
+| float64 | 8 bytes | IEEE 754 double precision       |
 
 #### Temporal Types
 
-- `date`：通常以 epoch day 表示
-- `timestamp`：通常以 epoch 纳秒或秒+纳秒表示
+| Type      | Width   | Encoding                              |
+| --------- | ------- | ------------------------------------- |
+| timestamp | 8 bytes | Microseconds since Unix epoch (int64) |
+| date32    | 4 bytes | Days since Unix epoch (int32)         |
+| duration  | 8 bytes | Duration in microseconds (int64)      |
 
-#### String 与 Binary
+#### String and Binary
 
-都属于变长类型，使用 `offset+size` 指向真实 payload。
+- **Encoding**: UTF-8 for strings, raw bytes for binary
+- **Storage**: Offset+size pair in field slot, data in variable region
+- **Padding**: Data padded to 8-byte alignment (standard) or natural alignment (compact)
 
-### Null 处理
+### Null Handling
 
-#### Row Null 处理
+#### Row Null Handling
 
-由 row bitmap 标记字段 null 状态，null 字段对应 slot 内容可忽略。
+- Null fields have their corresponding bit set to 1 in the null bitmap
+- Field slot contents are undefined for null fields (standard) or zeroed (compact)
+- Reading a null field returns a null/empty value indicator
 
-#### Array Null 处理
+#### Array Null Handling
 
-由数组 bitmap 标记每个元素是否为 null。
+- Null elements have their corresponding bit set to 1 in the array's null bitmap
+- Element data is undefined for null elements
+- Compact format: Bitmap skipped if elements are non-nullable
 
-#### 变长 null 语义
+#### Variable-Width Null Semantics
 
-null 与空值（如空字符串、空数组）必须区分；空值应写长度为 0 的实体。
+When reading variable-width data from a null field:
 
-### 对齐与 Padding
+- Returns size of -1 or equivalent null indicator
+- No data access is performed
 
-#### Standard 对齐
+### Alignment and Padding
 
-以 8-byte 为主，保证跨语言一致实现简单。
+#### Standard Format Alignment
 
-#### Compact 对齐
+1. **Null Bitmap**: Size rounded to 8-byte boundary
+2. **Field Slots**: Always 8 bytes each
+3. **Variable Data**: Each value padded to 8-byte boundary
+4. **Array Data**: Total data region padded to 8-byte boundary
 
-允许 2/4/8 灵活对齐，目标是减少浪费。
+#### Compact Format Alignment
 
-#### Padding 字节
+1. **Field Slots**: Natural width (1, 2, 4, or 8 bytes)
+2. **Null Bitmap**: Byte-aligned, placed after fields
+3. **Variable Data**: Padded to 8-byte boundary only when needed
+4. **Header**: May use relaxed alignment for smaller overhead
 
-padding 建议写 0，避免未初始化内存泄露并提高可重复性。
+#### Padding Bytes
 
-## 大小计算
+- All padding bytes must be set to zero
+- Ensures deterministic serialization output
+- Prevents information leakage from uninitialized memory
 
-### Standard Row 大小
+## Size Calculations
 
-```
-row_size = bitmap_size + num_fields * 8 + aligned(variable_region_size)
-```
-
-### Compact Row 大小
-
-```
-row_size = compact_fixed_size + optional_bitmap + aligned(variable_region_size)
-```
-
-### Standard Array 大小
-
-```
-array_size = header_size + aligned(element_data_size)
-```
-
-### Compact Array 大小
-
-```
-array_size = compact_header_size + aligned(compact_element_data_size)
-```
-
-### Map 大小
+### Standard Row Size
 
 ```
-map_size = map_header + aligned(keys_region) + aligned(values_region)
+row_size = bitmap_size + num_fields * 8 + variable_data_size
+
+where:
+  bitmap_size = ((num_fields + 63) / 64) * 8
+  variable_data_size = sum of (padded_size for each variable field)
+  padded_size = ((size + 7) / 8) * 8
 ```
 
-## 汇总表
+### Compact Row Size
 
-### 布局总结
+```
+row_size = fixed_region_size + bitmap_size + variable_data_size
 
-| 结构            | Standard                         | Compact (Java)                   |
-| --------------- | -------------------------------- | -------------------------------- |
-| Row             | bitmap + 8-byte slots + var data | compact fixed + optional bitmap + var data |
-| Array           | count + bitmap + elements        | compact header + elements        |
-| Map             | count + key/value data regions   | 依实现可紧凑化                   |
+where:
+  fixed_region_size = sum of (fixed_width(field) or 8 for each field)
+  bitmap_size = all_non_nullable ? 0 : (num_nullable_fields + 7) / 8
+  // May be rounded to 8-byte boundary if has variable fields
+```
 
-### 类型宽度总结
+### Standard Array Size
 
-| 类型族                 | 典型宽度                    |
-| ---------------------- | --------------------------- |
-| bool/int8              | 1 byte                      |
-| int16                  | 2 bytes                     |
-| int32/float32          | 4 bytes                     |
-| int64/float64          | 8 bytes                     |
-| string/binary/复杂类型 | slot 中 8-byte offset+size  |
+```
+array_size = header_size + data_size
 
-## 实现说明
+where:
+  header_size = 8 + ((num_elements + 63) / 64) * 8
+  data_size = ((num_elements * element_size + 7) / 8) * 8
+```
+
+### Compact Array Size
+
+```
+array_size = header_size + data_size
+
+where:
+  header_size = 4 + (element_nullable ? (num_elements + 7) / 8 : 0)
+  // header_size rounded to 8 if element_width % 8 == 0
+  data_size = num_elements * element_width
+```
+
+### Map Size
+
+```
+map_size = 8 + keys_array_size + values_array_size
+```
+
+## Summary Tables
+
+### Layout Summary
+
+| Component        | Standard Format                 | Compact Format                        |
+| ---------------- | ------------------------------- | ------------------------------------- |
+| Row Header       | `((N + 63) / 64) * 8` bytes     | 0 or `(N + 7) / 8` bytes (at end)     |
+| Row Field Slots  | `N * 8` bytes                   | `sum(field_widths)` bytes             |
+| Array Header     | `8 + ((E + 63) / 64) * 8` bytes | `4 + (E + 7) / 8` bytes (if nullable) |
+| Array Elements   | `E * element_size` (8-aligned)  | `E * element_width`                   |
+| Map Header       | 8 bytes                         | 8 bytes                               |
+| Offset+Size Pair | 8 bytes (32-bit offset + size)  | 8 bytes (same)                        |
+
+Where N = number of fields, E = number of elements
+
+### Type Width Summary
+
+| Category      | Storage Width | Standard Slot | Compact Slot |
+| ------------- | ------------- | ------------- | ------------ |
+| bool          | 1 byte        | 8 bytes       | 1 byte       |
+| int8          | 1 byte        | 8 bytes       | 1 byte       |
+| int16         | 2 bytes       | 8 bytes       | 2 bytes      |
+| int32         | 4 bytes       | 8 bytes       | 4 bytes      |
+| int64         | 8 bytes       | 8 bytes       | 8 bytes      |
+| float32       | 4 bytes       | 8 bytes       | 4 bytes      |
+| float64       | 8 bytes       | 8 bytes       | 8 bytes      |
+| string/binary | Variable      | 8 bytes       | 8 bytes      |
+| array         | Variable      | 8 bytes       | 8 bytes      |
+| map           | Variable      | 8 bytes       | 8 bytes      |
+| struct        | Variable      | 8 bytes       | inline or 8  |
+
+## Implementation Notes
 
 ### Endianness
 
-统一使用 little-endian，跨语言实现必须一致。
+- All multi-byte integers are stored in **little-endian** format
+- Floating-point values use native IEEE 754 representation
 
-### 内存安全
+### Memory Safety
 
-- 读取前先做边界检查
-- 对 offset/size 做溢出检查
-- 避免使用未初始化 padding
+- Writers must zero padding bytes to prevent information leakage
+- Readers must validate offsets and sizes before accessing data
+- Buffer bounds checking is required for untrusted input
 
-### 性能建议
+### Performance Considerations
 
-- 批量顺序写入，减少随机写
-- 热字段优先放 fixed region 前部
-- 通过 profile 决定是否启用 compact
+**Standard Format**:
 
-### 何时选择哪种格式
+- Fixed 8-byte slots enable O(1) field access with simple arithmetic
+- 8-byte alignment optimizes CPU cache line usage
+- Best for cross-language interoperability
 
-- **Standard**：跨语言互通、调试友好、长期兼容
-- **Compact**：Java 单语言链路、内存敏感、高吞吐场景
+**Compact Format**:
+
+- Smaller row sizes reduce memory bandwidth
+- Field sorting minimizes padding waste
+- Inline structs eliminate pointer chasing
+- Relaxed alignment may have slight CPU overhead on some architectures
+
+### When to Use Each Format
+
+| Scenario                         | Recommended Format |
+| -------------------------------- | ------------------ |
+| Cross-language data exchange     | Standard           |
+| Java-only, memory-constrained    | Compact            |
+| Many small primitive fields      | Compact            |
+| Many nested fixed-size structs   | Compact            |
+| Maximum read performance         | Standard           |
+| Interoperability with C++/Python | Standard           |

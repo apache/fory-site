@@ -1,5 +1,5 @@
 ---
-title: 引用跟踪
+title: Reference Tracking
 sidebar_position: 45
 id: reference_tracking
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-本页说明 Fory 在跨语言序列化中如何处理共享引用与循环引用的引用跟踪。
+This page explains how Fory handles reference tracking for shared and circular references in cross-language serialization.
 
-## 概述
+## Overview
 
 Reference tracking enables:
 
@@ -29,46 +29,58 @@ Reference tracking enables:
 - **Circular references**: Objects that reference themselves or form cycles
 - **Memory efficiency**: No duplicate data for repeated objects
 
-## 启用引用跟踪
+## Enabling Reference Tracking
 
 ### Java
 
 ```java
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .withRefTracking(true)
+        .withXlang(true)
+        .withRefTracking(true)
     .build();
 ```
 
 ### Python
 
 ```python
-fory = pyfory.Fory(xlang=True, ref_tracking=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 ```
 
 ### Go
 
 ```go
-fory := forygo.NewFory(true)  // true enables ref tracking
+fory := forygo.NewFory(
+    forygo.WithXlang(true),
+    forygo.WithTrackRef(true),
+)
 ```
 
 ### C++
 
 ```cpp
-auto fory = fory::Fory::create(fory::Config{
-    .ref_tracking = true
-});
+auto fory = fory::serialization::Fory::builder().xlang(true).track_ref(true).build();
 ```
 
 ### Rust
 
 ```rust
 let fory = Fory::builder()
-    .with_ref_tracking(true)
-    .build();
+    .xlang(true)
+    .track_ref(true).build();
 ```
 
-## 线格式
+### Scala
+
+```scala
+import org.apache.fory.scala.ForyScala
+
+val fory = ForyScala.builder()
+      .withXlang(true)
+      .withRefTracking(true)
+  .build()
+```
+
+## Wire Format
 
 When reference tracking is enabled, nullable fields write a **ref flag byte** before the value:
 
@@ -84,7 +96,7 @@ Where `ref_flag` is:
 | `-2` (NOT_NULL_VALUE_FLAG) | Value is present, first occurrence                    |
 | `≥0`                       | Reference ID pointing to previously serialized object |
 
-## 引用跟踪与可空性
+## Reference Tracking vs Nullability
 
 These are **independent** concepts:
 
@@ -102,8 +114,8 @@ Key behavior:
 ```java
 // Reference tracking enabled, but non-nullable fields still skip ref flags
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .withRefTracking(true)
+        .withXlang(true)
+        .withRefTracking(true)
     .build();
 ```
 
@@ -111,19 +123,20 @@ Fory fory = Fory.builder()
 
 By default, **most fields do not track references** even when global `refTracking=true`. Only specific pointer/smart pointer types track references by default.
 
-### 默认行为 by Language
+### Default Behavior by Language
 
-| Language | Default Ref Tracking | Types That Track Refs by Default  |
-| -------- | -------------------- | --------------------------------- |
-| Java     | No                   | None (use annotation to enable)   |
-| Python   | No                   | None (use annotation to enable)   |
-| Go       | No                   | None (use `fory:"ref"` to enable) |
-| C++      | No                   | `std::shared_ptr<T>`              |
-| Rust     | No                   | `Rc<T>`, `Arc<T>`, `Weak<T>`      |
+| Language | Default Ref Tracking | Types That Track Refs by Default                           |
+| -------- | -------------------- | ---------------------------------------------------------- |
+| Java     | No                   | None (use annotation to enable)                            |
+| Python   | No                   | None (use annotation to enable)                            |
+| Go       | No                   | None (use `fory:"ref"` to enable)                          |
+| C++      | Yes                  | `std::shared_ptr<T>`, `fory::serialization::SharedWeak<T>` |
+| Rust     | No                   | `Rc<T>`, `Arc<T>`, `Weak<T>`                               |
+| Scala    | No                   | None (use `@Ref` to enable)                                |
 
 ### Customizing Per-Field Ref Tracking
 
-#### Java: @ForyField Annotation
+#### Java: @Ref Annotation
 
 ```java
 public class Document {
@@ -131,38 +144,44 @@ public class Document {
     String title;
 
     // Enable ref tracking for this field
-    @ForyField(trackingRef = true)
+    @Ref
     Author author;
 
     // Shared across documents, track refs to avoid duplicates
-    @ForyField(trackingRef = true)
-    List<Tag> tags;
+    List<@Ref Tag> tags;
 }
 ```
 
-#### C++: fory::field Wrapper
+#### C++: FORY_STRUCT Field Config
 
 ```cpp
 struct Document {
     std::string title;
 
-    // shared_ptr tracks refs by default
+    // shared_ptr/SharedWeak track refs by default
     std::shared_ptr<Author> author;
+    fory::serialization::SharedWeak<Data> data;
 
-    // Explicitly enable ref tracking
-    fory::field<std::vector<Tag>, 1, fory::track_ref<true>> tags;
-
-    // Explicitly disable ref tracking
-    fory::field<std::shared_ptr<Data>, 2, fory::track_ref<false>> data;
+    std::shared_ptr<Tag> tag_owner;
 };
-FORY_STRUCT(Document, title, author, tags, data);
+FORY_STRUCT(Document,
+    title,
+    author,
+    data,
+    (tag_owner, fory::F().ref())
+);
 ```
+
+To disable reference tracking for C++ entirely, set
+`Fory::builder().xlang(true).track_ref(false).build()` on the serializer.
 
 #### Rust: Field Attributes
 
 ```rust
-#[derive(Fory)]
-#[tag("example.Document")]
+use fory::ForyStruct;
+use std::rc::Rc;
+
+#[derive(ForyStruct)]
 struct Document {
     title: String,
 
@@ -170,10 +189,34 @@ struct Document {
     author: Rc<Author>,
 
     // Explicitly enable ref tracking
-    #[track_ref]
+    #[fory(ref = true)]
     tags: Vec<Tag>,
 }
 ```
+
+#### Scala: @Ref Annotation
+
+Scala schema IDL and Scala 3 macro derivation use the same shared JVM `@Ref`
+annotation:
+
+```scala
+import org.apache.fory.annotation.{ForyField, ForyStruct, Ref}
+import org.apache.fory.scala.ForySerializer
+
+@ForyStruct
+final class Node() derives ForySerializer {
+  @ForyField(id = 1)
+  var children: List[Node @Ref] = List.empty
+
+  @Ref
+  @ForyField(id = 2)
+  var parent: Option[Node] = None
+}
+```
+
+For Scala, top-level field reference tracking is owned by `@Ref` on the field or
+constructor parameter. Type-use `T @Ref` is for nested element/value/payload
+references, such as `List[Node @Ref]`.
 
 #### Go: Struct Tags
 
@@ -257,4 +300,4 @@ b.next = a;  // Circular reference
 
 - [Field Nullability](field-nullability.md) - How nullability affects serialization
 - [Serialization](serialization.md) - Basic cross-language serialization examples
-- [Xlang Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) - Binary protocol details
+- [Xlang Specification](../../specification/xlang_serialization_spec.md) - Binary protocol details

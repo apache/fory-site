@@ -1,31 +1,37 @@
-# Python 基准性能报告
+# Python Benchmark Performance Report
 
-_生成于 2026-04-14 14:53:18_
+_Generated on 2026-05-08 17:54:45_
 
-## 如何生成本报告
+## How to Generate This Report
 
 ```bash
 cd benchmarks/python
 ./run.sh
 ```
 
-## 硬件与操作系统信息
+## Benchmark Plot
 
-| 键                    | 值                           |
+The plot shows throughput (ops/sec); higher is better.
+
+![Throughput](throughput.png)
+
+## Hardware & OS Info
+
+| Key                   | Value                        |
 | --------------------- | ---------------------------- |
-| 操作系统              | Darwin 24.6.0                |
-| 机器架构              | arm64                        |
-| 处理器                | arm                          |
+| OS                    | Darwin 24.6.0                |
+| Machine               | arm64                        |
+| Processor             | arm                          |
 | Python                | 3.10.8                       |
-| CPU 核心数（物理）    | 12                           |
-| CPU 核心数（逻辑）    | 12                           |
-| 总内存（GB）          | 48.0                         |
-| Python 实现           | CPython                      |
-| 基准平台              | macOS-15.7.2-arm64-arm-64bit |
+| CPU Cores (Physical)  | 12                           |
+| CPU Cores (Logical)   | 12                           |
+| Total RAM (GB)        | 48.0                         |
+| Python Implementation | CPython                      |
+| Benchmark Platform    | macOS-15.7.2-arm64-arm-64bit |
 
-## 基准配置
+## Benchmark Configuration
 
-| 键         | 值    |
+| Key        | Value |
 | ---------- | ----- |
 | warmup     | 3     |
 | iterations | 15    |
@@ -33,81 +39,49 @@ cd benchmarks/python
 | number     | 1000  |
 | list_size  | 5     |
 
-## 基准图表
+## Benchmark Results
 
-所有图表均展示吞吐量（ops/sec）；数值越高越好。
+### Timing Results (nanoseconds)
 
-### 总吞吐量
+| Datatype          | Operation   | fory (ns) | protobuf (ns) | pickle (ns) | Fastest |
+| ----------------- | ----------- | --------- | ------------- | ----------- | ------- |
+| NumericStruct     | Serialize   | 491.4     | 802.3         | 1119.8      | fory    |
+| NumericStruct     | Deserialize | 522.2     | 1211.6        | 1788.7      | fory    |
+| Sample            | Serialize   | 1096.4    | 3315.8        | 10185.2     | fory    |
+| Sample            | Deserialize | 2772.0    | 6659.7        | 7061.9      | fory    |
+| MediaContent      | Serialize   | 989.2     | 3433.2        | 4392.7      | fory    |
+| MediaContent      | Deserialize | 1518.7    | 4381.2        | 4305.1      | fory    |
+| NumericStructList | Serialize   | 1111.2    | 4707.9        | 3235.8      | fory    |
+| NumericStructList | Deserialize | 1891.7    | 6891.0        | 3974.9      | fory    |
+| SampleList        | Serialize   | 3447.2    | 18719.1       | 32125.7     | fory    |
+| SampleList        | Deserialize | 13131.6   | 35264.2       | 24154.4     | fory    |
+| MediaContentList  | Serialize   | 2996.5    | 17597.4       | 11087.8     | fory    |
+| MediaContentList  | Deserialize | 6228.7    | 21562.0       | 10459.3     | fory    |
 
-![Throughput](throughput.png)
+### Throughput Results (ops/sec)
 
-### Mediacontent
+| Datatype          | Operation   | fory TPS  | protobuf TPS | pickle TPS | Fastest |
+| ----------------- | ----------- | --------- | ------------ | ---------- | ------- |
+| NumericStruct     | Serialize   | 2,035,025 | 1,246,379    | 893,009    | fory    |
+| NumericStruct     | Deserialize | 1,915,112 | 825,344      | 559,055    | fory    |
+| Sample            | Serialize   | 912,072   | 301,590      | 98,182     | fory    |
+| Sample            | Deserialize | 360,751   | 150,158      | 141,605    | fory    |
+| MediaContent      | Serialize   | 1,010,939 | 291,275      | 227,652    | fory    |
+| MediaContent      | Deserialize | 658,462   | 228,247      | 232,281    | fory    |
+| NumericStructList | Serialize   | 899,960   | 212,407      | 309,040    | fory    |
+| NumericStructList | Deserialize | 528,636   | 145,116      | 251,580    | fory    |
+| SampleList        | Serialize   | 290,092   | 53,421       | 31,128     | fory    |
+| SampleList        | Deserialize | 76,152    | 28,357       | 41,400     | fory    |
+| MediaContentList  | Serialize   | 333,720   | 56,826       | 90,189     | fory    |
+| MediaContentList  | Deserialize | 160,547   | 46,378       | 95,609     | fory    |
 
-![Mediacontent](mediacontent.png)
+### Serialized Data Sizes (bytes)
 
-### Mediacontentlist
-
-![Mediacontentlist](mediacontentlist.png)
-
-### Sample
-
-![Sample](sample.png)
-
-### Samplelist
-
-![Samplelist](samplelist.png)
-
-### Struct
-
-![Struct](struct.png)
-
-### Structlist
-
-![Structlist](structlist.png)
-
-## 基准结果
-
-### 延迟结果（纳秒）
-
-| 数据类型         | 操作        | fory (ns) | pickle (ns) | protobuf (ns) | 最快     |
-| ---------------- | ----------- | --------- | ----------- | ------------- | -------- |
-| Struct           | Serialize   | 431.3     | 963.9       | 604.3         | fory     |
-| Struct           | Deserialize | 476.6     | 925.1       | 804.8         | fory     |
-| Sample           | Serialize   | 4966.3    | 12725.1     | 4396.0        | protobuf |
-| Sample           | Deserialize | 4362.9    | 6409.2      | 6620.1        | fory     |
-| MediaContent     | Serialize   | 1213.1    | 4263.1      | 3173.7        | fory     |
-| MediaContent     | Deserialize | 1620.7    | 4625.8      | 4306.3        | fory     |
-| StructList       | Serialize   | 1072.0    | 2798.6      | 3759.0        | fory     |
-| StructList       | Deserialize | 1334.7    | 2756.7      | 3963.5        | fory     |
-| SampleList       | Serialize   | 23866.8   | 33484.5     | 18711.7       | protobuf |
-| SampleList       | Deserialize | 17347.5   | 22999.0     | 36077.1       | fory     |
-| MediaContentList | Serialize   | 3526.9    | 11258.1     | 17670.6       | fory     |
-| MediaContentList | Deserialize | 6241.1    | 10209.5     | 21440.7       | fory     |
-
-### 吞吐结果（ops/sec）
-
-| 数据类型         | 操作        | fory TPS  | pickle TPS | protobuf TPS | 最快     |
-| ---------------- | ----------- | --------- | ---------- | ------------ | -------- |
-| Struct           | Serialize   | 2,318,598 | 1,037,429  | 1,654,700    | fory     |
-| Struct           | Deserialize | 2,098,391 | 1,081,003  | 1,242,545    | fory     |
-| Sample           | Serialize   | 201,358   | 78,585     | 227,479      | protobuf |
-| Sample           | Deserialize | 229,204   | 156,026    | 151,056      | fory     |
-| MediaContent     | Serialize   | 824,338   | 234,569    | 315,087      | fory     |
-| MediaContent     | Deserialize | 616,999   | 216,177    | 232,216      | fory     |
-| StructList       | Serialize   | 932,803   | 357,322    | 266,029      | fory     |
-| StructList       | Deserialize | 749,212   | 362,753    | 252,301      | fory     |
-| SampleList       | Serialize   | 41,899    | 29,865     | 53,442       | protobuf |
-| SampleList       | Deserialize | 57,645    | 43,480     | 27,718       | fory     |
-| MediaContentList | Serialize   | 283,535   | 88,825     | 56,591       | fory     |
-| MediaContentList | Deserialize | 160,227   | 97,948     | 46,640       | fory     |
-
-### 序列化数据大小（字节）
-
-| 数据类型         | fory | pickle | protobuf |
-| ---------------- | ---- | ------ | -------- |
-| Struct           | 58   | 126    | 61       |
-| Sample           | 446  | 1176   | 375      |
-| MediaContent     | 391  | 624    | 301      |
-| StructList       | 184  | 420    | 315      |
-| SampleList       | 1980 | 3546   | 1890     |
-| MediaContentList | 1665 | 1415   | 1520     |
+| Datatype          | fory | protobuf | pickle |
+| ----------------- | ---- | -------- | ------ |
+| NumericStruct     | 78   | 93       | 169    |
+| Sample            | 445  | 375      | 1176   |
+| MediaContent      | 366  | 301      | 624    |
+| NumericStructList | 219  | 475      | 582    |
+| SampleList        | 1914 | 1890     | 3546   |
+| MediaContentList  | 1614 | 1520     | 1415   |

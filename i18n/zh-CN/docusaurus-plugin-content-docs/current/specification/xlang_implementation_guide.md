@@ -1,5 +1,5 @@
 ---
-title: Xlang 实现指南
+title: Xlang Implementation Guide
 sidebar_position: 10
 id: xlang_implementation_guide
 license: |
@@ -19,32 +19,35 @@ license: |
   limitations under the License.
 ---
 
-## 概览
+## Overview
 
-本指南描述当前 xlang 运行时的所有权模型。该模型由参考 Java
-运行时采用，并由 Dart 运行时重写版本镜像实现。
+This guide describes the current xlang runtime ownership model used by the
+reference Java runtime and mirrored by the Dart runtime rewrite.
 
-编码格式由 [Xlang Serialization Spec](xlang_serialization_spec.md)
-定义。本文关注的是服务边界、操作流程与内部所有权。新运行时不必使用相同的类名，
-但应保持相同的控制流：
+The wire format is defined by
+[Xlang Serialization Spec](xlang_serialization_spec.md). This document is about
+service boundaries, operation flow, and internal ownership. New runtimes do not
+need the same class names, but they should preserve the same control flow:
 
-- 根级操作留在运行时门面上
-- 嵌套载荷处理留在显式的读写上下文中
-- 类型元信息留在类型解析层
-- serializer 只关注载荷本身
+- root operations stay on the runtime facade
+- nested payload work stays on explicit read and write contexts
+- type metadata stays in the type resolver layer
+- serializers stay payload-focused
 
-如果本指南与编码格式规范冲突，应以
-`docs/specification/xlang_serialization_spec.md` 为准；如果与某个语言运行时的实现细节冲突，则以该语言当前运行时代码为准。
+When this guide conflicts with the wire-format specification, follow
+`docs/specification/xlang_serialization_spec.md`. When it conflicts with a
+runtime-specific implementation detail, follow the current runtime code for
+that language.
 
-## 事实来源
+## Source Of Truth
 
-按以下顺序使用这些来源：
+Use these sources in this order:
 
 1. `docs/specification/xlang_serialization_spec.md`
-2. 该语言当前的运行时实现
-3. `integration_tests/` 下的跨语言测试
+2. the current runtime implementation for the language
+3. cross-language tests under `integration_tests/`
 
-对于 Dart，运行时形态主要围绕以下组件展开：
+For Dart, the runtime shape is centered on:
 
 - `Fory`
 - `WriteContext`
@@ -52,150 +55,149 @@ license: |
 - `RefWriter`
 - `RefReader`
 - `TypeResolver`
-- `StructCodec`
+- `StructSerializer`
 
-## 运行时所有权模型
+## Runtime Ownership Model
 
-### `Fory` 是根操作门面
+### `Fory` is the root-operation facade
 
-`Fory` 持有一个运行时实例可复用的运行时服务。
+`Fory` owns the reusable runtime services for one runtime instance.
 
-在 Dart 中，`Fory` 恰好持有四个运行时成员：
+In Dart, `Fory` owns exactly four runtime members:
 
 - `Buffer`
 - `WriteContext`
 - `ReadContext`
 - `TypeResolver`
 
-在 Java 中，`Fory` 还持有 `JITContext`、`CopyContext`
-等运行时本地服务，但所有权规则相同：`Fory`
-是根级门面，而不是嵌套 serializer 执行工作的地方。
+In Java, `Fory` also owns runtime-local services such as `JITContext` and
+`CopyContext`, but the ownership rule is the same: `Fory` is the root facade,
+not the place where nested serializers do their work.
 
-`Fory` 负责：
+`Fory` is responsible for:
 
-- 为根级操作准备共享 buffer
-- 写入和读取根级 xlang 头部位图
-- 将嵌套值编码委托给 `WriteContext`
-- 将嵌套值解码委托给 `ReadContext`
-- 通过 `TypeResolver` 持有注册能力
-- 在顶层 `finally` 中重置操作级上下文状态
+- preparing the shared buffer for root operations
+- writing and reading the root xlang header bitmap
+- delegating nested value encoding to `WriteContext`
+- delegating nested value decoding to `ReadContext`
+- owning registration through `TypeResolver`
+- resetting operation-local context state in a top-level `finally`
 
-嵌套 serializer 不得回调根级 `serialize(...)` 或 `deserialize(...)`
-入口。
+Nested serializers must not call back into root `serialize(...)` or
+`deserialize(...)` entry points.
 
-### `WriteContext` 和 `ReadContext` 持有操作级状态
+### `WriteContext` and `ReadContext` hold operation-local state
 
-`WriteContext` 与 `ReadContext`
-由 `Fory` 为一次根级操作准备，并在复用前由 `Fory`
-在 `finally` 块中重置。
+`WriteContext` and `ReadContext` are prepared by `Fory` for one root operation
+and reset by `Fory` in a `finally` block before reuse.
 
-`prepare(...)` 应只绑定当前 buffer 和根级操作输入。`reset()`
-应清理操作级可变状态。
+`prepare(...)` should only bind the active buffer and root-operation inputs.
+`reset()` should clear operation-local mutable state.
 
-这些操作级状态包括：
+That operation-local state includes:
 
-- 当前 buffer
-- 当前活动的 `RefWriter` 或 `RefReader`
-- meta string 状态
-- 共享 TypeDef 状态
-- 以对象 identity 为键的操作级临时状态
-- compatible struct slot 状态
-- 逻辑对象图深度
+- the current buffer
+- the active `RefWriter` or `RefReader`
+- meta-string state
+- shared type-definition state
+- operation-local scratch state keyed by identity
+- logical object-graph depth
 
-无论是生成的还是手写的 serializer，都应把这些 context
-视为操作级服务的唯一来源。serializer
-不得把环境运行时状态保存在 thread local、全局变量或 serializer
-实例字段中。
+Generated and hand-written serializers should treat these contexts as the only
+source of operation-local services. Serializers must not keep ambient runtime
+state in thread locals, globals, or serializer instance fields.
 
 ### `WriteContext`
 
-`WriteContext` 持有写侧的全部操作级状态：
+`WriteContext` owns all write-side per-operation state:
 
-- 当前 `Buffer`
+- current `Buffer`
 - `RefWriter`
 - `MetaStringWriter`
-- 共享 TypeDef 写入状态
-- 根级 `trackRef` 模式
-- 递归深度与限制
-- compatible 写入使用的本地 struct slot 状态
+- shared TypeDef write state
+- root `trackRef` mode
+- recursion depth and limits
 
-它暴露一组一次性基础类型 helper，例如：
+It exposes one-shot primitive helpers such as:
 
 - `writeBool`
 - `writeInt32`
-- `writeVarUint32`
+- `writeVarUInt32`
 
-这些 helper 只是便捷方法。若 serializer
-需要执行大量重复的基础类型 IO，应缓存 `final buffer = context.buffer;`
-并直接调用 buffer 方法。
+These helpers are convenience methods. Serializers that perform repeated
+primitive IO should cache `final buffer = context.buffer;` and call buffer
+methods directly.
 
 ### `ReadContext`
 
-`ReadContext` 持有读侧的全部操作级状态：
+`ReadContext` owns all read-side per-operation state:
 
-- 当前 `Buffer`
+- current `Buffer`
 - `RefReader`
 - `MetaStringReader`
-- 共享 TypeDef 读取状态
-- 递归深度与限制
-- compatible 读取使用的本地 struct slot 状态
+- shared TypeDef read state
+- recursion depth and limits
 
-它暴露对应的一次性基础类型 helper，例如：
+It exposes matching one-shot primitive helpers such as:
 
 - `readBool`
 - `readInt32`
-- `readVarUint32`
+- `readVarUInt32`
 
-生成的 struct serializer 在构造目标实例后，应立即调用
-`context.reference(value)`，这样回引用才能解析到该对象。
+Generated struct serializers call `context.reference(value)` immediately after
+constructing the target instance so back-references can resolve to that object.
 
-## 引用跟踪
+## Reference Tracking
 
-引用处理被拆分到两个显式服务之后：
+Reference handling is split behind two explicit services:
 
-- `RefWriter` 写入 null、ref 与 new-value 标记，并按对象 identity
-  记住已经写出的对象。
-- `RefReader` 解码这些标记，预留读取侧引用 ID，并解析已经实例化过的对象。
+- `RefWriter` writes null, ref, and new-value markers and remembers previously
+  written objects by identity.
+- `RefReader` decodes those markers, reserves read reference IDs, and resolves
+  previously materialized objects.
 
-xlang 的引用标记如下：
+The xlang ref markers are:
 
 - `NULL_FLAG (-3)`
 - `REF_FLAG (-2)`
 - `NOT_NULL_VALUE_FLAG (-1)`
 - `REF_VALUE_FLAG (0)`
 
-关键行为：
+Key behavior:
 
-- 基础值永远不使用引用跟踪
-- 生成的 struct 内部由字段元信息控制引用行为
-- 根级 `trackRef` 只用于顶层对象图以及没有字段元信息的容器根对象
-- 若 serializer 在所有嵌套读取完成之前就分配了对象，则必须通过
-  `context.reference(...)` 尽早绑定该对象
+- basic values never use ref tracking
+- field metadata controls ref behavior inside generated structs
+- root `trackRef` is only for top-level graphs and container roots with no
+  field metadata
+- serializers that allocate an object before all nested reads complete must bind
+  that object early with `context.reference(...)`
 
-## 类型解析
+## Type Resolution
 
-`TypeResolver` 持有：
+`TypeResolver` owns:
 
-- 内建类型解析
-- 按数值 ID 或 `namespace + typeName` 注册
-- serializer 查找
-- struct 元数据查找
-- 类型元信息编码与解码
-- 包名、类型名、字段名的规范化编码 meta string
-- 用于 named 类型解析的已编码名称查找
-- struct、compatible struct、enum、ext、union 等形式的编码类型判定
+- built-in type resolution
+- registration by numeric id or by `namespace + typeName`
+- serializer lookup
+- struct metadata lookup
+- type metadata encoding and decoding
+- canonical encoded meta strings for package names, type names, and field names
+- encoded-name lookup for named type resolution
+- wire type decisions for struct, compatible struct, enum, ext, and union forms
 
-在 Java xlang 模式中，具体实现是 `XtypeResolver`。在 Dart 中，相同的所有权仍由内部 `TypeResolver` 持有。
+In Java xlang mode the concrete implementation is `XtypeResolver`. In Dart the
+same ownership stays behind the internal `TypeResolver`.
 
-serializer 自身不负责解析类元数据。它们通过当前 context
-请求读写嵌套值，再由 context 将类型相关工作委托给 `TypeResolver`。
+Serializers do not resolve class metadata themselves. They ask the current
+context to read or write nested values, and the context delegates type work to
+`TypeResolver`.
 
-## 根帧职责
+## Root Frame Responsibilities
 
-每个根载荷都以一个 1-byte 位图开头，该位图由 `Fory`
-自身写入和读取，而不是由 serializer 负责。
+Every root payload starts with a one-byte bitmap written and read by `Fory`
+itself, not by serializers.
 
-当前 xlang 根级位定义如下：
+Current xlang root bits:
 
 | Bit | Meaning                    |
 | --- | -------------------------- |
@@ -203,206 +205,223 @@ serializer 自身不负责解析类元数据。它们通过当前 context
 | `1` | xlang payload              |
 | `2` | out-of-band buffers in use |
 
-应将根级位图与逐对象引用标记区分开：
+Keep the root bitmap separate from per-object ref markers:
 
-- 根级位图描述整个载荷
-- 引用标记一次只描述一个嵌套值
+- the root bitmap describes the whole payload
+- ref flags describe one nested value at a time
 
-## 序列化流程
+## Serialization Flow
 
-### 根级写路径
+### Root write path
 
-当前根级写流程如下：
+The current root write flow is:
 
-1. `Fory.serialize(...)` 或 `serializeTo(...)` 准备目标 buffer。
-2. `Fory` 调用 `writeContext.prepare(...)`。
-3. `Fory` 写入根级位图。
-4. `Fory` 将根对象委托给 `WriteContext`。
-5. `writeContext.reset()` 在 `finally` 中执行。
+1. `Fory.serialize(...)` or `serializeTo(...)` prepares the target buffer.
+2. `Fory` calls `writeContext.prepare(...)`.
+3. `Fory` writes the root bitmap.
+4. `Fory` delegates the root object to `WriteContext`.
+5. `writeContext.reset()` runs in `finally`.
 
-对于非空根值，`WriteContext.writeRootValue(...)` 会执行：
+For a non-null root value, `WriteContext.writeRootValue(...)` performs:
 
-1. 引用/null 包装
-2. 类型元信息写入
-3. 载荷写入
+1. ref/null framing
+2. type metadata write
+3. payload write
 
-载荷 serializer 只负责自身类型的载荷。它们不写根级位图，也不负责注册或类型头编码。
+Payload serializers are responsible only for the payload of their type. They do
+not write the root bitmap and they do not own registration or type-header
+encoding.
 
-### 嵌套写入使用 `WriteContext`
+### Nested writes use `WriteContext`
 
-重要规则：
+Important rules:
 
-- 当嵌套 serializer 需要引用处理或类型元信息时，必须使用
-  `WriteContext` 的 helper，例如 `writeRef(...)`、`writeNonRef(...)`
-  以及容器 helper
-- 重复的基础类型写入应直接走 buffer
-- 嵌套 serializer 的流程应保持直线式，不要仅为了清理操作级状态而添加内部
-  `try/finally`
-- 顶层 `Fory.serialize(...)` 持有操作重置所需的 `finally`
+- nested serializers must use `WriteContext` helpers such as `writeRef(...)`,
+  `writeNonRef(...)`, and container helpers when they need ref handling or type
+  metadata
+- repeated primitive writes should go directly through the buffer
+- nested serializer flow should stay straight-line; do not add internal
+  `try/finally` blocks just to clean per-operation state
+- top-level `Fory.serialize(...)` owns the operation reset `finally`
 
-## 反序列化流程
+## Deserialization Flow
 
-### 根级读路径
+### Root read path
 
-当前根级读流程与写流程对称：
+The current root read flow mirrors the write flow:
 
-1. `Fory.deserialize(...)` 或 `deserializeFrom(...)` 读取根级位图。
-2. 若根值为 null，立即返回。
-3. `Fory` 校验 xlang 模式与其他根帧要求。
-4. `Fory` 调用 `readContext.prepare(...)`。
-5. `Fory` 委托给 `ReadContext`。
-6. `readContext.reset()` 在 `finally` 中执行。
+1. `Fory.deserialize(...)` or `deserializeFrom(...)` reads the root bitmap.
+2. null roots return immediately.
+3. `Fory` validates xlang mode and other root framing requirements.
+4. `Fory` calls `readContext.prepare(...)`.
+5. `Fory` delegates to `ReadContext`.
+6. `readContext.reset()` runs in `finally`.
 
-### `ReadContext` 持有引用预留与载荷实例化
+### `ReadContext` owns ref reservation and payload materialization
 
-`ReadContext.readRef()` 执行标准的 xlang 读取序列：
+`ReadContext.readRef()` performs the normal xlang read sequence:
 
-1. 消费下一个引用标记
-2. 在适当情况下立即返回 `null` 或回引用
-3. 为新的可引用值预留新的读取侧引用 ID
-4. 读取类型元信息
-5. 读取载荷
-6. 将预留的读取侧引用 ID 绑定到完成构造的对象
+1. consume the next ref marker
+2. return `null` or a back-reference immediately when appropriate
+3. reserve a fresh read ref id for new reference-tracked values
+4. read type metadata
+5. read the payload
+6. bind the reserved read ref id to the completed object
 
-基础类型和类字符串的热点路径应直接从 buffer 读取；复杂载荷则委托给解析出的 serializer。
+Primitive and string-like hot paths should read directly from the buffer;
+complex payloads delegate to the resolved serializer.
 
-### 嵌套读取使用 `ReadContext`
+### Nested reads use `ReadContext`
 
-重要规则：
+Important rules:
 
-- 若 serializer 会提前分配结果对象，则必须在读取可能回指它的嵌套子对象之前调用
-  `context.reference(obj)`
-- 嵌套 serializer 的流程应保持直线式，不要添加内部 `try/finally`
-  来恢复操作级状态
-- 顶层 `Fory.deserialize(...)` 持有操作重置所需的 `finally`
+- serializers that allocate the result object early must call
+  `context.reference(obj)` before reading nested children that may refer back to
+  it
+- nested serializer flow should stay straight-line; do not add internal
+  `try/finally` blocks just to restore operation-local state
+- top-level `Fory.deserialize(...)` owns the operation reset `finally`
 
-## 深度跟踪
+## Depth Tracking
 
-`WriteContext` 与 `ReadContext` 会显式跟踪逻辑对象深度。`increaseDepth()`
-负责执行 `Config.maxDepth` 限制。
+`WriteContext` and `ReadContext` track logical object depth explicitly.
+`increaseDepth()` enforces `Config.maxDepth`.
 
-深度应显式保存在 context 上，而不是只依赖原生调用栈。同时，深度清理也不应依赖散落在 serializer
-代码中的嵌套 `try/finally`。顶层 context reset
-必须能够在失败后恢复操作级状态。
+Depth should stay explicit on the contexts rather than relying on the native
+call stack alone. At the same time, depth cleanup should not depend on nested
+`try/finally` blocks throughout serializer code. Top-level context reset must be
+able to recover operation-local state after failures.
 
-## Struct 兼容性
+## Struct Compatibility
 
-struct 专属的 schema/version 包装与 compatible-field staging
-应归属在 struct serializer 层，而不是 `Fory` 上，也不是公共 serializer API
-上。
+Struct-specific schema/version framing and compatible-field layout belong in the
+struct serializer layer, not on `Fory` and not on the public serializer API.
 
-在 Dart 中，这个内部所有者是 `StructCodec`。
+In Dart that internal owner is `StructSerializer`.
 
-`StructCodec` 负责：
+`StructSerializer` is responsible for:
 
-- 在兼容模式关闭且版本校验开启时写入 schema hash 包装
-- 在兼容模式开启时执行 compatible struct 字段重映射
-- 缓存 compatible 写布局与读布局
-- 为生成的 serializer 提供 compatible 读写 slot 状态
-- 在读取成功后记住远端 struct 元数据
+- schema-hash framing when compatibility mode is off and version checks are on
+- compatible-struct field remapping when compatibility mode is on
+- caching compatible read layouts
+- skipping unknown compatible fields
+- passing compatible read layouts explicitly to generated serializers
 
-当 `Config.compatible` 启用且 struct 被标记为 evolving 时：
+When `Config.compatible` is enabled and the struct is marked evolving:
 
-- 编码类型使用 compatible struct 形式
-- 运行时写入共享 TypeDef 元数据
-- 读取侧按标识符映射输入字段，并跳过未知字段
+- the wire type uses the compatible struct form
+- the runtime writes shared TypeDef metadata
+- reads map incoming fields by identifier and skip unknown fields
+- generated serializers apply matched fields directly while preserving their own
+  object construction and default-value rules
 
-当 `compatible` 关闭而 `checkStructVersion` 启用时：
+When `compatible` is disabled and `checkStructVersion` is enabled:
 
-- 运行时会在 struct 载荷前写入 schema hash
-- 读取侧会在读字段之前检查该 hash
+- the runtime writes the schema hash for struct payloads
+- the read side checks that hash before reading fields
 
-## Meta string 与共享类型元信息
+## Meta Strings And Shared Type Metadata
 
-xlang 类型元信息由两类显式状态支撑：
+Two explicit pieces of state back xlang type metadata:
 
-- `MetaStringWriter` 和 `MetaStringReader`
-  负责去重与解码命名空间和类型名字串
-- 共享 TypeDef 的读写状态负责跟踪已声明的 compatible struct 元数据
+- `MetaStringWriter` and `MetaStringReader` deduplicate and decode namespace
+  and type-name strings
+- shared TypeDef write/read state tracks announced compatible struct metadata
 
-所有权规则：
+Ownership rules:
 
-- 规范化后的编码名称由 `TypeResolver` 持有
-- 每次操作的动态 meta string ID 由 `MetaStringWriter` 和
-  `MetaStringReader` 持有
-- 共享类型定义表属于操作级 context 状态
+- canonical encoded names live in `TypeResolver`
+- per-operation dynamic meta-string ids live on `MetaStringWriter` and
+  `MetaStringReader`
+- shared type-definition tables are operation-local context state
 
-## Xlang 模式下的 enum
+## Enums In Xlang Mode
 
-在 xlang 模式中，enum 按数值 tag 序列化，而不是按名称序列化。
+In xlang mode, enums are serialized by numeric tag, not by name.
 
-在 Java 中：
+In Java:
 
-- 默认 tag 是声明顺序对应的 ordinal
-- `@ForyEnumId` 可将其覆盖为稳定的显式 tag
-- `serializeEnumByName(true)` 影响的是 Java native 模式，而不是 xlang 模式
+- the default tag is the declaration ordinal
+- `@ForyEnumId` can override that with a stable explicit tag
+- `serializeEnumByName(true)` affects native Java mode, not xlang mode
 
-即便配置接口或注解形式不同，其他运行时也应保持相同的编码规则。
+Other runtimes should preserve the same wire rule even if the configuration or
+annotation surface differs.
 
-## Out-Of-Band Buffer Object
+## Out-Of-Band Buffer Objects
 
-buffer object 的处理也遵循同样的拆分原则：
+Buffer-object handling follows the same split:
 
-- 一个根级 bit 声明当前是否使用 out-of-band buffer
-- 嵌套 buffer object 载荷仍按单个值决定是 in-band 还是 out-of-band
-- serializer 应使用读写 context helper，而不是绕过运行时
+- one root bit advertises whether out-of-band buffers are in play
+- nested buffer-object payloads still decide in-band vs out-of-band one value at
+  a time
+- serializers use read/write context helpers rather than bypassing the runtime
 
-## 代码生成
+## Code Generation
 
-Dart 的常规集成路径如下：
+The normal Dart integration path is:
 
-1. 使用 `@ForyStruct` 标注 struct
-2. 使用 `@ForyField` 标注字段覆盖
-3. 运行 `build_runner`
-4. 在源码库中私有绑定生成的元数据，并通过 `Fory.register(...)`
-   注册生成的类型
+1. annotate structs with `@ForyStruct`
+2. annotate field overrides with `@ForyField`
+3. run `build_runner`
+4. call the generated per-library helper, such as
+   `<InputFile>Fory.register(...)`, to bind private generated metadata and
+   register generated types
 
-生成代码应产出：
+Generated code should emit:
 
-- 私有 serializer 类
-- 私有元数据常量
-- 每个被标注库对应的私有生成安装 helper
-- 保持 serializer factory 私有的生成绑定安装逻辑
+- private serializer classes
+- private metadata constants
+- a public per-library registration helper that users call from application code
+- private generated installation helpers that keep serializer factories private
 
-生成代码不应创建公共全局 registry，也不应创建第二套公共 API
-族。
+The public helper should be a thin generated wrapper around the runtime
+registration API, not a public global registry or a second unrelated runtime API
+family.
 
-## 目录布局
+## Directory Layout
 
-在每个 Dart package 的 `lib/` 树下，只允许一层嵌套源码目录。
+Under each Dart package `lib/` tree, only one nested source layer is allowed.
 
-允许：
+Allowed:
 
 - `lib/fory.dart`
 - `lib/src/<file>.dart`
 - `lib/src/<area>/<file>.dart`
 
-不允许：
+Not allowed:
 
 - `lib/src/<area>/<subarea>/<file>.dart`
 
-## 新运行时的 serializer 设计规则
+## Serializer Design Rules For New Runtimes
 
-任何新的 xlang 运行时都应遵循以下规则，即便其表面 API
-有所不同：
+Any new xlang runtime should follow these rules even if its surface API looks
+different:
 
-1. 根级操作保留在运行时门面上，嵌套载荷处理放在显式读写 context 中。
-2. 引用跟踪放在专门的读侧/写侧服务之后，使禁用引用跟踪的路径保持低成本。
-3. 让 serializer 只负责载荷。类型元信息、注册与根帧包装属于运行时与类型解析层。
-4. 显式跟踪操作级状态。不要依赖隐式 thread-local 运行时状态。
-5. 在实例化新对象之前预留读取侧引用 ID，并在嵌套子对象可能回指它时尽早绑定部分构造对象。
-6. 将操作准备与操作清理分离。`prepare(...)` 负责绑定当前操作输入，`reset()`
-   负责清理操作级状态。
-7. 保持根级位图、逐对象引用标记、类型头与载荷字节之间的边界清晰。
-8. 内部命名应停留在序列化领域。优先使用 `codec`、`binding`、`layout`、
-   `slots` 这类词，避免使用 `session` 这类 RPC 风格术语，或 `plan`
-   这类含义模糊的控制流词汇。
-9. 每次 xlang 协议或所有权模型变更后，都要运行跨语言测试矩阵，并同时更新本指南与
-   [Xlang Serialization Spec](xlang_serialization_spec.md)。
+1. Keep root operations on the runtime facade and nested payload work on
+   explicit read and write contexts.
+2. Keep reference tracking behind dedicated read-side and write-side services
+   so the disabled path stays cheap.
+3. Make serializers payload-only. Type metadata, registration, and root
+   framing belong to the runtime and type resolver layers.
+4. Track per-operation state explicitly. Do not rely on ambient thread-local
+   runtime state.
+5. Reserve read reference IDs before materializing new objects, and bind
+   partially built objects as soon as a nested child may refer back to them.
+6. Keep operation setup and operation cleanup separate. `prepare(...)` binds
+   the current operation inputs, and `reset()` clears operation-local state.
+7. Preserve the separation between the root bitmap, per-object ref flags, type
+   headers, and payload bytes.
+8. Keep internal naming in the serialization domain. Prefer words like
+   `serializer`, `binding`, and `layout`; avoid RPC-style terms such as
+   `session` or vague control-flow terms such as `plan`.
+9. After any xlang protocol or ownership change, run the cross-language test
+   matrix and update both this guide and
+   [Xlang Serialization Spec](xlang_serialization_spec.md).
 
-## 验证
+## Validation
 
-对于 Dart 运行时改动，至少运行：
+For Dart runtime changes, run at minimum:
 
 ```bash
 cd dart
@@ -411,7 +430,7 @@ dart analyze
 dart test
 ```
 
-若要覆盖生成代码的使用方，也应运行：
+For generated consumer coverage, also run:
 
 ```bash
 cd dart/packages/fory-test

@@ -1,5 +1,5 @@
 ---
-title: Scala 序列化指南
+title: Scala Serialization Guide
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,57 +19,53 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ Scala 基于 Fory Java 构建，为 Scala 类型提供优化的序列化器。它支持完整的 Scala 对象序列化，包括：
+Apache Fory™ Scala provides optimized serializers for Scala types, built on top of Fory Java. It supports xlang mode for cross-language payloads and native mode for Scala/JVM-only object serialization. It supports all Scala object serialization:
 
-- `case` 类序列化
-- `pojo/bean` 类序列化
-- `object` 单例序列化
-- `collection` 序列化（Seq、List、Map 等）
-- `tuple` 与 `either` 类型
-- `Option` 类型
-- Scala 2 和 Scala 3 枚举
+- `case` class serialization
+- `pojo/bean` class serialization
+- `object` singleton serialization
+- `collection` serialization (Seq, List, Map, etc.)
+- `tuple` and `either` types
+- `Option` types
+- Scala 2 and 3 enumerations
 
-同时支持 Scala 2 和 Scala 3。
+The runtime artifact supports Scala 2.13 and Scala 3. Schema IDL generated
+Scala source and macro-derived xlang serializers require Scala 3.
 
-## 特性
+## Features
 
-Fory Scala 继承了 Fory Java 的全部特性，并增加了 Scala 特定优化：
+Fory Scala inherits all features from Fory Java, plus Scala-specific optimizations:
 
-- **高性能**：JIT 代码生成、零拷贝，性能可比传统序列化快 20 到 170 倍
-- **Scala 类型支持**：为 case 类、单例、集合、tuple、Option、Either 提供优化序列化器
-- **默认值支持**：在 Schema 演进期间自动处理 Scala 类的默认参数
-- **单例保持**：`object` 单例在反序列化后仍保持引用相等性
-- **Schema 演进**：支持类 Schema 变更时的前向和后向兼容
+- **High Performance**: JIT code generation, zero-copy, 20-170x faster than traditional serialization
+- **Scala Type Support**: Optimized serializers for case classes, singletons, collections, tuples, Option, Either
+- **Default Value Support**: Automatic handling of Scala class default parameters during schema evolution
+- **Singleton Preservation**: `object` singletons maintain referential equality after deserialization
+- **Schema Evolution**: Forward/backward compatibility for class schema changes
 
-完整特性列表请参见 [Java 特性](../java/index.md#features)。
+See [Java Features](../java/index.md#features) for complete feature list.
 
-## 安装
+## Installation
 
-使用 sbt 添加依赖：
+Add the dependency with sbt:
 
 ```sbt
 libraryDependencies += "org.apache.fory" %% "fory-scala" % "0.17.0"
 ```
 
-## 快速开始
+## Quick Start
 
 ```scala
 import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
 case class Person(name: String, id: Long, github: String)
 case class Point(x: Int, y: Int, z: Int)
 
 object ScalaExample {
-  // 创建启用 Scala 优化的 Fory
-  val fory: Fory = Fory.builder()
-    .withScalaOptimizationEnabled(true)
+  val fory: Fory = ForyScala.builder()
+    .withXlang(true)
     .build()
 
-  // 为 Scala 注册优化的 Fory 序列化器
-  ScalaSerializers.registerSerializers(fory)
-
-  // 注册你的类
   fory.register(classOf[Person])
   fory.register(classOf[Point])
 
@@ -81,20 +77,30 @@ object ScalaExample {
 }
 ```
 
-## 基于 Fory Java 构建
+## Xlang Mode And Native Mode
 
-Fory Scala 基于 Fory Java 构建。Fory Java 中的大多数配置选项、特性和概念都可直接应用于 Scala。可参考 Java 文档了解：
+Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Scala wire mode through the JVM builder, and Scala examples that use it set `.withXlang(true)` explicitly so the mode choice is visible.
 
-- [配置](../java/configuration.md) - 所有 ForyBuilder 选项
-- [基础序列化](../java/basic-serialization.md) - 序列化模式与 API
-- [类型注册](../java/type-registration.md) - 类注册与安全性
-- [Schema 演进](../java/schema-evolution.md) - 前向和后向兼容
-- [自定义序列化器](../java/custom-serializers.md) - 实现自定义序列化器
-- [压缩](../java/compression.md) - Int、long 和字符串压缩
-- [故障排查](../java/troubleshooting.md) - 常见问题与解决方案
+Use native mode for Scala/JVM-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and inherits the JVM native-mode object serialization path from Fory Java while adding Scala-specific serializers for case classes, collections, tuples, options, and enumerations. It is optimized for JVM and Scala type systems and is the right path for same-language Scala/JVM framework replacement payloads.
 
-## Scala 特定文档
+See [Configuration](configuration.md) for Scala builder setup and [Java Native Mode](../java/native-mode.md) for the full JVM native-mode behavior.
 
-- [Fory 创建](fory-creation.md) - Scala 特定的 Fory 设置要求
-- [类型序列化](type-serialization.md) - Scala 类型的序列化
-- [默认值](default-values.md) - Scala 类默认值支持
+## Built on Fory Java
+
+Fory Scala is built on top of Fory Java. Most configuration options, features, and concepts from Fory Java apply directly to Scala. Refer to the Java documentation for:
+
+- [Configuration](../java/configuration.md) - All ForyBuilder options
+- [Basic Serialization](../java/basic-serialization.md) - Serialization patterns and APIs
+- [Type Registration](../java/type-registration.md) - Class registration and security
+- [Schema Evolution](../java/schema-evolution.md) - Forward/backward compatibility
+- [Custom Serializers](../java/custom-serializers.md) - Implement custom serializers
+- [Compression](../java/compression.md) - Int, long, and string compression
+- [Troubleshooting](../java/troubleshooting.md) - Common issues and solutions
+
+## Scala-Specific Documentation
+
+- [Configuration](configuration.md) - Scala-specific Fory setup requirements
+- [Type Serialization](type-serialization.md) - Serializing Scala types
+- [Schema Metadata](schema-metadata.md) - Scala annotations, references, enum IDs, and union metadata
+- [Default Values](default-values.md) - Scala class default values support
+- [Schema IDL And Xlang](schema-idl.md) - Scala 3 generated models and macro-derived xlang serializers

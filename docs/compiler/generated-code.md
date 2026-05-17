@@ -1151,7 +1151,7 @@ including nested positions.
 
 Generated schema modules register schema types and resolve KSP-generated
 serializers from the target class name. The package-owned helper runtime uses
-`ForyKotlin.builder()` with the schema module installed, so message
+`ForyKotlin.builder().withXlang(true)` with the schema module installed, so message
 `toBytes`/`fromBytes` helpers work without caller-managed runtime setup. For
 `addressbook.fdl`:
 
@@ -1160,7 +1160,6 @@ public object AddressbookForyModule : ForyModule {
   private val fory: ThreadSafeFory by lazy {
     ForyKotlin.builder()
       .withXlang(true)
-      .withCompatible(true)
       .withRefTracking(true)
       .withModule(this)
       .buildThreadSafeFory()
@@ -1285,16 +1284,15 @@ use type-use annotations such as `List[Node @Ref]`.
 ### Schema Module
 
 Generated schema modules register schema serializers, enums, structs, and
-unions. The package-owned helper runtime uses `ForyScala.builder()` with the
-schema module installed, so message `toBytes`/`fromBytes` helpers work without
-caller-managed runtime setup:
+unions. The package-owned helper runtime uses
+`ForyScala.builder().withXlang(true)` with the schema module installed, so
+message `toBytes`/`fromBytes` helpers work without caller-managed runtime setup:
 
 ```scala
 object AddressbookForyModule extends org.apache.fory.ForyModule {
   private lazy val fory: ThreadSafeFory =
     ForyScala.builder()
       .withXlang(true)
-      .withCompatible(true)
       .withRefTracking(true)
       .withModule(this)
       .buildThreadSafeFory()

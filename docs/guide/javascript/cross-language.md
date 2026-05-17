@@ -1,6 +1,6 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 80
+sidebar_position: 20
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -23,8 +23,8 @@ Fory JavaScript serializes to the same binary format as the Java, Python, Go, Ru
 
 Things to keep in mind:
 
-- The Fory JavaScript runtime reads and writes cross-language payloads only (it does not support any language-native format).
-- Out-of-band mode is not currently supported.
+- The Fory JavaScript runtime reads and writes cross-language payloads only (it does not support any native-mode format).
+- JavaScript does not support out-of-band mode.
 
 ## Requirements for a Successful Round Trip
 
@@ -33,14 +33,14 @@ For a message to survive a round trip between JavaScript and another runtime:
 1. **Same type identity** on both sides — same numeric ID, or same `namespace + typeName`.
 2. **Compatible field types** — a `Type.int32()` field in JavaScript matches Java `int`, Go `int32`, C# `int`.
 3. **Same nullability** — if one side marks a field nullable, the other should too.
-4. **Same `compatible` mode** if using schema evolution.
+4. Compatible schema evolution on both sides. JavaScript enables it by default.
 5. **Same reference tracking config** if your data has shared or circular references.
 
 ## Step-by-Step: JavaScript to Another Runtime
 
 1. Define the JavaScript schema with the same type name or numeric ID used by the other runtime.
 2. Register the schema in both runtimes.
-3. Match field types, nullability, and `compatible` settings.
+3. Match field types, nullability, and schema-evolution settings.
 4. Test a real payload end-to-end before shipping.
 
 JavaScript side:
@@ -76,7 +76,8 @@ On the other side, register the same `example.message` type (same name or same n
 
 Fory matches fields by name. When models are defined in multiple languages, keep field names consistent — or at minimum use a naming scheme that maps unambiguously across languages (e.g. `snake_case` everywhere).
 
-When using `compatible: true` for schema evolution, field order differences are tolerated, but the names themselves must still match.
+With the default compatible schema evolution, field order differences are tolerated, but the names
+themselves must still match.
 
 ## Numeric Types
 

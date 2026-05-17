@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 4
+sidebar_position: 11
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -80,5 +80,5 @@ Point decoded = fory.Deserialize<Point>(payload);
 ## Related Topics
 
 - [Type Registration](type-registration.md)
-- [Field Configuration](field-configuration.md)
+- [Schema Metadata](schema-metadata.md)
 - [Troubleshooting](troubleshooting.md)

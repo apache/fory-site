@@ -52,14 +52,13 @@ targets: [
 
 - [Configuration](configuration.md)
 - [Basic Serialization](basic-serialization.md)
+- [Cross-Language Serialization](cross-language.md)
+- [Schema Metadata](schema-metadata.md)
 - [Type Registration](type-registration.md)
 - [Custom Serializers](custom-serializers.md)
-- [Field Configuration](field-configuration.md)
 - [Shared and Circular References](references.md)
 - [Polymorphism and Dynamic Types](polymorphism.md)
 - [Schema Evolution](schema-evolution.md)
-- [Cross-Language Serialization](cross-language.md)
-- [Row Format Status](row-format.md)
 - [Troubleshooting](troubleshooting.md)
 
 ## Quick Example

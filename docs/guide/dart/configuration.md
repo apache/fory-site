@@ -1,7 +1,7 @@
 ---
 title: Configuration
-sidebar_position: 1
-id: dart_configuration
+sidebar_position: 2
+id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -28,12 +28,11 @@ Pass options directly to the constructor:
 ```dart
 import 'package:fory/fory.dart';
 
-// defaults — good for most single-service scenarios
+// defaults: xlang wire format with compatible schema evolution
 final fory = Fory();
 
-// cross-language service with schema evolution
+// customize limits while keeping default compatible mode
 final fory = Fory(
-  compatible: true,
   maxDepth: 512,
 );
 ```
@@ -44,10 +43,12 @@ Create one instance per application and reuse it; there is no benefit to creatin
 
 ### `compatible`
 
-Set to `true` when your service needs to handle payloads from code that may have a different version of the same model — for example, when you deploy services independently and cannot guarantee that both sides update at the same time.
+Compatible mode is enabled by default. Keep it enabled when your service needs to handle payloads
+from code that may have a different version of the same model, for example when you deploy services
+independently and cannot guarantee that both sides update at the same time.
 
 ```dart
-final fory = Fory(compatible: true);
+final fory = Fory();
 ```
 
 When `compatible: true`:
@@ -100,8 +101,8 @@ final fory = Fory(maxBinarySize: 8 * 1024 * 1024);
 
 | Option               | Default   |
 | -------------------- | --------- |
-| `compatible`         | `false`   |
-| `checkStructVersion` | `true`    |
+| `compatible`         | `true`    |
+| `checkStructVersion` | `false`   |
 | `maxDepth`           | 256       |
 | `maxCollectionSize`  | 1 048 576 |
 | `maxBinarySize`      | 64 MiB    |
@@ -110,7 +111,7 @@ final fory = Fory(maxBinarySize: 8 * 1024 * 1024);
 
 When Fory is used to communicate between services written in different languages:
 
-- Set `compatible: true` on **all** sides if any side needs schema evolution.
+- Keep compatible mode enabled on all sides if any side needs schema evolution.
 - Use the same numeric IDs or `namespace + typeName` pairs on every side.
 - Match the `compatible` setting on both the writing and reading side — mismatching modes will fail.
 

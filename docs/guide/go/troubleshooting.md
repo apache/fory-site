@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-sidebar_position: 110
+sidebar_position: 120
 id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -115,7 +115,8 @@ f2.RegisterStruct(User{}, 1)  // Same ID!
 1. **Enable compatible mode**:
 
 ```go
-f := fory.New(fory.WithCompatible(true))
+// Add WithCompatible(true) to the same option set on every peer.
+f := fory.New(/* existing options */, fory.WithCompatible(true))
 ```
 
 2. **Ensure struct definitions match**:
@@ -247,7 +248,7 @@ type Good struct {
 
 **Symptom**: Data deserializes but fields have wrong values.
 
-**Cause**: Different field ordering between languages. In non-compatible mode, fields are sorted by their snake_case names. CamelCase field names (e.g., `FirstName`) are converted to snake_case (e.g., `first_name`) for sorting.
+**Cause**: Different field ordering between languages. In schema-consistent mode, fields are sorted by their snake_case names. CamelCase field names (e.g., `FirstName`) are converted to snake_case (e.g., `first_name`) for sorting.
 
 **Solutions**:
 
@@ -417,12 +418,12 @@ FORY_GO_JAVA_CI=1 mvn test -Dtest=org.apache.fory.xlang.GoXlangTest
 
 ```go
 func TestSchemaEvolution(t *testing.T) {
-    f1 := fory.New(fory.WithCompatible(true))
+    f1 := fory.New()
     f1.RegisterStruct(UserV1{}, 1)
 
     data, _ := f1.Serialize(&UserV1{ID: 1, Name: "Alice"})
 
-    f2 := fory.New(fory.WithCompatible(true))
+    f2 := fory.New()
     f2.RegisterStruct(UserV2{}, 1)
 
     var result UserV2

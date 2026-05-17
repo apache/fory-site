@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 4
+sidebar_position: 9
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -25,7 +25,7 @@ For types that cannot or should not use Fory model macros, implement `Serializer
 
 - External types with strict wire compatibility requirements
 - Specialized compact encodings
-- Legacy payload migration paths
+- Existing payload adaptation paths
 - Highly tuned hot-path serialization
 
 ## Implementing `Serializer`

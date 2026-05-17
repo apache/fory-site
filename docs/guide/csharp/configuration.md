@@ -35,17 +35,16 @@ ThreadSafeFory threadSafe = Fory.Builder().BuildThreadSafe();
 
 `Fory.Builder().Build()` uses:
 
-| Option               | Default | Description                                    |
-| -------------------- | ------- | ---------------------------------------------- |
-| `TrackRef`           | `false` | Reference tracking disabled                    |
-| `Compatible`         | `false` | Schema-consistent mode (no evolution metadata) |
-| `CheckStructVersion` | `false` | Struct schema hash checks disabled             |
-| `MaxDepth`           | `20`    | Max dynamic nesting depth                      |
+| Option               | Default | Description                                  |
+| -------------------- | ------- | -------------------------------------------- |
+| `TrackRef`           | `false` | Reference tracking disabled                  |
+| `Compatible`         | `true`  | Compatible schema-evolution metadata enabled |
+| `CheckStructVersion` | `false` | Struct schema hash checks disabled           |
+| `MaxDepth`           | `20`    | Max dynamic nesting depth                    |
 
 ## Builder Options
 
-C# always uses xlang-compatible framing, so `ForyBuilder` does not expose a separate `Xlang(...)`
-toggle.
+C# always uses xlang-compatible framing, so `ForyBuilder` does not expose a mode toggle.
 
 ### `TrackRef(bool enabled = false)`
 
@@ -59,7 +58,9 @@ Fory fory = Fory.Builder()
 
 ### `Compatible(bool enabled = false)`
 
-Enables schema evolution mode.
+Enables schema evolution mode. C# uses the xlang wire format only, so compatible mode is enabled by
+default for independently deployed peers. Passing `false` opts into schema-consistent payloads when
+every writer and reader uses the same schema.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -91,7 +92,7 @@ Fory fory = Fory.Builder()
 
 ## Common Configurations
 
-### Fast schema-consistent service
+### Schema-consistent service
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -104,7 +105,6 @@ Fory fory = Fory.Builder()
 
 ```csharp
 Fory fory = Fory.Builder()
-    .Compatible(true)
     .TrackRef(true)
     .Build();
 ```

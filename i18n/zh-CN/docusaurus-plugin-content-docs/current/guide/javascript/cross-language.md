@@ -1,6 +1,6 @@
 ---
-title: 跨语言序列化
-sidebar_position: 80
+title: Cross-Language Serialization
+sidebar_position: 20
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,31 +19,31 @@ license: |
   limitations under the License.
 ---
 
-Fory JavaScript 与 Java、Python、Go、Rust、Swift 和 C++ 的 Fory 运行时使用相同的二进制格式进行序列化。你可以在 JavaScript 中写入消息，再在 Java 中读取它，反过来也一样，无需额外的转换层。
+Fory JavaScript serializes to the same binary format as the Java, Python, Go, Rust, Swift, and C++ Fory runtimes. You can write a message in JavaScript and read it in Java — or any other direction — without any conversion layer.
 
-需要注意：
+Things to keep in mind:
 
-- Fory JavaScript 运行时只读写跨语言载荷，不支持任何语言原生格式。
-- 当前暂不支持 out-of-band mode。
+- The Fory JavaScript runtime reads and writes cross-language payloads only (it does not support any native-mode format).
+- JavaScript does not support out-of-band mode.
 
-## 成功完成往返的要求
+## Requirements for a Successful Round Trip
 
-要让一条消息能在 JavaScript 与另一种运行时之间稳定往返，双方必须满足：
+For a message to survive a round trip between JavaScript and another runtime:
 
-1. 两端具有**相同的类型标识**，即相同的数值 ID，或相同的 `namespace + typeName`
-2. **字段类型兼容**，例如 JavaScript 中的 `Type.int32()` 字段应对应 Java `int`、Go `int32`、C# `int`
-3. **可空性一致**，如果一侧把字段标记为可空，另一侧也应如此
-4. 如果使用 Schema 演进，双方的 `compatible` 模式必须一致
-5. 如果数据包含共享引用或循环引用，双方的引用跟踪配置也必须一致
+1. **Same type identity** on both sides — same numeric ID, or same `namespace + typeName`.
+2. **Compatible field types** — a `Type.int32()` field in JavaScript matches Java `int`, Go `int32`, C# `int`.
+3. **Same nullability** — if one side marks a field nullable, the other should too.
+4. Compatible schema evolution on both sides. JavaScript enables it by default.
+5. **Same reference tracking config** if your data has shared or circular references.
 
-## 分步说明：从 JavaScript 到其他运行时
+## Step-by-Step: JavaScript to Another Runtime
 
-1. 在 JavaScript 中使用与其他运行时相同的类型名称或数值 ID 定义 schema
-2. 在两端都注册该 schema
-3. 对齐字段类型、可空性和 `compatible` 设置
-4. 在发布前对真实载荷做端到端测试
+1. Define the JavaScript schema with the same type name or numeric ID used by the other runtime.
+2. Register the schema in both runtimes.
+3. Match field types, nullability, and schema-evolution settings.
+4. Test a real payload end-to-end before shipping.
 
-JavaScript 侧：
+JavaScript side:
 
 ```ts
 import Fory, { Type } from "@apache-fory/core";
@@ -65,36 +65,60 @@ const bytes = serialize({
 });
 ```
 
-在另一侧，请使用对应运行时的 API 注册同一个 `example.message` 类型，即相同的名称或相同的数值 ID：
+On the other side, register the same `example.message` type (same name or same numeric ID) using the peer runtime's API:
 
 - [Java guide](../java/index.md)
 - [Python guide](../python/index.md)
 - [Go guide](../go/index.md)
 - [Rust guide](../rust/index.md)
 
-## 字段命名
+## Field Naming
 
-Fory 按字段名匹配字段。当模型在多种语言中定义时，应保持字段名一致，或者至少采用能够在不同语言间无歧义映射的命名方案，例如统一使用 `snake_case`。
+Fory matches fields by name. When models are defined in multiple languages, keep field names consistent — or at minimum use a naming scheme that maps unambiguously across languages (e.g. `snake_case` everywhere).
 
-当使用 `compatible: true` 进行 Schema 演进时，字段顺序的差异是允许的，但字段名本身仍必须一致。
+With the default compatible schema evolution, field order differences are tolerated, but the names
+themselves must still match.
 
-## 数值类型
+## Numeric Types
 
-JavaScript 的 `number` 是 64 位浮点数，无法与其他语言中的所有整数类型一一对应。因此应使用显式 schema 类型：
+JavaScript `number` is a 64-bit float, which does not map cleanly to every integer type in other languages. Use explicit schema types:
 
-- `Type.int32()`：用于 32 位整数，对应 Java `int`、Go `int32`、C# `int`
-- `Type.int64()`：配合 `bigint` 值使用，用于 64 位整数，对应 Java `long`、Go `int64`
-- `Type.float32()` 或 `Type.float64()`：用于浮点数
+- `Type.int32()` for 32-bit integers (Java `int`, Go `int32`, C# `int`)
+- `Type.int64()` with `bigint` values for 64-bit integers (Java `long`, Go `int64`)
+- `Type.float32()` or `Type.float64()` for floating-point values
 
-## 日期与时间
+## Lists and Dense Arrays
 
-- `Type.timestamp()`：表示一个时间点；往返后仍是 JavaScript `Date`
-- `Type.date()`：表示不带时间的日期；反序列化结果为 `Date`
-- `Type.duration()`：在 JavaScript 中暴露为毫秒数
+Use `Type.list(T)` for ordinary JavaScript `Array<T>` values and Fory
+`list<T>` schema. Dense bool/numeric vectors use the explicit array builders
+listed below.
 
-## 多态字段
+| Fory schema       | JavaScript/TypeScript schema builder |
+| ----------------- | ------------------------------------ |
+| `list<int32>`     | `Type.list(Type.int32())`            |
+| `array<bool>`     | `Type.boolArray()`                   |
+| `array<int8>`     | `Type.int8Array()`                   |
+| `array<int16>`    | `Type.int16Array()`                  |
+| `array<int32>`    | `Type.int32Array()`                  |
+| `array<int64>`    | `Type.int64Array()`                  |
+| `array<uint8>`    | `Type.uint8Array()`                  |
+| `array<uint16>`   | `Type.uint16Array()`                 |
+| `array<uint32>`   | `Type.uint32Array()`                 |
+| `array<uint64>`   | `Type.uint64Array()`                 |
+| `array<float16>`  | `Type.float16Array()`                |
+| `array<bfloat16>` | `Type.bfloat16Array()`               |
+| `array<float32>`  | `Type.float32Array()`                |
+| `array<float64>`  | `Type.float64Array()`                |
 
-`Type.any()` 允许字段在运行时承载不同类型的值，但它在跨语言场景中更难保持一致。只要可能，就应优先使用显式字段 schema。
+## Date and Time
+
+- `Type.timestamp()` — a point in time; round-trips as a JavaScript `Date`
+- `Type.date()` — a date without time; deserializes as `Date`
+- `Type.duration()` — exposed as a numeric millisecond value in JavaScript
+
+## Polymorphic Fields
+
+`Type.any()` lets a field hold different types at runtime, but it is harder to keep in sync across languages. Prefer explicit field schemas whenever possible.
 
 ```ts
 const wrapperType = Type.struct(
@@ -105,9 +129,9 @@ const wrapperType = Type.struct(
 );
 ```
 
-## 枚举
+## Enums
 
-枚举成员的**顺序**必须在不同语言间保持一致。Fory 按 ordinal position 而不是按枚举值对枚举进行编码。
+Enum member **order** must match across languages. Fory encodes enums by ordinal position, not by value.
 
 ```ts
 const Color = { Red: 1, Green: 2, Blue: 3 };
@@ -115,14 +139,14 @@ const fory = new Fory();
 fory.register(Type.enum({ typeId: 210 }, Color));
 ```
 
-在每个对端运行时中都应使用相同的类型 ID 或类型名。
+Use the same type ID or type name in every peer runtime.
 
-## 安全限制
+## Safety Limits
 
-`maxDepth`、`maxBinarySize` 和 `maxCollectionSize` 这些选项用于保护 JavaScript 运行时，防止接收过大载荷。它们不会改变二进制格式，只决定本地运行时愿意接受什么样的数据。
+The `maxDepth`, `maxBinarySize`, and `maxCollectionSize` options protect the JavaScript runtime from overly large payloads. They do not change the binary format — they only control what the local runtime is willing to accept.
 
-## 相关主题
+## Related Topics
 
-- [支持的类型](supported-types.md)
-- [Schema 演进](schema-evolution.md)
-- [Xlang 序列化规范](../../specification/xlang_serialization_spec.md)
+- [Supported Types](supported-types.md)
+- [Schema Evolution](schema-evolution.md)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)

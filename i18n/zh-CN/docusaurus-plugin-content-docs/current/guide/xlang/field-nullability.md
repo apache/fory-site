@@ -1,5 +1,5 @@
 ---
-title: 字段可空性
+title: Field Nullability
 sidebar_position: 40
 id: field_nullability
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-本页说明 Fory 在跨语言（xlang）序列化模式下如何处理字段可空性。
+This page explains how Fory handles field nullability in cross-language (xlang) serialization mode.
 
-## 默认行为
+## Default Behavior
 
 In xlang mode, **fields are non-nullable by default**. This means:
 
@@ -36,6 +36,7 @@ The following types are nullable by default:
 - Go pointer types (`*int32`, `*string`, etc.)
 - Rust `Option<T>`
 - Python `Optional[T]`
+- Scala `Option[T]`
 
 | Field Type                                 | Default Nullable | Null Flag Written |
 | ------------------------------------------ | ---------------- | ----------------- |
@@ -48,7 +49,7 @@ The following types are nullable by default:
 | Go pointer types (`*int32`, `*string`)     | Yes              | Yes               |
 | `Optional<T>` / `Option<T>`                | Yes              | Yes               |
 
-## 线格式
+## Wire Format
 
 The nullable flag controls whether a **null flag byte** is written before the field value:
 
@@ -62,7 +63,7 @@ Where `null_flag` is:
 - `-1` (NULL_FLAG): Value is null
 - `-2` (NOT_NULL_VALUE_FLAG): Value is present
 
-## 可空性与引用跟踪
+## Nullable vs Reference Tracking
 
 These are related but distinct concepts:
 
@@ -87,7 +88,7 @@ ref_flag >= 0  → reference to object at index ref_flag
 
 For detailed reference tracking behavior, see [Reference Tracking](field-reference-tracking.md).
 
-## 各语言示例
+## Language-Specific Examples
 
 ### Java
 
@@ -99,7 +100,7 @@ public class Person {
     List<String> tags;    // Must not be null
 
     // Explicitly nullable
-    @ForyField(nullable = true)
+    @Nullable
     String nickname;      // Can be null
 
     // Optional wrapper - nullable by default
@@ -107,8 +108,8 @@ public class Person {
 }
 
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .build();
+        .withXlang(true)
+        .build();
 fory.register(Person.class, "example.Person");
 ```
 
@@ -123,7 +124,7 @@ import pyfory
 class Person:
     # Non-nullable by default
     name: str              # Must have a value
-    age: pyfory.int32      # Primitive
+    age: pyfory.Int32      # Primitive
     tags: List[str]        # Must not be None
 
     # Optional makes it nullable
@@ -137,10 +138,9 @@ fory.register_type(Person, typename="example.Person")
 ### Rust
 
 ```rust
-use fory::Fory;
+use fory::{Fory, ForyStruct};
 
-#[derive(Fory)]
-#[tag("example.Person")]
+#[derive(ForyStruct)]
 struct Person {
     // Non-nullable by default
     name: String,
@@ -167,8 +167,8 @@ type Person struct {
     Bio      *string  // Can be nil
 }
 
-fory := forygo.NewFory()
-fory.RegisterTagType("example.Person", Person{})
+fory := forygo.NewFory(forygo.WithXlang(true))
+fory.RegisterStructByName(Person{}, "example.Person")
 ```
 
 ### C++
@@ -189,29 +189,43 @@ FORY_STRUCT(Person, name, age, tags, nickname, bio);
 
 ## Customizing Nullability
 
-### Java: @ForyField Annotation
+### Java: @Nullable Annotation
 
 ```java
 public class Config {
-    @ForyField(nullable = true)
+    @Nullable
     String optionalSetting;  // Explicitly nullable
 
-    @ForyField(nullable = false)
     String requiredSetting;  // Explicitly non-nullable (default)
 }
 ```
 
-### C++: fory::field Wrapper
+### C++: FORY_STRUCT Field Config
 
 ```cpp
 struct Config {
-    // Explicitly mark as nullable
-    fory::field<std::string, 1, fory::nullable<true>> optional_setting;
-
-    // Explicitly mark as non-nullable (default)
-    fory::field<std::string, 2, fory::nullable<false>> required_setting;
+    std::optional<std::string> optional_setting;
+    std::string required_setting;
 };
-FORY_STRUCT(Config, optional_setting, required_setting);
+
+FORY_STRUCT(Config,
+    (optional_setting, fory::F(1)),
+    (required_setting, fory::F(2))
+);
+```
+
+For nullable pointer carriers, opt in with `.nullable()`:
+
+```cpp
+struct ConfigRef {
+    std::shared_ptr<std::string> optional_setting;
+    std::shared_ptr<std::string> required_setting;
+};
+
+FORY_STRUCT(ConfigRef,
+    (optional_setting, fory::F(1).nullable()),
+    (required_setting, fory::F(2))
+);
 ```
 
 ## Null Value Handling
@@ -247,5 +261,5 @@ Schema B: { name: String (nullable) }
 
 - [Reference Tracking](field-reference-tracking.md) - Shared and circular reference handling
 - [Serialization](serialization.md) - Basic cross-language serialization
-- [Type Mapping](https://fory.apache.org/docs/specification/xlang_type_mapping) - Cross-language type mapping reference
-- [Xlang Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) - Binary protocol details
+- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type mapping reference
+- [Xlang Specification](../../specification/xlang_serialization_spec.md) - Binary protocol details

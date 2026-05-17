@@ -1,6 +1,6 @@
 ---
 title: Shared & Circular References
-sidebar_position: 5
+sidebar_position: 6
 id: references
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -35,7 +35,7 @@ When the same object is referenced multiple times, Fory serializes it only once 
 use fory::Fory;
 use std::rc::Rc;
 
-let fory = Fory::default();
+let fory = Fory::builder().xlang(false).build();
 
 // Create a shared value
 let shared = Rc::new(String::from("shared_value"));
@@ -44,7 +44,7 @@ let shared = Rc::new(String::from("shared_value"));
 let data = vec![shared.clone(), shared.clone(), shared.clone()];
 
 // The shared value is serialized only once
-let bytes = fory.serialize(&data);
+let bytes = fory.serialize(&data)?;
 let decoded: Vec<Rc<String>> = fory.deserialize(&bytes)?;
 
 // Verify reference identity is preserved
@@ -64,12 +64,12 @@ For thread-safe shared references, use `Arc<T>`:
 use fory::Fory;
 use std::sync::Arc;
 
-let fory = Fory::default();
+let fory = Fory::builder().xlang(false).build();
 
 let shared = Arc::new(String::from("shared_value"));
 let data = vec![shared.clone(), shared.clone()];
 
-let bytes = fory.serialize(&data);
+let bytes = fory.serialize(&data)?;
 let decoded: Vec<Arc<String>> = fory.deserialize(&bytes)?;
 
 assert!(Arc::ptr_eq(&decoded[0], &decoded[1]));
@@ -102,8 +102,8 @@ struct Node {
     children: Vec<Rc<RefCell<Node>>>,
 }
 
-let mut fory = Fory::default();
-fory.register::<Node>(2000);
+let mut fory = Fory::builder().xlang(false).build();
+fory.register::<Node>(2000)?;
 
 // Build a parent-child tree
 let parent = Rc::new(RefCell::new(Node {
@@ -128,7 +128,7 @@ parent.borrow_mut().children.push(child1.clone());
 parent.borrow_mut().children.push(child2.clone());
 
 // Serialize and deserialize the circular structure
-let bytes = fory.serialize(&parent);
+let bytes = fory.serialize(&parent)?;
 let decoded: Rc<RefCell<Node>> = fory.deserialize(&bytes)?;
 
 // Verify the circular relationship
@@ -154,8 +154,8 @@ struct Node {
     children: Vec<Arc<Mutex<Node>>>,
 }
 
-let mut fory = Fory::default();
-fory.register::<Node>(6000);
+let mut fory = Fory::builder().xlang(false).build();
+fory.register::<Node>(6000)?;
 
 let parent = Arc::new(Mutex::new(Node {
     val: 10,
@@ -178,7 +178,7 @@ let child2 = Arc::new(Mutex::new(Node {
 parent.lock().unwrap().children.push(child1.clone());
 parent.lock().unwrap().children.push(child2.clone());
 
-let bytes = fory.serialize(&parent);
+let bytes = fory.serialize(&parent)?;
 let decoded: Arc<Mutex<Node>> = fory.deserialize(&bytes)?;
 
 assert_eq!(decoded.lock().unwrap().children.len(), 2);

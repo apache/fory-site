@@ -1,5 +1,5 @@
 ---
-title: 故障排查
+title: Troubleshooting
 sidebar_position: 11
 id: troubleshooting
 license: |
@@ -19,15 +19,15 @@ license: |
   limitations under the License.
 ---
 
-本页介绍 Swift 中常见的问题及调试方法。
+This page covers common Swift issues and how to debug them.
 
-## 常见运行时错误
+## Common Runtime Errors
 
 ### `Type not registered: ...`
 
-原因：当前 `Fory` 实例没有注册用户类型。
+Cause: user type was not registered on the current `Fory` instance.
 
-修复方式：
+Fix:
 
 ```swift
 fory.register(MyType.self, id: 100)
@@ -35,56 +35,58 @@ fory.register(MyType.self, id: 100)
 
 ### `Type mismatch: expected ..., got ...`
 
-原因：对端之间的注册映射或字段类型信息不一致。
+Cause: registration mapping or field type info differs across peers.
 
-修复方式：
+Fix:
 
-- 确保两端使用相同的 type ID 或名称映射
-- 检查字段类型是否兼容
+- Ensure both sides register the same type ID/name mapping
+- Verify field type compatibility
 
 ### `Invalid data: xlang bitmap mismatch`
 
-原因：序列化端和反序列化端使用了不同的 `xlang` 配置。
+Cause: the input was produced by a peer runtime that did not write the xlang
+wire format Swift expects.
 
-修复方式：确保双方使用相同的 `xlang` 模式。
+Fix: configure the peer serializer to write xlang format. Swift already uses
+xlang format and has no native-mode switch.
 
 ### `Invalid data: class version hash mismatch`
 
-原因：在 `compatible=false` 下发生了 schema 变更。
+Cause: schema changed while `compatible=false`.
 
-修复方式：
+Fix:
 
-- 为需要演进的 schema 启用兼容模式
-- 或保持严格的 schema 一致性
+- Enable compatible mode for evolving schemas
+- Or keep strict schema parity with schema-consistent mode
 
-## 常见宏阶段错误
+## Common Macro-time Errors
 
-### `@ForyObject requires explicit types for stored properties`
+### `@ForyStruct requires explicit types for stored properties`
 
-为所有存储属性补充显式类型声明。
+Add explicit type annotations to stored properties.
 
-### `@ForyObject enum associated values cannot have default values`
+### `Fory enum associated values cannot have default values`
 
-移除枚举关联值上的默认值。
+Remove default values from enum case associated values.
 
-### `Set<...> with Any elements is not supported by @ForyObject yet`
+### `Set<...> with Any elements is not supported by @ForyStruct yet`
 
-改用 `[Any]` 或明确元素类型的集合。
+Use `[Any]` or a typed set instead.
 
 ### `Dictionary<..., ...> with Any values is only supported for String, Int32, or AnyHashable keys`
 
-把 key 类型改为 `String`、`Int32` 或 `AnyHashable`，或者避免在 map value 中使用动态 `Any`。
+Switch key type to `String`, `Int32`, or `AnyHashable`, or avoid dynamic `Any` map values.
 
-## 调试命令
+## Debugging Commands
 
-运行 Swift 测试：
+Run Swift tests:
 
 ```bash
 cd swift
 ENABLE_FORY_DEBUG_OUTPUT=1 swift test
 ```
 
-运行由 Java 驱动的 Swift xlang 测试：
+Run Java-driven Swift xlang tests:
 
 ```bash
 cd java/fory-core

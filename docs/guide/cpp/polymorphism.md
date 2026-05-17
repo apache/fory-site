@@ -1,6 +1,6 @@
 ---
 title: Polymorphic Serialization
-sidebar_position: 5
+sidebar_position: 7
 id: polymorphism
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -63,7 +63,7 @@ struct Zoo {
 FORY_STRUCT(Zoo, star_animal);
 
 int main() {
-  auto fory = Fory::builder().track_ref(true).build();
+  auto fory = Fory::builder().xlang(true).track_ref(true).build();
 
   // Register all types with unique type IDs
   fory.register_struct<Zoo>(100);
@@ -167,7 +167,7 @@ FORY_STRUCT(Pet, animal1, (animal2, fory::F().dynamic(true)),
 - Performance is critical and you don't need subtype support
 - Working with monomorphic data despite having a polymorphic base class
 
-### Field Configuration
+### Schema Metadata
 
 Configure field metadata directly in `FORY_STRUCT`:
 
@@ -182,7 +182,7 @@ FORY_STRUCT(Zoo, (star, fory::F(0)),
             (mascot, fory::F(2).dynamic(false)));
 ```
 
-See [Field Configuration](field-configuration.md) for complete details on
+See [Schema Metadata](schema-metadata.md) for complete details on
 `nullable()`, `ref()`, and other field-level options.
 
 ## std::unique_ptr Polymorphism
@@ -195,7 +195,7 @@ struct Container {
 };
 FORY_STRUCT(Container, pet);
 
-auto fory = Fory::builder().track_ref(true).build();
+auto fory = Fory::builder().xlang(true).track_ref(true).build();
 fory.register_struct<Container>(200);
 fory.register_struct<Dog>(201);
 
@@ -224,7 +224,7 @@ struct AnimalShelter {
 };
 FORY_STRUCT(AnimalShelter, animals, registry);
 
-auto fory = Fory::builder().track_ref(true).build();
+auto fory = Fory::builder().xlang(true).track_ref(true).build();
 fory.register_struct<AnimalShelter>(100);
 fory.register_struct<Dog>(101);
 fory.register_struct<Cat>(102);
@@ -261,11 +261,11 @@ struct Container {
 FORY_STRUCT(Container, value, nested);
 
 // Default max_dyn_depth is 5
-auto fory1 = Fory::builder().build();
+auto fory1 = Fory::builder().xlang(true).build();
 assert(fory1.config().max_dyn_depth == 5);
 
 // Increase limit for deeper nesting
-auto fory2 = Fory::builder().max_dyn_depth(10).build();
+auto fory2 = Fory::builder().xlang(true).max_dyn_depth(10).build();
 fory2.register_struct<Container>(1);
 
 // Create deeply nested structure
@@ -290,7 +290,7 @@ auto decoded = fory2.deserialize<std::shared_ptr<Container>>(bytes).value();
 **Depth exceeded error:**
 
 ```cpp
-auto fory_shallow = Fory::builder().max_dyn_depth(2).build();
+auto fory_shallow = Fory::builder().xlang(true).max_dyn_depth(2).build();
 fory_shallow.register_struct<Container>(1);
 
 // 3 levels exceeds max_dyn_depth=2
@@ -320,7 +320,7 @@ struct Pet {
 FORY_STRUCT(Pet, primary, (optional, fory::F().nullable()));
 ```
 
-See [Field Configuration](field-configuration.md) for more details.
+See [Schema Metadata](schema-metadata.md) for more details.
 
 ## Combining Polymorphism with Other Features
 
@@ -340,7 +340,7 @@ struct WeightedNode : GraphNode {
 FORY_STRUCT(WeightedNode, id, neighbors, weight);
 
 // Enable ref tracking to handle shared references and cycles
-auto fory = Fory::builder().track_ref(true).build();
+auto fory = Fory::builder().xlang(true).track_ref(true).build();
 fory.register_struct<GraphNode>(100);
 fory.register_struct<WeightedNode>(101);
 
@@ -365,6 +365,7 @@ Use compatible mode for schema evolution with polymorphic types:
 
 ```cpp
 auto fory = Fory::builder()
+    .xlang(true)
     .compatible(true)  // Enable schema evolution
     .track_ref(true)
     .build();
@@ -381,7 +382,7 @@ auto fory = Fory::builder()
 2. **Enable reference tracking** for polymorphic types:
 
    ```cpp
-   auto fory = Fory::builder().track_ref(true).build();
+   auto fory = Fory::builder().xlang(true).track_ref(true).build();
    ```
 
 3. **Virtual destructors required**: Ensure base classes have virtual destructors:
@@ -411,7 +412,7 @@ auto fory = Fory::builder()
 6. **Adjust `max_dyn_depth`** based on your data structure depth:
 
    ```cpp
-   auto fory = Fory::builder().max_dyn_depth(10).build();
+   auto fory = Fory::builder().xlang(true).max_dyn_depth(10).build();
    ```
 
 7. **Use `nullable()`** for optional polymorphic fields:
@@ -473,7 +474,7 @@ if (!decoded_result.ok()) {
 ## Related Topics
 
 - [Type Registration](type-registration.md) - Registering types for serialization
-- [Field Configuration](field-configuration.md) - Field-level metadata and options
+- [Schema Metadata](schema-metadata.md) - Field-level metadata and options
 - [Supported Types](supported-types.md) - Smart pointers and collections
 - [Configuration](configuration.md) - `max_dyn_depth` and other settings
 - [Basic Serialization](basic-serialization.md) - Core serialization concepts

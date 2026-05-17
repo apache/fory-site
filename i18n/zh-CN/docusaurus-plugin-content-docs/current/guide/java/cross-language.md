@@ -1,6 +1,6 @@
 ---
-title: 跨语言序列化
-sidebar_position: 8
+title: Cross-Language Serialization
+sidebar_position: 4
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,62 +19,61 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ 通过 xlang 序列化格式支持 Java 和其他语言（Python、Rust、Go、JavaScript 等）之间的无缝数据交换。这使得多语言微服务、多语言数据管道和跨平台数据共享成为可能。
+Apache Fory™ supports seamless data exchange between Java and other languages (Python, Rust, Go, JavaScript, etc.) through the xlang serialization format. This enables multi-language microservices, polyglot data pipelines, and cross-platform data sharing.
 
-## 启用跨语言模式
+## Create an Xlang Runtime
 
-要序列化供其他语言使用的数据，使用 `Language.XLANG` 模式：
+Java defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```java
 import org.apache.fory.*;
 import org.apache.fory.config.*;
 
-// 使用 XLANG 模式创建 Fory 实例
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .withRefTracking(true)  // 为复杂图启用引用跟踪
+    .withXlang(true)
+    .withRefTracking(true)  // Enable reference tracking for complex graphs
     .build();
 ```
 
-## 为跨语言兼容性注册类型
+## Register Types for Cross-Language Compatibility
 
-类型必须使用**一致的 ID 或名称**在所有语言中注册。Fory 支持两种注册方法：
+Types must be registered with **consistent IDs or names** across all languages. Fory supports two registration methods:
 
-### 按 ID 注册（推荐用于性能）
+### Register by ID (Recommended for Performance)
 
 ```java
 public record Person(String name, int age) {}
 
-// 使用数字 ID 注册 - 更快更紧凑
+// Register with numeric ID - faster and more compact
 fory.register(Person.class, 1);
 
 Person person = new Person("Alice", 30);
 byte[] bytes = fory.serialize(person);
-// bytes 可以被 Python、Rust、Go 等反序列化。
+// bytes can be deserialized by Python, Rust, Go, etc.
 ```
 
-**优点**：更快的序列化，更小的二进制大小
-**权衡**：需要协调以避免跨团队/服务的 ID 冲突
+**Benefits**: Faster serialization, smaller binary size
+**Trade-offs**: Requires coordination to avoid ID conflicts across teams/services
 
-### 按名称注册（推荐用于灵活性）
+### Register by Name (Recommended for Flexibility)
 
 ```java
 public record Person(String name, int age) {}
 
-// 使用字符串名称注册 - 更灵活
+// Register with string name - more flexible
 fory.register(Person.class, "example.Person");
 
 Person person = new Person("Alice", 30);
 byte[] bytes = fory.serialize(person);
-// bytes 可以被 Python、Rust、Go 等反序列化。
+// bytes can be deserialized by Python, Rust, Go, etc.
 ```
 
-**优点**：不容易冲突，跨团队管理更容易，无需协调
-**权衡**：由于字符串编码，二进制大小稍大
+**Benefits**: Less prone to conflicts, easier management across teams, no coordination needed
+**Trade-offs**: Slightly larger binary size due to string encoding
 
-## 跨语言示例：Java ↔ Python
+## Cross-Language Example: Java ↔ Python
 
-### Java（序列化器）
+### Java (Serializer)
 
 ```java
 import org.apache.fory.*;
@@ -85,22 +84,22 @@ public record Person(String name, int age) {}
 public class Example {
     public static void main(String[] args) {
         Fory fory = Fory.builder()
-            .withLanguage(Language.XLANG)
+            .withXlang(true)
             .withRefTracking(true)
             .build();
 
-        // 使用一致的名称注册
+        // Register with consistent name
         fory.register(Person.class, "example.Person");
 
         Person person = new Person("Bob", 25);
         byte[] bytes = fory.serialize(person);
 
-        // 通过网络/文件/队列将 bytes 发送到 Python 服务
+        // Send bytes to Python service via network/file/queue
     }
 }
 ```
 
-### Python（反序列化器）
+### Python (Deserializer)
 
 ```python
 import pyfory
@@ -109,22 +108,21 @@ from dataclasses import dataclass
 @dataclass
 class Person:
     name: str
-    age: pyfory.int32
+    age: pyfory.Int32
 
-# 在 xlang 模式下创建 Fory
-fory = pyfory.Fory(ref_tracking=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 
-# 使用与 Java 相同的名称注册
+# Register with the SAME name as Java
 fory.register_type(Person, typename="example.Person")
 
-# 从 Java 反序列化 bytes
+# Deserialize bytes from Java
 person = fory.deserialize(bytes_from_java)
-print(f"{person.name}, {person.age}")  # 输出：Bob, 25
+print(f"{person.name}, {person.age}")  # Output: Bob, 25
 ```
 
-## 处理循环引用和共享引用
+## Handling Circular and Shared References
 
-启用引用跟踪时，跨语言模式支持循环引用和共享引用：
+Xlang mode supports circular and shared references when reference tracking is enabled:
 
 ```java
 public class Node {
@@ -134,98 +132,131 @@ public class Node {
 }
 
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .withRefTracking(true)  // 循环引用需要
+    .withXlang(true)
+    .withRefTracking(true)  // Required for circular references
     .build();
 
 fory.register(Node.class, "example.Node");
 
-// 创建循环引用
+// Create circular reference
 Node node1 = new Node();
 node1.value = "A";
 Node node2 = new Node();
 node2.value = "B";
 node1.next = node2;
-node2.parent = node1;  // 循环引用
+node2.parent = node1;  // Circular reference
 
 byte[] bytes = fory.serialize(node1);
-// Python/Rust/Go 可以正确反序列化这个，并保留循环引用
+// Python/Rust/Go can correctly deserialize this with circular references preserved
 ```
 
-## 类型映射考虑
+## Type Mapping Considerations
 
-并非所有 Java 类型在其他语言中都有等价物。使用 xlang 模式时：
+Not all Java types have equivalents in other languages. When using xlang mode:
 
-- 使用**原始类型**（`int`、`long`、`double`、`String`）以获得最大兼容性
-- 使用**标准集合**（`List`、`Map`、`Set`）而不是特定于语言的集合
-- 避免 **Java 特定类型**，如 `Optional`、`BigDecimal`（除非目标语言支持它们）
-- 查看[类型映射指南](https://fory.apache.org/docs/specification/xlang_type_mapping)获取完整的兼容性矩阵
+- Use **primitive types** (`int`, `long`, `double`, `String`) for maximum compatibility
+- Use **standard collections** (`List`, `Map`, `Set`) instead of language-specific ones
+- Use **reduced-precision carriers** (`Float16`, `BFloat16`, `Float16List`, `BFloat16List`) for 16-bit float payloads
+- Treat `Float16[]`, `BFloat16[]`, `Float16List`, and `BFloat16List` as `list<T>` carriers by default; use `@ArrayType` when the schema must be `array<float16>` or `array<bfloat16>`
+- Avoid **Java-specific types** like `Optional`, `BigDecimal` (unless the target language supports them)
+- See [Type Mapping Guide](../../specification/xlang_type_mapping.md) for complete compatibility matrix
 
-### 兼容类型
+### Lists and Dense Arrays
+
+Java primitive arrays are dense `array<T>` carriers, except plain `byte[]`,
+which defaults to `bytes`. General Java collections and Fory primitive-list
+carriers such as `Int32List`, `Float16List`, and `BFloat16List` use
+`list<T>` unless the field has explicit `@ArrayType` metadata.
+
+| Fory schema       | Java field shape                           |
+| ----------------- | ------------------------------------------ |
+| `list<int32>`     | `List<Integer>` or `Int32List`             |
+| `array<bool>`     | `boolean[]`                                |
+| `array<int8>`     | `@Int8Type byte[]` type-use                |
+| `array<int16>`    | `short[]`                                  |
+| `array<int32>`    | `int[]`                                    |
+| `array<int64>`    | `long[]`                                   |
+| `array<uint8>`    | `@UInt8Type byte[]` type-use               |
+| `array<uint16>`   | `@UInt16Type short[]` type-use             |
+| `array<uint32>`   | `@UInt32Type int[]` type-use               |
+| `array<uint64>`   | `@UInt64Type long[]` type-use              |
+| `array<float16>`  | `Float16Array` or `@Float16Type short[]`   |
+| `array<bfloat16>` | `BFloat16Array` or `@BFloat16Type short[]` |
+| `array<float32>`  | `float[]`                                  |
+| `array<float64>`  | `double[]`                                 |
+
+Prefer type-use syntax for primitive-array annotations:
+
+```java
+private @UInt32Type int[] ids;
+private @BFloat16Type short[] values;
+```
+
+### Compatible Types
 
 ```java
 public record UserData(
-    String name,           // ✅ 兼容
-    int age,               // ✅ 兼容
-    List<String> tags,     // ✅ 兼容
-    Map<String, Integer> scores  // ✅ 兼容
+    String name,           // compatible
+    int age,               // compatible
+    List<String> tags,     // compatible
+    Map<String, Integer> scores  // compatible
 ) {}
 ```
 
-### 有问题的类型
+### Problematic Types
 
 ```java
 public record UserData(
-    Optional<String> name,    // ❌ 不跨语言兼容
-    BigDecimal balance,       // ❌ 支持有限
-    EnumSet<Status> statuses  // ❌ Java 特定集合
+    Optional<String> name,    // not cross-language compatible
+    BigDecimal balance,       // limited support
+    EnumSet<Status> statuses  // Java-specific collection
 ) {}
 ```
 
-## 性能考虑
+## Performance Considerations
 
-跨语言模式相比仅 Java 模式有额外的开销：
+Xlang mode has additional overhead compared to Java native mode:
 
-- **类型元数据编码**：每个类型添加额外字节
-- **类型解析**：在反序列化期间需要名称/ID 查找
+- **Type metadata encoding**: Adds extra bytes per type
+- **Type resolution**: Requires name/ID lookup during deserialization
 
-**为了最佳性能**：
+**For best performance**:
 
-- 尽可能使用**基于 ID 的注册**（更小的编码）
-- 如果不需要循环引用，**禁用引用跟踪**（`withRefTracking(false)`）
-- 当只需要 Java 序列化时**使用 Java 模式**（`Language.JAVA`）
+- Use **ID-based registration** when possible (smaller encoding)
+- **Disable reference tracking** if you don't need circular references (`withRefTracking(false)`)
+- **Use native mode** (`withXlang(false)`) when only Java serialization is needed
 
-## 跨语言最佳实践
+## Cross-Language Best Practices
 
-1. **一致的注册**：确保所有服务使用相同的 ID/名称注册类型
-2. **版本兼容性**：使用兼容模式跨服务进行 schema 演化
+1. **Consistent Registration**: Ensure all services register types with identical IDs/names
+2. **Version Compatibility**: Keep compatible mode for schema evolution across services
 
-## 跨语言序列化故障排除
+## Troubleshooting Cross-Language Serialization
 
-### "Type not registered" 错误
+### "Type not registered" errors
 
-- 验证类型在两端都使用相同的 ID/名称注册
-- 检查类型名称是否有拼写错误或大小写差异
+- Verify type is registered with same ID/name on both sides
+- Check if type name has typos or case differences
 
-### "Type mismatch" 错误
+### "Type mismatch" errors
 
-- 确保字段类型在语言之间兼容
-- 查看[类型映射指南](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
+- Ensure field types are compatible across languages
+- Review [Type Mapping Guide](../../specification/xlang_type_mapping.md)
 
-### 数据损坏或意外值
+### Data corruption or unexpected values
 
-- 验证两端都使用 `Language.XLANG` 模式
-- 确保两端具有兼容的 Fory 版本
+- Verify both sides use xlang payloads
+- Ensure both sides have compatible Fory versions
 
-## 另请参阅
+## See Also
 
-- [跨语言序列化规范](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec)
-- [类型映射参考](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
-- [Python 跨语言指南](../python/cross-language.md)
-- [Rust 跨语言指南](../rust/cross-language.md)
+- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Type Mapping Reference](../../specification/xlang_type_mapping.md)
+- [Python Cross-Language Guide](../python/cross-language.md)
+- [Rust Cross-Language Guide](../rust/cross-language.md)
 
-## 相关主题
+## Related Topics
 
-- [Schema 演化](schema-evolution.md) - 兼容模式
-- [类型注册](type-registration.md) - 注册方法
-- [行格式](row-format.md) - 跨语言行格式
+- [Schema Evolution](schema-evolution.md) - Compatible mode
+- [Type Registration](type-registration.md) - Registration methods
+- [Row Format](row-format.md) - Cross-language row format

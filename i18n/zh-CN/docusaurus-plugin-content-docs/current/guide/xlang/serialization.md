@@ -1,7 +1,7 @@
 ---
-title: 序列化
-sidebar_position: 3
-id: xlang_serialization
+title: Serialization
+sidebar_position: 30
+id: serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,11 +19,20 @@ license: |
   limitations under the License.
 ---
 
-本页演示了所有支持语言的跨语言序列化模式示例。在一种语言中序列化的数据可以在任何其他支持的语言中反序列化。
+This page demonstrates cross-language serialization patterns with examples in all supported languages. Data serialized in one language can be deserialized in any other supported language.
 
-## 序列化内置类型
+## Serialize Built-in Types
 
-常见类型可以自动序列化，无需注册：原始数值类型、字符串、二进制、数组、列表、映射等。
+Common types can be serialized automatically without registration: primitive numeric types, string, binary, array, list, map, and more.
+
+Reduced-precision floating-point values are also part of the built-in xlang type system:
+
+- `float16` and `array<float16>`
+- `bfloat16` and `array<bfloat16>`
+
+Use the language-specific carrier types documented in the type mapping reference. Python uses `pyfory.Float16` and `pyfory.BFloat16` as annotation markers only; scalar values are native Python `float`, and dense reduced-precision arrays use `pyfory.Float16Array` and `pyfory.BFloat16Array`. Go uses the `float16` and `bfloat16` packages for scalar, slice, and array carriers; JavaScript uses `number` for scalar `float16` and `bfloat16`, and dense array carriers `BoolArray`, `Float16Array`, and `BFloat16Array` for the corresponding `array<T>` schemas. Dart uses `double` plus `Float16Type` or `Bfloat16Type` metadata for scalar fields, and `Float16List` / `Bfloat16List` for dense arrays. Java uses `@ArrayType` on supported reduced-precision carriers for `array<float16>` / `array<bfloat16>` schema, while general object arrays stay on the `list` path; C++, Rust, and C# provide their own dedicated scalar and array carriers.
+
+When `compatible=true`, a direct struct/class field can evolve between `list<T>` and `array<T>` for dense bool/numeric `T`. Integer list element encodings in the same signedness and width domain match the corresponding dense array element domain. This applies only to the immediate matched field schema. It does not apply to nested collection, map, array, union, or generic positions. If a peer `list<T>` payload declares nullable or ref-tracked elements, reading it into a local `array<T>` field raises a compatible-read error.
 
 ### Java
 
@@ -35,17 +44,17 @@ import java.util.*;
 
 public class Example1 {
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withLanguage(Language.XLANG).build();
+    Fory fory = Fory.builder().withXlang(true).build();
     List<Object> list = ofArrayList(true, false, "str", -1.1, 1, new int[100], new double[20]);
     byte[] bytes = fory.serialize(list);
-    // bytes 可以被其他语言反序列化
+    // bytes can be deserialized by other languages
     fory.deserialize(bytes);
     Map<Object, Object> map = new HashMap<>();
     map.put("k1", "v1");
     map.put("k2", list);
     map.put("k3", -1);
     bytes = fory.serialize(map);
-    // bytes 可以被其他语言反序列化
+    // bytes can be deserialized by other languages
     fory.deserialize(bytes);
   }
 }
@@ -57,15 +66,15 @@ public class Example1 {
 import pyfory
 import numpy as np
 
-fory = pyfory.Fory()
+fory = pyfory.Fory(xlang=True)
 object_list = [True, False, "str", -1.1, 1,
                np.full(100, 0, dtype=np.int32), np.full(20, 0.0, dtype=np.double)]
 data = fory.serialize(object_list)
-# bytes 可以被其他语言反序列化
+# bytes can be deserialized by other languages
 new_list = fory.deserialize(data)
 object_map = {"k1": "v1", "k2": object_list, "k3": -1}
 data = fory.serialize(object_map)
-# bytes 可以被其他语言反序列化
+# bytes can be deserialized by other languages
 new_map = fory.deserialize(data)
 print(new_map)
 ```
@@ -79,19 +88,19 @@ import forygo "github.com/apache/fory/go/fory"
 import "fmt"
 
 func main() {
-  list := []interface{}{true, false, "str", -1.1, 1, make([]int32, 10), make([]float64, 20)}
-  fory := forygo.NewFory()
+  list := []any{true, false, "str", -1.1, 1, make([]int32, 10), make([]float64, 20)}
+  fory := forygo.NewFory(forygo.WithXlang(true))
   bytes, err := fory.Marshal(list)
   if err != nil {
     panic(err)
   }
-  var newValue interface{}
-  // bytes 可以被其他语言反序列化
+  var newValue any
+  // bytes can be deserialized by other languages
   if err := fory.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
   fmt.Println(newValue)
-  dict := map[string]interface{}{
+  dict := map[string]any{
     "k1": "v1",
     "k2": list,
     "k3": -1,
@@ -100,7 +109,7 @@ func main() {
   if err != nil {
     panic(err)
   }
-  // bytes 可以被其他语言反序列化
+  // bytes can be deserialized by other languages
   if err := fory.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
@@ -111,17 +120,9 @@ func main() {
 ### JavaScript
 
 ```javascript
-import Fory from "@apache-fory/fory";
+import Fory from "@apache-fory/core";
 
-/**
- * @apache-fory/hps 使用 v8 的 fast-calls-api，可以直接被 jit 调用，
- * 确保 Node 版本为 20 或更高。
- * 实验性功能，目前无法保证安装成功。
- * 如果无法安装该模块，请将其替换为 `const hps = null;`
- **/
-import hps from "@apache-fory/hps";
-
-const fory = new Fory({ hps });
+const fory = new Fory();
 const input = fory.serialize("hello fory");
 const result = fory.deserialize(input);
 console.log(result);
@@ -130,19 +131,19 @@ console.log(result);
 ### Rust
 
 ```rust
-use fory::{from_buffer, to_buffer, Fory};
-use std::collections::HashMap;
+use fory::Fory;
 
 fn run() {
-    let bin: Vec<u8> = to_buffer(&"hello".to_string());
-    let obj: String = from_buffer(&bin).expect("should success");
+    let fory = Fory::builder().xlang(true).build();
+    let bin = fory.serialize(&"hello".to_string()).expect("serialize success");
+    let obj: String = fory.deserialize(&bin).expect("deserialize success");
     assert_eq!("hello".to_string(), obj);
 }
 ```
 
-## 序列化自定义类型
+## Serialize Custom Types
 
-用户定义的类型必须使用 register API 进行注册，以建立不同语言中类型之间的映射关系。请在所有语言中使用一致的类型名称。
+User-defined types must be registered using the register API to establish the mapping relationship between types in different languages. Use consistent type names across all languages.
 
 ### Java
 
@@ -194,11 +195,11 @@ public class Example2 {
 
   // mvn exec:java -Dexec.mainClass="org.apache.fory.examples.Example2"
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withLanguage(Language.XLANG).build();
+    Fory fory = Fory.builder().withXlang(true).build();
     fory.register(SomeClass1.class, "example.SomeClass1");
     fory.register(SomeClass2.class, "example.SomeClass2");
     byte[] bytes = fory.serialize(createObject());
-    // bytes 可以被其他语言反序列化
+    // bytes can be deserialized by other languages
     System.out.println(fory.deserialize(bytes));
   }
 }
@@ -215,7 +216,7 @@ import pyfory, array
 @dataclass
 class SomeClass1:
     f1: Any
-    f2: Dict[pyfory.Int8Type, pyfory.Int32Type]
+    f2: Dict[pyfory.Int8, pyfory.Int32]
 
 
 @dataclass
@@ -223,22 +224,22 @@ class SomeClass2:
     f1: Any = None
     f2: str = None
     f3: List[str] = None
-    f4: Dict[pyfory.Int8Type, pyfory.Int32Type] = None
-    f5: pyfory.Int8Type = None
-    f6: pyfory.Int16Type = None
-    f7: pyfory.Int32Type = None
-    # int 类型将被视为 `pyfory.Int64Type`。
-    # 如果对等方使用更窄的类型，请使用 `pyfory.Int32Type` 进行类型提示。
+    f4: Dict[pyfory.Int8, pyfory.Int32] = None
+    f5: pyfory.Int8 = None
+    f6: pyfory.Int16 = None
+    f7: pyfory.Int32 = None
+    # int type will be taken as `pyfory.Int64`.
+    # use `pyfory.Int32` for type hint if peer uses more narrow type.
     f8: int = None
-    f9: pyfory.Float32Type = None
-    # float 类型将被视为 `pyfory.Float64Type`
+    f9: pyfory.Float32 = None
+    # float type will be taken as `pyfory.Float64`
     f10: float = None
-    f11: pyfory.Int16ArrayType = None
-    f12: List[pyfory.Int16Type] = None
+    f11: pyfory.Array[pyfory.Int16] = None
+    f12: List[pyfory.Int16] = None
 
 
 if __name__ == "__main__":
-    f = pyfory.Fory()
+    f = pyfory.Fory(xlang=True)
     f.register_type(SomeClass1, typename="example.SomeClass1")
     f.register_type(SomeClass2, typename="example.SomeClass2")
     obj1 = SomeClass1(f1=True, f2={-1: 2})
@@ -257,7 +258,7 @@ if __name__ == "__main__":
         f12=[-1, 4],
     )
     data = f.serialize(obj)
-    # bytes 可以被其他语言反序列化
+    # bytes can be deserialized by other languages
     print(f.deserialize(data))
 ```
 
@@ -271,9 +272,14 @@ import "fmt"
 
 func main() {
   type SomeClass1 struct {
-    F1  interface{}
+    F1 any
+    F2 map[int8]int32
+  }
+
+  type SomeClass2 struct {
+    F1  any
     F2  string
-    F3  []interface{}
+    F3  []any
     F4  map[int8]int32
     F5  int8
     F6  int16
@@ -282,44 +288,37 @@ func main() {
     F9  float32
     F10 float64
     F11 []int16
-    F12 fory.Int16Slice
+    F12 []int16
   }
-
-  type SomeClass2 struct {
-    F1 interface{}
-    F2 map[int8]int32
-  }
-  fory := forygo.NewFory()
-  if err := fory.RegisterTagType("example.SomeClass1", SomeClass1{}); err != nil {
+  serializer := forygo.NewFory(forygo.WithXlang(true))
+  if err := serializer.RegisterStructByName(SomeClass1{}, "example.SomeClass1"); err != nil {
     panic(err)
   }
-  if err := fory.RegisterTagType("example.SomeClass2", SomeClass2{}); err != nil {
+  if err := serializer.RegisterStructByName(SomeClass2{}, "example.SomeClass2"); err != nil {
     panic(err)
   }
-  obj1 := &SomeClass1{}
-  obj1.F1 = true
-  obj1.F2 = map[int8]int32{-1: 2}
-  obj := &SomeClass1{}
-  obj.F1 = obj1
-  obj.F2 = "abc"
-  obj.F3 = []interface{}{"abc", "abc"}
-  f4 := map[int8]int32{1: 2}
-  obj.F4 = f4
-  obj.F5 = fory.MaxInt8
-  obj.F6 = fory.MaxInt16
-  obj.F7 = fory.MaxInt32
-  obj.F8 = fory.MaxInt64
-  obj.F9 = 1.0 / 2
-  obj.F10 = 1 / 3.0
-  obj.F11 = []int16{1, 2}
-  obj.F12 = []int16{-1, 4}
-  bytes, err := fory.Marshal(obj);
+  obj1 := &SomeClass1{F1: true, F2: map[int8]int32{-1: 2}}
+  obj := &SomeClass2{
+    F1:  obj1,
+    F2:  "abc",
+    F3:  []any{"abc", "abc"},
+    F4:  map[int8]int32{1: 2},
+    F5:  127,
+    F6:  32767,
+    F7:  2147483647,
+    F8:  9223372036854775807,
+    F9:  1.0 / 2,
+    F10: 1.0 / 3.0,
+    F11: []int16{1, 2},
+    F12: []int16{-1, 4},
+  }
+  bytes, err := serializer.Marshal(obj)
   if err != nil {
     panic(err)
   }
-  var newValue interface{}
-  // bytes 可以被其他语言反序列化
-  if err := fory.Unmarshal(bytes, &newValue); err != nil {
+  var newValue any
+  // bytes can be deserialized by other languages
+  if err := serializer.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
   fmt.Println(newValue)
@@ -329,22 +328,17 @@ func main() {
 ### JavaScript
 
 ```javascript
-import Fory, { Type, InternalSerializerType } from "@apache-fory/fory";
+import Fory, { Type } from "@apache-fory/core";
 
-/**
- * @apache-fory/hps 使用 v8 的 fast-calls-api，可以直接被 jit 调用，
- * 确保 Node 版本为 20 或更高。
- * 实验性功能，目前无法保证安装成功。
- * 如果无法安装该模块，请将其替换为 `const hps = null;`
- **/
-import hps from "@apache-fory/hps";
-
-// 使用 JSON schema 描述数据结构
-const description = Type.object("example.foo", {
-  foo: Type.string(),
-});
-const fory = new Fory({ hps });
-const { serialize, deserialize } = fory.registerSerializer(description);
+// Describe data structures using JSON schema
+const description = Type.struct(
+  { typeName: "example.foo" },
+  {
+    foo: Type.string(),
+  },
+);
+const fory = new Fory();
+const { serialize, deserialize } = fory.register(description);
 const input = serialize({ foo: "hello fory" });
 const result = deserialize(input);
 console.log(result);
@@ -354,19 +348,17 @@ console.log(result);
 
 ```rust
 use chrono::{NaiveDate, NaiveDateTime};
-use fory::{from_buffer, to_buffer, Fory};
+use fory::{Fory, ForyStruct};
 use std::collections::HashMap;
 
 #[test]
 fn complex_struct() {
-    #[derive(Fory, Debug, PartialEq)]
-    #[tag("example.foo2")]
+    #[derive(ForyStruct, Debug, PartialEq)]
     struct Animal {
         category: String,
     }
 
-    #[derive(Fory, Debug, PartialEq)]
-    #[tag("example.foo")]
+    #[derive(ForyStruct, Debug, PartialEq)]
     struct Person {
         c1: Vec<u8>,  // binary
         c2: Vec<i16>, // primitive array
@@ -403,15 +395,22 @@ fn complex_struct() {
         c6: 4.0,
     };
 
-    let bin: Vec<u8> = to_buffer(&person);
-    let obj: Person = from_buffer(&bin).expect("should success");
+    let mut fory = Fory::builder().xlang(true).build();
+    fory
+        .register_by_name::<Animal>("example", "foo2")
+        .expect("register Animal");
+    fory
+        .register_by_name::<Person>("example", "foo")
+        .expect("register Person");
+    let bin = fory.serialize(&person).expect("serialize success");
+    let obj: Person = fory.deserialize(&bin).expect("deserialize success");
     assert_eq!(person, obj);
 }
 ```
 
-## 序列化共享引用和循环引用
+## Serialize Shared and Circular References
 
-共享引用和循环引用可以自动序列化，不会有重复数据或递归错误。启用引用跟踪即可使用此功能。
+Shared references and circular references can be serialized automatically with no duplicate data or recursion errors. Enable reference tracking to use this feature.
 
 ### Java
 
@@ -437,11 +436,13 @@ public class ReferenceExample {
 
   // mvn exec:java -Dexec.mainClass="org.apache.fory.examples.ReferenceExample"
   public static void main(String[] args) {
-    Fory fory = Fory.builder().withLanguage(Language.XLANG)
-      .withRefTracking(true).build();
+    Fory fory = Fory.builder()
+        .withXlang(true)
+        .withRefTracking(true)
+        .build();
     fory.register(SomeClass.class, "example.SomeClass");
     byte[] bytes = fory.serialize(createObject());
-    // bytes 可以被其他语言反序列化
+    // bytes can be deserialized by other languages
     System.out.println(fory.deserialize(bytes));
   }
 }
@@ -458,13 +459,13 @@ class SomeClass:
     f2: Dict[str, str]
     f3: Dict[str, str]
 
-fory = pyfory.Fory(ref_tracking=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 fory.register_type(SomeClass, typename="example.SomeClass")
 obj = SomeClass()
 obj.f2 = {"k1": "v1", "k2": "v2"}
 obj.f1, obj.f3 = obj, obj.f2
 data = fory.serialize(obj)
-# bytes 可以被其他语言反序列化
+# bytes can be deserialized by other languages
 print(fory.deserialize(data))
 ```
 
@@ -482,8 +483,8 @@ func main() {
     F2 map[string]string
     F3 map[string]string
   }
-  fory := forygo.NewFory(true)
-  if err := fory.Register(SomeClass{}, 65); err != nil {
+  fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
+  if err := fory.RegisterStruct(SomeClass{}, 65); err != nil {
     panic(err)
   }
   value := &SomeClass{F2: map[string]string{"k1": "v1", "k2": "v2"}}
@@ -493,8 +494,8 @@ func main() {
   if err != nil {
     panic(err)
   }
-  var newValue interface{}
-  // bytes 可以被其他语言反序列化
+  var newValue any
+  // bytes can be deserialized by other languages
   if err := fory.Unmarshal(bytes, &newValue); err != nil {
     panic(err)
   }
@@ -505,22 +506,15 @@ func main() {
 ### JavaScript
 
 ```javascript
-import Fory, { Type } from "@apache-fory/fory";
-/**
- * @apache-fory/hps 使用 v8 的 fast-calls-api，可以直接被 jit 调用，
- * 确保 Node 版本为 20 或更高。
- * 实验性功能，目前无法保证安装成功。
- * 如果无法安装该模块，请将其替换为 `const hps = null;`
- **/
-import hps from "@apache-fory/hps";
+import Fory, { Type } from "@apache-fory/core";
 
-const description = Type.object("example.foo", {
+const description = Type.struct("example.foo", {
   foo: Type.string(),
-  bar: Type.object("example.foo"),
+  bar: Type.struct("example.foo").setTrackingRef(true),
 });
 
-const fory = new Fory({ hps });
-const { serialize, deserialize } = fory.registerSerializer(description);
+const fory = new Fory({ ref: true });
+const { serialize, deserialize } = fory.register(description);
 const data: any = {
   foo: "hello fory",
 };
@@ -532,11 +526,11 @@ console.log(result.bar.foo === result.foo);
 
 ### Rust
 
-由于所有权限制，Rust 中无法实现循环引用。
+Circular references cannot be implemented in Rust due to ownership restrictions.
 
-## 另请参阅
+## See Also
 
-- [零拷贝序列化](zero-copy.md) - 大型数据的带外序列化
-- [类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping) - 跨语言类型映射参考
-- [入门指南](getting-started.md) - 安装和设置
-- [Xlang 序列化规范](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec) - 二进制协议详情
+- [Zero-Copy Serialization](zero-copy.md) - Out-of-band serialization for large data
+- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type mapping reference
+- [Getting Started](getting-started.md) - Installation and setup
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md) - Binary protocol details

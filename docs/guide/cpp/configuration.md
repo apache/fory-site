@@ -19,57 +19,40 @@ license: |
   limitations under the License.
 ---
 
-This page covers Fory configuration options and serialization modes.
-
-## Serialization Modes
-
-Apache Fory™ supports two serialization modes:
-
-### SchemaConsistent Mode (Default)
-
-Type declarations must match exactly between peers:
-
-```cpp
-auto fory = Fory::builder().build(); // SchemaConsistent by default
-```
-
-### Compatible Mode
-
-Allows independent schema evolution:
-
-```cpp
-auto fory = Fory::builder().compatible(true).build();
-```
+This page covers C++ runtime configuration. `Fory::builder()` creates xlang
+payloads by default, and omitted compatible mode resolves to compatible mode in
+xlang. Native mode is selected explicitly with `.xlang(false)` and defaults to
+schema-consistent payloads.
 
 ## Builder Pattern
 
-Use `ForyBuilder` to construct Fory instances with custom configuration:
+Use `Fory::builder()` to construct Fory instances with custom configuration:
 
 ```cpp
 #include "fory/serialization/fory.h"
 
 using namespace fory::serialization;
 
-// Default configuration
-auto fory = Fory::builder().build();
+// Xlang mode with compatible schema evolution.
+auto fory = Fory::builder().xlang(true).build();
 
-// Compatible mode for schema evolution
+// Schema-consistent xlang payloads.
 auto fory = Fory::builder()
-    .compatible(true)
-    .build();
-
-// Cross-language mode
-auto fory = Fory::builder()
-    .xlang(true).compatible(true)
-    .build();
-
-// Full configuration
-auto fory = Fory::builder()
-    .compatible(true)
     .xlang(true)
+    .compatible(false)
+    .build();
+
+// Native mode for C++-only traffic.
+auto fory = Fory::builder()
+    .xlang(false)
+    .build();
+
+// Native mode with compatible schema evolution.
+auto fory = Fory::builder()
+    .xlang(false)
     .track_ref(true)
     .max_dyn_depth(10)
-    .check_struct_version(true)
+    .compatible(true)
     .build();
 ```
 
@@ -77,31 +60,36 @@ auto fory = Fory::builder()
 
 ### xlang(bool)
 
-Enable/disable cross-language (xlang) serialization mode.
+Select the wire mode.
 
 ```cpp
 auto fory = Fory::builder()
-    .xlang(true).compatible(true)  // Enable cross-language compatibility
+    .xlang(false)
     .build();
 ```
 
-When enabled, includes metadata for cross-language compatibility with Java, Python, Go, Rust, and JavaScript.
+When `true`, C++ writes the xlang wire format used by Java, Python, Go, Rust,
+JavaScript, C#, Swift, and Dart. When `false`, C++ writes native-mode payloads
+for C++-only traffic.
 
 **Default:** `true`
 
 ### compatible(bool)
 
-Enable/disable compatible mode for schema evolution.
+Enable compatible schema evolution.
 
 ```cpp
 auto fory = Fory::builder()
-    .compatible(true)  // Enable schema evolution
+    .xlang(true)
+    .compatible(true)
     .build();
 ```
 
 When enabled, supports reading data serialized with different schema versions.
+When omitted, xlang mode defaults to compatible mode. Native mode defaults to
+schema-consistent mode and uses compatible mode only when this option is set.
 
-**Default:** `false`
+**Default:** `true` in xlang mode; `false` in native mode
 
 ### track_ref(bool)
 
@@ -109,6 +97,7 @@ Enable/disable reference tracking for shared and circular references.
 
 ```cpp
 auto fory = Fory::builder()
+    .xlang(true)
     .track_ref(true)  // Enable reference tracking
     .build();
 ```
@@ -123,6 +112,7 @@ Set maximum allowed nesting depth for dynamically-typed objects.
 
 ```cpp
 auto fory = Fory::builder()
+    .xlang(true)
     .max_dyn_depth(10)  // Allow up to 10 levels
     .build();
 ```
@@ -142,6 +132,8 @@ Enable/disable struct version checking.
 
 ```cpp
 auto fory = Fory::builder()
+    .xlang(true)
+    .compatible(false)
     .check_struct_version(true)  // Enable version checking
     .build();
 ```
@@ -155,9 +147,7 @@ When enabled, validates type hashes to detect schema mismatches.
 ### Single-Threaded (Fastest)
 
 ```cpp
-auto fory = Fory::builder()
-    .xlang(true).compatible(true)
-    .build();  // Returns Fory
+auto fory = Fory::builder().xlang(true).build();  // Returns Fory
 ```
 
 Single-threaded `Fory` is the fastest option, but NOT thread-safe. Use one instance per thread.
@@ -165,25 +155,23 @@ Single-threaded `Fory` is the fastest option, but NOT thread-safe. Use one insta
 ### Thread-Safe
 
 ```cpp
-auto fory = Fory::builder()
-    .xlang(true).compatible(true)
-    .build_thread_safe();  // Returns ThreadSafeFory
+auto fory = Fory::builder().xlang(true).build_thread_safe();  // Returns ThreadSafeFory
 ```
 
 `ThreadSafeFory` uses a pool of Fory instances to provide thread-safe serialization. Slightly slower due to pool overhead, but safe to use from multiple threads concurrently.
 
 ## Configuration Summary
 
-| Option                       | Description                             | Default |
-| ---------------------------- | --------------------------------------- | ------- |
-| `xlang(bool)`                | Enable cross-language mode              | `true`  |
-| `compatible(bool)`           | Enable schema evolution                 | `false` |
-| `track_ref(bool)`            | Enable reference tracking               | `true`  |
-| `max_dyn_depth(uint32_t)`    | Maximum nesting depth for dynamic types | `5`     |
-| `check_struct_version(bool)` | Enable struct version checking          | `false` |
+| Option                       | Description                             | Default                        |
+| ---------------------------- | --------------------------------------- | ------------------------------ |
+| `xlang(bool)`                | Use xlang mode                          | `true`                         |
+| `compatible(bool)`           | Enable schema evolution                 | xlang: `true`; native: `false` |
+| `track_ref(bool)`            | Enable reference tracking               | `true`                         |
+| `max_dyn_depth(uint32_t)`    | Maximum nesting depth for dynamic types | `5`                            |
+| `check_struct_version(bool)` | Enable struct version checking          | `false`                        |
 
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Using configured Fory
-- [Cross-Language](cross-language.md) - XLANG mode details
+- [Cross-Language](cross-language.md) - xlang mode details
 - [Type Registration](type-registration.md) - Registering types

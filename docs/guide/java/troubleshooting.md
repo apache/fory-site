@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-sidebar_position: 16
+sidebar_position: 17
 id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -30,15 +30,13 @@ In such cases, you can invoke `ForyBuilder#withClassVersionCheck` to create Fory
 ```java
 // Enable class version check to diagnose issues
 Fory fory = Fory.builder()
-  .withXlang(false)
   .withClassVersionCheck(true)
   .build();
 
-// If ClassNotCompatibleException is thrown, use compatible mode
-Fory fory = Fory.builder()
-  .withXlang(false)
-  .withCompatible(true)
-  .build();
+// If ClassNotCompatibleException is thrown, add compatible mode to the
+// same builder configuration on every peer.
+ForyBuilder builder = Fory.builder()
+  .withCompatible(true);
 ```
 
 **Note**: compatible mode has more performance and space cost. For xlang mode it is the default and recommended setting. Use schema-consistent mode only if your classes are always consistent between serialization and deserialization, or if all services deploy schema changes at the same time.
@@ -54,7 +52,7 @@ Use `serialize` with one of the `deserialize` overloads:
 **Wrong usage example:**
 
 ```java
-// ❌ Wrong: deserialize with an incompatible target class
+// Wrong: deserialize with an incompatible target class
 byte[] bytes = fory.serialize(struct1);
 Struct2 result = fory.deserialize(bytes, Struct2.class);  // May throw ClassCastException
 ```
@@ -200,4 +198,4 @@ FORY_LOG_LEVEL=INFO mvn test -Dtest=org.apache.fory.TestClass#testMethod
 - [Configuration](configuration.md) - All ForyBuilder options
 - [Schema Evolution](schema-evolution.md) - Compatible mode details
 - [Type Registration](type-registration.md) - Registration best practices
-- [Migration Guide](migration.md) - Upgrading Fory versions
+- [Native Mode](native-mode.md) - Java-only serialization features

@@ -354,7 +354,7 @@ Byte 0:   Bitmap flags
           - Bits 2-7: reserved
 ```
 
-- **xlang flag** (bit 0): 1 when serialization uses Fory xlang format, 0 when serialization uses Fory language-native format.
+- **xlang flag** (bit 0): 1 when serialization uses Fory xlang format, 0 when serialization uses a Fory native-mode format.
 - **oob flag** (bit 1): 1 when out-of-band serialization is enabled (BufferCallback is not null), 0 otherwise.
 - **reserved bits** (bits 2-7): must be zero.
 
@@ -423,7 +423,7 @@ function read_ref_or_null(buffer):
 - Reference IDs are assigned sequentially starting from `0`
 - The ID is assigned when `REF_VALUE_FLAG` is written (first occurrence)
 - Objects are stored in a list/map indexed by their reference ID
-- For reading, a placeholder slot is reserved before deserializing the object, then filled after
+- For reading, a reference slot is reserved before deserializing the object, then filled after
 
 ### When Reference Tracking is Disabled
 

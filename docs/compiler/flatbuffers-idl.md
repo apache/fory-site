@@ -27,7 +27,7 @@ translates them into Fory IR for code generation.
 - When to use FlatBuffers input with Fory
 - Exact FlatBuffers to Fory mapping behavior
 - Supported Fory-specific attributes in `.fbs`
-- Migration notes and generated-code differences
+- Adoption notes and generated-code differences
 
 ## Why Use Apache Fory
 
@@ -36,10 +36,10 @@ translates them into Fory IR for code generation.
 - Java performance: In Java object-serialization workloads, Fory is faster than
   FlatBuffers in Fory benchmarks.
 - Other languages: serialization performance is generally in a similar range.
-- Deserialization in practice: FlatBuffers does not perform native-object deserialization and is
-  faster by default, but if your application needs native objects, it requires
-  conversion and that conversion step can dominate read cost. In those cases,
-  Fory deserialization is often faster end-to-end.
+- Deserialization in practice: FlatBuffers can be faster when callers read
+  directly from its buffer, but applications that need native objects still
+  require conversion, and that conversion step can dominate read cost. In those
+  cases, Fory deserialization is often faster end-to-end.
 - Easier APIs: Fory uses direct native objects, so you do not need to
   reverse-build tables or manually manage offsets.
 - Better graph modeling: Shared and circular references are first-class features
@@ -183,7 +183,7 @@ Inspect translated schema syntax for debugging:
 foryc schema.fbs --emit-fdl --emit-fdl-path ./translated
 ```
 
-## Migration Notes
+## Adoption Notes
 
 1. Keep existing `namespace` values stable to keep type registration stable.
 2. Review fields that relied on FlatBuffers default literals and set explicit
@@ -195,5 +195,5 @@ foryc schema.fbs --emit-fdl --emit-fdl-path ./translated
 ## Summary
 
 FlatBuffers input lets you reuse existing `.fbs` schemas while moving to Fory's
-runtime and code generation model. This is useful for incremental migration,
-while preserving schema investment and adopting Fory-native object APIs.
+runtime and code generation model. This is useful for incremental adoption while
+preserving schema investment and using Fory-native object APIs.

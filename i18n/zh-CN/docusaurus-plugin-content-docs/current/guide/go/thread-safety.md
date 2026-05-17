@@ -1,6 +1,6 @@
 ---
-title: 线程安全
-sidebar_position: 100
+title: Thread Safety
+sidebar_position: 110
 id: thread_safety
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,14 +19,14 @@ license: |
   limitations under the License.
 ---
 
-本指南介绍 Fory Go 的并发使用模式，包括线程安全封装以及多 goroutine 场景下的最佳实践。
+This guide covers concurrent usage patterns for Fory Go, including the thread-safe wrapper and best practices for multi-goroutine environments.
 
-## 默认 Fory 实例
+## Default Fory Instance
 
 The default `Fory` instance is **not thread-safe**:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // NOT SAFE: Concurrent access from multiple goroutines
 go func() {
@@ -37,7 +37,7 @@ go func() {
 }()
 ```
 
-### 为什么不是线程安全？
+### Why Not Thread-Safe?
 
 For performance, Fory reuses internal state:
 
@@ -47,7 +47,7 @@ For performance, Fory reuses internal state:
 
 This avoids allocations but requires exclusive access.
 
-## 线程安全封装
+## Thread-Safe Wrapper
 
 For concurrent use, use the `threadsafe` package:
 
@@ -66,7 +66,7 @@ go func() {
 }()
 ```
 
-### 工作机制
+### How It Works
 
 The thread-safe wrapper uses `sync.Pool`:
 
@@ -112,7 +112,7 @@ data, err := threadsafe.Marshal(&value)
 err = threadsafe.Unmarshal(data, &target)
 ```
 
-## 类型注册
+## Type Registration
 
 Type registration should be done before concurrent use:
 
@@ -148,7 +148,7 @@ However, for best performance, register all types at startup before concurrent u
 With the default Fory, returned byte slices are views into the internal buffer:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 data1, _ := f.Serialize(value1)
 // data1 is valid
@@ -184,7 +184,7 @@ This is safer but has allocation overhead.
 
 ```go
 func BenchmarkNonThreadSafe(b *testing.B) {
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterStruct(User{}, 1)
     user := &User{ID: 1, Name: "Alice"}
 
@@ -215,7 +215,7 @@ For maximum performance with known goroutine count:
 ```go
 func worker(id int) {
     // Each worker has its own Fory instance
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterStruct(User{}, 1)
 
     for task := range tasks {
@@ -282,7 +282,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 ```go
 // WRONG: Race condition
-var f = fory.New()
+var f = fory.New(fory.WithXlang(true))
 
 func handler1() {
     f.Serialize(value1)  // Race!
@@ -299,7 +299,7 @@ func handler2() {
 
 ```go
 // WRONG: Buffer invalidated on next call
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 data, _ := f.Serialize(value1)
 savedData := data  // Just copies the slice header!
 
@@ -333,14 +333,14 @@ go func() {
 
 **Fix**: Register all types before concurrent use.
 
-## 最佳实践
+## Best Practices
 
 1. **Register types at startup**: Before any concurrent operations
 2. **Clone data if keeping references**: With non-thread-safe instance
 3. **Use per-worker instances for hot paths**: Eliminates pool contention
 4. **Profile before optimizing**: Thread-safe overhead may be negligible
 
-## 相关主题
+## Related Topics
 
 - [Configuration](configuration.md)
 - [Basic Serialization](basic-serialization.md)

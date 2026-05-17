@@ -98,37 +98,18 @@ Create one `Fory` instance per application and reuse it — creating a new one f
 
 ## Configuration
 
-```ts
-import Fory from "@apache-fory/core";
-import hps from "@apache-fory/hps";
-
-const fory = new Fory({
-  ref: true,
-  compatible: true,
-  maxDepth: 100,
-  maxBinarySize: 64 * 1024 * 1024,
-  maxCollectionSize: 1_000_000,
-  hps,
-});
-```
-
-| Option                     | Default     | Description                                                                           |
-| -------------------------- | ----------- | ------------------------------------------------------------------------------------- |
-| `ref`                      | `false`     | Enable reference tracking for shared or circular object graphs                        |
-| `compatible`               | `false`     | Allow field additions/removals without breaking existing messages                     |
-| `maxDepth`                 | `50`        | Maximum nesting depth. Must be `>= 2`. Increase for deeply nested structures          |
-| `maxBinarySize`            | 64 MiB      | Maximum bytes accepted for any single binary field                                    |
-| `maxCollectionSize`        | `1_000_000` | Maximum elements accepted in any list, set, or map                                    |
-| `useSliceString`           | `false`     | Optional string-reading optimization for Node.js. Leave at default unless benchmarked |
-| `hps`                      | unset       | Optional fast string helper from `@apache-fory/hps` (Node.js 20+)                     |
-| `hooks.afterCodeGenerated` | unset       | Callback to inspect the generated serializer code — useful for debugging              |
+Fory JavaScript is xlang-only. `new Fory()` uses compatible schema evolution by default. Configure
+reference tracking, size limits, and optional Node.js string acceleration through constructor
+options; see [Configuration](configuration.md).
 
 ## Documentation
 
 | Topic                                         | Description                                             |
 | --------------------------------------------- | ------------------------------------------------------- |
 | [Basic Serialization](basic-serialization.md) | Core APIs and everyday usage                            |
+| [Configuration](configuration.md)             | Runtime options, compatible mode, limits, and HPS       |
 | [Type Registration](type-registration.md)     | Numeric IDs, names, decorators, and schema registration |
+| [Schema Metadata](schema-metadata.md)         | Type builders, field options, and decorators            |
 | [Supported Types](supported-types.md)         | Primitive, collection, time, enum, and struct mappings  |
 | [References](references.md)                   | Shared references and circular object graphs            |
 | [Schema Evolution](schema-evolution.md)       | Compatible mode and evolving structs                    |

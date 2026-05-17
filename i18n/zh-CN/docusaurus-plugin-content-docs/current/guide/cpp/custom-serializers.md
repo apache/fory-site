@@ -1,6 +1,6 @@
 ---
-title: 自定义序列化器
-sidebar_position: 6
+title: Custom Serializers
+sidebar_position: 10
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,17 +19,17 @@ license: |
   limitations under the License.
 ---
 
-对于不支持 `FORY_STRUCT` 的类型，需要手动实现 `Serializer` 模板特化。
+For types that don't support `FORY_STRUCT`, implement a `Serializer` template specialization manually.
 
-## 何时使用自定义序列化器
+## When to Use Custom Serializers
 
 - External types from third-party libraries
 - Types with special serialization requirements
-- Legacy data format compatibility
+- Existing data format compatibility
 - Performance-critical custom encoding
 - Cross-language interoperability with custom protocols
 
-## 实现 Serializer 模板
+## Implementing the Serializer Template
 
 To create a custom serializer, specialize the `Serializer` template for your type within the `fory::serialization` namespace:
 
@@ -290,9 +290,9 @@ ctx.write_uint16(value);
 
 // Variable-length integers (compact encoding)
 ctx.write_var_uint32(value);   // Unsigned varint
-ctx.write_varint32(value);    // Signed zigzag varint
+ctx.write_var_int32(value);    // Signed zigzag varint
 ctx.write_var_uint64(value);   // Unsigned varint
-ctx.write_varint64(value);    // Signed zigzag varint
+ctx.write_var_int64(value);    // Signed zigzag varint
 
 // Tagged integers (for mixed-size encoding)
 ctx.write_tagged_uint64(value);
@@ -318,9 +318,9 @@ int8_t i8 = ctx.read_int8(ctx.error());
 
 // Variable-length integers
 uint32_t u32 = ctx.read_var_uint32(ctx.error());
-int32_t i32 = ctx.read_varint32(ctx.error());
+int32_t i32 = ctx.read_var_int32(ctx.error());
 uint64_t u64 = ctx.read_var_uint64(ctx.error());
-int64_t i64 = ctx.read_varint64(ctx.error());
+int64_t i64 = ctx.read_var_int64(ctx.error());
 
 // Check for errors after read operations
 if (ctx.has_error()) {
@@ -365,7 +365,7 @@ static MyType read_data(ReadContext &ctx) {
 
 ## Related Topics
 
-- [Type Registration](type_registration) - Registering serializers
-- [Basic Serialization](basic_serialization) - Using FORY_STRUCT macro
-- [Schema Evolution](schema_evolution) - Compatible mode
-- [Cross-Language](cross_language) - Cross-language serialization
+- [Type Registration](type-registration.md) - Registering serializers
+- [Basic Serialization](basic-serialization.md) - Using FORY_STRUCT macro
+- [Schema Evolution](schema-evolution.md) - Compatible mode
+- [Cross-Language](cross-language.md) - Cross-language serialization

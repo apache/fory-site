@@ -176,7 +176,7 @@ data = bytes(person) # or `person.to_bytes()`
 | [Type System](schema-idl.md#type-system)        | Primitive types, collections, and type rules      |
 | [Compiler Guide](compiler-guide.md)             | CLI options and build integration                 |
 | [Generated Code](generated-code.md)             | Output format for each target language            |
-| [Protocol Buffers IDL Support](protobuf-idl.md) | Comparison with protobuf and migration guide      |
+| [Protocol Buffers IDL Support](protobuf-idl.md) | Protobuf mapping rules and adoption guidance      |
 | [FlatBuffers IDL Support](flatbuffers-idl.md)   | FlatBuffers mapping rules and codegen differences |
 
 ## Key Concepts

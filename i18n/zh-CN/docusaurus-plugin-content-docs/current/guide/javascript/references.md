@@ -1,5 +1,5 @@
 ---
-title: 引用
+title: References
 sidebar_position: 50
 id: references
 license: |
@@ -19,23 +19,23 @@ license: |
   limitations under the License.
 ---
 
-默认情况下，Fory 会把每个值都当作独立副本处理。如果同一个对象出现在两个字段中，它会被序列化两次；反序列化后，你得到的也是两个彼此独立的副本。以下情况应启用引用跟踪：
+By default Fory treats every value as a separate copy — if the same object appears in two fields it gets serialized twice, and after deserialization you get two independent copies. Enable reference tracking when:
 
-- 同一个对象实例会在对象图中的多个位置被引用
-- 数据中包含循环结构，例如一个节点指向自己
-- 往返之后必须保留对象身份
+- the same object instance is referenced from multiple places in the graph
+- your data contains a circular structure (e.g. a node that points to itself)
+- object identity must be preserved after a round trip
 
-对于普通的树状数据，应保持引用跟踪关闭，因为它会引入少量额外开销。
+Leave reference tracking off for plain tree-shaped data; it adds a small overhead.
 
-## 第一步：在 `Fory` 实例上启用引用跟踪
+## Step 1: Enable Reference Tracking on the `Fory` Instance
 
 ```ts
 const fory = new Fory({ ref: true });
 ```
 
-## 第二步：标记可能出现共享引用或循环引用的字段
+## Step 2: Mark the Fields That Can Have Shared or Circular References
 
-对于每个值可能被共享或形成循环的字段，都需要在字段 schema 上调用 `.setTrackingRef(true)`：
+For each field whose value may be shared or circular, call `.setTrackingRef(true)` on the field's schema:
 
 ```ts
 const nodeType = Type.struct("example.node", {
@@ -44,9 +44,9 @@ const nodeType = Type.struct("example.node", {
 });
 ```
 
-全局开关和字段级开关必须**同时**启用。缺少任何一个，值都会被复制，而不是按引用恢复。
+You need **both** the global flag and the field-level flag. Missing either one results in values being copied rather than referenced.
 
-## 循环自引用示例
+## Circular self-reference example
 
 ```ts
 import Fory, { Type } from "@apache-fory/core";
@@ -66,7 +66,7 @@ const copy = deserialize(serialize(node));
 console.log(copy.selfRef === copy); // true
 ```
 
-## 共享嵌套引用示例
+## Shared nested reference example
 
 ```ts
 const innerType = Type.struct(501, {
@@ -86,26 +86,26 @@ const copy = deserialize(serialize({ left: shared, right: shared }));
 console.log(copy.left === copy.right); // true
 ```
 
-## 何时启用
+## When to enable it
 
-以下情况建议启用引用跟踪：
+Enable reference tracking when:
 
-- 同一个对象实例会被多个字段重复引用
-- 你的对象图可能存在环
-- 反序列化后对象身份是否保持一致很重要
+- the same object instance is reused in multiple fields
+- your graph can be cyclic
+- identity preservation matters after deserialization
 
-以下情况建议关闭：
+Leave it disabled when:
 
-- 数据是普通树结构
-- 你希望获得最低开销
-- 对象身份并不重要
+- the data is a plain tree
+- you want the lowest overhead
+- object identity does not matter
 
-## 跨语言说明
+## Cross-Language Note
 
-引用跟踪是 Fory 二进制协议的一部分，并且可以跨运行时工作。为了让行为一致，两端都必须启用引用跟踪，并把相同字段标记为引用跟踪字段。
+Reference tracking is part of the Fory binary protocol and works across runtimes. Both sides must enable reference tracking and mark the same fields as reference-tracked for the behavior to be consistent.
 
-## 相关主题
+## Related Topics
 
-- [基础序列化](basic-serialization.md)
-- [Schema 演进](schema-evolution.md)
-- [跨语言](cross-language.md)
+- [Basic Serialization](basic-serialization.md)
+- [Schema Evolution](schema-evolution.md)
+- [Cross-Language](cross-language.md)

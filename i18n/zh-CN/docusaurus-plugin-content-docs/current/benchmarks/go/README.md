@@ -1,58 +1,58 @@
-# Go 序列化基准报告
+# Go Serialization Benchmark Report
 
-生成时间：2026-02-06 11:26:58
+Generated: 2026-05-08 17:55:12
 
-## 系统信息
+## Performance Chart
+
+![Throughput](throughput.png)
+
+## System Information
 
 - **OS**: Darwin 24.6.0
 - **Architecture**: arm64
 - **Python**: 3.10.8
 
-## 性能图表
+## Performance Summary
 
-![Benchmark](benchmark_combined.png)
+| Data Type         | Operation   | Fory (ops/s) | Protobuf (ops/s) | Msgpack (ops/s) | Fory vs PB | Fory vs MP |
+| ----------------- | ----------- | ------------ | ---------------- | --------------- | ---------- | ---------- |
+| NumericStruct     | Serialize   | 12.74M       | 7.16M            | 3.63M           | 1.78x      | 3.51x      |
+| NumericStruct     | Deserialize | 10.63M       | 8.40M            | 1.78M           | 1.27x      | 5.98x      |
+| Sample            | Serialize   | 7.16M        | 2.53M            | 646K            | 2.84x      | 11.10x     |
+| Sample            | Deserialize | 3.27M        | 2.10M            | 343K            | 1.56x      | 9.54x      |
+| MediaContent      | Serialize   | 3.74M        | 1.75M            | 1.14M           | 2.14x      | 3.27x      |
+| MediaContent      | Deserialize | 2.03M        | 1.23M            | 646K            | 1.66x      | 3.15x      |
+| NumericStructList | Serialize   | 1.10M        | 386K             | 201K            | 2.84x      | 5.44x      |
+| NumericStructList | Deserialize | 1.09M        | 368K             | 103K            | 2.96x      | 10.54x     |
+| SampleList        | Serialize   | 496K         | 126K             | 36K             | 3.93x      | 13.83x     |
+| SampleList        | Deserialize | 195K         | 96K              | 17K             | 2.04x      | 11.73x     |
+| MediaContentList  | Serialize   | 250K         | 91K              | 57K             | 2.73x      | 4.38x      |
+| MediaContentList  | Deserialize | 112K         | 74K              | 31K             | 1.53x      | 3.65x      |
 
-## 性能汇总
+## Detailed Timing (ns/op)
 
-| Data Type        | Operation   | Fory (ops/s) | Protobuf (ops/s) | Msgpack (ops/s) | Fory vs PB | Fory vs MP |
-| ---------------- | ----------- | ------------ | ---------------- | --------------- | ---------- | ---------- |
-| Struct           | Serialize   | 15.16M       | 10.23M           | 5.41M           | 1.48x      | 2.80x      |
-| Struct           | Deserialize | 12.10M       | 11.01M           | 3.23M           | 1.10x      | 3.75x      |
-| Structlist       | Serialize   | 1.58M        | 561K             | 299K            | 2.82x      | 5.28x      |
-| Structlist       | Deserialize | 1.10M        | 529K             | 175K            | 2.09x      | 6.30x      |
-| Sample           | Serialize   | 7.28M        | 2.72M            | 670K            | 2.68x      | 10.87x     |
-| Sample           | Deserialize | 3.79M        | 2.37M            | 376K            | 1.60x      | 10.09x     |
-| Samplelist       | Serialize   | 510K         | 141K             | 38K             | 3.61x      | 13.34x     |
-| Samplelist       | Deserialize | 236K         | 107K             | 19K             | 2.20x      | 12.66x     |
-| Mediacontent     | Serialize   | 3.72M        | 2.12M            | 1.29M           | 1.75x      | 2.88x      |
-| Mediacontent     | Deserialize | 2.34M        | 1.81M            | 698K            | 1.30x      | 3.35x      |
-| Mediacontentlist | Serialize   | 268K         | 110K             | 72K             | 2.44x      | 3.72x      |
-| Mediacontentlist | Deserialize | 138K         | 87K              | 36K             | 1.58x      | 3.86x      |
+| Data Type         | Operation   | Fory   | Protobuf | Msgpack |
+| ----------------- | ----------- | ------ | -------- | ------- |
+| NumericStruct     | Serialize   | 78.5   | 139.6    | 275.5   |
+| NumericStruct     | Deserialize | 94.0   | 119.0    | 562.5   |
+| Sample            | Serialize   | 139.6  | 395.9    | 1549.0  |
+| Sample            | Deserialize | 306.0  | 475.9    | 2919.0  |
+| MediaContent      | Serialize   | 267.3  | 571.6    | 875.1   |
+| MediaContent      | Deserialize | 492.4  | 815.8    | 1549.0  |
+| NumericStructList | Serialize   | 912.8  | 2594.0   | 4970.0  |
+| NumericStructList | Deserialize | 919.9  | 2721.0   | 9698.0  |
+| SampleList        | Serialize   | 2018.0 | 7927.0   | 27909.0 |
+| SampleList        | Deserialize | 5126.0 | 10460.0  | 60118.0 |
+| MediaContentList  | Serialize   | 4006.0 | 10939.0  | 17553.0 |
+| MediaContentList  | Deserialize | 8893.0 | 13588.0  | 32439.0 |
 
-## 详细耗时（ns/op）
+### Serialized Data Sizes (bytes)
 
-| Data Type        | Operation   | Fory   | Protobuf | Msgpack |
-| ---------------- | ----------- | ------ | -------- | ------- |
-| Struct           | Serialize   | 66.0   | 97.8     | 184.9   |
-| Struct           | Deserialize | 82.7   | 90.9     | 309.6   |
-| Structlist       | Serialize   | 632.8  | 1783.0   | 3340.0  |
-| Structlist       | Deserialize | 906.4  | 1891.0   | 5709.0  |
-| Sample           | Serialize   | 137.3  | 367.3    | 1492.0  |
-| Sample           | Deserialize | 263.6  | 422.2    | 2661.0  |
-| Samplelist       | Serialize   | 1962.0 | 7087.0   | 26169.0 |
-| Samplelist       | Deserialize | 4234.0 | 9321.0   | 53615.0 |
-| Mediacontent     | Serialize   | 268.8  | 471.1    | 773.7   |
-| Mediacontent     | Deserialize | 426.9  | 553.1    | 1432.0  |
-| Mediacontentlist | Serialize   | 3736.0 | 9107.0   | 13911.0 |
-| Mediacontentlist | Deserialize | 7247.0 | 11435.0  | 27975.0 |
-
-### 序列化数据大小（字节）
-
-| Data Type        | Fory | Protobuf | Msgpack |
-| ---------------- | ---- | -------- | ------- |
-| Struct           | 58   | 61       | 57      |
-| Sample           | 446  | 375      | 524     |
-| MediaContent     | 342  | 301      | 400     |
-| StructList       | 560  | 1260     | 1146    |
-| SampleList       | 7600 | 7560     | 10486   |
-| MediaContentList | 5776 | 6080     | 8006    |
+| Data Type         | Fory | Protobuf | Msgpack |
+| ----------------- | ---- | -------- | ------- |
+| NumericStruct     | 78   | 93       | 88      |
+| Sample            | 445  | 375      | 524     |
+| MediaContent      | 340  | 301      | 400     |
+| NumericStructList | 819  | 1900     | 1766    |
+| SampleList        | 7599 | 7560     | 10486   |
+| MediaContentList  | 5774 | 6080     | 8006    |

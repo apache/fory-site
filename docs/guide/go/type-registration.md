@@ -1,6 +1,6 @@
 ---
 title: Type Registration
-sidebar_position: 30
+sidebar_position: 40
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -39,7 +39,7 @@ type User struct {
     Name string
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 err := f.RegisterStruct(User{}, 1)
 if err != nil {
     panic(err)
@@ -57,7 +57,7 @@ if err != nil {
 Register a struct with a type name string. This is more flexible but has higher serialization cost:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 err := f.RegisterStructByName(User{}, "example.User")
 if err != nil {
     panic(err)
@@ -85,7 +85,7 @@ const (
     StatusComplete Status = 2
 )
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 err := f.RegisterEnum(Status(0), 1)
 ```
 
@@ -100,7 +100,7 @@ err := f.RegisterEnumByName(Status(0), "example.Status")
 For types requiring custom serialization logic, register as extension types with a custom serializer:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register by ID
 err := f.RegisterExtension(CustomType{}, 1, &CustomSerializer{})
@@ -116,8 +116,8 @@ See [Custom Serializers](custom-serializers.md) for details on implementing the 
 Type registration is per-Fory-instance:
 
 ```go
-f1 := fory.New()
-f2 := fory.New()
+f1 := fory.New(fory.WithXlang(true))
+f2 := fory.New(fory.WithXlang(true))
 
 // Types registered on f1 are NOT available on f2
 f1.RegisterStruct(User{}, 1)
@@ -131,7 +131,7 @@ f2.RegisterStruct(User{}, 1)
 Register types after creating a Fory instance and before any serialize/deserialize calls:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register before use
 f.RegisterStruct(User{}, 1)
@@ -156,7 +156,7 @@ type Person struct {
     Address Address
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register ALL struct types used in the object graph
 f.RegisterStruct(Address{}, 1)

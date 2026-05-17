@@ -1,6 +1,6 @@
 ---
-title: Type Registration & Security
-sidebar_position: 3
+title: Type Registration
+sidebar_position: 5
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -65,7 +65,7 @@ If you invoke `ForyBuilder#requireClassRegistration(false)` to disable class reg
 For example, you can allow classes started with `org.example.*`:
 
 ```java
-Fory fory = Fory.builder()
+Fory fory = Fory.builder().withXlang(false)
   .requireClassRegistration(false)
   .withTypeChecker((typeResolver, className) -> className.startsWith("org.example."))
   .build();
@@ -78,7 +78,7 @@ Fory provides a `org.apache.fory.resolver.AllowListChecker` which is an allowed/
 ```java
 AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
 checker.allowClass("org.example.*");
-ThreadSafeFory fory = Fory.builder()
+ThreadSafeFory fory = Fory.builder().withXlang(false)
   .requireClassRegistration(false)
   .withTypeChecker(checker)
   .buildThreadSafeFory();

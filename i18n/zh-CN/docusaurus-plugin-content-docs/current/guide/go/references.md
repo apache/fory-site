@@ -1,6 +1,6 @@
 ---
-title: 引用处理
-sidebar_position: 50
+title: References
+sidebar_position: 60
 id: references
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,26 +19,26 @@ license: |
   limitations under the License.
 ---
 
-Fory Go 支持引用跟踪，可处理循环引用和共享对象。 This is essential for serializing complex data structures like graphs, trees with parent pointers, and linked lists with cycles.
+Fory Go supports reference tracking to handle circular references and shared objects. This is essential for serializing complex data structures like graphs, trees with parent pointers, and linked lists with cycles.
 
-## 启用引用跟踪
+## Enabling Reference Tracking
 
 Reference tracking is **disabled by default**. Enable it when creating a Fory instance:
 
 ```go
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 ```
 
 **Important**: Global reference tracking must be enabled for any reference tracking to occur. When `WithTrackRef(false)` (the default), all per-field reference tags are ignored.
 
-## 引用跟踪工作原理
+## How Reference Tracking Works
 
 ### Without Reference Tracking (Default)
 
 When disabled, each object is serialized independently:
 
 ```go
-f := fory.New()  // TrackRef disabled by default
+f := fory.New(fory.WithXlang(true))  // TrackRef disabled by default
 
 shared := &Data{Value: 42}
 container := &Container{A: shared, B: shared}
@@ -52,7 +52,7 @@ data, _ := f.Serialize(container)
 When enabled, objects are tracked by identity:
 
 ```go
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 
 shared := &Data{Value: 42}
 container := &Container{A: shared, B: shared}
@@ -61,7 +61,7 @@ data, _ := f.Serialize(container)
 // 'shared' is serialized ONCE, second occurrence is a reference
 ```
 
-## 引用标记
+## Reference Flags
 
 Fory uses flags to indicate reference states during serialization:
 
@@ -72,7 +72,7 @@ Fory uses flags to indicate reference states during serialization:
 | `NotNullValueFlag` | -1    | Non-null value (data follows)             |
 | `RefValueFlag`     | 0     | Reference value flag                      |
 
-## 可引用跟踪的类型
+## Referenceable Types
 
 Only certain types support reference tracking. In xlang mode, the following types can track references:
 
@@ -87,7 +87,7 @@ Only certain types support reference tracking. In xlang mode, the following type
 | `time.Time`, `time.Duration`  | No                | Value types                    |
 | Arrays (`[N]T`)               | No                | Value types                    |
 
-## 字段级引用控制
+## Per-Field Reference Control
 
 By default, reference tracking is **disabled** for individual fields even when global `WithTrackRef(true)` is set. You can enable reference tracking for specific fields using the `ref` struct tag:
 
@@ -109,9 +109,9 @@ type Container struct {
 - Pointer to primitive types (e.g., `*int`, `*string`) cannot use this tag
 - Default is `ref=false` (no reference tracking per field)
 
-See [Struct Tags](struct-tags.md) for more details.
+See [Struct Tags](schema-metadata.md) for more details.
 
-## 循环引用
+## Circular References
 
 Reference tracking is required for circular data structures:
 
@@ -123,7 +123,7 @@ type Node struct {
     Next  *Node `fory:"ref"`
 }
 
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(Node{}, 1)
 
 // Create circular list
@@ -151,7 +151,7 @@ type TreeNode struct {
     Children []*TreeNode `fory:"ref"`
 }
 
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(TreeNode{}, 1)
 
 root := &TreeNode{Value: "root"}
@@ -174,7 +174,7 @@ type GraphNode struct {
     Neighbors []*GraphNode `fory:"ref"`
 }
 
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(GraphNode{}, 1)
 
 // Create a graph
@@ -208,7 +208,7 @@ type Application struct {
     FallbackConfig *Config `fory:"ref"`
 }
 
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(Config{}, 1)
 f.RegisterStruct(Application{}, 2)
 
@@ -277,7 +277,7 @@ For large object graphs, this may increase memory usage.
 Circular references without tracking cause stack overflow or max depth errors:
 
 ```go
-f := fory.New()  // No reference tracking
+f := fory.New(fory.WithXlang(true))  // No reference tracking
 
 n1 := &Node{Value: 1}
 n1.Next = n1  // Self-reference
@@ -313,7 +313,7 @@ type Person struct {
 }
 
 func main() {
-    f := fory.New(fory.WithTrackRef(true))
+    f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
     f.RegisterStruct(Person{}, 1)
 
     // Create people with mutual friendships
@@ -349,8 +349,8 @@ func main() {
 }
 ```
 
-## 相关主题
+## Related Topics
 
 - [Configuration](configuration.md)
-- [Struct Tags](struct-tags.md)
+- [Struct Tags](schema-metadata.md)
 - [Cross-Language Serialization](cross-language.md)

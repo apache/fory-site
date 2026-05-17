@@ -1,7 +1,7 @@
 ---
 title: Schema Evolution
 sidebar_position: 8
-id: dart_schema_evolution
+id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -21,14 +21,15 @@ license: |
 
 Schema evolution lets different versions of your app exchange messages safely — a v2 writer can produce a message that a v1 reader can still decode, and vice versa.
 
-## Two Modes
+## Compatible And Schema-Consistent Evolution
 
-### Compatible Mode (recommended for evolving services)
+### Compatible Mode
 
-Enable this when services may run different versions at the same time — for example, during a rolling deployment or when clients are not updated immediately.
+Compatible mode is the Dart default. Keep this default when services may run different versions at
+the same time, for example during a rolling deployment or when clients are not updated immediately.
 
 ```dart
-final fory = Fory(compatible: true);
+final fory = Fory();
 ```
 
 In compatible mode, Fory includes enough field metadata in each message so that the reader can skip unknown fields and use defaults for missing ones. Use stable field IDs (see below) to anchor the schema across changes.
@@ -88,5 +89,5 @@ Test rolling-upgrade scenarios with real round trips before deploying.
 ## Related Topics
 
 - [Configuration](configuration.md)
-- [Field Configuration](field-configuration.md)
+- [Schema Metadata](schema-metadata.md)
 - [Cross-Language](cross-language.md)

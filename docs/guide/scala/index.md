@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ Scala provides optimized serializers for Scala types, built on top of Fory Java. It supports all Scala object serialization:
+Apache Fory™ Scala provides optimized serializers for Scala types, built on top of Fory Java. It supports xlang mode for cross-language payloads and native mode for Scala/JVM-only object serialization. It supports all Scala object serialization:
 
 - `case` class serialization
 - `pojo/bean` class serialization
@@ -63,6 +63,7 @@ case class Point(x: Int, y: Int, z: Int)
 
 object ScalaExample {
   val fory: Fory = ForyScala.builder()
+    .withXlang(true)
     .build()
 
   fory.register(classOf[Person])
@@ -75,6 +76,14 @@ object ScalaExample {
   }
 }
 ```
+
+## Xlang Mode And Native Mode
+
+Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Scala wire mode through the JVM builder, and Scala examples that use it set `.withXlang(true)` explicitly so the mode choice is visible.
+
+Use native mode for Scala/JVM-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and inherits the JVM native-mode object serialization path from Fory Java while adding Scala-specific serializers for case classes, collections, tuples, options, and enumerations. It is optimized for JVM and Scala type systems and is the right path for same-language Scala/JVM framework replacement payloads.
+
+See [Configuration](configuration.md) for Scala builder setup and [Java Native Mode](../java/native-mode.md) for the full JVM native-mode behavior.
 
 ## Built on Fory Java
 
@@ -90,7 +99,8 @@ Fory Scala is built on top of Fory Java. Most configuration options, features, a
 
 ## Scala-Specific Documentation
 
-- [Fory Creation](fory-creation.md) - Scala-specific Fory setup requirements
+- [Configuration](configuration.md) - Scala-specific Fory setup requirements
 - [Type Serialization](type-serialization.md) - Serializing Scala types
+- [Schema Metadata](schema-metadata.md) - Scala annotations, references, enum IDs, and union metadata
 - [Default Values](default-values.md) - Scala class default values support
 - [Schema IDL And Xlang](schema-idl.md) - Scala 3 generated models and macro-derived xlang serializers

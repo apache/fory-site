@@ -1,5 +1,5 @@
 ---
-title: 故障排除
+title: Troubleshooting
 sidebar_position: 13
 id: troubleshooting
 license: |
@@ -19,46 +19,55 @@ license: |
   limitations under the License.
 ---
 
-本页介绍常见问题及其解决方案。
+This page covers common issues and their solutions.
 
-## 常见问题
+## Common Issues
 
-### 格式功能的 ImportError
+### ImportError with Format Features
 
 ```python
-# 解决方案：安装行格式支持
+# Solution: Install Row format support
 pip install pyfory[format]
 
-# 或从源码安装格式支持
+# Or install from source with format support
 pip install -e ".[format]"
 ```
 
-### 序列化性能慢
+### Slow Serialization Performance
 
 ```python
-# 检查是否启用了 Cython 加速
+# Check if Cython acceleration is enabled
 import pyfory
-print(pyfory.ENABLE_FORY_CYTHON_SERIALIZATION)  # 应该为 True
+print(pyfory.ENABLE_FORY_CYTHON_SERIALIZATION)  # Should be True
 
-# 如果为 False，Cython 扩展可能未正确编译
-# 重新安装：pip install --force-reinstall --no-cache-dir pyfory
+# If False, Cython extension may not be compiled correctly
+# Reinstall with: pip install --force-reinstall --no-cache-dir pyfory
 ```
 
-### 跨语言兼容性问题
+### Cross-Language Compatibility Issues
 
 ```python
-# 使用一致的命名进行显式类型注册
+# Use explicit type registration with consistent naming
 f = pyfory.Fory(xlang=True)
-f.register(MyClass, typename="com.package.MyClass")  # 在所有语言中使用相同的名称
+f.register(MyClass, typename="com.package.MyClass")  # Use same name in all languages
 ```
 
-### 循环引用错误或重复数据
+### Circular Reference Errors or Duplicate Data
+
+Registered xlang schema objects and Python native objects both require reference tracking when
+object identity or cycles matter:
 
 ```python
-# 启用引用跟踪
-f = pyfory.Fory(ref=True)  # 循环引用所需
+# Enable reference tracking for registered schema objects.
+f = pyfory.Fory(ref=True)
+```
 
-# 循环引用示例
+For arbitrary Python object graphs with circular references, use Python native mode:
+
+```python
+f = pyfory.Fory(xlang=False, ref=True, strict=False)
+
+# Example with circular reference
 class Node:
     def __init__(self, value):
         self.value = value
@@ -67,72 +76,72 @@ class Node:
 node1 = Node(1)
 node2 = Node(2)
 node1.next = node2
-node2.next = node1  # 循环引用
+node2.next = node1  # Circular reference
 
 data = f.dumps(node1)
 result = f.loads(data)
-assert result.next.next is result  # 循环引用被保留
+assert result.next.next is result  # Circular reference preserved
 ```
 
-### Schema 演化不工作
+### Schema Evolution Not Working
 
 ```python
-# 启用兼容模式用于 schema 演化
-f = pyfory.Fory(xlang=True, compatible=True)
+# Keep your existing wire mode and enable compatible schema evolution.
+f = pyfory.Fory(compatible=True)
 
-# 版本 1：原始类
+# Version 1: Original class
 @dataclass
 class User:
     name: str
-    age: int
+    age: pyfory.Int32
 
 f.register(User, typename="User")
 data = f.dumps(User("Alice", 30))
 
-# 版本 2：添加新字段（向后兼容）
+# Version 2: Add new field (backward compatible)
 @dataclass
 class User:
     name: str
-    age: int
-    email: str = "unknown@example.com"  # 带默认值的新字段
+    age: pyfory.Int32
+    email: str = "unknown@example.com"  # New field with default
 
-# 仍然可以反序列化旧数据
+# Can still deserialize old data
 user = f.loads(data)
 print(user.email)  # "unknown@example.com"
 ```
 
-### 严格模式下的类型注册错误
+### Type Registration Errors in Strict Mode
 
 ```python
-# 在序列化之前注册所有自定义类型
+# Register all custom types before serialization
 f = pyfory.Fory(strict=True)
 
-# 使用前必须注册
+# Must register before use
 f.register(MyClass, type_id=100)
 f.register(AnotherClass, type_id=101)
 
-# 或禁用严格模式（生产环境不推荐）
-f = pyfory.Fory(strict=False)  # 仅在受信任的环境中使用
+# Or disable strict mode (NOT recommended for production)
+f = pyfory.Fory(strict=False)  # Use only in trusted environments
 ```
 
-## 调试模式
+## Debug Mode
 
-在导入 pyfory 之前设置环境变量以禁用 Cython 进行调试：
+Set environment variable BEFORE importing pyfory to disable Cython for debugging:
 
 ```python
 import os
 os.environ['ENABLE_FORY_CYTHON_SERIALIZATION'] = '0'
-import pyfory  # 现在使用纯 Python 实现
+import pyfory  # Now uses pure Python implementation
 
-# 这对以下情况很有用：
-# 1. 调试协议问题
-# 2. 理解序列化行为
-# 3. 无需重新编译 Cython 的开发
+# This is useful for:
+# 1. Debugging protocol issues
+# 2. Understanding serialization behavior
+# 3. Development without recompiling Cython
 ```
 
-## 错误处理
+## Error Handling
 
-优雅地处理常见的序列化错误：
+Handle common serialization errors gracefully:
 
 ```python
 import pyfory
@@ -143,44 +152,44 @@ fory = pyfory.Fory(strict=True)
 try:
     data = fory.dumps(my_object)
 except TypeUnregisteredError as e:
-    print(f"类型未注册：{e}")
-    # 注册类型并重试
+    print(f"Type not registered: {e}")
+    # Register the type and retry
     fory.register(type(my_object), type_id=100)
     data = fory.dumps(my_object)
 except Exception as e:
-    print(f"序列化失败：{e}")
+    print(f"Serialization failed: {e}")
 
 try:
     obj = fory.loads(data)
 except TypeNotCompatibleError as e:
-    print(f"Schema 不匹配：{e}")
-    # 处理版本不匹配
+    print(f"Schema mismatch: {e}")
+    # Handle version mismatch
 except Exception as e:
-    print(f"反序列化失败：{e}")
+    print(f"Deserialization failed: {e}")
 ```
 
-## 开发环境设置
+## Development Setup
 
 ```bash
 git clone https://github.com/apache/fory.git
 cd fory/python
 
-# 安装依赖
+# Install dependencies
 pip install -e ".[dev,format]"
 
-# 运行测试
+# Run tests
 pytest -v -s .
 
-# 运行特定测试
+# Run specific test
 pytest -v -s pyfory/tests/test_serializer.py
 
-# 格式化代码
+# Format code
 ruff format .
 ruff check --fix .
 ```
 
-## 相关主题
+## Related Topics
 
-- [配置](configuration.md) - Fory 参数
-- [类型注册](type-registration.md) - 注册最佳实践
-- [安全性](security.md) - 安全配置
+- [Configuration](configuration.md) - Fory parameters
+- [Type Registration](type-registration.md) - Registration best practices
+- [Security](security.md) - Security configuration

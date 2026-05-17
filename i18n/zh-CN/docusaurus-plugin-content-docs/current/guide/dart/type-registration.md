@@ -1,7 +1,7 @@
 ---
-title: 类型注册
-sidebar_position: 4
-id: dart_type_registration
+title: Type Registration
+sidebar_position: 6
+id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,30 +19,30 @@ license: |
   limitations under the License.
 ---
 
-Fory 需要知道序列化消息中的某个类型对应哪个类。你要做的，就是在序列化或反序列化之前注册每个类。
+Fory needs to know which class corresponds to which type in a serialized message. You do this by registering each class before you serialize or deserialize it.
 
-## 选择注册策略
+## Choosing a Registration Strategy
 
-Fory 提供两种策略。选定一种后，就要在所有读写该类型的语言里保持一致。
+Fory offers two strategies. Pick one and use it consistently across every language that reads or writes the type.
 
-### 策略一：数字 ID
+### Strategy 1: Numeric ID
 
-更紧凑，也更快。适合小团队在服务间统一协调 ID。
+Compact and fast. Good when a small team can coordinate IDs across services.
 
 ```dart
 ModelsFory.register(fory, User, id: 100);
 ```
 
-其他语言里也必须使用相同的数字：
+The same number must be used in every other language:
 
 ```java
 // Java side
 fory.register(User.class, 100);
 ```
 
-### 策略二：Namespace + Type Name
+### Strategy 2: Namespace + Type Name
 
-自描述性更强。适合多个团队或多个包独立定义类型，而协调数字 ID 不现实的场景。
+More self-describing. Good when multiple teams or packages define types independently and numeric ID coordination is impractical.
 
 ```dart
 ModelsFory.register(
@@ -53,21 +53,21 @@ ModelsFory.register(
 );
 ```
 
-每个读写该类型的运行时都必须使用相同的 `namespace` 和 `typeName`。
+Every runtime that reads or writes this type must use the same `namespace` and `typeName`.
 
-> **不要对同一个类型混用策略。** 如果一侧使用数字 ID，另一侧使用名称，反序列化会失败。
+> **Do not mix strategies for the same type.** If one side uses a numeric ID and the other uses a name, deserialization will fail.
 
-## 注册生成类型
+## Registering Generated Types
 
-调用 `.fory.dart` 文件中生成的 `register` 函数，它会为你安装好所需的全部序列化元信息：
+Call the generated `register` function from the `.fory.dart` file. It installs all the serializer metadata for you:
 
 ```dart
 UserModelsFory.register(fory, User, id: 100);
 ```
 
-## 注册自定义序列化器
+## Registering a Custom Serializer
 
-对于无法添加 `@ForyStruct()` 的类型，可以直接传入序列化器实例：
+For types that you cannot annotate with `@ForyStruct()`, pass a serializer instance directly:
 
 ```dart
 fory.registerSerializer(
@@ -78,21 +78,21 @@ fory.registerSerializer(
 );
 ```
 
-关于如何实现序列化器，见 [自定义序列化器](custom-serializers.md)。
+See [Custom Serializers](custom-serializers.md) for how to implement a serializer.
 
-## 必须遵守的规则
+## Rules to Follow
 
-- 在第一次调用 `serialize` 或 `deserialize` **之前**完成注册
-- 注册消息中可能出现的**每一个**类，而不仅是根类型
-- 一旦载荷已经持久化，或已经在服务间交换，就必须保持 ID 或名称**稳定**
-- 对同一个类型，不要一侧用数字 ID，另一侧用名称
+- Register **before** the first `serialize` or `deserialize` call.
+- Register **every** class that can appear in a message, not only the root type.
+- Keep IDs (or names) **stable** once payloads are persisted or exchanged across services. Changing them will break deserialization of old messages.
+- Do not mix a numeric ID on one side with a name on the other for the same type.
 
-## 跨语言要求
+## Cross-Language Requirements
 
-所有读写该类型的运行时都必须使用相同的数字 ID，或者相同的 `namespace + typeName` 组合。示例见 [跨语言](cross-language.md)。
+The same numeric ID or `namespace + typeName` pair must be used in every runtime that reads or writes the type. See [Cross-Language](cross-language.md) for examples.
 
-## 相关主题
+## Related Topics
 
-- [代码生成](code-generation.md)
-- [跨语言](cross-language.md)
-- [自定义序列化器](custom-serializers.md)
+- [Code Generation](code-generation.md)
+- [Cross-Language](cross-language.md)
+- [Custom Serializers](custom-serializers.md)

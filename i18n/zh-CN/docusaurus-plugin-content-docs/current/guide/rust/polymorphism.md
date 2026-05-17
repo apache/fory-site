@@ -1,6 +1,6 @@
 ---
-title: Trait 对象序列化
-sidebar_position: 6
+title: Trait Object Serialization
+sidebar_position: 7
 id: polymorphism
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,28 +19,28 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ 通过 trait 对象支持多态序列化，实现动态分发和类型灵活性。
+Apache Fory™ supports polymorphic serialization through trait objects, enabling dynamic dispatch and type flexibility.
 
-## 支持的 Trait 对象类型
+## Supported Trait Object Types
 
-- `Box<dyn Trait>` - 拥有所有权的 trait 对象
-- `Rc<dyn Trait>` - 引用计数 trait 对象
-- `Arc<dyn Trait>` - 线程安全引用计数 trait 对象
-- `Vec<Box<dyn Trait>>`、`HashMap<K, Box<dyn Trait>>` - trait 对象集合
+- `Box<dyn Trait>` - Owned trait objects
+- `Rc<dyn Trait>` - Reference-counted trait objects
+- `Arc<dyn Trait>` - Thread-safe reference-counted trait objects
+- `Vec<Box<dyn Trait>>`, `HashMap<K, Box<dyn Trait>>` - Collections of trait objects
 
-## 基础 Trait 对象序列化
+## Basic Trait Object Serialization
 
 ```rust
 use fory::{Fory, register_trait_type};
 use fory::Serializer;
-use fory::ForyObject;
+use fory::ForyStruct;
 
 trait Animal: Serializer {
     fn speak(&self) -> String;
     fn name(&self) -> &str;
 }
 
-#[derive(ForyObject)]
+#[derive(ForyStruct)]
 struct Dog { name: String, breed: String }
 
 impl Animal for Dog {
@@ -48,7 +48,7 @@ impl Animal for Dog {
     fn name(&self) -> &str { &self.name }
 }
 
-#[derive(ForyObject)]
+#[derive(ForyStruct)]
 struct Cat { name: String, color: String }
 
 impl Animal for Cat {
@@ -56,18 +56,18 @@ impl Animal for Cat {
     fn name(&self) -> &str { &self.name }
 }
 
-// 注册 trait 实现
+// Register trait implementations
 register_trait_type!(Animal, Dog, Cat);
 
-#[derive(ForyObject)]
+#[derive(ForyStruct)]
 struct Zoo {
     star_animal: Box<dyn Animal>,
 }
 
-let mut fory = Fory::default().compatible(true);
-fory.register::<Dog>(100);
-fory.register::<Cat>(101);
-fory.register::<Zoo>(102);
+let mut fory = Fory::builder().xlang(false).compatible(true).build();
+fory.register::<Dog>(100)?;
+fory.register::<Cat>(101)?;
+fory.register::<Zoo>(102)?;
 
 let zoo = Zoo {
     star_animal: Box::new(Dog {
@@ -76,23 +76,23 @@ let zoo = Zoo {
     }),
 };
 
-let bytes = fory.serialize(&zoo);
+let bytes = fory.serialize(&zoo)?;
 let decoded: Zoo = fory.deserialize(&bytes)?;
 
 assert_eq!(decoded.star_animal.name(), "Buddy");
 assert_eq!(decoded.star_animal.speak(), "Woof!");
 ```
 
-## 序列化 dyn Any Trait 对象
+## Serializing dyn Any Trait Objects
 
-Apache Fory™ 支持序列化 `Rc<dyn Any>` 和 `Arc<dyn Any>` 以实现运行时类型分发：
+Apache Fory™ supports serializing `Rc<dyn Any>` and `Arc<dyn Any>` for runtime type dispatch:
 
-**要点：**
+**Key points:**
 
-- 适用于任何实现 `Serializer` 的类型
-- 反序列化后需要向下转型以访问具体类型
-- 序列化期间保留类型信息
-- 对插件系统和动态类型处理很有用
+- Works with any type that implements `Serializer`
+- Requires downcasting after deserialization to access the concrete type
+- Type information is preserved during serialization
+- Useful for plugin systems and dynamic type handling
 
 ```rust
 use std::rc::Rc;
@@ -103,19 +103,19 @@ let dog_rc: Rc<dyn Animal> = Rc::new(Dog {
     breed: "Golden".to_string()
 });
 
-// 转换为 Rc<dyn Any> 以进行序列化
+// Convert to Rc<dyn Any> for serialization
 let dog_any: Rc<dyn Any> = dog_rc.clone();
 
-// 序列化 Any 包装器
-let bytes = fory.serialize(&dog_any);
+// Serialize the Any wrapper
+let bytes = fory.serialize(&dog_any)?;
 let decoded: Rc<dyn Any> = fory.deserialize(&bytes)?;
 
-// 向下转型回具体类型
+// Downcast back to the concrete type
 let unwrapped = decoded.downcast_ref::<Dog>().unwrap();
 assert_eq!(unwrapped.name, "Rex");
 ```
 
-对于线程安全场景，使用 `Arc<dyn Any>`：
+For thread-safe scenarios, use `Arc<dyn Any>`:
 
 ```rust
 use std::sync::Arc;
@@ -126,37 +126,37 @@ let dog_arc: Arc<dyn Animal> = Arc::new(Dog {
     breed: "Labrador".to_string()
 });
 
-// 转换为 Arc<dyn Any>
+// Convert to Arc<dyn Any>
 let dog_any: Arc<dyn Any> = dog_arc.clone();
 
-let bytes = fory.serialize(&dog_any);
+let bytes = fory.serialize(&dog_any)?;
 let decoded: Arc<dyn Any> = fory.deserialize(&bytes)?;
 
-// 向下转型为具体类型
+// Downcast to concrete type
 let unwrapped = decoded.downcast_ref::<Dog>().unwrap();
 assert_eq!(unwrapped.name, "Buddy");
 ```
 
-## 结构体中基于 Rc/Arc 的 Trait 对象
+## Rc/Arc-Based Trait Objects in Structs
 
-对于具有 `Rc<dyn Trait>` 或 `Arc<dyn Trait>` 的字段，Fory 自动处理转换：
+For fields with `Rc<dyn Trait>` or `Arc<dyn Trait>`, Fory automatically handles the conversion:
 
 ```rust
 use std::sync::Arc;
 use std::rc::Rc;
 use std::collections::HashMap;
 
-#[derive(ForyObject)]
+#[derive(ForyStruct)]
 struct AnimalShelter {
     animals_rc: Vec<Rc<dyn Animal>>,
     animals_arc: Vec<Arc<dyn Animal>>,
     registry: HashMap<String, Arc<dyn Animal>>,
 }
 
-let mut fory = Fory::default().compatible(true);
-fory.register::<Dog>(100);
-fory.register::<Cat>(101);
-fory.register::<AnimalShelter>(102);
+let mut fory = Fory::builder().xlang(false).compatible(true).build();
+fory.register::<Dog>(100)?;
+fory.register::<Cat>(101)?;
+fory.register::<AnimalShelter>(102)?;
 
 let shelter = AnimalShelter {
     animals_rc: vec![
@@ -174,59 +174,59 @@ let shelter = AnimalShelter {
     ]),
 };
 
-let bytes = fory.serialize(&shelter);
+let bytes = fory.serialize(&shelter)?;
 let decoded: AnimalShelter = fory.deserialize(&bytes)?;
 
 assert_eq!(decoded.animals_rc[0].name(), "Rex");
 assert_eq!(decoded.animals_arc[0].speak(), "Woof!");
 ```
 
-## 独立 Trait 对象序列化
+## Standalone Trait Object Serialization
 
-由于 Rust 的孤儿规则，`Rc<dyn Trait>` 和 `Arc<dyn Trait>` 不能直接实现 `Serializer`。对于独立序列化（不在结构体字段内），`register_trait_type!` 宏生成包装类型。
+Due to Rust's orphan rule, `Rc<dyn Trait>` and `Arc<dyn Trait>` cannot implement `Serializer` directly. For standalone serialization (not inside struct fields), the `register_trait_type!` macro generates wrapper types.
 
-**注意：** 如果不想使用包装类型，可以改为序列化为 `Rc<dyn Any>` 或 `Arc<dyn Any>`（参见上面的 dyn Any 部分）。
+**Note:** If you don't want to use wrapper types, you can serialize as `Rc<dyn Any>` or `Arc<dyn Any>` instead (see the dyn Any section above).
 
-`register_trait_type!` 宏生成 `AnimalRc` 和 `AnimalArc` 包装类型：
+The `register_trait_type!` macro generates `AnimalRc` and `AnimalArc` wrapper types:
 
 ```rust
-// 对于 Rc<dyn Trait>
+// For Rc<dyn Trait>
 let dog_rc: Rc<dyn Animal> = Rc::new(Dog {
     name: "Rex".to_string(),
     breed: "Golden".to_string()
 });
 let wrapper = AnimalRc::from(dog_rc);
 
-let bytes = fory.serialize(&wrapper);
+let bytes = fory.serialize(&wrapper)?;
 let decoded: AnimalRc = fory.deserialize(&bytes)?;
 
-// 解包回 Rc<dyn Animal>
+// Unwrap back to Rc<dyn Animal>
 let unwrapped: Rc<dyn Animal> = decoded.unwrap();
 assert_eq!(unwrapped.name(), "Rex");
 
-// 对于 Arc<dyn Trait>
+// For Arc<dyn Trait>
 let dog_arc: Arc<dyn Animal> = Arc::new(Dog {
     name: "Buddy".to_string(),
     breed: "Labrador".to_string()
 });
 let wrapper = AnimalArc::from(dog_arc);
 
-let bytes = fory.serialize(&wrapper);
+let bytes = fory.serialize(&wrapper)?;
 let decoded: AnimalArc = fory.deserialize(&bytes)?;
 
 let unwrapped: Arc<dyn Animal> = decoded.unwrap();
 assert_eq!(unwrapped.name(), "Buddy");
 ```
 
-## 最佳实践
+## Best Practices
 
-1. **使用 `register_trait_type!`** 注册所有 trait 实现
-2. **启用 compatible 模式**：对 trait 对象使用 `.compatible(true)`
-3. **注册所有具体类型**：在序列化之前
-4. **优先使用 dyn Any**：对于更简单的独立序列化
+1. **Use `register_trait_type!`** to register all trait implementations
+2. **Enable compatible mode** for trait objects: `.compatible(true)`
+3. **Register all concrete types** before serialization
+4. **Prefer dyn Any** for simpler standalone serialization
 
-## 相关主题
+## Related Topics
 
-- [引用](references.md) - Rc/Arc 共享引用
-- [Schema 演化](schema-evolution.md) - Compatible 模式
-- [类型注册](type-registration.md) - 注册类型
+- [References](references.md) - Rc/Arc shared references
+- [Schema Evolution](schema-evolution.md) - Compatible mode
+- [Type Registration](type-registration.md) - Registering types

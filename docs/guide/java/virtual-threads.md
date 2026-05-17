@@ -1,7 +1,7 @@
 ---
 title: Virtual Threads
-sidebar_position: 10
-id: java_virtual_threads
+sidebar_position: 13
+id: virtual_threads
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -33,7 +33,7 @@ When you use virtual threads, always use Fory's binary input/output APIs:
 Typical usage:
 
 ```java
-ThreadSafeFory fory = Fory.builder()
+ThreadSafeFory fory = Fory.builder().withXlang(false)
     .requireClassRegistration(false)
     .buildThreadSafeFory();
 

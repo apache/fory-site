@@ -1,6 +1,6 @@
 ---
-title: 基本序列化
-sidebar_position: 10
+title: Basic Serialization
+sidebar_position: 1
 id: basic_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,37 +19,42 @@ license: |
   limitations under the License.
 ---
 
-本指南介绍 Fory Go 的核心序列化 API。
+This guide covers the core serialization APIs in Fory Go.
 
-## 创建 Fory 实例
+## Creating a Fory Instance
 
-在序列化前先创建 Fory 实例并注册类型：
+Create a Fory instance and register your types before serialization:
 
 ```go
 import "github.com/apache/fory/go/fory"
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register struct with a type ID
 f.RegisterStruct(User{}, 1)
 f.RegisterStruct(Order{}, 2)
 
 // Or register with a name (more flexible, less prone to ID conflicts, but higher serialization cost)
-f.RegisterNamedStruct(User{}, "example.User")
+f.RegisterStructByName(User{}, "example.User")
 
 // Register enum types
 f.RegisterEnum(Color(0), 3)
 ```
 
-**重要**：应在多次序列化调用间复用同一个 Fory 实例。创建新实例会分配内部缓冲区、类型缓存和解析器，开销较高。默认实例不是线程安全的；并发场景请使用线程安全封装（见 [线程安全](thread-safety.md)）。
+`fory.New()` uses xlang mode with compatible schema evolution. The example sets
+`fory.WithXlang(true)` explicitly so the mode choice is visible. For Go-only
+payloads that need native mode, configure `fory.WithXlang(false)` explicitly in
+the native-mode examples.
 
-更多内容请参考 [类型注册](type-registration.md)。
+**Important**: The Fory instance should be reused across serialization calls. Creating a new instance involves allocating internal buffers, type caches, and resolvers, which is expensive. The default Fory instance is not thread-safe; for concurrent usage, use the thread-safe wrapper (see [Thread Safety](thread-safety.md)).
 
-## 核心 API
+See [Type Registration](type-registration.md) for more details.
 
-### Serialize 与 Deserialize
+## Core API
 
-最主要的序列化接口：
+### Serialize and Deserialize
+
+The primary API for serialization:
 
 ```go
 // Serialize any value
@@ -66,16 +71,16 @@ if err != nil {
 }
 ```
 
-### Marshal 与 Unmarshal
+### Marshal and Unmarshal
 
-`Serialize` 和 `Deserialize` 的别名（对 Go 开发者更熟悉）：
+Aliases for `Serialize` and `Deserialize` (familiar to Go developers):
 
 ```go
 data, err := f.Marshal(value)
 err = f.Unmarshal(data, &result)
 ```
 
-## 序列化基础类型
+## Serializing Primitives
 
 ```go
 // Integers
@@ -99,9 +104,9 @@ var b bool
 f.Deserialize(data, &b)  // b = true
 ```
 
-## 序列化集合类型
+## Serializing Collections
 
-### Slice
+### Slices
 
 ```go
 // String slice
@@ -121,7 +126,7 @@ f.Deserialize(data, &intResult)
 // intResult = [1, 2, 3]
 ```
 
-### Map
+### Maps
 
 ```go
 // String to string map
@@ -141,11 +146,11 @@ f.Deserialize(data, &result2)
 // result2 = {"count": 42}
 ```
 
-## 序列化结构体
+## Serializing Structs
 
-### 基础结构体序列化
+### Basic Struct Serialization
 
-只有**导出字段**（首字母大写）会被序列化：
+Only **exported fields** (starting with uppercase) are serialized:
 
 ```go
 type User struct {
@@ -164,7 +169,7 @@ f.Deserialize(data, &result)
 // result.ID = 1, result.Name = "Alice", result.password = ""
 ```
 
-### 嵌套结构体
+### Nested Structs
 
 ```go
 type Address struct {
@@ -192,7 +197,7 @@ f.Deserialize(data, &result)
 // result.Address.City = "NYC"
 ```
 
-### 指针字段
+### Pointer Fields
 
 ```go
 type Node struct {
@@ -201,7 +206,7 @@ type Node struct {
 }
 
 // Use WithTrackRef for pointer fields
-f := fory.New(fory.WithTrackRef(true))
+f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(Node{}, 1)
 
 root := &Node{
@@ -216,13 +221,13 @@ f.Deserialize(data, &result)
 // result.Child.Value = 2
 ```
 
-## 流式 API
+## Streaming API
 
-当你希望自行管理缓冲区时可使用流式接口。
+For scenarios where you want to control the buffer:
 
 ### SerializeTo
 
-序列化到现有缓冲区：
+Serialize to an existing buffer:
 
 ```go
 buf := fory.NewByteBuffer(nil)
@@ -237,7 +242,7 @@ data := buf.GetByteSlice(0, buf.WriterIndex())
 
 ### DeserializeFrom
 
-从现有缓冲区反序列化：
+Deserialize from an existing buffer:
 
 ```go
 buf := fory.NewByteBuffer(data)
@@ -247,9 +252,9 @@ f.DeserializeFrom(buf, &result1)
 f.DeserializeFrom(buf, &result2)
 ```
 
-## 泛型 API（类型安全）
+## Generic API (Type-Safe)
 
-Fory Go 提供了泛型函数用于类型安全的序列化：
+Fory Go provides generic functions for type-safe serialization:
 
 ```go
 import "github.com/apache/fory/go/fory"
@@ -268,15 +273,15 @@ var result User
 err = fory.Deserialize(f, data, &result)
 ```
 
-泛型 API 的优势：
+The generic API:
 
-- 在编译期推断类型
-- 提供更好的类型安全
-- 在某些场景下可获得性能收益
+- Infers type at compile time
+- Provides better type safety
+- May offer performance benefits
 
-## 错误处理
+## Error Handling
 
-务必检查序列化/反序列化返回的错误：
+Always check errors from serialization operations:
 
 ```go
 data, err := f.Serialize(value)
@@ -296,19 +301,19 @@ if err != nil {
 }
 ```
 
-常见错误类型：
+Common error kinds:
 
-- `ErrKindBufferOutOfBound`：读写越界
-- `ErrKindTypeMismatch`：反序列化时类型 ID 不匹配
-- `ErrKindUnknownType`：遇到未知类型
-- `ErrKindMaxDepthExceeded`：超过递归深度限制
-- `ErrKindHashMismatch`：结构体哈希不一致（schema 已变更）
+- `ErrKindBufferOutOfBound`: Read/write beyond buffer bounds
+- `ErrKindTypeMismatch`: Type ID mismatch during deserialization
+- `ErrKindUnknownType`: Unknown type encountered
+- `ErrKindMaxDepthExceeded`: Recursion depth limit exceeded
+- `ErrKindHashMismatch`: Struct hash mismatch (schema changed)
 
-排查建议见 [故障排查](troubleshooting.md)。
+See [Troubleshooting](troubleshooting.md) for error resolution.
 
-## Nil 处理
+## Nil Handling
 
-### Nil 指针
+### Nil Pointers
 
 ```go
 var ptr *User = nil
@@ -319,7 +324,7 @@ f.Deserialize(data, &result)
 // result = nil
 ```
 
-### 空集合
+### Empty Collections
 
 ```go
 // Nil slice
@@ -338,7 +343,7 @@ f.Deserialize(data, &result)
 // result = [] (empty, not nil)
 ```
 
-## 完整示例
+## Complete Example
 
 ```go
 package main
@@ -362,7 +367,7 @@ type Item struct {
 }
 
 func main() {
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterStruct(Order{}, 1)
     f.RegisterStruct(Item{}, 2)
 
@@ -396,9 +401,9 @@ func main() {
 }
 ```
 
-## 相关主题
+## Related Topics
 
-- [配置](configuration.md)
-- [类型注册](type-registration.md)
-- [支持类型](supported-types.md)
-- [引用](references.md)
+- [Configuration](configuration.md)
+- [Type Registration](type-registration.md)
+- [Supported Types](supported-types.md)
+- [References](references.md)

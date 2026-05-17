@@ -1,5 +1,5 @@
 ---
-title: Go 序列化指南
+title: Go Serialization Guide
 sidebar_position: 0
 id: index
 license: |
@@ -19,29 +19,29 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory Go 是一个面向 Go 的高性能跨语言序列化库。它支持自动对象图序列化，并具备循环引用、多态和跨语言兼容能力。
+Apache Fory Go is a high-performance serialization library for Go. It supports xlang mode for cross-language payloads and native mode for Go-only payloads, with automatic object graph serialization, circular references, polymorphism, and schema-aware serializers.
 
-## 为什么选择 Fory Go？
+## Why Fory Go?
 
-- **高性能**：序列化速度快，二进制协议经过优化
-- **跨语言**：可与 Java、Python、C++、Rust、JavaScript 无缝交换数据
-- **自动序列化**：无需 IDL 定义或 schema 编译
-- **引用跟踪**：内置循环引用和共享对象支持
-- **类型安全**：具备基于 schema 感知序列化器的强类型能力
-- **Schema 演进**：兼容模式支持前向/后向兼容
-- **线程安全选项**：提供基于池化的线程安全封装，适用于并发场景
+- **High Performance**: Fast serialization and optimized binary protocols
+- **Cross-Language**: Seamless data exchange with Java, Python, C++, Rust, and JavaScript
+- **Automatic Serialization**: No IDL definitions or schema compilation required
+- **Reference Tracking**: Built-in support for circular references and shared objects
+- **Type Safety**: Strong typing with schema-aware serializers
+- **Schema Evolution**: Compatible mode for forward/backward compatibility
+- **Thread-Safe Option**: Pool-based thread-safe wrapper for concurrent use
 
-## 快速开始
+## Quick Start
 
-### 安装
+### Installation
 
-**要求**：Go 1.24 或更高版本
+**Requirements**: Go 1.24 or later
 
 ```bash
 go get github.com/apache/fory/go/fory
 ```
 
-### 基本用法
+### Basic Usage
 
 ```go
 package main
@@ -58,8 +58,8 @@ type User struct {
 }
 
 func main() {
-    // Create a Fory instance
-    f := fory.New()
+    // Create an xlang Fory instance.
+    f := fory.New(fory.WithXlang(true))
 
     // Register struct with a type ID
     if err := f.RegisterStruct(User{}, 1); err != nil {
@@ -84,72 +84,71 @@ func main() {
 }
 ```
 
-## 默认序列化路径
+## Xlang Mode And Native Mode
 
-Fory Go 可直接作用于普通 Go 结构体。标准运行时路径会缓存类型元数据，并对热点序列化路径做优化，因此大多数应用都可以直接使用，而不需要额外的构建步骤：
+Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Go wire mode, and Go examples that use it set `fory.WithXlang(true)` explicitly so the mode choice is visible.
 
-```go
-f := fory.New()
-data, _ := f.Serialize(myStruct)
-```
+Use native mode for Go-only traffic. Native mode is selected with `fory.WithXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps Go object serialization on the Go runtime path. It is optimized for Go structs, pointers, interfaces, and Go-specific type behavior that does not need a portable xlang mapping.
 
-## 配置
+See [Cross-Language Serialization](cross-language.md) for Go xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode options.
 
-Fory Go 使用函数式选项模式进行配置：
+## Configuration
+
+Fory Go uses a functional options pattern for configuration:
 
 ```go
 f := fory.New(
+    fory.WithXlang(true),
     fory.WithTrackRef(true),      // Enable reference tracking
-    fory.WithCompatible(true),    // Enable schema evolution
     fory.WithMaxDepth(20),       // Set max nesting depth
 )
 ```
 
-全部可选项请参考 [配置](configuration.md)。
+See [Configuration](configuration.md) for all available options.
 
-## 支持类型
+## Supported Types
 
-Fory Go 支持广泛的数据类型：
+Fory Go supports a wide range of types:
 
-- **基础类型**：`bool`、`int8`-`int64`、`uint8`-`uint64`、`float32`、`float64`、`string`
-- **集合类型**：slice、map、set
-- **时间类型**：`time.Time`、`time.Duration`
-- **指针类型**：自动处理 nil 的各类指针
-- **结构体**：任意包含导出字段的结构体
+- **Primitives**: `bool`, `int8`-`int64`, `uint8`-`uint64`, `float32`, `float64`, `string`
+- **Collections**: slices, maps, sets
+- **Time**: `time.Time`, `time.Duration`
+- **Pointers**: pointer types with automatic nil handling
+- **Structs**: any struct with exported fields
 
-完整映射请见 [支持类型](supported-types.md)。
+See [Supported Types](supported-types.md) for the complete type mapping.
 
-## 跨语言序列化
+## Cross-Language Serialization
 
-Fory Go 与其他 Fory 实现完全兼容。在 Go 中序列化的数据可在 Java、Python、C++、Rust 或 JavaScript 中反序列化：
+Fory Go is fully compatible with other Fory implementations. Data serialized in Go can be deserialized in Java, Python, C++, Rust, or JavaScript:
 
 ```go
 // Go serialization
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(User{}, 1)
 data, _ := f.Serialize(&User{ID: 1, Name: "Alice"})
 // 'data' can be deserialized by Java, Python, etc.
 ```
 
-类型映射与兼容性细节请参考 [跨语言序列化](cross-language.md)。
+See [Cross-Language Serialization](cross-language.md) for type mapping and compatibility details.
 
-## 文档导航
+## Documentation
 
-| 主题                                 | 说明                  |
-| ------------------------------------ | --------------------- |
-| [配置](configuration.md)             | 配置项与运行参数      |
-| [基本序列化](basic-serialization.md) | 核心 API 与使用模式   |
-| [类型注册](type-registration.md)     | 序列化前的类型注册    |
-| [支持类型](supported-types.md)       | 完整类型支持说明      |
-| [引用](references.md)                | 循环引用与共享对象    |
-| [Struct 标签](struct-tags.md)        | 字段级配置            |
-| [Schema 演进](schema-evolution.md)   | 前向/后向兼容策略     |
-| [跨语言](cross-language.md)          | 多语言序列化          |
-| [线程安全](thread-safety.md)         | 并发使用模式          |
-| [故障排查](troubleshooting.md)       | 常见问题与解决方案    |
+| Topic                                         | Description                            |
+| --------------------------------------------- | -------------------------------------- |
+| [Basic Serialization](basic-serialization.md) | Core APIs and usage patterns           |
+| [Configuration](configuration.md)             | Options and settings                   |
+| [Cross-Language](cross-language.md)           | Multi-language serialization           |
+| [Schema Metadata](schema-metadata.md)         | Field-level configuration              |
+| [Type Registration](type-registration.md)     | Registering types for serialization    |
+| [Supported Types](supported-types.md)         | Complete type support reference        |
+| [References](references.md)                   | Circular references and shared objects |
+| [Schema Evolution](schema-evolution.md)       | Forward/backward compatibility         |
+| [Thread Safety](thread-safety.md)             | Concurrent usage patterns              |
+| [Troubleshooting](troubleshooting.md)         | Common issues and solutions            |
 
-## 相关资源
+## Related Resources
 
-- [Xlang 序列化规范](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec)
-- [跨语言类型映射](https://fory.apache.org/docs/specification/xlang_type_mapping)
-- [GitHub 仓库](https://github.com/apache/fory)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Cross-Language Type Mapping](../../specification/xlang_type_mapping.md)
+- [GitHub Repository](https://github.com/apache/fory)

@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 6
+sidebar_position: 10
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -25,7 +25,7 @@ For types that don't support `FORY_STRUCT`, implement a `Serializer` template sp
 
 - External types from third-party libraries
 - Types with special serialization requirements
-- Legacy data format compatibility
+- Existing data format compatibility
 - Performance-critical custom encoding
 - Cross-language interoperability with custom protocols
 
@@ -146,7 +146,7 @@ The `type_id` constant should be set to `TypeId::EXT` for custom extension types
 Register your custom serializer with Fory before use:
 
 ```cpp
-auto fory = Fory::builder().xlang(true).compatible(true).build();
+auto fory = Fory::builder().xlang(true).build();
 
 // Register with numeric type ID (must match across languages)
 auto result = fory.register_extension_type<MyExt>(103);
@@ -255,7 +255,7 @@ struct Serializer<CustomType> {
 } // namespace fory
 
 int main() {
-  auto fory = Fory::builder().xlang(true).compatible(true).build();
+  auto fory = Fory::builder().xlang(true).build();
   fory.register_extension_type<CustomType>(100);
 
   CustomType original{42, "test"};

@@ -1,6 +1,6 @@
 ---
 title: Schema Evolution
-sidebar_position: 8
+sidebar_position: 6
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -27,18 +27,21 @@ In many systems, the schema of a class used for serialization may change over ti
 
 ### Default Mode
 
-In Java-native mode (`xlang=false`), Fory serializes objects using schema-consistent mode by default. This mode assumes that the deserialization process uses the same class schema as the serialization process, minimizing payload overhead. However, if there is a schema inconsistency, deserialization will fail.
+In Java native mode (`xlang=false`), Fory serializes objects using schema-consistent mode by default. This mode assumes that the deserialization process uses the same class schema as the serialization process, minimizing payload overhead. However, if there is a schema inconsistency, deserialization will fail.
 
-In cross-language mode (`xlang=true`), Fory defaults to compatible mode because schemas can diverge more easily across independently deployed services and language implementations.
+In xlang mode, Fory defaults to compatible mode because schemas can diverge more easily across independently deployed services and language implementations.
 
 ### Compatible Mode
 
-If the schema is expected to change, to make deserialization succeed (i.e., schema forward/backward compatibility), users must configure Fory with `ForyBuilder#withCompatible(true)`. Cross-language mode already uses this setting by default; it is still recommended to set it explicitly in examples and service configuration.
+If a Java-native mode schema is expected to change, configure Fory with
+`ForyBuilder#withCompatible(true)` so deserialization can tolerate added, removed, or reordered
+fields. Xlang mode already uses compatible mode by default, so xlang services do not need this
+option unless they previously overrode the schema mode.
 
 In this compatible mode, deserialization can handle schema changes such as missing or extra fields, allowing it to succeed even when the serialization and deserialization processes have different class schemas.
 
 ```java
-Fory fory = Fory.builder()
+Fory fory = Fory.builder().withXlang(false)
   .withCompatible(true)
   .build();
 
@@ -56,8 +59,8 @@ This compatible mode involves serializing class metadata into the serialized out
 - `Evolution.ENABLED`: require schema evolution metadata for this class. Registration or type resolution fails if the Fory instance cannot emit that metadata.
 - `Evolution.DISABLED`: force fixed-schema `STRUCT/NAMED_STRUCT` encoding even when compatible metadata is otherwise enabled.
 
-Use `@ForyStruct(evolution = Evolution.DISABLED)` for fixed-schema structs. The legacy boolean
-form `@ForyStruct(evolving = false)` is still supported as a fixed-schema opt-out.
+Use `@ForyStruct(evolution = Evolution.DISABLED)` for fixed-schema structs. The boolean shorthand
+`@ForyStruct(evolving = false)` is also supported as a fixed-schema opt-out.
 
 If a class schema is stable and will not change, opt out of schema evolution on that class to avoid compatible metadata overhead:
 
@@ -124,7 +127,7 @@ contexts must be created for each Fory instance. If you need a different classlo
 separate `Fory` or `ThreadSafeFory` configured with that loader instead of switching loaders on an
 existing instance.
 
-For more details, please refer to the [Meta Sharing specification](https://fory.apache.org/docs/specification/fory_java_serialization_spec#meta-share).
+For more details, please refer to the [Meta Sharing specification](https://fory.apache.org/docs/specification/java_serialization_spec#meta-share).
 
 ## Deserialize Unknown Classes
 
@@ -134,7 +137,7 @@ When enabled and metadata sharing is enabled, Fory will store the deserialized d
 
 If this data is sent to another process and the class exists in this process, the data will be deserialized into the object of this type without losing any information.
 
-If metadata sharing is not enabled, the new class data will be skipped and a `UnknownSkipClass` stub object will be returned.
+If metadata sharing is not enabled, the new class data is skipped and Fory returns an `UnknownEmptyStruct` marker object.
 
 ## Copy/Map Object from One Type to Another
 
@@ -163,9 +166,9 @@ public class StructMappingExample {
     double f3;
   }
 
-  static ThreadSafeFory fory1 = Fory.builder()
+  static ThreadSafeFory fory1 = Fory.builder().withXlang(false)
     .withCompatible(true).buildThreadSafeFory();
-  static ThreadSafeFory fory2 = Fory.builder()
+  static ThreadSafeFory fory2 = Fory.builder().withXlang(false)
     .withCompatible(true).buildThreadSafeFory();
 
   static {
@@ -207,7 +210,7 @@ public class DeserializeIntoType {
     double f3;
   }
 
-  static ThreadSafeFory fory = Fory.builder()
+  static ThreadSafeFory fory = Fory.builder().withXlang(false)
     .withCompatible(true).buildThreadSafeFory();
 
   public static void main(String[] args) {
@@ -220,14 +223,14 @@ public class DeserializeIntoType {
 
 ## Configuration
 
-| Option                    | Description                            | Default                   |
-| ------------------------- | -------------------------------------- | ------------------------- |
-| `compatibleMode`          | `SCHEMA_CONSISTENT` or `COMPATIBLE`    | `SCHEMA_CONSISTENT`       |
-| `checkClassVersion`       | Check class schema consistency         | `false`                   |
-| `metaShareEnabled`        | Enable meta sharing                    | `true` if Compatible mode |
-| `scopedMetaShareEnabled`  | Scoped meta share per serialization    | `true` if Compatible mode |
-| `deserializeUnknownClass` | Handle non-existent or unknown classes | `true` if Compatible mode |
-| `metaCompressor`          | Compressor for meta compression        | `DeflaterMetaCompressor`  |
+| Option                    | Description                            | Default                                          |
+| ------------------------- | -------------------------------------- | ------------------------------------------------ |
+| `compatibleMode`          | `SCHEMA_CONSISTENT` or `COMPATIBLE`    | xlang: `COMPATIBLE`; native: `SCHEMA_CONSISTENT` |
+| `checkClassVersion`       | Check class schema consistency         | `false`                                          |
+| `metaShareEnabled`        | Enable meta sharing                    | `true` if Compatible mode                        |
+| `scopedMetaShareEnabled`  | Scoped meta share per serialization    | `true` if Compatible mode                        |
+| `deserializeUnknownClass` | Handle non-existent or unknown classes | `true` if Compatible mode                        |
+| `metaCompressor`          | Compressor for meta compression        | `DeflaterMetaCompressor`                         |
 
 ## Best Practices
 
@@ -239,5 +242,5 @@ public class DeserializeIntoType {
 ## Related Topics
 
 - [Configuration](configuration.md) - All ForyBuilder options
-- [Cross-Language Serialization](cross-language.md) - XLANG mode
+- [Cross-Language Serialization](cross-language.md) - xlang mode
 - [Troubleshooting](troubleshooting.md) - Common schema issues

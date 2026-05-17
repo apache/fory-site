@@ -1,7 +1,7 @@
 ---
-title: 虚拟线程
-sidebar_position: 8
-id: java_virtual_threads
+title: Virtual Threads
+sidebar_position: 13
+id: virtual_threads
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,19 +19,21 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory Java 在虚拟线程工作负载下应使用 `buildThreadSafeFory()`。它会构建一个固定大小的共享 `ThreadPoolFory`，其大小为 `4 * availableProcessors()`。如果你需要不同的固定池大小，请使用 `buildThreadSafeForyPool(poolSize)`。
+Apache Fory Java uses `buildThreadSafeFory()` for virtual-thread workloads. It builds a fixed-size
+shared `ThreadPoolFory` sized to `4 * availableProcessors()`. If you need a different fixed pool
+size, use `buildThreadSafeForyPool(poolSize)`.
 
-## 使用二进制输入/输出 API
+## Use Binary Input/Output APIs
 
-在使用虚拟线程时，应始终使用 Fory 的二进制输入/输出 API：
+When you use virtual threads, always use Fory's binary input/output APIs:
 
-- `serialize(Object)` 或 `serialize(MemoryBuffer, Object)`
-- `deserialize(byte[])` 或 `deserialize(MemoryBuffer)`
+- `serialize(Object)` or `serialize(MemoryBuffer, Object)`
+- `deserialize(byte[])` or `deserialize(MemoryBuffer)`
 
-典型用法：
+Typical usage:
 
 ```java
-ThreadSafeFory fory = Fory.builder()
+ThreadSafeFory fory = Fory.builder().withXlang(false)
     .requireClassRegistration(false)
     .buildThreadSafeFory();
 
@@ -39,35 +41,43 @@ byte[] bytes = fory.serialize(request);
 Object value = fory.deserialize(bytes);
 ```
 
-## 在大量虚拟线程场景下不要使用 Stream API
+## Do Not Use Stream APIs For Large Virtual-Thread Counts
 
-对于大量依赖虚拟线程的工作负载，不要使用基于 stream 或 channel 的 API：
+Do not use stream or channel based APIs for virtual-thread-heavy workloads:
 
 - `serialize(OutputStream, Object)`
 - `deserialize(ForyInputStream)`
 - `deserialize(ForyReadableChannel)`
 
-这些 API 会在整个阻塞调用期间一直占用一个池化的 `Fory` 实例。在大量虚拟线程场景下，这意味着许多 `Fory` 实例会在等待 I/O 时持续处于占用状态。每个 `Fory` 实例通常会使用大约 `30~50 KB` 内存，因此在阻塞 I/O 期间保留大量实例会很快累积出明显的内存开销。
+Those APIs keep a pooled `Fory` instance occupied for the whole blocking call. With many virtual
+threads, that means many `Fory` instances stay busy while waiting on I/O. Each `Fory` instance
+typically uses around `30~50 KB` of memory, so holding many of them during blocking I/O adds up
+quickly.
 
-只有当你的虚拟线程数量至多是几百个，并且这些额外保留的 `Fory` 内存仍然可以接受时，才建议在虚拟线程中使用 stream API。
+Use stream APIs with virtual threads only when you have at most several hundred virtual threads and
+the extra retained `Fory` memory is still acceptable.
 
-## 为什么二进制 API 更合适
+## Why Binary APIs Are The Right Fit
 
-序列化和反序列化属于 CPU 工作。Fory 本身足够快，因此这部分 CPU 时间通常远短于网络传输时间。
+Serialization and deserialization are CPU work. Fory is fast, so this CPU time is usually short
+compared with network transfer time.
 
-在大多数情况下，你并不需要让网络传输与 Fory 反序列化重叠执行。Fory 反序列化的耗时通常不到网络传输时间的 `1/10`，因此相比尝试通过 Fory 逐步流式处理一个对象图，优化传输路径往往更重要。
+In most cases, you do not need to overlap network transfer with Fory deserialization. Fory
+deserialization is usually less than `1/10` of network transfer time, so optimizing the transport
+path matters much more than trying to stream one object graph through Fory.
 
-大多数 RPC 系统本身也是基于带帧的字节消息，而不是 Java 对象流。例如，gRPC 使用长度定界帧，这与 Fory 的二进制 API 天然契合。
+Most RPC systems also already work with framed byte messages instead of Java object streams. For
+example, gRPC uses length-delimited frames, which matches Fory's binary APIs naturally.
 
-一个适合虚拟线程的模式是：
+A good virtual-thread pattern is:
 
-1. 读取一条完整的带帧消息到字节数组中
-2. 调用 `fory.deserialize(bytes)`
-3. 生成响应对象
-4. 调用 `fory.serialize(response)`
-5. 将响应字节写成下一段带帧数据
+1. Read one framed message into bytes.
+2. Call `fory.deserialize(bytes)`.
+3. Produce the response object.
+4. Call `fory.serialize(response)`.
+5. Write the response bytes as the next framed chunk.
 
-## 推荐模式
+## Recommended Pattern
 
 ```java
 byte[] requestBytes = readOneFrame(channel);
@@ -78,24 +88,26 @@ byte[] responseBytes = fory.serialize(response);
 writeOneFrame(channel, responseBytes);
 ```
 
-这种方式让 Fory 只参与高效的 CPU 密集部分，而把阻塞 I/O 留在序列化器之外。
+This keeps Fory on the fast CPU-bound part and keeps blocking I/O outside the serializer.
 
-## 超大载荷：分块的长度定界流式处理
+## Huge Payloads: Chunked Length-Delimited Streaming
 
-对于大多数场景，上述常规的带帧字节模式已经足够。只有在载荷非常大，并且你希望让传输与序列化/反序列化重叠时，才需要考虑分块流式处理。
+For most cases, the normal framed-byte pattern above is enough. Only consider chunked streaming for
+very large payloads when you want to overlap transport with serialization and deserialization.
 
-即便如此，也不要使用 Fory 自带的 stream API。正确做法是：把一个大载荷拆成多个子对象图，将每个子对象图分别序列化为 `byte[]`，然后按以下顺序写出：
+Even in that case, do not use Fory's stream APIs. Instead, split one large payload into multiple
+sub object graphs, serialize each sub object graph to a `byte[]`, then write:
 
-1. 帧长度
-2. 分块字节
+1. frame length
+2. chunk bytes
 
-在虚拟线程中进行反序列化时：
+On deserialization in virtual threads:
 
-1. 读取帧长度
-2. 精确读取对应字节数
-3. 调用 `fory.deserialize(chunkBytes)`
+1. read the frame length
+2. read exactly that many bytes
+3. call `fory.deserialize(chunkBytes)`
 
-这样可以让传输按块推进，而 Fory 始终只处理完整的二进制帧。
+This lets the transport move data chunk by chunk while Fory still works on complete binary frames.
 
 ```java
 for (Object chunk : splitIntoSubGraphs(largePayload)) {
@@ -111,4 +123,5 @@ while (hasMoreFrames(input)) {
 }
 ```
 
-长度定界帧非常常见，gRPC 也使用长度定界帧而不是 Java 对象流，因此这种模式与典型 RPC 和虚拟线程传输模型非常契合。
+Length-delimited framing is common, and gRPC also uses length-delimited frames instead of Java
+object streams, so this pattern fits typical RPC and virtual-thread transports well.

@@ -1,46 +1,46 @@
-# Fory Swift 基准
+# Fory Swift Benchmark
 
-该基准用于比较 Apache Fory、Protocol Buffers 和 MessagePack 在 Swift 中的序列化与反序列化吞吐量。
+This benchmark compares serialization and deserialization throughput for Apache Fory, Protocol Buffers, and JSON in Swift.
 
-## 硬件与运行时信息
+## Throughput Plot
 
-| 键                    | 值                            |
+![Throughput](throughput.png)
+
+## Hardware and Runtime Info
+
+| Key                   | Value                         |
 | --------------------- | ----------------------------- |
-| 时间戳                | 2026-03-10T06:25:16Z          |
-| 操作系统              | Version 15.7.2 (Build 24G325) |
-| 主机                  | macbook-pro.local             |
-| CPU 核心数（逻辑）    | 12                            |
-| 内存（GB）            | 48.00                         |
-| 每个用例持续时间（秒）| 3                             |
+| Timestamp             | 2026-05-08T09:05:32Z          |
+| OS                    | Version 15.7.2 (Build 24G325) |
+| Host                  | macbook-pro.local             |
+| CPU Cores (Logical)   | 12                            |
+| Memory (GB)           | 48.00                         |
+| Duration per case (s) | 3                             |
 
-## 吞吐结果
+## Throughput Results
 
-<p align="center">
-<img src="throughput.png" width="95%" />
-</p>
+| Datatype          | Operation   |   Fory TPS | Protobuf TPS | JSON TPS | Fastest      |
+| ----------------- | ----------- | ---------: | -----------: | -------: | ------------ |
+| NumericStruct     | Serialize   |  9,435,623 |    6,175,939 |  408,960 | fory (1.53x) |
+| NumericStruct     | Deserialize | 11,037,225 |    6,842,676 |  328,302 | fory (1.61x) |
+| Sample            | Serialize   |  3,596,835 |    1,257,100 |   79,781 | fory (2.86x) |
+| Sample            | Deserialize |    982,255 |      733,588 |   41,274 | fory (1.34x) |
+| MediaContent      | Serialize   |  1,561,376 |      609,896 |   98,677 | fory (2.56x) |
+| MediaContent      | Deserialize |    523,836 |      395,202 |   70,528 | fory (1.33x) |
+| NumericStructList | Serialize   |  2,910,846 |      918,363 |   82,965 | fory (3.17x) |
+| NumericStructList | Deserialize |  2,436,636 |      701,656 |   69,353 | fory (3.47x) |
+| SampleList        | Serialize   |    694,557 |      202,040 |   16,679 | fory (3.44x) |
+| SampleList        | Deserialize |    187,109 |      131,947 |    8,236 | fory (1.42x) |
+| MediaContentList  | Serialize   |    348,238 |       98,007 |   18,698 | fory (3.55x) |
+| MediaContentList  | Deserialize |    104,990 |       74,422 |   16,298 | fory (1.41x) |
 
-| 数据类型         | 操作        |   Fory TPS | Protobuf TPS | Msgpack TPS | 最快         |
-| ---------------- | ----------- | ---------: | -----------: | ----------: | ------------ |
-| Struct           | Serialize   |  9,727,950 |    6,572,406 |     141,248 | fory (1.48x) |
-| Struct           | Deserialize | 11,889,570 |    8,584,510 |      99,792 | fory (1.39x) |
-| Sample           | Serialize   |  3,496,305 |    1,281,983 |      17,188 | fory (2.73x) |
-| Sample           | Deserialize |  1,045,018 |      765,706 |      12,767 | fory (1.36x) |
-| MediaContent     | Serialize   |  1,425,354 |      678,542 |      29,048 | fory (2.10x) |
-| MediaContent     | Deserialize |    614,447 |      478,298 |      12,711 | fory (1.28x) |
-| StructList       | Serialize   |  3,307,962 |    1,028,210 |      24,781 | fory (3.22x) |
-| StructList       | Deserialize |  2,788,200 |      708,596 |       8,160 | fory (3.93x) |
-| SampleList       | Serialize   |    715,734 |      205,380 |       3,361 | fory (3.48x) |
-| SampleList       | Deserialize |    199,317 |      133,425 |       1,498 | fory (1.49x) |
-| MediaContentList | Serialize   |    364,097 |      103,721 |       5,538 | fory (3.51x) |
-| MediaContentList | Deserialize |    103,421 |       86,331 |       1,529 | fory (1.20x) |
+## Serialized Size (bytes)
 
-## 序列化大小（字节）
-
-| 数据类型         | Fory | Protobuf | Msgpack |
-| ---------------- | ---: | -------: | ------: |
-| MediaContent     |  365 |      301 |     524 |
-| MediaContentList | 1535 |     1520 |    2639 |
-| Sample           |  446 |      375 |     737 |
-| SampleList       | 1980 |     1890 |    3698 |
-| Struct           |   58 |       61 |      65 |
-| StructList       |  184 |      315 |     338 |
+| Datatype          | Fory | Protobuf | JSON |
+| ----------------- | ---: | -------: | ---: |
+| NumericStruct     |   78 |       93 |  159 |
+| Sample            |  445 |      375 |  696 |
+| MediaContent      |  362 |      301 |  608 |
+| NumericStructList |  255 |      475 |  816 |
+| SampleList        | 1978 |     1890 | 3501 |
+| MediaContentList  | 1531 |     1520 | 3067 |

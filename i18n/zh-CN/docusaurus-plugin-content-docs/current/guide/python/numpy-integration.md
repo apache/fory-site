@@ -1,6 +1,6 @@
 ---
-title: NumPy 与科学计算
-sidebar_position: 8
+title: NumPy & Pandas
+sidebar_position: 10
 id: numpy_integration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-Fory 原生支持 numpy 数组，提供优化的序列化。
+Fory natively supports numpy arrays and pandas DataFrame with optimized serialization.
 
-## NumPy 数组序列化
+## NumPy Array Serialization
 
-大型数组在可能的情况下使用零拷贝：
+Large arrays use zero-copy when possible:
 
 ```python
 import pyfory
 import numpy as np
 
-f = pyfory.Fory()
+f = pyfory.Fory(xlang=False)
 
-# 原生支持 Numpy 数组
+# Numpy arrays are supported natively
 arrays = {
     'matrix': np.random.rand(1000, 1000),
     'vector': np.arange(10000),
@@ -41,13 +41,13 @@ arrays = {
 data = f.serialize(arrays)
 result = f.deserialize(data)
 
-# 对于兼容的数组类型使用零拷贝
+# Zero-copy for compatible array types
 assert np.array_equal(arrays['matrix'], result['matrix'])
 ```
 
-## Pandas DataFrame
+## Pandas DataFrames
 
-Fory 可以高效序列化 Pandas DataFrame：
+Fory can serialize Pandas DataFrames efficiently:
 
 ```python
 import pyfory
@@ -68,9 +68,9 @@ result = f.deserialize(data)
 assert df.equals(result)
 ```
 
-## 使用带外缓冲区的零拷贝
+## Zero-Copy with Out-of-Band Buffers
 
-对于大型数组的最大性能，使用带外序列化：
+For maximum performance with large arrays, use out-of-band serialization:
 
 ```python
 import pyfory
@@ -78,10 +78,10 @@ import numpy as np
 
 f = pyfory.Fory(xlang=False, ref=False, strict=False)
 
-# 大型数组
+# Large array
 array = np.random.rand(10000, 1000)
 
-# 带外零拷贝
+# Out-of-band for zero-copy
 buffer_objects = []
 data = f.serialize(array, buffer_callback=buffer_objects.append)
 buffers = [obj.getbuffer() for obj in buffer_objects]
@@ -90,14 +90,14 @@ result = f.deserialize(data, buffers=buffers)
 assert np.array_equal(array, result)
 ```
 
-## 支持的数组类型
+## Supported Array Types
 
-- `np.ndarray`（所有 dtype）
+- `np.ndarray` (all dtypes)
 - `np.matrix`
-- 结构化数组
-- 记录数组
+- Structured arrays
+- Record arrays
 
-## 相关主题
+## Related Topics
 
-- [带外序列化](out-of-band.md) - 零拷贝缓冲区
-- [基础序列化](basic-serialization.md) - 标准用法
+- [Out-of-Band Serialization](out-of-band.md) - Zero-copy buffers
+- [Basic Serialization](basic-serialization.md) - Standard usage

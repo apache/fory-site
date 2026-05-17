@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-sidebar_position: 11
+sidebar_position: 12
 id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -41,12 +41,17 @@ Ensure the same type-ID/name mapping exists on both write and read sides.
 **Cause**: The payload is not an xlang Fory frame, or it came from a peer/runtime mode that does
 not emit the xlang header C# requires.
 
-**Fix**: Ensure the payload was produced by an xlang-compatible Fory runtime. C# always expects the
-xlang header and does not expose a separate `Xlang(...)` builder option.
+**Fix**: Ensure the payload was produced by an xlang-compatible peer runtime. C# always expects the
+xlang header and does not expose a mode switch, so configure the writer instead:
 
-```csharp
-Fory writer = Fory.Builder().Compatible(true).Build();
-Fory reader = Fory.Builder().Compatible(true).Build();
+```java
+Fory fory = Fory.builder()
+    .withXlang(true)
+    .build();
+```
+
+```python
+fory = pyfory.Fory(xlang=True)
 ```
 
 ## Schema Version Mismatch in Strict Mode

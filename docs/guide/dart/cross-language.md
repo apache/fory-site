@@ -1,7 +1,7 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 9
-id: dart_cross_language
+sidebar_position: 4
+id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -23,10 +23,10 @@ Apache Fory™ Dart serializes to the same binary format as the Java, Go, C#, Py
 
 ## Setup
 
-Create a `Fory` instance as normal. There is no separate "cross-language mode" to enable in Dart:
+Create a `Fory` instance as normal. There is no separate xlang option to enable in Dart:
 
 ```dart
-final fory = Fory(); // or Fory(compatible: true) for schema evolution
+final fory = Fory(); // xlang payloads with compatible schema evolution
 ```
 
 The key requirement is that both sides register the same type using the same identity.
@@ -90,8 +90,8 @@ final bytes = fory.serialize(Person()
 
 ```java
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
-    .build();
+        .withXlang(true)
+        .build();
 
 fory.register(Person.class, 100);
 Person value = (Person) fory.deserialize(bytesFromDart);
@@ -102,7 +102,7 @@ Person value = (Person) fory.deserialize(bytesFromDart);
 ### Dart
 
 ```dart
-final fory = Fory(compatible: true);
+final fory = Fory();
 PersonFory.register(fory, Person, id: 100);
 final bytes = fory.serialize(Person()
   ..name = 'Alice'
@@ -147,7 +147,7 @@ type Person struct {
     Age  int32
 }
 
-f := fory.New(fory.WithXlang(true), fory.WithCompatible(true))
+f := fory.New(fory.WithXlang(true))
 _ = f.RegisterStruct(Person{}, 100)
 
 var person Person

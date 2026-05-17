@@ -1,5 +1,5 @@
 ---
-title: 生成代码
+title: Generated Code
 sidebar_position: 5
 id: generated_code
 license: |
@@ -19,18 +19,18 @@ license: |
   limitations under the License.
 ---
 
-本文档说明各目标语言的代码生成结果与结构。
+This document explains generated code for each target language.
 
-Fory IDL 生成的类型遵循宿主语言习惯，可直接作为领域对象使用。生成代码同时包含 `to/from bytes` 辅助方法和类型注册辅助逻辑。
+Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and registration helpers or modules.
 
-## 参考 Schema
+## Reference Schemas
 
-下面示例基于两个真实 schema：
+The examples below use two real schemas:
 
-1. `addressbook.fdl`（显式类型 ID）
-2. `auto_id.fdl`（未显式声明类型 ID）
+1. `addressbook.fdl` (explicit type IDs)
+2. `auto_id.fdl` (no explicit type IDs)
 
-### `addressbook.fdl`（节选）
+### `addressbook.fdl` (excerpt)
 
 ```protobuf
 package addressbook;
@@ -77,7 +77,7 @@ message AddressBook [id=103] {
 }
 ```
 
-### `auto_id.fdl`（节选）
+### `auto_id.fdl` (excerpt)
 
 ```protobuf
 package auto_id;
@@ -112,17 +112,21 @@ union Wrapper {
 
 ## Java
 
-### 输出布局
+### Output Layout
 
-对于 `package addressbook`，Java 输出通常位于：
+For `package addressbook`, Java output is generated under:
 
 - `<java_out>/addressbook/`
-- 类型文件：`AddressBook.java`、`Person.java`、`Dog.java`、`Cat.java`、`Animal.java`
-- 注册辅助类：`AddressbookForyRegistration.java`
+- Type files: `AddressBook.java`, `Person.java`, `Dog.java`, `Cat.java`, `Animal.java`
+- Schema module: `AddressbookForyModule.java`
 
-### 类型生成
+For schemas without a Java package, the schema module name is derived from the
+source file stem, for example `main.fdl` generates `MainForyModule.java`.
+Java import graphs cannot mix default-package schemas with named Java packages.
 
-message 会生成带 `@ForyField`、默认构造器、getter/setter 以及字节辅助方法的 Java 类：
+### Type Generation
+
+Messages generate Java classes with `@ForyField`, default constructors, getters/setters, and byte helpers:
 
 ```java
 public class Person {
@@ -154,7 +158,9 @@ public class Person {
 }
 ```
 
-union 会生成继承 `org.apache.fory.type.union.Union` 的类：
+Messages with `evolving=false` are generated with Java fixed-schema struct encoding.
+
+Unions generate classes extending `org.apache.fory.type.union.Union`:
 
 ```java
 public final class Animal extends Union {
@@ -175,34 +181,42 @@ public final class Animal extends Union {
 }
 ```
 
-### 注册
+### Schema Module
 
-生成的注册辅助方法：
+Each JVM schema generates a `ForyModule`. Imported schema modules are installed
+through `fory.register(...)`, so shared imports are deduplicated by the runtime.
 
 ```java
-public static void register(Fory fory) {
+public final class AddressbookForyModule implements org.apache.fory.ForyModule {
+  public static final AddressbookForyModule INSTANCE = new AddressbookForyModule();
+
+  static ThreadSafeFory getFory() { ... }
+
+  @Override
+  public void install(Fory fory) {
     org.apache.fory.resolver.TypeResolver resolver = fory.getTypeResolver();
-    resolver.registerUnion(Animal.class, 106L, new org.apache.fory.serializer.UnionSerializer(fory, Animal.class));
+    resolver.registerUnion(Animal.class, 106L, new org.apache.fory.serializer.UnionSerializer(resolver, Animal.class));
     resolver.register(Person.class, 100L);
     resolver.register(Person.PhoneType.class, 101L);
     resolver.register(Person.PhoneNumber.class, 102L);
     resolver.register(Dog.class, 104L);
     resolver.register(Cat.class, 105L);
     resolver.register(AddressBook.class, 103L);
+  }
 }
 ```
 
-对于未显式 `[id=...]` 的 schema，注册代码会使用计算得到的数值 ID（例如 `auto_id.fdl`）：
+For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs (for example from `auto_id.fdl`):
 
 ```java
 resolver.register(Status.class, 1124725126L);
-resolver.registerUnion(Wrapper.class, 1471345060L, new org.apache.fory.serializer.UnionSerializer(fory, Wrapper.class));
+resolver.registerUnion(Wrapper.class, 1471345060L, new org.apache.fory.serializer.UnionSerializer(resolver, Wrapper.class));
 resolver.register(Envelope.class, 3022445236L);
-resolver.registerUnion(Envelope.Detail.class, 1609214087L, new org.apache.fory.serializer.UnionSerializer(fory, Envelope.Detail.class));
+resolver.registerUnion(Envelope.Detail.class, 1609214087L, new org.apache.fory.serializer.UnionSerializer(resolver, Envelope.Detail.class));
 resolver.register(Envelope.Payload.class, 2862577837L);
 ```
 
-若设置 `option enable_auto_type_id = false;`，则按命名空间与类型名注册：
+If `option enable_auto_type_id = false;` is set, registration uses namespace and type name:
 
 ```java
 resolver.register(Config.class, "myapp.models", "Config");
@@ -210,10 +224,10 @@ resolver.registerUnion(
     Holder.class,
     "myapp.models",
     "Holder",
-    new org.apache.fory.serializer.UnionSerializer(fory, Holder.class));
+    new org.apache.fory.serializer.UnionSerializer(resolver, Holder.class));
 ```
 
-### 使用示例
+### Usage
 
 ```java
 Person person = new Person();
@@ -226,15 +240,15 @@ Person restored = Person.fromBytes(data);
 
 ## Python
 
-### 输出布局
+### Output Layout
 
-Python 每个 schema 文件生成一个模块，例如：
+Python output is one module per schema file, for example:
 
 - `<python_out>/addressbook.py`
 
-### 类型生成
+### Type Generation
 
-union 生成 case 枚举与 `Union` 子类，并提供类型化辅助方法：
+Unions generate a case enum plus a `Union` subclass with typed helpers:
 
 ```python
 class AnimalCase(Enum):
@@ -253,7 +267,7 @@ class Animal(Union):
     def set_dog(self, v: Dog) -> None: ...
 ```
 
-message 生成 `@pyfory.dataclass` 类型，嵌套类型保持嵌套：
+Messages generate `@pyfory.dataclass` types, and nested types stay nested:
 
 ```python
 @pyfory.dataclass
@@ -277,9 +291,9 @@ class Person:
     def from_bytes(cls, data: bytes) -> "Person": ...
 ```
 
-### 注册
+### Registration
 
-生成注册函数：
+Generated registration function:
 
 ```python
 def register_addressbook_types(fory: pyfory.Fory):
@@ -292,7 +306,7 @@ def register_addressbook_types(fory: pyfory.Fory):
     fory.register_type(AddressBook, type_id=103)
 ```
 
-未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
+For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
 
 ```python
 fory.register_type(Status, type_id=1124725126)
@@ -302,7 +316,7 @@ fory.register_union(Envelope.Detail, type_id=1609214087, serializer=Envelope.Det
 fory.register_type(Envelope.Payload, type_id=2862577837)
 ```
 
-若设置 `option enable_auto_type_id = false;`：
+If `option enable_auto_type_id = false;` is set:
 
 ```python
 fory.register_type(Config, namespace="myapp.models", typename="Config")
@@ -314,7 +328,7 @@ fory.register_union(
 )
 ```
 
-### 使用示例
+### Usage
 
 ```python
 person = Person(name="Alice", pet=Animal.dog(Dog(name="Rex", bark_volume=10)))
@@ -325,18 +339,18 @@ restored = Person.from_bytes(data)
 
 ## Rust
 
-### 输出布局
+### Output Layout
 
-Rust 每个 schema 生成一个模块文件，例如：
+Rust output is one module file per schema, for example:
 
 - `<rust_out>/addressbook.rs`
 
-### 类型生成
+### Type Generation
 
-union 映射为 Rust enum，并用 `#[fory(id = ...)]` 声明 case ID：
+Unions map to Rust enums with `#[fory(id = ...)]` case attributes:
 
 ```rust
-#[derive(ForyObject, Debug, Clone, PartialEq)]
+#[derive(ForyUnion, Debug, Clone, PartialEq)]
 pub enum Animal {
     #[fory(id = 1)]
     Dog(Dog),
@@ -345,11 +359,11 @@ pub enum Animal {
 }
 ```
 
-嵌套类型生成嵌套 module：
+Nested types generate nested modules:
 
 ```rust
 pub mod person {
-    #[derive(ForyObject, Debug, Clone, PartialEq, Default)]
+    #[derive(ForyEnum, Debug, Clone, PartialEq, Default)]
     #[repr(i32)]
     pub enum PhoneType {
         #[default]
@@ -358,7 +372,7 @@ pub mod person {
         Work = 2,
     }
 
-    #[derive(ForyObject, Debug, Clone, PartialEq, Default)]
+    #[derive(ForyStruct, Debug, Clone, PartialEq, Default)]
     pub struct PhoneNumber {
         #[fory(id = 1)]
         pub number: String,
@@ -368,23 +382,23 @@ pub mod person {
 }
 ```
 
-message 会 `derive(ForyObject)` 并生成 `to_bytes`/`from_bytes`：
+Messages derive `ForyStruct` and include `to_bytes`/`from_bytes` helpers:
 
 ```rust
-#[derive(ForyObject, Debug, Clone, PartialEq, Default)]
+#[derive(ForyStruct, Debug, Clone, PartialEq, Default)]
 pub struct Person {
     #[fory(id = 1)]
     pub name: String,
     #[fory(id = 7)]
     pub phones: Vec<person::PhoneNumber>,
-    #[fory(id = 8, type_id = "union")]
+    #[fory(id = 8)]
     pub pet: Animal,
 }
 ```
 
-### 注册
+### Registration
 
-生成注册函数：
+Generated registration function:
 
 ```rust
 pub fn register_types(fory: &mut Fory) -> Result<(), fory::Error> {
@@ -399,7 +413,7 @@ pub fn register_types(fory: &mut Fory) -> Result<(), fory::Error> {
 }
 ```
 
-未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
+For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
 
 ```rust
 fory.register::<Status>(1124725126)?;
@@ -409,14 +423,14 @@ fory.register_union::<envelope::Detail>(1609214087)?;
 fory.register::<envelope::Payload>(2862577837)?;
 ```
 
-若设置 `option enable_auto_type_id = false;`：
+If `option enable_auto_type_id = false;` is set:
 
 ```rust
-fory.register_by_namespace::<Config>("myapp.models", "Config")?;
-fory.register_union_by_namespace::<Holder>("myapp.models", "Holder")?;
+fory.register_by_name::<Config>("myapp.models", "Config")?;
+fory.register_union_by_name::<Holder>("myapp.models", "Holder")?;
 ```
 
-### 使用示例
+### Usage
 
 ```rust
 let person = Person {
@@ -431,15 +445,15 @@ let restored = Person::from_bytes(&bytes)?;
 
 ## C++
 
-### 输出布局
+### Output Layout
 
-C++ 每个 schema 文件生成一个头文件，例如：
+C++ output is one header per schema file, for example:
 
 - `<cpp_out>/addressbook.h`
 
-### 类型生成
+### Type Generation
 
-message 会生成 `final` 类，并包含类型化访问器与字节辅助方法：
+Messages generate `final` classes with typed accessors and byte helpers:
 
 ```cpp
 class Person final {
@@ -465,7 +479,7 @@ class Person final {
 };
 ```
 
-可选 message 字段会生成 `has_xxx`、`mutable_xxx`、`clear_xxx` API：
+Optional message fields generate `has_xxx`, `mutable_xxx`, and `clear_xxx` APIs:
 
 ```cpp
 class Envelope final {
@@ -485,7 +499,7 @@ class Envelope final {
 };
 ```
 
-union 会生成基于 `std::variant` 的封装：
+Unions generate `std::variant` wrappers:
 
 ```cpp
 class Animal final {
@@ -515,11 +529,13 @@ class Animal final {
 };
 ```
 
-生成头文件还会包含 `FORY_UNION`、`FORY_FIELD_CONFIG`、`FORY_ENUM`、`FORY_STRUCT` 等序列化元信息宏。
+Generated headers include `FORY_UNION`, `FORY_ENUM`, and `FORY_STRUCT` macros
+for serialization metadata. Field and payload configuration is embedded in the
+generated `FORY_STRUCT`/`FORY_UNION` entries.
 
-### 注册
+### Registration
 
-生成注册函数：
+Generated registration function:
 
 ```cpp
 inline void register_types(fory::serialization::BaseFory& fory) {
@@ -533,7 +549,7 @@ inline void register_types(fory::serialization::BaseFory& fory) {
 }
 ```
 
-未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
+For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
 
 ```cpp
 fory.register_enum<Status>(1124725126);
@@ -543,14 +559,14 @@ fory.register_union<Envelope::Detail>(1609214087);
 fory.register_struct<Envelope::Payload>(2862577837);
 ```
 
-若设置 `option enable_auto_type_id = false;`：
+If `option enable_auto_type_id = false;` is set:
 
 ```cpp
 fory.register_struct<Config>("myapp.models", "Config");
 fory.register_union<Holder>("myapp.models", "Holder");
 ```
 
-### 使用示例
+### Usage
 
 ```cpp
 addressbook::Person person;
@@ -563,17 +579,17 @@ auto restored = addressbook::Person::from_bytes(bytes.value());
 
 ## Go
 
-### 输出布局
+### Output Layout
 
-Go 输出路径受 schema 选项与 `--go_out` 共同影响。
+Go output path depends on schema options and `--go_out`.
 
-对于 `addressbook.fdl`，若配置了 `go_package`，生成结果会遵循对应 import path/package（位于 `--go_out` 根目录下）。
+For `addressbook.fdl`, `go_package` is configured and generated output follows the configured import path/package (for example under your `--go_out` root).
 
-若未配置 `go_package`，则使用 `--go_out` 指定目录，并按 package 规则生成文件名与包名。
+Without `go_package`, output uses the requested `--go_out` directory and package-derived file naming.
 
-### 类型生成
+### Type Generation
 
-嵌套类型默认使用下划线命名（`Person_PhoneType`、`Person_PhoneNumber`）：
+Nested types use underscore naming by default (`Person_PhoneType`, `Person_PhoneNumber`):
 
 ```go
 type Person_PhoneType int32
@@ -590,13 +606,13 @@ type Person_PhoneNumber struct {
 }
 ```
 
-message 会生成带 `fory` tag 的 struct 与字节辅助方法：
+Messages generate structs with `fory` tags and byte helpers:
 
 ```go
 type Person struct {
     Name   string               `fory:"id=1"`
-    Id     int32                `fory:"id=2,compress=true"`
-    Phones []Person_PhoneNumber `fory:"id=7"`
+    Id     int32                `fory:"id=2"`
+    Phones []Person_PhoneNumber `fory:"id=7,type=list"`
     Pet    Animal               `fory:"id=8"`
 }
 
@@ -604,7 +620,7 @@ func (m *Person) ToBytes() ([]byte, error) { ... }
 func (m *Person) FromBytes(data []byte) error { ... }
 ```
 
-union 会生成 case struct，并提供构造器/访问器/visitor API：
+Unions generate typed case structs with constructors/accessors/visitor APIs:
 
 ```go
 type AnimalCase uint32
@@ -622,9 +638,9 @@ func (u Animal) AsDog() (*Dog, bool) { ... }
 func (u Animal) Visit(visitor AnimalVisitor) error { ... }
 ```
 
-### 注册
+### Registration
 
-生成注册函数：
+Generated registration function:
 
 ```go
 func RegisterTypes(f *fory.Fory) error {
@@ -644,7 +660,7 @@ func RegisterTypes(f *fory.Fory) error {
 }
 ```
 
-未显式 `[id=...]` 时，注册代码使用计算得到的数值 ID：
+For schemas without explicit `[id=...]`, generated registration uses computed numeric IDs:
 
 ```go
 if err := f.RegisterEnum(Status(0), 1124725126); err != nil { ... }
@@ -654,20 +670,22 @@ if err := f.RegisterUnion(Envelope_Detail{}, 1609214087, fory.NewUnionSerializer
 if err := f.RegisterStruct(Envelope_Payload{}, 2862577837); err != nil { ... }
 ```
 
-若设置 `option enable_auto_type_id = false;`：
+If `option enable_auto_type_id = false;` is set:
 
 ```go
-if err := f.RegisterNamedStruct(Config{}, "myapp.models.Config"); err != nil { ... }
-if err := f.RegisterNamedUnion(Holder{}, "myapp.models.Holder", fory.NewUnionSerializer(...)); err != nil { ... }
+if err := f.RegisterStructByName(Config{}, "myapp.models.Config"); err != nil { ... }
+if err := f.RegisterUnionByName(Holder{}, "myapp.models.Holder", fory.NewUnionSerializer(...)); err != nil { ... }
 ```
 
-`go_nested_type_style` 可控制嵌套类型命名风格：
+`go_nested_type_style` controls nested type naming:
 
 ```protobuf
 option go_nested_type_style = "camelcase";
 ```
 
-### 使用示例
+The CLI flag `--go_nested_type_style` overrides this schema option when both are set.
+
+### Usage
 
 ```go
 person := &Person{
@@ -687,15 +705,15 @@ if err := restored.FromBytes(data); err != nil {
 
 ## C\#
 
-### 输出布局
+### Output Layout
 
-C# 输出通常是每个 schema 对应一个 `.cs` 文件，例如：
+C# output is one `.cs` file per schema, for example:
 
 - `<csharp_out>/addressbook/addressbook.cs`
 
-### 类型生成
+### Type Generation
 
-message 会生成带 `[ForyObject]` 的类、C# 属性以及字节辅助方法：
+Messages generate `[ForyObject]` classes with C# properties and byte helpers:
 
 ```csharp
 [ForyObject]
@@ -711,7 +729,7 @@ public sealed partial class Person
 }
 ```
 
-union 会生成带类型化 case 辅助方法的 `Union` 子类：
+Unions generate `Union` subclasses with typed case helpers:
 
 ```csharp
 public sealed class Animal : Union
@@ -723,9 +741,9 @@ public sealed class Animal : Union
 }
 ```
 
-### 注册
+### Registration
 
-每个 schema 都会生成一个注册辅助类：
+Each schema generates a registration helper:
 
 ```csharp
 public static class AddressbookForyRegistration
@@ -739,19 +757,20 @@ public static class AddressbookForyRegistration
 }
 ```
 
-若未显式提供类型 ID，生成的注册代码会像其他目标语言一样使用计算得到的数值 ID。
+When explicit type IDs are not provided, generated registration uses computed
+numeric IDs (same behavior as other targets).
 
 ## JavaScript
 
-### 输出布局
+### Output Layout
 
-JavaScript 输出通常是每个 schema 对应一个 `.ts` 文件，例如：
+JavaScript output is one `.ts` file per schema, for example:
 
 - `<javascript_out>/addressbook.ts`
 
-### 类型生成
+### Type Generation
 
-message 会生成使用 camelCase 字段名的 `export interface` 声明：
+Messages generate `export interface` declarations with camelCase field names:
 
 ```typescript
 export interface Person {
@@ -762,7 +781,7 @@ export interface Person {
 }
 ```
 
-enum 会生成 `export enum` 声明：
+Enums generate `export enum` declarations:
 
 ```typescript
 export enum PhoneType {
@@ -772,7 +791,7 @@ export enum PhoneType {
 }
 ```
 
-union 会生成带 case enum 的判别联合类型：
+Unions generate a discriminated union with a case enum:
 
 ```typescript
 export enum AnimalCase {
@@ -787,36 +806,36 @@ export type Animal =
 
 ## Swift
 
-### 输出布局
+### Output Layout
 
-Swift 输出通常是每个 schema 对应一个 `.swift` 文件，例如：
+Swift output is one `.swift` file per schema, for example:
 
 - `<swift_out>/addressbook/addressbook.swift`
 
-### 类型生成
+### Type Generation
 
-生成器会创建带 `@ForyObject` 和字段 ID 的 Swift 模型。
+The generator creates Swift models with split model macros and stable field/case IDs.
 
-当 package/namespace 非空时，命名空间形态由 `swift_namespace_style` 控制：
+When package/namespace is non-empty, namespace shaping is controlled by `swift_namespace_style`:
 
-- `enum`（默认）：生成嵌套 enum 命名空间包装
-- `flatten`：在顶层类型名上加上由 package 派生的前缀（例如 `Demo_Foo_User`）
+- `enum` (default): nested enum namespace wrappers.
+- `flatten`: package-derived prefix on top-level type names (for example `Demo_Foo_User`).
 
-当 package/namespace 为空时，不会生成 enum 包装或 flatten 前缀。
+When package/namespace is empty, no enum wrapper or flatten prefix is applied.
 
-对于非空 package 且使用默认 `enum` 风格时：
+For non-empty package with default `enum` style:
 
 ```swift
 public enum Addressbook {
-    @ForyObject
+    @ForyUnion
     public enum Animal: Equatable {
-        @ForyField(id: 1)
+        @ForyCase(id: 1)
         case dog(Addressbook.Dog)
-        @ForyField(id: 2)
+        @ForyCase(id: 2)
         case cat(Addressbook.Cat)
     }
 
-    @ForyObject
+    @ForyStruct
     public struct Person: Equatable {
         @ForyField(id: 1)
         public var name: String = ""
@@ -826,21 +845,27 @@ public enum Addressbook {
 }
 ```
 
-对于非空 package 且使用 `flatten` 风格时：
+For non-empty package with `flatten` style:
 
 ```swift
-@ForyObject
+@ForyStruct
 public struct Addressbook_Person: Equatable { ... }
 ```
 
-当命令行和 schema 选项同时设置时，CLI 参数 `--swift_namespace_style` 会覆盖 schema 中的 `swift_namespace_style`。
+The CLI flag `--swift_namespace_style` overrides schema option `swift_namespace_style` when both are set.
 
-union 会生成带关联值的标记 Swift enum。
-带 `ref`/`weak_ref` 字段的 message 会生成 `final class` 模型，以保留引用语义。
+Unions are generated as tagged Swift enums with associated payload values.
+Messages with `ref`/`weak_ref` fields are generated as `final class` models to preserve reference semantics.
+Fixed or tagged integer encodings inside list/map fields are emitted as Swift
+field type hints, for example `@ListField(element: .encoding(.fixed))` or
+`@MapField(value: .encoding(.tagged))`.
+For non-null fixed-width integer list elements, Swift classifies the field as
+the corresponding Fory primitive packed-array type; fixed-width integer sets
+remain Fory sets.
 
-### 注册
+### Registration
 
-每个 schema 都会生成带传递性 import 注册的辅助类：
+Each schema includes a registration helper with transitive import registration:
 
 ```swift
 public enum ForyRegistration {
@@ -852,23 +877,23 @@ public enum ForyRegistration {
 }
 ```
 
-对于非空 package 且使用 `flatten` 风格时，辅助类名称也会带前缀（例如 `Addressbook_ForyRegistration`）。
+With non-empty package and `flatten` style, the helper is prefixed too (for example `Addressbook_ForyRegistration`).
 
-若未显式提供 `[id=...]`，注册会使用计算得到的数值 ID。
-若设置 `option enable_auto_type_id = false;`，则生成代码会改用基于名称的注册 API。
+For schemas without explicit `[id=...]`, registration uses computed numeric IDs.
+If `option enable_auto_type_id = false;` is set, generated code uses name-based registration APIs.
 
 ## Dart
 
-### 输出布局
+### Output Layout
 
-Dart 输出通常是每个 schema 对应两个文件：一个带注解类型的主 `.dart` 文件，以及一个包含生成序列化器和注册辅助逻辑的 `.fory.dart` part 文件。
+Dart output is two files per schema: a main `.dart` file with annotated types, and a `.fory.dart` part file with generated serializers and registration helpers.
 
 - `<dart_out>/package/package.dart`
 - `<dart_out>/package/package.fory.dart`
 
-### 类型生成
+### Type Generation
 
-message 会生成带 `@ForyStruct` 注解的 `final class`，并在每个字段上加 `@ForyField`：
+Messages generate `@ForyStruct` annotated `final class` declarations with `@ForyField` on each field:
 
 ```dart
 @ForyStruct()
@@ -878,8 +903,8 @@ final class Person {
   @ForyField(id: 1)
   String name = '';
 
-  @ForyField(id: 2)
-  Int32 id = Int32(0);
+  @ForyField(id: 2, type: Int32Type())
+  int id = 0;
 
   @ForyField(id: 7)
   List<Person_PhoneNumber> phones = <Person_PhoneNumber>[];
@@ -889,7 +914,7 @@ final class Person {
 }
 ```
 
-enum 会生成带 `rawValue` getter 和 `fromRawValue` factory 的 Dart `enum`：
+Enums generate Dart `enum` declarations with a `rawValue` getter and `fromRawValue` factory:
 
 ```dart
 enum Person_PhoneType {
@@ -912,7 +937,7 @@ enum Person_PhoneType {
 }
 ```
 
-union 会生成带 `@ForyUnion` 注解的类，包含工厂构造器、case enum 以及自定义序列化器：
+Unions generate `@ForyUnion` annotated classes with factory constructors, a case enum, and a custom serializer:
 
 ```dart
 enum AnimalCase {
@@ -941,28 +966,57 @@ final class Animal {
 }
 ```
 
-嵌套类型使用扁平下划线命名（例如 `Person_PhoneNumber`、`Person_PhoneType`）。
+Nested types use flat underscore naming (e.g., `Person_PhoneNumber`, `Person_PhoneType`).
 
-非 optional、非 ref 的原始类型列表会使用 typed array 以获得零拷贝性能（例如 `list<int32>` -> `Int32List`）。
+`list<T>` fields generate ordered collection carriers and use the Fory list
+protocol. `array<T>` fields generate dense one-dimensional bool or numeric
+carriers and use the specialized dense-array protocol. Generated code must not
+choose `array<T>` only because a language has an optimized list-like carrier;
+the schema kind comes from the IDL.
 
-列表元素或 map value 上的引用跟踪通过 `@ListType` / `@MapType` 注解表达：
+| IDL schema          | Dart generated carrier | Notes                                      |
+| ------------------- | ---------------------- | ------------------------------------------ |
+| `list<int32>`       | `List<int>`            | List protocol, varint element encoding     |
+| `list<fixed int32>` | `List<int>`            | List protocol, fixed-width element segment |
+| `array<bool>`       | `BoolList`             | One byte per bool                          |
+| `array<int8>`       | `Int8List`             | Dense signed bytes                         |
+| `array<int16>`      | `Int16List`            | Dense little-endian int16                  |
+| `array<int32>`      | `Int32List`            | Dense little-endian int32                  |
+| `array<int64>`      | `Int64List`            | Dense little-endian int64                  |
+| `array<uint8>`      | `Uint8List`            | Dense unsigned bytes                       |
+| `array<uint16>`     | `Uint16List`           | Dense little-endian uint16                 |
+| `array<uint32>`     | `Uint32List`           | Dense little-endian uint32                 |
+| `array<uint64>`     | `Uint64List`           | Dense little-endian uint64                 |
+| `array<float16>`    | `Float16List`          | Dense binary16 storage                     |
+| `array<bfloat16>`   | `Bfloat16List`         | Dense bfloat16 storage                     |
+| `array<float32>`    | `Float32List`          | Dense little-endian float32                |
+| `array<float64>`    | `Float64List`          | Dense little-endian float64                |
+
+Generated Dart fields that use `ArrayType(element: BoolType())` must use
+`BoolList`; plain `List<bool>` remains the generated and handwritten carrier
+for `list<bool>`.
+
+Reference tracking on list elements or map values uses the container sugar annotations:
 
 ```dart
-@ListType(element: ValueType.ref())
+@ListField(element: DeclaredType(ref: true))
 @ForyField(id: 3)
 List<Node> children = <Node>[];
 
-@MapType(value: ValueType.ref())
+@MapField(value: DeclaredType(ref: true))
 @ForyField(id: 2)
 Map<String, Node> byName = <String, Node>{};
 ```
 
-### 注册
+### Registration
 
-每个 schema 都会生成一个注册辅助类，负责处理该文件中的所有类型，并传递性注册 import 进来的类型：
+Each generated Dart library includes a registration helper named after the input
+file, such as `AddressbookFory` for `addressbook.dart`. The helper handles all
+generated types in that file and transitively registers imported generated
+types:
 
 ```dart
-abstract final class ForyRegistration {
+abstract final class AddressbookFory {
   static void register(
     Fory fory,
     Type type, {
@@ -979,7 +1033,7 @@ abstract final class ForyRegistration {
 }
 ```
 
-### 使用示例
+### Usage
 
 ```dart
 import 'package:fory/fory.dart';
@@ -987,51 +1041,307 @@ import 'generated/addressbook/addressbook.dart';
 
 void main() {
   final fory = Fory();
-  ForyRegistration.register(fory, Person, id: 100);
-  ForyRegistration.register(fory, Dog, id: 104);
+  AddressbookFory.register(fory, Person, id: 100);
+  AddressbookFory.register(fory, Dog, id: 104);
   // ...
 
   final person = Person()
     ..name = 'Alice'
-    ..id = Int32(1);
+    ..id = 1;
 
   final bytes = fory.serialize(person);
   final roundTrip = fory.deserialize<Person>(bytes);
 }
 ```
 
-## 跨语言说明
+## Kotlin
 
-### 类型 ID 行为
+The Kotlin target emits Kotlin source only. The compiler does not generate Java
+files.
 
-- 显式 `[id=...]` 会直接用于生成注册代码。
-- 未声明类型 ID 时，生成代码会使用计算得到的数值 ID（参见 `auto_id.*` 输出）。
-- 若设置 `option enable_auto_type_id = false;`，则生成代码改为使用 namespace/type-name 注册 API，而非数值 ID。
+### Output Layout
 
-### 嵌套类型形态
+For source file `addressbook.fdl` with `package addressbook`, Kotlin output is
+generated under:
 
-| 语言       | 嵌套类型形式                 |
-| ---------- | ---------------------------- |
-| Java       | `Person.PhoneNumber`         |
-| Python     | `Person.PhoneNumber`         |
-| Rust       | `person::PhoneNumber`        |
-| C++        | `Person::PhoneNumber`        |
-| Go         | `Person_PhoneNumber`（默认） |
-| C#         | `Person.PhoneNumber`         |
-| JavaScript | `Person.PhoneNumber`         |
-| Swift      | `Person.PhoneNumber`         |
-| Dart       | `Person_PhoneNumber`         |
+- `<kotlin_out>/addressbook/`
+- Type files: `AddressBook.kt`, `Person.kt`, `Dog.kt`, `Cat.kt`, `Animal.kt`
+- Schema module: `AddressbookForyModule.kt`
 
-### 字节辅助方法命名
+The schema module name is derived from the source file stem. Schemas in the same
+Kotlin package need distinct generated file names; duplicate generated Kotlin
+file paths are rejected before files are written.
 
-| 语言       | 辅助方法名称              |
+If `option kotlin_package = "...";` is present, the output path and Kotlin
+package use that option. Otherwise Kotlin uses the FDL package. A Kotlin import
+graph cannot mix default-package schemas with named Kotlin packages.
+Registration still uses the FDL package so cross-language type names stay
+stable.
+
+### Type Generation
+
+Messages generate Kotlin `data class` declarations by default:
+
+```kotlin
+@ForyStruct
+public data class Person(
+  @field:ForyField(id = 1)
+  public val name: String,
+
+  @field:ForyField(id = 7)
+  public val phones: List<PersonPhoneNumber>,
+
+  @field:ForyField(id = 8)
+  public val pet: Animal,
+) {
+  public fun toBytes(): ByteArray = AddressbookForyModule.getFory().serialize(this)
+
+  public companion object {
+    public fun fromBytes(bytes: ByteArray): Person =
+      AddressbookForyModule.getFory().deserialize(bytes, Person::class.java)
+  }
+}
+```
+
+Messages that participate in compiler-detected construction cycles generate
+normal mutable classes so the generated serializer can publish the instance
+before reading back-references:
+
+```kotlin
+@ForyStruct
+public class Node() {
+  @ForyField(id = 1)
+  public var id: String = ""
+
+  @Ref
+  @ForyField(id = 2)
+  public var parent: Node? = null
+}
+```
+
+Generated Kotlin IDL sources express nullability with Kotlin `?`, not Fory
+`@Nullable`, including mutable classes emitted for compiler-detected
+construction cycles.
+
+Enums generate Kotlin enum classes with stable Fory enum IDs. Unions generate
+sealed classes with `@ForyUnion`; case ID `0` is the unknown-case carrier and
+schema-defined cases hold a single `value` property.
+
+```kotlin
+@ForyUnion
+public sealed class Animal {
+  @ForyCase(id = 0)
+  public data class UnknownCase(public val caseId: Int, public val value: Any?) : Animal()
+
+  @ForyCase(id = 1)
+  public data class DogCase(public val value: Dog) : Animal()
+}
+```
+
+Kotlin `int32`, `int64`, `uint32`, and `uint64` fields use xlang varint
+encoding by default, so generated Kotlin does not emit `@VarInt` for the
+default case. It emits `@Fixed` or `@Tagged` only when the schema requests that
+non-default encoding. `duration` maps to `kotlin.time.Duration`, and infinite
+durations are rejected when encoded. Dense `array<float16>` and
+`array<bfloat16>` use the Java core `Float16Array` and `BFloat16Array`
+carriers. Generated Kotlin IDL uses `@ArrayType ByteArray` for `array<int8>`,
+including nested positions.
+
+### Schema Module
+
+Generated schema modules register schema types and resolve KSP-generated
+serializers from the target class name. The package-owned helper runtime uses
+`ForyKotlin.builder().withXlang(true)` with the schema module installed, so message
+`toBytes`/`fromBytes` helpers work without caller-managed runtime setup. For
+`addressbook.fdl`:
+
+```kotlin
+public object AddressbookForyModule : ForyModule {
+  private val fory: ThreadSafeFory by lazy {
+    ForyKotlin.builder()
+      .withXlang(true)
+      .withRefTracking(true)
+      .withModule(this)
+      .buildThreadSafeFory()
+  }
+
+  internal fun getFory(): ThreadSafeFory = fory
+
+  override fun install(fory: Fory) {
+    KotlinSerializers.registerType(fory, Person::class.java, 100L)
+    KotlinSerializers.registerSerializer(fory, Person::class.java)
+    KotlinSerializers.registerUnion(fory, Animal::class.java, 106L)
+  }
+}
+```
+
+`registerUnion` discovers the generated `<Target>_ForySerializer`; callers do
+not pass a serializer instance.
+
+## Scala
+
+The Scala target emits Scala 3 source only. The `fory-scala` runtime artifact
+still supports Scala 2.13 and Scala 3, but generated IDL source and macro
+derivation require Scala 3.
+
+### Output Layout
+
+For `package addressbook`, Scala output is generated under:
+
+- `<scala_out>/addressbook/`
+- Type files: `AddressBook.scala`, `Person.scala`, `Dog.scala`, `Cat.scala`, `Animal.scala`
+- Schema module: `AddressbookForyModule.scala`
+
+For schemas without a Scala package, the schema module name is derived from the
+source file stem, for example `main.fdl` generates `MainForyModule.scala`.
+Scala import graphs cannot mix default-package schemas with named Scala
+packages.
+
+### Type Generation
+
+Messages outside compiler-detected construction cycles generate case classes:
+
+```scala
+import org.apache.fory.annotation.{ForyField, ForyStruct}
+import org.apache.fory.scala.ForySerializer
+
+@ForyStruct
+final case class Person(
+  @ForyField(id = 1) name: String,
+  @ForyField(id = 3) email: Option[String],
+  @ForyField(id = 7) phones: List[Person.PhoneNumber],
+  @ForyField(id = 8) pet: Animal
+) derives ForySerializer {
+  def toBytes(): Array[Byte] =
+    AddressbookForyModule.getFory.serialize(this)
+}
+
+object Person {
+  def fromBytes(bytes: Array[Byte]): Person =
+    AddressbookForyModule.getFory.deserialize(bytes).asInstanceOf[Person]
+}
+```
+
+Messages in circular construction cycles generate normal classes with mutable
+serialized fields so reads can register the object before reading back-references:
+
+```scala
+import org.apache.fory.annotation.{ForyField, ForyStruct, Ref}
+import org.apache.fory.scala.ForySerializer
+
+@ForyStruct
+final class Node() derives ForySerializer {
+  @ForyField(id = 1)
+  var id: String = ""
+
+  @Ref
+  @ForyField(id = 2)
+  var parent: Option[Node] = None
+}
+```
+
+Enums generate Scala 3 enums with stable Fory IDs:
+
+```scala
+import org.apache.fory.annotation.ForyEnumId
+
+enum PhoneType {
+  @ForyEnumId(0)
+  case Mobile
+
+  @ForyEnumId(1)
+  case Home
+
+  @ForyEnumId(2)
+  case Work
+}
+```
+
+Unions generate Scala 3 ADT enums. Case ID `0` is reserved for the unknown-case
+carrier; schema-defined cases start at `1`.
+
+```scala
+import org.apache.fory.annotation.{ForyCase, ForyUnion}
+import org.apache.fory.scala.ForySerializer
+
+@ForyUnion
+enum Animal derives ForySerializer {
+  @ForyCase(id = 0)
+  case UnknownCase(caseId: Int, value: Any)
+
+  @ForyCase(id = 1)
+  case DogCase(value: Dog)
+
+  @ForyCase(id = 2)
+  case CatCase(value: Cat)
+}
+```
+
+`optional T` fields generate `Option[T]`. Top-level message references use
+`@Ref` on the field or constructor parameter. Nested element/value references
+use type-use annotations such as `List[Node @Ref]`.
+
+### Schema Module
+
+Generated schema modules register schema serializers, enums, structs, and
+unions. The package-owned helper runtime uses
+`ForyScala.builder().withXlang(true)` with the schema module installed, so
+message `toBytes`/`fromBytes` helpers work without caller-managed runtime setup:
+
+```scala
+object AddressbookForyModule extends org.apache.fory.ForyModule {
+  private lazy val fory: ThreadSafeFory =
+    ForyScala.builder()
+      .withXlang(true)
+      .withRefTracking(true)
+      .withModule(this)
+      .buildThreadSafeFory()
+
+  private[addressbook] def getFory: ThreadSafeFory = fory
+
+  override def install(fory: Fory): Unit = {
+    ScalaSerializers.registerEnum(fory, classOf[Person.PhoneType], 101L)
+    ForySerializer.register(fory, classOf[Person.PhoneNumber], 102L)
+    ForySerializer.register(fory, classOf[Person], 100L)
+    ForySerializer.register(fory, classOf[Animal], 106L)
+  }
+}
+```
+
+## Cross-Language Notes
+
+### Type ID Behavior
+
+- Explicit `[id=...]` values are used directly in generated registration.
+- When type IDs are omitted, generated code uses computed numeric IDs (see `auto_id.*` outputs).
+- If `option enable_auto_type_id = false;` is set, generated registration uses name-based APIs instead of numeric IDs.
+
+### Nested Type Shape
+
+| Language   | Nested type form               |
+| ---------- | ------------------------------ |
+| Java       | `Person.PhoneNumber`           |
+| Python     | `Person.PhoneNumber`           |
+| Rust       | `person::PhoneNumber`          |
+| C++        | `Person::PhoneNumber`          |
+| Go         | `Person_PhoneNumber` (default) |
+| C#         | `Person.PhoneNumber`           |
+| JavaScript | `Person.PhoneNumber`           |
+| Swift      | `Person.PhoneNumber`           |
+| Dart       | `Person_PhoneNumber`           |
+
+### Byte Helper Naming
+
+| Language   | Helpers                   |
 | ---------- | ------------------------- |
 | Java       | `toBytes` / `fromBytes`   |
+| Kotlin     | `toBytes` / `fromBytes`   |
+| Scala      | `toBytes` / `fromBytes`   |
 | Python     | `to_bytes` / `from_bytes` |
 | Rust       | `to_bytes` / `from_bytes` |
 | C++        | `to_bytes` / `from_bytes` |
 | Go         | `ToBytes` / `FromBytes`   |
 | C#         | `ToBytes` / `FromBytes`   |
-| JavaScript | （通过 `fory.serialize()`） |
+| JavaScript | (via `fory.serialize()`)  |
 | Swift      | `toBytes` / `fromBytes`   |
-| Dart       | （通过 `fory.serialize()`） |
+| Dart       | (via `fory.serialize()`)  |

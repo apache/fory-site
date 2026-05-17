@@ -1,6 +1,6 @@
 ---
-title: 跨语言序列化
-sidebar_position: 80
+title: Cross-Language Serialization
+sidebar_position: 20
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-Fory Go 支持与 Java、Python、C++、Rust、JavaScript 无缝交换数据。本指南介绍跨语言兼容与类型映射要点。
+Fory Go enables seamless data exchange with Java, Python, C++, Rust, and JavaScript. This guide covers cross-language compatibility and type mapping.
 
-## 启用跨语言模式
+## Create an Xlang Runtime
 
-需要显式开启跨语言（xlang）模式：
+Go defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```go
 f := fory.New(fory.WithXlang(true))
 ```
 
-## 跨语言类型注册
+## Type Registration for Cross-Language
 
-在所有语言中使用一致的类型 ID：
+Use consistent type IDs across all languages:
 
 ### Go
 
@@ -66,23 +66,23 @@ import pyfory
 
 @dataclass
 class User:
-    id: pyfory.Int64Type
+    id: pyfory.Int64
     name: str
 
-fory = pyfory.Fory()
+fory = pyfory.Fory(xlang=True)
 fory.register(User, type_id=1)
 user = fory.deserialize(data)
 ```
 
-## 类型映射
+## Type Mapping
 
-不同语言间完整类型映射请参考 [类型映射规范](https://fory.apache.org/docs/specification/xlang_type_mapping)。
+See [Type Mapping Specification](../../specification/xlang_type_mapping.md) for detailed type mappings across all languages.
 
-## 字段顺序
+## Field Ordering
 
-跨语言序列化要求字段顺序一致。Fory 会将字段名转为 snake_case 后按字母序排序。
+Cross-language serialization requires consistent field ordering. Fory sorts fields by their snake_case names alphabetically.
 
-Go 字段名会先转 snake_case：
+Go field names are converted to snake_case for sorting:
 
 ```go
 type Example struct {
@@ -94,7 +94,7 @@ type Example struct {
 // Sorted order: age, first_name, user_id
 ```
 
-请确保其他语言使用能产生相同 snake_case 顺序的字段名；或通过字段 ID 显式控制：
+Ensure other languages use matching field names that produce the same snake_case ordering, or use field IDs for explicit control:
 
 ```go
 type Example struct {
@@ -104,11 +104,11 @@ type Example struct {
 }
 ```
 
-## 示例
+## Examples
 
-### Go 到 Java
+### Go to Java
 
-**Go（序列化端）**：
+**Go (Serializer)**:
 
 ```go
 type Order struct {
@@ -131,7 +131,7 @@ data, _ := f.Serialize(order)
 // Send 'data' to Java service
 ```
 
-**Java（反序列化端）**：
+**Java (Deserializer)**:
 
 ```java
 public class Order {
@@ -147,9 +147,9 @@ fory.register(Order.class, 1);
 Order order = fory.deserialize(data, Order.class);
 ```
 
-### Python 到 Go
+### Python to Go
 
-**Python（序列化端）**：
+**Python (Serializer)**:
 
 ```python
 from dataclasses import dataclass
@@ -157,18 +157,18 @@ import pyfory
 
 @dataclass
 class Message:
-    id: pyfory.Int64Type
+    id: pyfory.Int64
     content: str
-    timestamp: pyfory.Int64Type
+    timestamp: pyfory.Int64
 
-fory = pyfory.Fory()
+fory = pyfory.Fory(xlang=True)
 fory.register(Message, type_id=1)
 
 msg = Message(id=1, content="Hello from Python", timestamp=1234567890)
 data = fory.serialize(msg)
 ```
 
-**Go（反序列化端）**：
+**Go (Deserializer)**:
 
 ```go
 type Message struct {
@@ -185,11 +185,34 @@ f.Deserialize(data, &msg)
 fmt.Println(msg.Content)  // "Hello from Python"
 ```
 
-### 嵌套结构
+### Nested Structures
 
-跨语言嵌套结构要求相关类型全部注册：
+Cross-language nested structures require all types to be registered:
 
-**Go**：
+## Lists and Dense Arrays
+
+Go slices are ordinary `list<T>` carriers unless a field tag explicitly requests
+the dense `array<T>` schema. Use `array<T>` only for one-dimensional bool or
+numeric data.
+
+| Fory schema       | Go carrier and tag sketch                              |
+| ----------------- | ------------------------------------------------------ |
+| `list<int32>`     | `[]int32` / `fory:"type=list(element=int32)"`          |
+| `array<bool>`     | `[]bool` / `fory:"type=array(element=bool)"`           |
+| `array<int8>`     | `[]int8` / `fory:"type=array(element=int8)"`           |
+| `array<int16>`    | `[]int16` / `fory:"type=array(element=int16)"`         |
+| `array<int32>`    | `[]int32` / `fory:"type=array(element=int32)"`         |
+| `array<int64>`    | `[]int64` / `fory:"type=array(element=int64)"`         |
+| `array<uint8>`    | `[]uint8` / `fory:"type=array(element=uint8)"`         |
+| `array<uint16>`   | `[]uint16` / `fory:"type=array(element=uint16)"`       |
+| `array<uint32>`   | `[]uint32` / `fory:"type=array(element=uint32)"`       |
+| `array<uint64>`   | `[]uint64` / `fory:"type=array(element=uint64)"`       |
+| `array<float16>`  | `[]float16.Float16` / `type=array(element=float16)`    |
+| `array<bfloat16>` | `[]bfloat16.BFloat16` / `type=array(element=bfloat16)` |
+| `array<float32>`  | `[]float32` / `fory:"type=array(element=float32)"`     |
+| `array<float64>`  | `[]float64` / `fory:"type=array(element=float64)"`     |
+
+**Go**:
 
 ```go
 type Address struct {
@@ -208,7 +231,7 @@ f.RegisterStruct(Address{}, 1)
 f.RegisterStruct(Company{}, 2)
 ```
 
-**Java**：
+**Java**:
 
 ```java
 public class Address {
@@ -226,11 +249,11 @@ fory.register(Address.class, 1);
 fory.register(Company.class, 2);
 ```
 
-## 常见问题
+## Common Issues
 
-### 字段名不匹配
+### Field Name Mismatch
 
-Go 常用 PascalCase，其他语言可能是 camelCase 或 snake_case。Fory 按 snake_case 转换结果做字段匹配：
+Go uses PascalCase, other languages may use camelCase or snake_case. Fields are matched by their snake_case conversion:
 
 ```go
 // Go
@@ -244,37 +267,39 @@ public class User {
 }
 ```
 
-### 类型语义差异
+### Type Interpretation
 
-Go 的无符号类型在 Java 中会映射到相同比特位的有符号类型：
+Go unsigned types map to Java signed types with the same bit pattern:
 
 ```go
 var value uint64 = 18446744073709551615  // Max uint64
 ```
 
-Java `long` 持有相同比特位，但按有符号解释为 `-1`。若需无符号语义，可在 Java 中使用 `Long.toUnsignedString()`。
+Java's `long` holds the same bits but interprets as -1. Use `Long.toUnsignedString()` in Java if unsigned interpretation is needed.
 
-### Nil 与 Null
+### Nil vs Null
 
-Go 的 nil slice/map 在不同配置下序列化方式不同：
+Go nil slices/maps serialize differently based on configuration:
 
 ```go
 var slice []string = nil
 // In xlang mode: serializes based on nullable configuration
 ```
 
-请确保其他语言端能正确处理 null。
+Ensure other languages handle null appropriately.
 
-## 最佳实践
+## Best Practices
 
-1. **统一 type ID**：同一类型在所有语言中使用相同数值 ID
-2. **完整注册类型**：包括嵌套结构体类型
-3. **统一字段顺序**：使用一致 snake_case，或使用显式字段 ID
-4. **尽早做跨语言集成测试**：持续验证兼容性
-5. **注意类型语义差异**：特别是有符号/无符号解释差异
+1. **Use consistent type IDs**: Same numeric ID for the same type across all languages
+2. **Register all types**: Including nested struct types
+3. **Match field ordering**: Use same snake_case names or explicit field IDs
+4. **Test cross-language**: Run integration tests early and often
+5. **Handle type differences**: Be aware of signed/unsigned interpretation differences
 
-## 相关主题
+## Related Topics
 
-- [类型注册](type-registration.md)
-- [支持类型](supported-types.md)
-- [Schema 演进](schema-evolution.md)
+- [Type Registration](type-registration.md)
+- [Supported Types](supported-types.md)
+- [Schema Evolution](schema-evolution.md)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Type Mapping Specification](../../specification/xlang_type_mapping.md)

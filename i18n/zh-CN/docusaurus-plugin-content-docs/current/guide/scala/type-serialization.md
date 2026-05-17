@@ -1,5 +1,5 @@
 ---
-title: 类型序列化
+title: Type Serialization
 sidebar_position: 2
 id: type_serialization
 license: |
@@ -19,24 +19,23 @@ license: |
   limitations under the License.
 ---
 
-本页介绍 Scala 特定类型的序列化。
+This page covers serialization of Scala-specific JVM types in native mode. For
+cross-language Scala models, use the xlang path described in
+[Schema IDL And Xlang](schema-idl.md).
 
-## 设置
+## Setup
 
-所有示例假设以下设置：
+All examples assume the following setup:
 
 ```scala
 import org.apache.fory.Fory
-import org.apache.fory.serializer.scala.ScalaSerializers
+import org.apache.fory.scala.ForyScala
 
-val fory = Fory.builder()
-  .withScalaOptimizationEnabled(true)
+val fory = ForyScala.builder().withXlang(false)
   .build()
-
-ScalaSerializers.registerSerializers(fory)
 ```
 
-## Case 类
+## Case Class
 
 ```scala
 case class Person(github: String, age: Int, id: Long)
@@ -47,7 +46,7 @@ val p = Person("https://github.com/chaokunyang", 18, 1)
 println(fory.deserialize(fory.serialize(p)))
 ```
 
-## POJO 类
+## POJO Class
 
 ```scala
 class Foo(f1: Int, f2: String) {
@@ -59,9 +58,9 @@ fory.register(classOf[Foo])
 println(fory.deserialize(fory.serialize(new Foo(1, "chaokunyang"))))
 ```
 
-## Object 单例
+## Object Singleton
 
-Scala `object` 单例被序列化和反序列化为同一个实例：
+Scala `object` singletons are serialized and deserialized to the same instance:
 
 ```scala
 object MySingleton {
@@ -75,9 +74,9 @@ val o2 = fory.deserialize(fory.serialize(MySingleton))
 println(o1 == o2) // true
 ```
 
-## 集合
+## Collection
 
-完全支持 Scala 集合：
+Scala collections are fully supported:
 
 ```scala
 val seq = Seq(1, 2)
@@ -89,9 +88,9 @@ println(fory.deserialize(fory.serialize(list)))
 println(fory.deserialize(fory.serialize(map)))
 ```
 
-## 元组
+## Tuple
 
-支持所有 Scala 元组类型（Tuple1 到 Tuple22）：
+All Scala tuple types (Tuple1 through Tuple22) are supported:
 
 ```scala
 val tuple2 = (100, 10000L)
@@ -101,9 +100,9 @@ val tuple4 = (100, 10000L, 10000L, "str")
 println(fory.deserialize(fory.serialize(tuple4)))
 ```
 
-## 枚举
+## Enum
 
-### Scala 3 枚举
+### Scala 3 Enum
 
 ```scala
 enum Color { case Red, Green, Blue }
@@ -126,7 +125,7 @@ fory.register(Class.forName("scala.Enumeration.Val"))
 println(fory.deserialize(fory.serialize(ColorEnum.Green)))
 ```
 
-> **注意**：对于 Scala 2 Enumeration，可能需要注册 `scala.Enumeration.Val` 或启用引用跟踪以避免 `StackOverflowError`。
+> **Note**: For Scala 2 Enumeration, you may need to register `scala.Enumeration.Val` or enable reference tracking to avoid `StackOverflowError`.
 
 ## Option
 
@@ -148,9 +147,9 @@ val left: Either[String, Int] = Left("error")
 println(fory.deserialize(fory.serialize(left)))
 ```
 
-## 嵌套类型
+## Nested Types
 
-完全支持复杂的嵌套结构：
+Complex nested structures are fully supported:
 
 ```scala
 case class Address(street: String, city: String)

@@ -21,15 +21,15 @@ license: |
 
 Schema evolution lets different versions of your service exchange messages safely — a v2 writer can produce a message a v1 reader still understands, and vice versa.
 
-## Two Modes
+## Compatible And Schema-Consistent Evolution
 
 - **Compatible mode** (default): writes extra field metadata so readers can skip unknown fields and tolerate missing ones. Good for independent deployments, rolling upgrades, and xlang services.
 - **Schema-consistent mode**: more compact, but both sides must have exactly the same schema. Use it only when schemas do not change, or when all services update together.
 
-## Enable Compatible Mode
+## Default Compatible Mode
 
 ```ts
-const fory = new Fory({ compatible: true });
+const fory = new Fory();
 ```
 
 Use this when:
@@ -63,7 +63,7 @@ const readerType = Type.struct(
 );
 ```
 
-With `compatible: true`, the reader ignores fields it does not know about, and fills unknown fields with default values.
+With compatible mode, the reader ignores fields it does not know about, and fills unknown fields with default values.
 
 ## Opting Out of Evolution for One Struct
 
@@ -84,10 +84,10 @@ const fixedType = Type.struct(
 
 |                                 | Schema-consistent | Compatible          |
 | ------------------------------- | ----------------- | ------------------- |
-| Services always update together | ✔ best choice     | works, but wasteful |
-| Independent deployments         | will break        | ✔ best choice       |
-| Smallest possible messages      | ✔                 | slightly larger     |
-| Rolling upgrades                | risky             | ✔ safe              |
+| Services always update together | best choice       | works, but wasteful |
+| Independent deployments         | will break        | best choice         |
+| Smallest possible messages      | best choice       | slightly larger     |
+| Rolling upgrades                | risky             | safe                |
 
 ## Cross-Language Requirement
 

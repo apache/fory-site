@@ -1,6 +1,6 @@
 ---
 title: Cross-Language Serialization
-sidebar_position: 10
+sidebar_position: 4
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,13 +21,13 @@ license: |
 
 `pyfory` supports cross-language object graph serialization, allowing you to serialize data in Python and deserialize it in Java, Go, Rust, or other supported languages.
 
-## Enable Cross-Language Mode
+## Create an Xlang Runtime
 
-To use xlang mode, create `Fory` with `xlang=True, compatible=True`:
+Python defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```python
 import pyfory
-fory = pyfory.Fory(xlang=True, compatible=True, ref=False, strict=True)
+fory = pyfory.Fory(xlang=True, ref=False, strict=True)
 ```
 
 ## Cross-Language Example
@@ -38,8 +38,7 @@ fory = pyfory.Fory(xlang=True, compatible=True, ref=False, strict=True)
 import pyfory
 from dataclasses import dataclass
 
-# Cross-language mode for interoperability
-f = pyfory.Fory(xlang=True, compatible=True, ref=True)
+f = pyfory.Fory(xlang=True, ref=True)
 
 # Register type for cross-language compatibility
 @dataclass
@@ -65,7 +64,7 @@ public class Person {
 }
 
 Fory fory = Fory.builder()
-    .withXlang(true).withCompatible(true)
+    .withXlang(true)
     .withRefTracking(true)
     .build();
 
@@ -85,9 +84,7 @@ struct Person {
     age: i32,
 }
 
-let mut fory = Fory::builder()
-    .compatible(true)
-    .xlang(true).build();
+let mut fory = Fory::builder().xlang(true).build();
 
 fory.register_by_name::<Person>("example", "Person");
 let person: Person = fory.deserialize(&binary_data)?;
@@ -195,7 +192,7 @@ Fory row-format schemas.
 
 ## Differences from Python Native Mode
 
-The binary protocol and API are similar to `pyfory`'s python-native mode, but Python-native mode can serialize any Python object—including global functions, local functions, lambdas, local classes, and types with customized serialization using `__getstate__/__reduce__/__reduce_ex__`, which are **not allowed** in xlang mode.
+The binary protocol and API are similar to `pyfory`'s Python native mode, but Python native mode can serialize any Python object—including global functions, local functions, lambdas, local classes, and types with customized serialization using `__getstate__/__reduce__/__reduce_ex__`, which are **not allowed** in xlang mode.
 
 ## See Also
 
@@ -206,6 +203,6 @@ The binary protocol and API are similar to `pyfory`'s python-native mode, but Py
 
 ## Related Topics
 
-- [Configuration](configuration.md) - XLANG mode settings
+- [Configuration](configuration.md) - xlang mode settings
 - [Schema Evolution](schema-evolution.md) - Compatible mode
 - [Type Registration](type-registration.md) - Registration patterns

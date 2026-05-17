@@ -151,11 +151,9 @@ Apache Fory™ supports class schema forward/backward compatibility across **Jav
 
 **Recommendations**:
 
-- Version your serialized data by Fory major version
-- Plan migration strategies when upgrading major versions
-- See [upgrade guide](../guide/java/migration.md) for details
-
-**Future**: Binary compatibility will be guaranteed starting from Fory 1.0 release.
+- Use xlang mode for cross-language payloads and schemas shared across runtimes
+- Use native mode for same-language traffic when the runtime supports it
+- Use [schema evolution](../guide/java/schema-evolution.md) when Java schemas change independently
 
 ## Security
 

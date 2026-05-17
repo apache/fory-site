@@ -63,16 +63,18 @@ fory = "0.13"
 ### JavaScript
 
 ```bash
-npm install @apache-fory/fory
+npm install @apache-fory/core
 ```
 
 ### C++
 
 Use Bazel or CMake to build from source. See [C++ Guide](../cpp/index.md) for details.
 
-## Enable Cross-Language Mode
+## Create an Xlang Runtime
 
-Each language requires enabling xlang mode to ensure binary compatibility across languages.
+Xlang mode is the default for runtimes that expose a mode switch. Swift, C#, JavaScript/TypeScript,
+and Dart only expose the xlang wire format. The examples below keep compatible schema evolution on
+the default path and show only options that change another setting.
 
 ### Java
 
@@ -81,9 +83,8 @@ import org.apache.fory.*;
 import org.apache.fory.config.*;
 
 Fory fory = Fory.builder()
-    .withXlang(true)  // Enable cross-language mode
-    .withCompatible(true)  // Recommended xlang default
-    .withRefTracking(true)          // Optional: for circular references
+    .withXlang(true)
+    .withRefTracking(true)  // Optional: for circular references
     .build();
 ```
 
@@ -92,11 +93,10 @@ Fory fory = Fory.builder()
 ```python
 import pyfory
 
-# Cross-language mode uses compatible=True by default; set it explicitly in examples.
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 
 # Enable reference tracking when needed
-fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
+fory = pyfory.Fory(xlang=True, ref=True)
 ```
 
 ### Go
@@ -104,9 +104,9 @@ fory = pyfory.Fory(xlang=True, compatible=True, ref=True)
 ```go
 import forygo "github.com/apache/fory/go/fory"
 
-fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithCompatible(true))
+fory := forygo.NewFory(forygo.WithXlang(true))
 // Or with reference tracking
-fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithCompatible(true), forygo.WithTrackRef(true))
+fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
 ```
 
 ### Rust
@@ -114,15 +114,15 @@ fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithCompatible(true), fory
 ```rust
 use fory::Fory;
 
-let fory = Fory::builder().xlang(true).compatible(true).build();
+let fory = Fory::builder().xlang(true).build();
 ```
 
 ### JavaScript
 
 ```javascript
-import Fory from "@apache-fory/fory";
+import Fory, { Type } from "@apache-fory/core";
 
-const fory = new Fory({ compatible: true });
+const fory = new Fory();
 ```
 
 ### C++
@@ -132,10 +132,7 @@ const fory = new Fory({ compatible: true });
 
 using namespace fory::serialization;
 
-auto fory = Fory::builder()
-    .xlang(true)
-    .compatible(true)
-    .build();
+auto fory = Fory::builder().xlang(true).build();
 ```
 
 ## Type Registration
@@ -175,7 +172,7 @@ struct Person {
     age: i32,
 }
 
-let mut fory = Fory::builder().xlang(true).compatible(true).build();
+let mut fory = Fory::builder().xlang(true).build();
 fory
     .register_by_name::<Person>("example", "Person")
     .expect("register Person");
@@ -184,19 +181,22 @@ fory
 **JavaScript:**
 
 ```javascript
-const description = Type.object("example.Person", {
-  name: Type.string(),
-  age: Type.int32(),
-});
-fory.registerSerializer(description);
+const personType = Type.struct(
+  { typeName: "example.Person" },
+  {
+    name: Type.string(),
+    age: Type.int32(),
+  },
+);
+const { serialize, deserialize } = fory.register(personType);
 ```
 
 **C++:**
 
 ```cpp
-fory.register_struct<Person>("example.Person");
+fory.register_struct<Person>("example", "Person");
 // For enums, use register_enum:
-// fory.register_enum<Color>("example.Color");
+// fory.register_enum<Color>("example", "Color");
 ```
 
 ### Register by ID
@@ -247,9 +247,7 @@ public class Person {
 
 public class HelloWorld {
     public static void main(String[] args) throws Exception {
-        Fory fory = Fory.builder()
-            .withXlang(true).withCompatible(true)
-            .build();
+        Fory fory = Fory.builder().withXlang(true).build();
         fory.register(Person.class, "example.Person");
 
         Person person = new Person();
@@ -274,7 +272,7 @@ class Person:
     name: str
     age: pyfory.Int32
 
-fory = pyfory.Fory(xlang=True, compatible=True)
+fory = pyfory.Fory(xlang=True)
 fory.register_type(Person, typename="example.Person")
 
 with open("person.bin", "rb") as f:

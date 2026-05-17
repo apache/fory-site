@@ -1,6 +1,6 @@
 ---
 title: Schema Evolution
-sidebar_position: 3
+sidebar_position: 5
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -48,13 +48,13 @@ FORY_STRUCT(PersonV2, name, age, email);
 int main() {
   // Create separate Fory instances for each schema version
   auto fory_v1 = Fory::builder()
-      .compatible(true)  // Enable schema evolution
       .xlang(true)
+      .compatible(true)  // Enable schema evolution
       .build();
 
   auto fory_v2 = Fory::builder()
-      .compatible(true)
       .xlang(true)
+      .compatible(true)
       .build();
 
   // Register with the SAME type ID for schema evolution
@@ -92,14 +92,14 @@ FORY_STRUCT_EVOLVING(StableMessage, false);
 
 Compatible mode supports the following schema changes:
 
-| Change Type        | Support | Behavior                                |
-| ------------------ | ------- | --------------------------------------- |
-| Add new fields     | ✅      | Missing fields use default values       |
-| Remove fields      | ✅      | Extra fields are skipped                |
-| Reorder fields     | ✅      | Fields matched by name, not position    |
-| Change nullability | ✅      | `T` ↔ `std::optional<T>`                |
-| Change field types | ❌      | Types must be compatible                |
-| Rename fields      | ❌      | Field names must match (case-sensitive) |
+| Change Type        | Support       | Behavior                                |
+| ------------------ | ------------- | --------------------------------------- |
+| Add new fields     | Supported     | Missing fields use default values       |
+| Remove fields      | Supported     | Extra fields are skipped                |
+| Reorder fields     | Supported     | Fields matched by name, not position    |
+| Change nullability | Supported     | `T` ↔ `std::optional<T>`                |
+| Change field types | Not supported | Types must be compatible                |
+| Rename fields      | Not supported | Field names must match (case-sensitive) |
 
 ## Adding Fields (Backward Compatibility)
 
@@ -394,16 +394,16 @@ Schema evolution works across languages when using xlang mode:
 ```cpp
 // C++ with compatible mode
 auto fory = Fory::builder()
-    .compatible(true)
     .xlang(true)
+    .compatible(true)
     .build();
 ```
 
 ```java
 // Java with compatible mode
 Fory fory = Fory.builder()
-    .withCompatible(true)
     .withXlang(true)
+    .withCompatible(true)
     .build();
 ```
 

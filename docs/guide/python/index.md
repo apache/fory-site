@@ -21,21 +21,21 @@ license: |
 
 **Apache Fory™** is a blazing fast multi-language serialization framework powered by **JIT compilation** and **zero-copy** techniques, providing up to **ultra-fast performance** while maintaining ease of use and safety.
 
-`pyfory` provides the Python implementation of Apache Fory™, offering both high-performance object serialization and advanced row-format capabilities for data processing tasks.
+`pyfory` provides the Python implementation of Apache Fory™, offering xlang mode for cross-language payloads, native mode for Python-only object serialization, and advanced row-format capabilities for data processing tasks.
 
 ## Key Features
 
 ### Flexible Serialization Modes
 
-- **Python native Mode**: Full Python compatibility, drop-in replacement for pickle/cloudpickle
-- **Cross-Language Mode**: Optimized for multi-language data exchange
+- **Xlang mode**: Default cross-language wire format with compatible schema evolution
+- **Python native mode**: Same-language mode and drop-in replacement for pickle/cloudpickle
 - **Row Format**: Zero-copy row format for analytics workloads
 
 ### Versatile Serialization Features
 
-- **Shared/circular reference support** for complex object graphs in both Python-native and cross-language modes
+- **Reference tracking** for shared xlang schema objects and Python native-mode circular graphs
 - **Polymorphism support** for customized types with automatic type dispatching
-- **Schema evolution** support for backward/forward compatibility when using dataclasses in cross-language mode
+- **Schema evolution** support for backward/forward compatibility when using dataclasses in xlang mode
 - **Out-of-band buffer support** for zero-copy serialization of large data structures like NumPy arrays and Pandas DataFrames, compatible with pickle protocol 5
 
 ### Blazing Fast Performance
@@ -92,8 +92,8 @@ class Person:
     name: str
     age: int
 
-# Create thread-safe Fory instance
-fory = pyfory.ThreadSafeFory(xlang=False, ref=True)
+# Create a thread-safe xlang Fory instance
+fory = pyfory.ThreadSafeFory(xlang=True, ref=True)
 fory.register(Person)
 
 # Use in multiple threads safely
@@ -132,8 +132,8 @@ class Person:
     name: str
     age: int
 
-# Create Fory instance
-fory = pyfory.Fory(xlang=False, ref=True)
+# Create an xlang Fory instance
+fory = pyfory.Fory(xlang=True, ref=True)
 fory.register(Person)
 
 person = Person("Alice", 30)
@@ -142,18 +142,26 @@ result = fory.deserialize(data)
 print(result)  # Person(name='Alice', age=30)
 ```
 
+## Xlang Mode And Native Mode
+
+Use xlang mode for cross-language payloads and dataclass schemas shared with other Fory runtimes. Xlang mode is the default Python wire mode, and Python examples that use it set `xlang=True` explicitly so the mode choice is visible.
+
+Use native mode for Python-only traffic. Native mode is selected with `xlang=False`, uses schema-consistent payloads unless compatible mode is enabled, and owns pickle/cloudpickle-style behavior such as functions, lambdas, classes, methods, `__reduce__`, `__getstate__`, and out-of-band pickle protocol 5 buffers. It is optimized for Python's type system and supports a broader Python object surface than xlang mode, so use it when replacing pickle or cloudpickle.
+
+See [Python Native Mode](python-native.md) for Python-only serialization details and [Cross-Language](cross-language.md) for Python xlang registration and interoperability rules.
+
 ## Next Steps
 
 - [Configuration](configuration.md) - Fory parameters and modes
 - [Basic Serialization](basic-serialization.md) - Basic usage patterns
 - [Python Native Mode](python-native.md) - Functions, lambdas, classes
-- [Cross-Language](cross-language.md) - XLANG mode
+- [Cross-Language](cross-language.md) - xlang mode
 - [Row Format](row-format.md) - Zero-copy row format
 - [Security](security.md) - Security best practices
 
 ## Links
 
-- **Documentation**: https://fory.apache.org/docs/latest/python_guide/
+- **Documentation**: https://fory.apache.org/docs/guide/python/
 - **GitHub**: https://github.com/apache/fory
 - **PyPI**: https://pypi.org/project/pyfory/
 - **Issues**: https://github.com/apache/fory/issues

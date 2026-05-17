@@ -1,6 +1,6 @@
 ---
 title: Advanced Features
-sidebar_position: 11
+sidebar_position: 16
 id: advanced_features
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,59 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This page covers advanced features including zero-copy serialization, deep copy, memory management, and logging.
-
-## Zero-Copy Serialization
-
-Fory supports zero-copy serialization for efficient handling of large binary data:
-
-```java
-import org.apache.fory.*;
-import org.apache.fory.config.*;
-import org.apache.fory.serializer.BufferObject;
-import org.apache.fory.memory.MemoryBuffer;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-public class ZeroCopyExample {
-  // Note that fory instance should be reused instead of creation every time.
-  static Fory fory = Fory.builder()
-    .withXlang(false)
-    .build();
-
-  public static void main(String[] args) {
-    List<Object> list = Arrays.asList("str", new byte[1000], new int[100], new double[100]);
-    Collection<BufferObject> bufferObjects = new ArrayList<>();
-    byte[] bytes = fory.serialize(list, e -> !bufferObjects.add(e));
-    List<MemoryBuffer> buffers = bufferObjects.stream()
-      .map(BufferObject::toBuffer).collect(Collectors.toList());
-    System.out.println(fory.deserialize(bytes, buffers));
-  }
-}
-```
-
-## Object Deep Copy
-
-Fory provides efficient deep copy functionality:
-
-### With Reference Tracking
-
-```java
-Fory fory = Fory.builder().withRefCopy(true).build();
-SomeClass a = xxx;
-SomeClass copied = fory.copy(a);
-```
-
-### Without Reference Tracking (Better Performance)
-
-When disabled, deep copy will ignore circular and shared references. Same reference of an object graph will be copied into different objects in one `Fory#copy`:
-
-```java
-Fory fory = Fory.builder().withRefCopy(false).build();
-SomeClass a = xxx;
-SomeClass copied = fory.copy(a);
-```
+This page covers advanced Java runtime features that are not part of first-use serialization.
+Java native-mode zero-copy serialization is documented in [Native Mode](native-mode.md), and deep
+copy semantics are documented in [Object Copy](object-copy.md).
 
 ## Memory Allocation Customization
 
@@ -178,7 +128,7 @@ public static final ThreadSafeFory FORY;
 
 static {
   LoggerFactory.useSlf4jLogging(true);
-  FORY = Fory.builder()
+  FORY = Fory.builder().withXlang(false)
     .buildThreadSafeFory();
 }
 ```
@@ -205,4 +155,6 @@ static {
 
 - [Compression](compression.md) - Data compression options
 - [Configuration](configuration.md) - All ForyBuilder options
-- [Cross-Language Serialization](cross-language.md) - XLANG mode
+- [Native Mode](native-mode.md) - Java-only serialization, JDK hooks, and zero-copy buffers
+- [Object Copy](object-copy.md) - Deep copy functionality
+- [Cross-Language](cross-language.md) - Java xlang interoperability

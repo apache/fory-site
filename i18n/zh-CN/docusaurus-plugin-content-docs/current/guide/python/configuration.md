@@ -1,6 +1,6 @@
 ---
-title: 配置
-sidebar_position: 2
+title: Configuration
+sidebar_position: 3
 id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,163 +19,148 @@ license: |
   limitations under the License.
 ---
 
-本页介绍 Fory 配置参数和语言模式。
+This page covers Python runtime configuration. `pyfory.Fory()` defaults to xlang mode with
+compatible schema evolution. Native mode is selected explicitly with `xlang=False` and defaults to
+schema-consistent payloads.
 
-## Fory 类
+## Fory Class
 
-主要序列化接口：
+The main serialization interface:
 
 ```python
 class Fory:
     def __init__(
         self,
-        xlang: bool = False,
+        xlang: bool = True,
         ref: bool = False,
         strict: bool = True,
-        compatible: bool = False,
-        max_depth: int = 50
+        compatible: Optional[bool] = None,
+        max_depth: int = 50,
+        policy: DeserializationPolicy = None,
+        field_nullable: bool = False,
+        meta_compressor=None,
     )
 ```
 
-## ThreadSafeFory 类
+## ThreadSafeFory Class
 
-使用线程本地存储的线程安全序列化接口：
+Thread-safe serialization interface using a pooled wrapper:
 
 ```python
 class ThreadSafeFory:
     def __init__(
-        self,
-        xlang: bool = False,
-        ref: bool = False,
-        strict: bool = True,
-        compatible: bool = False,
-        max_depth: int = 50
+        self, fory_factory=None, **kwargs
     )
 ```
 
-## 参数
+## Parameters
 
-| 参数         | 类型   | 默认值  | 描述                                                                                                                                    |
-| ------------ | ------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `xlang`      | `bool` | `False` | 启用跨语言序列化。当为 `False` 时，启用 Python 原生模式，支持所有 Python 对象。当为 `True` 时，启用跨语言模式，兼容 Java、Go、Rust 等。 |
-| `ref`        | `bool` | `False` | 启用引用跟踪以支持共享/循环引用。如果数据没有共享引用，禁用此选项可获得更好性能。                                                       |
-| `strict`     | `bool` | `True`  | 出于安全考虑需要类型注册。**生产环境强烈推荐**。仅在受信任的环境中禁用。                                                                |
-| `compatible` | `bool` | `False` | 在跨语言模式中启用 schema 演化，允许在保持兼容性的同时添加/删除字段。                                                                   |
-| `max_depth`  | `int`  | `50`    | 反序列化的最大深度，用于安全防护，防止栈溢出攻击。                                                                                      |
+| Parameter         | Type                            | Default | Description                                                                                                                                             |
+| ----------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `xlang`           | `bool`                          | `True`  | Use xlang mode. Set `False` for Python native mode.                                                                                                     |
+| `ref`             | `bool`                          | `False` | Enable reference tracking for shared/circular references. Disable for better performance if your data has no shared references.                         |
+| `strict`          | `bool`                          | `True`  | Require type registration for security. Keep this enabled for production unless a policy owns trust decisions.                                          |
+| `compatible`      | `bool \| None`                  | `None`  | Schema evolution mode. `None` follows the wire mode: xlang defaults to compatible mode, while native mode defaults to schema-consistent mode.           |
+| `max_depth`       | `int`                           | `50`    | Maximum deserialization depth for security, preventing stack overflow attacks.                                                                          |
+| `policy`          | `DeserializationPolicy \| None` | `None`  | Deserialization policy used for security checks. Strongly recommended when `strict=False`.                                                              |
+| `field_nullable`  | `bool`                          | `False` | Treat dataclass fields as nullable by default.                                                                                                          |
+| `meta_compressor` | `Any`                           | `None`  | Optional metadata compressor used for compatible-mode metadata encoding.                                                                                |
+| `fory_factory`    | `Callable \| None`              | `None`  | `ThreadSafeFory` factory hook. When set, `ThreadSafeFory` creates instances via this callback; otherwise it forwards `**kwargs` to `Fory` construction. |
 
-## 核心方法
+## Key Methods
 
 ```python
-# 序列化（serialize/deserialize 与 dumps/loads 完全相同）
+# Serialization (serialize/deserialize are identical to dumps/loads)
 data: bytes = fory.serialize(obj)
 obj = fory.deserialize(data)
 
-# 替代 API（别名）
+# Alternative API (aliases)
 data: bytes = fory.dumps(obj)
 obj = fory.loads(data)
 
-# 按 ID 注册类型（用于 Python 模式）
+# Type registration by id
 fory.register(MyClass, type_id=123)
 fory.register(MyClass, type_id=123, serializer=custom_serializer)
 
-# 按名称注册类型（用于跨语言模式）
+# Type registration by name
 fory.register(MyClass, typename="my.package.MyClass")
 fory.register(MyClass, typename="my.package.MyClass", serializer=custom_serializer)
 ```
 
-## 语言模式比较
+## Xlang And Native Mode Comparison
 
-| 特性            | Python 模式 (`xlang=False`)      | 跨语言模式 (`xlang=True`)          |
-| --------------- | -------------------------------- | ---------------------------------- |
-| **使用场景**    | 纯 Python 应用                   | 多语言系统                         |
-| **兼容性**      | 仅限 Python                      | Java、Go、Rust、C++、JavaScript 等 |
-| **支持的类型**  | 所有 Python 类型                 | 仅限跨语言兼容类型                 |
-| **函数/Lambda** | ✓ 支持                           | ✗ 不允许                           |
-| **本地类**      | ✓ 支持                           | ✗ 不允许                           |
-| **动态类**      | ✓ 支持                           | ✗ 不允许                           |
-| **Schema 演化** | ✓ 支持（需要 `compatible=True`） | ✓ 支持（需要 `compatible=True`）   |
-| **性能**        | 极快                             | 非常快                             |
-| **数据大小**    | 紧凑                             | 紧凑（带类型元数据）               |
+| Feature             | Native mode (`xlang=False`)                    | Xlang mode (default)                  |
+| ------------------- | ---------------------------------------------- | ------------------------------------- |
+| Use case            | Python-only applications                       | Multi-language systems                |
+| Compatibility       | Python only                                    | Java, Go, Rust, C++, JavaScript, etc. |
+| Supported types     | Python object surface                          | Cross-language compatible types       |
+| Functions/lambdas   | Supported with trusted dynamic deserialization | Not allowed                           |
+| Local classes       | Supported with trusted dynamic deserialization | Not allowed                           |
+| Dynamic classes     | Supported with trusted dynamic deserialization | Not allowed                           |
+| Schema mode default | Schema-consistent                              | Compatible                            |
 
-## Python 模式 (`xlang=False`)
+## Xlang Mode
 
-Python 模式支持所有 Python 类型，包括函数、类和闭包：
+Xlang mode is the default and restricts payloads to types compatible across Fory runtimes:
 
 ```python
 import pyfory
 
-# 完全 Python 兼容模式
+fory = pyfory.Fory(xlang=True, ref=True)
+fory.register(MyDataClass, typename="com.example.MyDataClass")
+data = fory.serialize(MyDataClass(field1="value", field2=42))
+```
+
+Use `compatible=False` only when every xlang peer updates schema together and you want
+schema-consistent xlang payloads.
+
+## Native Mode
+
+```python
+import pyfory
+
 fory = pyfory.Fory(xlang=False, ref=True, strict=False)
-
-# 支持所有 Python 对象：
-data = fory.dumps({
-    'function': lambda x: x * 2,        # 函数和 lambda
-    'class': type('Dynamic', (), {}),    # 动态类
-    'method': str.upper,                # 方法
-    'nested': {'circular_ref': None}    # 循环引用（当 ref=True 时）
-})
-
-# 可直接替代 pickle/cloudpickle
-import pickle
-obj = [1, 2, {"nested": [3, 4]}]
-assert fory.loads(fory.dumps(obj)) == pickle.loads(pickle.dumps(obj))
 ```
 
-## 跨语言模式 (`xlang=True`)
+Native mode supports Python-specific object features such as functions, local classes, methods,
+`__reduce__`, and `__getstate__`. It defaults to schema-consistent mode. Set
+`compatible=True` only when Python-only deployments need schema evolution.
 
-跨语言模式将类型限制为所有 Fory 实现间兼容的类型：
+## Example Configurations
+
+### Xlang Service
 
 ```python
 import pyfory
 
-# 跨语言兼容模式
-f = pyfory.Fory(xlang=True, ref=True)
-
-# 仅支持跨语言兼容类型
-f.register(MyDataClass, typename="com.example.MyDataClass")
-
-# 数据可以被 Java、Go、Rust 等读取
-data = f.serialize(MyDataClass(field1="value", field2=42))
-```
-
-## 示例配置
-
-### 生产环境配置
-
-```python
-import pyfory
-
-# 生产环境推荐设置
 fory = pyfory.Fory(
-    xlang=False,        # 如果需要跨语言支持则使用 True
-    ref=False,          # 如果有共享/循环引用则启用
-    strict=True,        # 关键：生产环境始终为 True
-    compatible=False,   # 仅在需要 schema 演化时启用
-    max_depth=20        # 根据数据结构深度调整
+    xlang=True,
+    ref=False,
+    strict=True,
+    max_depth=20,
 )
 
-# 预先注册所有类型
-fory.register(UserModel, type_id=100)
-fory.register(OrderModel, type_id=101)
-fory.register(ProductModel, type_id=102)
+fory.register(UserModel, typename="example.User")
 ```
 
-### 开发环境配置
+### Native Mode With Dynamic Types
 
 ```python
 import pyfory
 
-# 开发设置（更宽松）
 fory = pyfory.Fory(
     xlang=False,
     ref=True,
-    strict=False,    # 开发时允许任何类型
-    max_depth=1000   # 开发时更高的限制
+    strict=False,
+    max_depth=1000,
 )
 ```
 
-## 相关主题
+Use `strict=False` only for trusted data, preferably with a `policy=` deserialization policy.
 
-- [基础序列化](basic-serialization.md) - 使用已配置的 Fory
-- [类型注册](type-registration.md) - 注册模式
-- [安全性](security.md) - 安全最佳实践
+## Related Topics
+
+- [Basic Serialization](basic-serialization.md) - Using configured Fory
+- [Type Registration](type-registration.md) - Registration patterns
+- [Python Native Mode](python-native.md) - Python-only object serialization
+- [Security](security.md) - Security best practices

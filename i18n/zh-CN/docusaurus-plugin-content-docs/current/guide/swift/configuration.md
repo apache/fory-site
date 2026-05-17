@@ -1,5 +1,5 @@
 ---
-title: 配置
+title: Configuration
 sidebar_position: 2
 id: configuration
 license: |
@@ -19,81 +19,95 @@ license: |
   limitations under the License.
 ---
 
-本页介绍 `ForyConfig` 以及推荐的运行时配置。
+This page covers `Config` and recommended runtime presets.
 
-## ForyConfig
+## Config
 
-`Fory` 的配置结构如下：
+`Fory` is configured with:
 
 ```swift
-public struct ForyConfig {
-    public var xlang: Bool
-    public var trackRef: Bool
-    public var compatible: Bool
+public struct Config {
+  public let trackRef: Bool
+  public let compatible: Bool
+  public let checkClassVersion: Bool
+  public let maxCollectionSize: Int
+  public let maxBinarySize: Int
+  public let maxDepth: Int
 }
 ```
 
-默认配置：
+Default configuration:
 
 ```swift
-let fory = Fory() // xlang=true, trackRef=false, compatible=false
+let fory = Fory() // ref=false, compatible=true
 ```
 
-## 线程模型
+Swift supports the xlang wire format only, so there is no `xlang` option in
+`Config` or the `Fory` initializer.
 
-`Fory` 是单线程运行时，会在调用线程上复用一组读写上下文。建议每个线程复用一个实例，不要把同一个实例并发共享给多个线程。
+## Threading
 
-## 配置项
+`Fory` is single-threaded and optimized to reuse one read/write context pair on the calling thread.
+Reuse one instance per thread and do not use the same instance concurrently.
 
-### `xlang`
-
-控制是否启用跨语言协议模式。
-
-- `true`：使用 xlang 编码格式，默认值
-- `false`：使用 Swift 原生模式
-
-```swift
-let fory = Fory(xlang: true)
-```
+## Options
 
 ### `trackRef`
 
-为可跟踪引用的类型启用共享引用和循环引用跟踪。
+Enables shared/circular reference tracking for reference-trackable types.
 
-- `false`：不维护引用表，适合无环或纯值对象图
-- `true`：保留类对象图中的身份关系
+- `false`: No reference table (smaller/faster for acyclic or value-only graphs)
+- `true`: Preserve object identity for class/reference graphs
 
 ```swift
-let fory = Fory(xlang: true, trackRef: true)
+let fory = Fory(ref: true)
 ```
 
 ### `compatible`
 
-启用跨版本的兼容 Schema 模式。
+Enables compatible schema mode for evolution across versions.
 
-- `false`：Schema 一致模式，更严格，元信息开销更低
-- `true`：兼容模式，支持字段新增、删除和重排
+- `false`: Schema-consistent mode (stricter, lower metadata overhead)
+- `true`: Compatible mode (supports add/remove/reorder fields)
 
 ```swift
-let fory = Fory(xlang: true, trackRef: false, compatible: true)
+let fory = Fory()
 ```
 
-## 推荐配置
+### `checkClassVersion`
 
-### 本地严格 Schema
+Controls class-version validation in schema-consistent mode. When omitted, it
+defaults to `true` when `compatible=false` and `false` when `compatible=true`.
 
 ```swift
-let fory = Fory(xlang: false, trackRef: false, compatible: false)
+let fory = Fory(compatible: false, checkClassVersion: true)
 ```
 
-### 跨语言服务载荷
+### Size and Depth Limits
+
+`maxCollectionSize`, `maxBinarySize`, and `maxDepth` bound decoded payload size
+and nesting depth.
 
 ```swift
-let fory = Fory(xlang: true, trackRef: false, compatible: true)
+let fory = Fory(maxCollectionSize: 1_000_000, maxBinarySize: 64 * 1024 * 1024, maxDepth: 5)
 ```
 
-### 需要对象身份的图结构载荷
+## Recommended Presets
+
+### Local, strict schema
 
 ```swift
-let fory = Fory(xlang: true, trackRef: true, compatible: true)
+let fory = Fory(ref: false, compatible: false)
+```
+
+### Cross-language service payloads
+
+```swift
+let fory = Fory()
+```
+
+### Graph/object identity workloads
+
+```swift
+let fory = Fory(ref: true)
 ```

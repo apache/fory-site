@@ -1,6 +1,6 @@
 ---
-title: Schema 演化
-sidebar_position: 3
+title: Schema Evolution
+sidebar_position: 5
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,115 +19,127 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ 在 **Compatible 模式**下支持 schema 演化，允许序列化和反序列化双方拥有不同的类型定义。
+Apache Fory™ supports schema evolution in **Compatible mode**, allowing serialization and deserialization peers to have different type definitions.
 
-## Compatible 模式
+## Compatible Mode
 
-使用 `compatible(true)` 启用 schema 演化：
+Enable schema evolution with `compatible(true)`:
 
 ```cpp
 #include "fory/serialization/fory.h"
 
 using namespace fory::serialization;
 
-// 版本 1：原始 schema
+// Version 1: Original schema
 struct PersonV1 {
   std::string name;
   int32_t age;
 };
 FORY_STRUCT(PersonV1, name, age);
 
-// 版本 2：添加 email 字段
+// Version 2: Added email field
 struct PersonV2 {
   std::string name;
   int32_t age;
-  std::string email;  // 新字段
+  std::string email;  // NEW FIELD
 };
 FORY_STRUCT(PersonV2, name, age, email);
 
 int main() {
-  // 为每个 schema 版本创建单独的 Fory 实例
+  // Create separate Fory instances for each schema version
   auto fory_v1 = Fory::builder()
-      .compatible(true)  // 启用 schema 演化
       .xlang(true)
+      .compatible(true)  // Enable schema evolution
       .build();
 
   auto fory_v2 = Fory::builder()
-      .compatible(true)
       .xlang(true)
+      .compatible(true)
       .build();
 
-  // 使用相同的类型 ID 进行 schema 演化
+  // Register with the SAME type ID for schema evolution
   constexpr uint32_t PERSON_TYPE_ID = 100;
   fory_v1.register_struct<PersonV1>(PERSON_TYPE_ID);
   fory_v2.register_struct<PersonV2>(PERSON_TYPE_ID);
 
-  // 使用 V1 序列化
+  // Serialize with V1
   PersonV1 v1{"Alice", 30};
   auto bytes = fory_v1.serialize(v1).value();
 
-  // 反序列化为 V2 - email 获得默认值（空字符串）
+  // Deserialize as V2 - email gets default value (empty string)
   auto v2 = fory_v2.deserialize<PersonV2>(bytes).value();
   assert(v2.name == "Alice");
   assert(v2.age == 30);
-  assert(v2.email == "");  // 缺失字段的默认值
+  assert(v2.email == "");  // Default value for missing field
 
   return 0;
 }
 ```
 
-## Schema 演化特性
+### Disable Evolution for Stable Structs
 
-Compatible 模式支持以下 schema 变更：
-
-| 变更类型     | 支持 | 行为                         |
-| ------------ | ---- | ---------------------------- |
-| 添加新字段   | ✅   | 缺失字段使用默认值           |
-| 删除字段     | ✅   | 额外字段被跳过               |
-| 重排字段顺序 | ✅   | 按名称匹配字段，而非位置     |
-| 更改可空性   | ✅   | `T` ↔ `std::optional<T>`     |
-| 更改字段类型 | ❌   | 类型必须兼容                 |
-| 重命名字段   | ❌   | 字段名必须匹配（区分大小写） |
-
-## 添加字段（向后兼容）
-
-当使用具有额外字段的新 schema 反序列化旧数据时：
+If a struct schema is stable and will not change, you can disable evolution for that struct to avoid compatible metadata overhead. Use `FORY_STRUCT_EVOLVING` after `FORY_STRUCT`:
 
 ```cpp
-// 旧 schema (V1)
+struct StableMessage {
+  int32_t id;
+};
+FORY_STRUCT(StableMessage, id);
+FORY_STRUCT_EVOLVING(StableMessage, false);
+```
+
+## Schema Evolution Features
+
+Compatible mode supports the following schema changes:
+
+| Change Type        | Support       | Behavior                                |
+| ------------------ | ------------- | --------------------------------------- |
+| Add new fields     | Supported     | Missing fields use default values       |
+| Remove fields      | Supported     | Extra fields are skipped                |
+| Reorder fields     | Supported     | Fields matched by name, not position    |
+| Change nullability | Supported     | `T` ↔ `std::optional<T>`                |
+| Change field types | Not supported | Types must be compatible                |
+| Rename fields      | Not supported | Field names must match (case-sensitive) |
+
+## Adding Fields (Backward Compatibility)
+
+When deserializing old data with a new schema that has additional fields:
+
+```cpp
+// Old schema (V1)
 struct ProductV1 {
   std::string name;
   double price;
 };
 FORY_STRUCT(ProductV1, name, price);
 
-// 新 schema (V2) 带有额外字段
+// New schema (V2) with additional fields
 struct ProductV2 {
   std::string name;
   double price;
-  std::vector<std::string> tags;       // 新字段
-  std::map<std::string, std::string> attributes;  // 新字段
+  std::vector<std::string> tags;       // NEW
+  std::map<std::string, std::string> attributes;  // NEW
 };
 FORY_STRUCT(ProductV2, name, price, tags, attributes);
 
-// 序列化 V1
+// Serialize V1
 ProductV1 v1{"Laptop", 999.99};
 auto bytes = fory_v1.serialize(v1).value();
 
-// 反序列化为 V2
+// Deserialize as V2
 auto v2 = fory_v2.deserialize<ProductV2>(bytes).value();
 assert(v2.name == "Laptop");
 assert(v2.price == 999.99);
-assert(v2.tags.empty());        // 默认：空 vector
-assert(v2.attributes.empty());  // 默认：空 map
+assert(v2.tags.empty());        // Default: empty vector
+assert(v2.attributes.empty());  // Default: empty map
 ```
 
-## 删除字段（向前兼容）
+## Removing Fields (Forward Compatibility)
 
-当使用具有较少字段的旧 schema 反序列化新数据时：
+When deserializing new data with an old schema that has fewer fields:
 
 ```cpp
-// 完整 schema
+// Full schema
 struct UserFull {
   int64_t id;
   std::string username;
@@ -137,30 +149,30 @@ struct UserFull {
 };
 FORY_STRUCT(UserFull, id, username, email, password_hash, login_count);
 
-// 精简 schema（删除了 3 个字段）
+// Minimal schema (removed 3 fields)
 struct UserMinimal {
   int64_t id;
   std::string username;
 };
 FORY_STRUCT(UserMinimal, id, username);
 
-// 序列化完整版本
+// Serialize full version
 UserFull full{12345, "johndoe", "john@example.com", "hash123", 42};
 auto bytes = fory_full.serialize(full).value();
 
-// 反序列化为精简版本 - 额外字段被跳过
+// Deserialize as minimal - extra fields are skipped
 auto minimal = fory_minimal.deserialize<UserMinimal>(bytes).value();
 assert(minimal.id == 12345);
 assert(minimal.username == "johndoe");
-// email、password_hash、login_count 被跳过
+// email, password_hash, login_count are skipped
 ```
 
-## 字段重排
+## Field Reordering
 
-在 compatible 模式下，字段按名称匹配，而非位置：
+In compatible mode, fields are matched by name, not by position:
 
 ```cpp
-// 原始字段顺序
+// Original field order
 struct ConfigOriginal {
   std::string host;
   int32_t port;
@@ -169,20 +181,20 @@ struct ConfigOriginal {
 };
 FORY_STRUCT(ConfigOriginal, host, port, enable_ssl, protocol);
 
-// 重排后的字段
+// Reordered fields
 struct ConfigReordered {
-  bool enable_ssl;      // 移到第一位
-  std::string protocol; // 移到第二位
-  std::string host;     // 移到第三位
-  int32_t port;         // 移到最后
+  bool enable_ssl;      // Moved to first
+  std::string protocol; // Moved to second
+  std::string host;     // Moved to third
+  int32_t port;         // Moved to last
 };
 FORY_STRUCT(ConfigReordered, enable_ssl, protocol, host, port);
 
-// 使用原始顺序序列化
+// Serialize with original order
 ConfigOriginal orig{"localhost", 8080, true, "https"};
 auto bytes = fory_orig.serialize(orig).value();
 
-// 使用不同字段顺序反序列化 - 正常工作
+// Deserialize with different field order - works correctly
 auto reordered = fory_reord.deserialize<ConfigReordered>(bytes).value();
 assert(reordered.host == "localhost");
 assert(reordered.port == 8080);
@@ -190,9 +202,9 @@ assert(reordered.enable_ssl == true);
 assert(reordered.protocol == "https");
 ```
 
-## 嵌套结构体演化
+## Nested Struct Evolution
 
-Schema 演化递归支持嵌套结构体：
+Schema evolution works recursively for nested structs:
 
 ```cpp
 // V1 Address
@@ -202,31 +214,31 @@ struct AddressV1 {
 };
 FORY_STRUCT(AddressV1, street, city);
 
-// V2 Address 带有新字段
+// V2 Address with new fields
 struct AddressV2 {
   std::string street;
   std::string city;
-  std::string country;  // 新字段
-  std::string zipcode;  // 新字段
+  std::string country;  // NEW
+  std::string zipcode;  // NEW
 };
 FORY_STRUCT(AddressV2, street, city, country, zipcode);
 
-// V1 Employee 使用 V1 Address
+// V1 Employee with V1 Address
 struct EmployeeV1 {
   std::string name;
   AddressV1 home_address;
 };
 FORY_STRUCT(EmployeeV1, name, home_address);
 
-// V2 Employee 使用 V2 Address 和新字段
+// V2 Employee with V2 Address and new field
 struct EmployeeV2 {
   std::string name;
-  AddressV2 home_address;  // 嵌套结构体已演化
-  std::string employee_id; // 新字段
+  AddressV2 home_address;  // Nested struct evolved
+  std::string employee_id; // NEW
 };
 FORY_STRUCT(EmployeeV2, name, home_address, employee_id);
 
-// 使用相同 ID 注册类型
+// Register types with same IDs
 constexpr uint32_t ADDRESS_TYPE_ID = 100;
 constexpr uint32_t EMPLOYEE_TYPE_ID = 101;
 
@@ -235,170 +247,170 @@ fory_v1.register_struct<EmployeeV1>(EMPLOYEE_TYPE_ID);
 fory_v2.register_struct<AddressV2>(ADDRESS_TYPE_ID);
 fory_v2.register_struct<EmployeeV2>(EMPLOYEE_TYPE_ID);
 
-// 序列化 V1
+// Serialize V1
 EmployeeV1 emp_v1{"Jane Doe", {"123 Main St", "NYC"}};
 auto bytes = fory_v1.serialize(emp_v1).value();
 
-// 反序列化为 V2
+// Deserialize as V2
 auto emp_v2 = fory_v2.deserialize<EmployeeV2>(bytes).value();
 assert(emp_v2.name == "Jane Doe");
 assert(emp_v2.home_address.street == "123 Main St");
 assert(emp_v2.home_address.city == "NYC");
-assert(emp_v2.home_address.country == "");  // 默认值
-assert(emp_v2.home_address.zipcode == "");  // 默认值
-assert(emp_v2.employee_id == "");           // 默认值
+assert(emp_v2.home_address.country == "");  // Default
+assert(emp_v2.home_address.zipcode == "");  // Default
+assert(emp_v2.employee_id == "");           // Default
 ```
 
-## 双向演化
+## Bidirectional Evolution
 
-Schema 演化双向工作：
+Schema evolution works in both directions:
 
 ```cpp
-// V2 -> V1（降级）
+// V2 -> V1 (downgrade)
 PersonV2 v2{"Charlie", 35, "charlie@example.com"};
 auto bytes = fory_v2.serialize(v2).value();
 
 auto v1 = fory_v1.deserialize<PersonV1>(bytes).value();
 assert(v1.name == "Charlie");
 assert(v1.age == 35);
-// email 字段在反序列化时被丢弃
+// email field is discarded during deserialization
 ```
 
-## 默认值
+## Default Values
 
-当字段缺失时，使用 C++ 默认初始化：
+When fields are missing, C++ default initialization is used:
 
-| 类型                   | 默认值         |
-| ---------------------- | -------------- |
-| `int8_t`、`int16_t`... | `0`            |
-| `float`、`double`      | `0.0`          |
-| `bool`                 | `false`        |
-| `std::string`          | `""`           |
-| `std::vector<T>`       | 空 vector      |
-| `std::map<K,V>`        | 空 map         |
-| `std::set<T>`          | 空 set         |
-| `std::optional<T>`     | `std::nullopt` |
-| 结构体类型             | 默认构造       |
+| Type                   | Default Value       |
+| ---------------------- | ------------------- |
+| `int8_t`, `int16_t`... | `0`                 |
+| `float`, `double`      | `0.0`               |
+| `bool`                 | `false`             |
+| `std::string`          | `""`                |
+| `std::vector<T>`       | Empty vector        |
+| `std::map<K,V>`        | Empty map           |
+| `std::set<T>`          | Empty set           |
+| `std::optional<T>`     | `std::nullopt`      |
+| Struct types           | Default-constructed |
 
-## SchemaConsistent 模式（默认）
+## Schema Consistent Mode
 
-不使用 compatible 模式时，schema 必须完全匹配：
+Without compatible mode, schemas must match exactly. In xlang mode, compatible mode is the default, so disable it explicitly only when schemas do not change or all services deploy schema changes at the same time:
 
 ```cpp
-// 严格模式（默认）
+// Strict schema-consistent mode
 auto fory = Fory::builder()
-    .compatible(false)  // 默认：schema 必须匹配
     .xlang(true)
+    .compatible(false)
     .build();
 
-// 序列化/反序列化要求相同的 schema
-// Schema 不匹配可能导致错误或未定义行为
+// Serialization/deserialization requires identical schemas
+// Schema mismatches may cause errors or undefined behavior
 ```
 
-**何时使用 SchemaConsistent 模式：**
+**Use SchemaConsistent mode when:**
 
-- Schema 保证匹配（相同的二进制版本）
-- 需要最高性能（更少的元数据开销）
-- 您同时控制序列化和反序列化
+- Schemas are guaranteed to match (same binary version)
+- Maximum performance is required (less metadata overhead)
+- You control both serialization and deserialization
 
-**何时使用 Compatible 模式：**
+**Use Compatible mode when:**
 
-- Schema 可能独立演化
-- 需要跨版本兼容性
-- 不同服务可能有不同的 schema 版本
+- Schemas may evolve independently
+- Cross-version compatibility is required
+- Different services may have different schema versions
 
-## 类型 ID 要求
+## Type ID Requirements
 
-要使 schema 演化正常工作：
+For schema evolution to work:
 
-1. **相同类型 ID**：同一结构体的不同版本必须使用相同的类型 ID
-2. **一致的 ID**：类型 ID 必须在所有 Fory 实例中保持一致
-3. **注册所有版本**：每个 Fory 实例注册自己的结构体版本
+1. **Same Type ID**: Different versions of the same struct must use the same type ID
+2. **Consistent IDs**: Type IDs must be consistent across all Fory instances
+3. **Register All Versions**: Each Fory instance registers its own struct version
 
 ```cpp
 constexpr uint32_t PERSON_TYPE_ID = 100;
 
-// 实例 1 使用 PersonV1
+// Instance 1 uses PersonV1
 fory_v1.register_struct<PersonV1>(PERSON_TYPE_ID);
 
-// 实例 2 使用 PersonV2
+// Instance 2 uses PersonV2
 fory_v2.register_struct<PersonV2>(PERSON_TYPE_ID);
 
-// 相同的类型 ID 启用 schema 演化
+// Same type ID enables schema evolution
 ```
 
-## 最佳实践
+## Best Practices
 
-### 1. 为演化做规划
+### 1. Plan for Evolution
 
-设计 schema 时考虑未来的变更：
+Design schemas with future changes in mind:
 
 ```cpp
-// 好的做法：对可能删除的字段使用 optional
+// Good: Use optional for fields that might be removed
 struct Config {
   std::string host;
   int32_t port;
-  std::optional<std::string> deprecated_field;  // 以后可以删除
+  std::optional<std::string> deprecated_field;  // Can be removed later
 };
 ```
 
-### 2. 使用有意义的默认值
+### 2. Use Meaningful Default Values
 
-考虑新字段使用什么默认值才有意义：
+Consider what default values make sense for new fields:
 
 ```cpp
 struct Settings {
-  int32_t timeout_ms;      // 默认：0（可能需要一个合理的默认值）
-  bool enabled;            // 默认：false
-  std::string mode;        // 默认：""（可能需要 "default"）
+  int32_t timeout_ms;      // Default: 0 (might want a sensible default)
+  bool enabled;            // Default: false
+  std::string mode;        // Default: "" (might want "default")
 };
 ```
 
-### 3. 记录 Schema 版本
+### 3. Document Schema Versions
 
-跟踪 schema 变更以便调试：
+Track schema changes for debugging:
 
 ```cpp
-// V1：初始 schema（2024-01-01）
-// V2：添加 email 字段（2024-02-01）
-// V3：添加 phone、address 字段（2024-03-01）
+// V1: Initial schema (2024-01-01)
+// V2: Added email field (2024-02-01)
+// V3: Added phone, address fields (2024-03-01)
 ```
 
-### 4. 测试演化路径
+### 4. Test Evolution Paths
 
-测试升级和降级场景：
+Test both upgrade and downgrade scenarios:
 
 ```cpp
-// 测试 V1 -> V2
-// 测试 V2 -> V1
-// 测试 V1 -> V3
-// 测试 V3 -> V1
+// Test V1 -> V2
+// Test V2 -> V1
+// Test V1 -> V3
+// Test V3 -> V1
 ```
 
-## 跨语言 Schema 演化
+## Cross-Language Schema Evolution
 
-使用 xlang 模式时，schema 演化跨语言工作：
+Schema evolution works across languages when using xlang mode:
 
 ```cpp
-// 使用 compatible 模式的 C++
+// C++ with compatible mode
 auto fory = Fory::builder()
-    .compatible(true)
     .xlang(true)
+    .compatible(true)
     .build();
 ```
 
 ```java
-// 使用 compatible 模式的 Java
+// Java with compatible mode
 Fory fory = Fory.builder()
-    .withCompatibleMode(CompatibleMode.COMPATIBLE)
-    .withLanguage(Language.XLANG)
+    .withXlang(true)
+    .withCompatible(true)
     .build();
 ```
 
-即使 schema 版本不同，两个实例也可以交换数据。
+Both instances can exchange data even with different schema versions.
 
-## 相关主题
+## Related Topics
 
-- [配置](configuration.md) - 启用 compatible 模式
-- [类型注册](type-registration.md) - 类型 ID 管理
-- [跨语言](cross-language.md) - 跨语言注意事项
+- [Configuration](configuration.md) - Enabling compatible mode
+- [Type Registration](type-registration.md) - Type ID management
+- [Cross-Language](cross-language.md) - Cross-language considerations

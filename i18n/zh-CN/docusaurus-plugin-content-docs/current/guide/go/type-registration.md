@@ -1,6 +1,6 @@
 ---
-title: 类型注册
-sidebar_position: 30
+title: Type Registration
+sidebar_position: 40
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-类型注册用于告知 Fory 如何识别并序列化你的自定义类型。对于结构体、枚举和扩展类型，注册是必需的。
+Type registration tells Fory how to identify and serialize your custom types. Registration is required for struct, enum, and extension types.
 
-## 为什么要注册类型？
+## Why Register Types?
 
-1. **类型识别**：反序列化时，Fory 需要知道实际类型
-2. **多态支持**：反序列化接口类型时，Fory 需要知道要创建哪个具体类型
-3. **跨语言兼容**：其他语言实现需要识别并反序列化你的类型
+1. **Type Identification**: Fory needs to identify the actual type during deserialization
+2. **Polymorphism**: When deserializing interface types, Fory must know which concrete type to create
+3. **Cross-Language Compatibility**: Other languages need to recognize and deserialize your types
 
-## 结构体注册
+## Struct Registration
 
-### 通过 ID 注册
+### Register by ID
 
-使用数值类型 ID 注册结构体，可获得更紧凑的序列化结果：
+Register a struct with a numeric type ID for compact serialization:
 
 ```go
 type User struct {
@@ -39,42 +39,42 @@ type User struct {
     Name string
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 err := f.RegisterStruct(User{}, 1)
 if err != nil {
     panic(err)
 }
 ```
 
-**ID 使用建议**：
+**ID Guidelines**:
 
-- ID 在应用内必须唯一
-- 若用于跨语言，所有语言中的 ID 必须一致
-- 序列化端和反序列化端必须为同一类型使用同一 ID
+- IDs must be unique within your application
+- IDs must be consistent across all languages for cross-language serialization
+- Use the same ID for the same type in serializer and deserializer
 
-### 通过名称注册
+### Register by Name
 
-使用类型名字符串注册结构体。该方式更灵活，但序列化开销更高：
+Register a struct with a type name string. This is more flexible but has higher serialization cost:
 
 ```go
-f := fory.New()
-err := f.RegisterNamedStruct(User{}, "example.User")
+f := fory.New(fory.WithXlang(true))
+err := f.RegisterStructByName(User{}, "example.User")
 if err != nil {
     panic(err)
 }
 ```
 
-**名称使用建议**：
+**Name Guidelines**:
 
-- 使用 `namespace.TypeName` 约定的全限定名
-- 名称在所有语言中必须唯一且一致
-- 名称区分大小写
+- Use fully-qualified names following `namespace.TypeName` convention
+- Names must be unique and consistent across all languages
+- Names are case-sensitive
 
-## 枚举注册
+## Enum Registration
 
-Go 没有原生枚举类型，但可以把整数类型按枚举注册。
+Go doesn't have native enums, but you can register integer types as enums:
 
-### 通过 ID 注册
+### Register by ID
 
 ```go
 type Status int32
@@ -85,39 +85,39 @@ const (
     StatusComplete Status = 2
 )
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 err := f.RegisterEnum(Status(0), 1)
 ```
 
-### 通过名称注册
+### Register by Name
 
 ```go
-err := f.RegisterNamedEnum(Status(0), "example.Status")
+err := f.RegisterEnumByName(Status(0), "example.Status")
 ```
 
-## 扩展类型
+## Extension Types
 
-对于需要自定义序列化逻辑的类型，可将其注册为扩展类型，并提供自定义序列化器：
+For types requiring custom serialization logic, register as extension types with a custom serializer:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register by ID
 err := f.RegisterExtension(CustomType{}, 1, &CustomSerializer{})
 
 // Or register by name
-err = f.RegisterNamedExtension(CustomType{}, "example.Custom", &CustomSerializer{})
+err = f.RegisterExtensionByName(CustomType{}, "example.Custom", &CustomSerializer{})
 ```
 
-关于 `ExtensionSerializer` 接口实现，请参考 [自定义序列化器](custom-serializers.md)。
+See [Custom Serializers](custom-serializers.md) for details on implementing the `ExtensionSerializer` interface.
 
-## 注册作用域
+## Registration Scope
 
-类型注册是 **Fory 实例级别** 的：
+Type registration is per-Fory-instance:
 
 ```go
-f1 := fory.New()
-f2 := fory.New()
+f1 := fory.New(fory.WithXlang(true))
+f2 := fory.New(fory.WithXlang(true))
 
 // Types registered on f1 are NOT available on f2
 f1.RegisterStruct(User{}, 1)
@@ -126,12 +126,12 @@ f1.RegisterStruct(User{}, 1)
 f2.RegisterStruct(User{}, 1)
 ```
 
-## 注册时机
+## Registration Timing
 
-应在创建 Fory 实例后、首次序列化/反序列化之前完成类型注册：
+Register types after creating a Fory instance and before any serialize/deserialize calls:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register before use
 f.RegisterStruct(User{}, 1)
@@ -141,9 +141,9 @@ f.RegisterStruct(Order{}, 2)
 data, _ := f.Serialize(&User{ID: 1, Name: "Alice"})
 ```
 
-## 嵌套类型注册
+## Nested Type Registration
 
-对象图中的所有结构体类型（包括嵌套类型）都应注册：
+Register all struct types in the object graph, including nested types:
 
 ```go
 type Address struct {
@@ -156,20 +156,20 @@ type Person struct {
     Address Address
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // Register ALL struct types used in the object graph
 f.RegisterStruct(Address{}, 1)
 f.RegisterStruct(Person{}, 2)
 ```
 
-## 跨语言注册
+## Cross-Language Registration
 
-进行跨语言序列化时，必须在所有语言中保持一致注册。
+For cross-language serialization, types must be registered consistently across all languages.
 
-### 使用 ID
+### Using IDs
 
-所有语言使用同一个数值 ID：
+All languages use the same numeric ID:
 
 **Go**:
 
@@ -189,14 +189,14 @@ fory.register(User.class, 1);
 fory.register(User, type_id=1)
 ```
 
-### 使用名称
+### Using Names
 
-所有语言使用同一个类型名：
+All languages use the same type name:
 
 **Go**:
 
 ```go
-f.RegisterNamedStruct(User{}, "example.User")
+f.RegisterStructByName(User{}, "example.User")
 ```
 
 **Java**:
@@ -214,47 +214,51 @@ fory.register(User, typename="example.User")
 **Rust**:
 
 ```rust
-#[derive(Fory)]
+use fory::{Fory, ForyObject};
+
+#[derive(ForyObject)]
 struct User {
     id: i64,
     name: String,
 }
 
 let mut fory = Fory::default();
-fory.register_by_name::<User>("example.User")?;
+fory.register_by_name::<User>("example", "User")?;
 ```
 
-## 最佳实践
+## Best Practices
 
-1. **尽早注册**：应用启动后、任何序列化操作前完成全部类型注册
-2. **保持一致**：所有语言与实例中使用一致的 ID 或名称
-3. **注册完整**：不仅注册顶层类型，也要注册嵌套结构体
-4. **性能优先时用 ID**：数值 ID 比名称开销更低
-5. **灵活性优先时用名称**：名称更易维护，也更不易冲突
+1. **Register early**: Register all types at application startup before any serialization
+2. **Be consistent**: Use the same ID or name across all languages and all instances
+3. **Register all types**: Include nested struct types, not just top-level types
+4. **Prefer IDs for performance**: Numeric IDs have lower serialization overhead than names
+5. **Use names for flexibility**: Names are easier to manage and less prone to conflicts
 
-## 常见错误
+## Common Errors
 
-### 类型未注册
+### Unregistered Type
 
 ```
 error: unknown type encountered
 ```
 
-**解决方式**：在序列化/反序列化前先注册类型。
+**Solution**: Register the type before serialization/deserialization.
 
-### ID/名称不匹配
+### ID/Name Mismatch
 
-用某个 ID/名称序列化的数据，若在反序列化端使用不同 ID/名称注册，将无法正确反序列化。
+Data serialized with one ID or name cannot be deserialized if registered with a different ID or name.
 
-**解决方式**：确保序列化端与反序列化端使用一致的 ID 或名称。
+**Solution**: Use consistent IDs or names across serializer and deserializer.
 
-### 重复注册
+### Duplicate Registration
 
-两个类型使用同一 ID 会发生冲突。
+Two types registered with the same ID will conflict.
 
-**解决方式**：确保每个类型使用唯一 ID。
+**Solution**: Ensure unique IDs for each type.
 
-## 相关主题
+## Related Topics
 
-- [基本序列化](basic-serialization.md)
-- [跨语言序列化](cross-language.md)
+- [Basic Serialization](basic-serialization.md)
+- [Cross-Language Serialization](cross-language.md)
+- [Supported Types](supported-types.md)
+- [Troubleshooting](troubleshooting.md)

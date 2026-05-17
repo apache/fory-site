@@ -1,6 +1,6 @@
 ---
-title: 跨语言序列化
-sidebar_position: 8
+title: Cross-Language Serialization
+sidebar_position: 3
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,11 +19,13 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ C# 支持与其他 Fory 运行时进行跨语言序列化。
+Apache Fory™ C# supports cross-language serialization with other Fory runtimes.
 
-## 跨语言运行时
+## Cross-Language Runtime
 
-C# 始终会读写 xlang 帧头。它没有单独的 `Xlang(...)` 构建器选项，因此互操作代码只需要配置兼容模式、引用跟踪等其余运行时行为。
+C# always writes and reads the xlang frame header. There is no mode switch, so interoperability code
+only needs to configure the remaining runtime behavior such as compatibility mode and reference
+tracking.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -31,7 +33,7 @@ Fory fory = Fory.Builder()
     .Build();
 ```
 
-## 使用稳定 ID 注册
+## Register with Stable IDs
 
 ```csharp
 [ForyObject]
@@ -48,36 +50,36 @@ Fory fory = Fory.Builder()
 fory.Register<Person>(100);
 ```
 
-请在所有语言中保持相同的 ID 映射。
+Use the same ID mapping on all languages.
 
-## 按命名空间和类型名注册
+## Register by Namespace/Type Name
 
 ```csharp
 fory.Register<Person>("com.example", "Person");
 ```
 
-## 跨语言示例
+## Cross-Language Example
 
-### C#（序列化端）
+### C# (Serializer)
 
 ```csharp
 Person person = new() { Name = "Alice", Age = 30 };
 byte[] payload = fory.Serialize(person);
 ```
 
-### Java（反序列化端）
+### Java (Deserializer)
 
 ```java
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
-    .withRefTracking(true)
+        .withXlang(true)
+        .withRefTracking(true)
     .build();
 
 fory.register(Person.class, 100);
 Person value = (Person) fory.deserialize(payloadFromCSharp);
 ```
 
-### Python（反序列化端）
+### Python (Deserializer)
 
 ```python
 import pyfory
@@ -87,19 +89,43 @@ fory.register_type(Person, type_id=100)
 value = fory.deserialize(payload_from_csharp)
 ```
 
-## 类型映射参考
+## Type Mapping Reference
 
-完整映射请参见 [xlang 指南](../xlang/)。
+See [xlang guide](../xlang/index.md) for complete mapping.
 
-## 最佳实践
+For reduced-precision numeric payloads, use `Half` / `Half[]` or `List<Half>` for xlang `float16`, and `BFloat16` / `BFloat16[]` or `List<BFloat16>` for xlang `bfloat16`.
 
-1. 保持 type ID 稳定并做好文档记录。
-2. 在滚动升级时启用 `Compatible(true)`。
-3. 在读写两端都注册所有用户类型。
-4. 用真实载荷做端到端回环验证。
+## Lists and Dense Arrays
 
-## 相关主题
+C# `List<T>` maps to Fory `list<T>`. Use the schema marker
+`Apache.Fory.Schema.Types.Array<T>` when a field is dense `array<T>`.
 
-- [类型注册](type_registration)
-- [Schema 演进](schema_evolution)
-- [支持的类型](supported_types)
+| Fory schema       | C# schema marker sketch |
+| ----------------- | ----------------------- |
+| `list<int32>`     | `S.List<S.Int32>`       |
+| `array<bool>`     | `S.Array<S.Bool>`       |
+| `array<int8>`     | `S.Array<S.Int8>`       |
+| `array<int16>`    | `S.Array<S.Int16>`      |
+| `array<int32>`    | `S.Array<S.Int32>`      |
+| `array<int64>`    | `S.Array<S.Int64>`      |
+| `array<uint8>`    | `S.Array<S.UInt8>`      |
+| `array<uint16>`   | `S.Array<S.UInt16>`     |
+| `array<uint32>`   | `S.Array<S.UInt32>`     |
+| `array<uint64>`   | `S.Array<S.UInt64>`     |
+| `array<float16>`  | `S.Array<S.Float16>`    |
+| `array<bfloat16>` | `S.Array<S.BFloat16>`   |
+| `array<float32>`  | `S.Array<S.Float32>`    |
+| `array<float64>`  | `S.Array<S.Float64>`    |
+
+## Best Practices
+
+1. Keep type IDs stable and documented.
+2. Enable `Compatible(true)` for rolling upgrades.
+3. Register all user types on both read/write peers.
+4. Validate integration with real payload round trips.
+
+## Related Topics
+
+- [Type Registration](type-registration.md)
+- [Schema Evolution](schema-evolution.md)
+- [Supported Types](supported-types.md)

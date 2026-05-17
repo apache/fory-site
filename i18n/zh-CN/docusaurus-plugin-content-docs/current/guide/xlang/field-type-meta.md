@@ -1,5 +1,5 @@
 ---
-title: 字段类型元信息
+title: Field Type Meta
 sidebar_position: 46
 id: field_type_meta
 license: |
@@ -19,16 +19,16 @@ license: |
   limitations under the License.
 ---
 
-字段类型元信息配置用于控制结构体字段序列化时是否写入类型信息。 This is essential for supporting polymorphism where the actual runtime type may differ from the declared field type.
+Field type meta configuration controls whether type information is written during serialization for struct fields. This is essential for supporting polymorphism where the actual runtime type may differ from the declared field type.
 
-## 概述
+## Overview
 
 When serializing a struct field, Fory needs to determine whether to write type metadata:
 
 - **Static typing**: Use the declared field type's serializer directly (no type info written)
 - **Dynamic typing**: Write type information to support runtime subtypes
 
-## 何时需要类型元信息
+## When Type Meta Is Needed
 
 Type metadata is required when:
 
@@ -42,7 +42,7 @@ Type metadata is NOT needed when:
 2. **Primitive types**: Type is known at compile time
 3. **Performance optimization**: When you know the runtime type always matches the declared type
 
-## 各语言配置
+## Language-Specific Configuration
 
 ### Java
 
@@ -85,9 +85,7 @@ public class Container {
 
 ### C++
 
-C++ uses the `fory::dynamic<V>` template tag or `.dynamic(bool)` builder method:
-
-**Using `fory::field<>` template**:
+C++ uses the `.dynamic(bool)` builder method inside `FORY_STRUCT`:
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -100,29 +98,15 @@ struct Animal {
 
 struct Zoo {
     // Auto: type info written because Animal is polymorphic (std::is_polymorphic)
-    fory::field<std::shared_ptr<Animal>, 0, fory::nullable> animal;
+    std::shared_ptr<Animal> animal;
 
     // Force non-dynamic: skip type info even though Animal is polymorphic
-    fory::field<std::shared_ptr<Animal>, 1, fory::nullable, fory::dynamic<false>> fixed_animal;
+    std::shared_ptr<Animal> fixed_animal;
 
     // Force dynamic: write type info even for non-polymorphic types
-    fory::field<std::shared_ptr<Data>, 2, fory::dynamic<true>> polymorphic_data;
-};
-FORY_STRUCT(Zoo, animal, fixed_animal, polymorphic_data);
-```
-
-**Using `FORY_FIELD_CONFIG` macro**:
-
-```cpp
-struct Zoo {
-    std::shared_ptr<Animal> animal;
-    std::shared_ptr<Animal> fixed_animal;
     std::shared_ptr<Data> polymorphic_data;
 };
-
-FORY_STRUCT(Zoo, animal, fixed_animal, polymorphic_data);
-
-FORY_FIELD_CONFIG(Zoo,
+FORY_STRUCT(Zoo,
     (animal, fory::F(0).nullable()),                    // Auto-detect polymorphism
     (fixed_animal, fory::F(1).nullable().dynamic(false)), // Skip type info
     (polymorphic_data, fory::F(2).dynamic(true))        // Force type info
@@ -200,7 +184,7 @@ class Container:
 - **Native mode**: `dynamic` defaults to `True` for object types, `False` for numeric/str/time types
 - **Xlang mode**: `dynamic` defaults to `False` for concrete types
 
-## 默认行为
+## Default Behavior
 
 | Language | Interface/Abstract Types | Concrete Types   |
 | -------- | ------------------------ | ---------------- |
@@ -286,9 +270,7 @@ struct Zoo {
     std::shared_ptr<Dog> maybe_mixed_breed;
 };
 
-FORY_STRUCT(Zoo, animal, maybe_mixed_breed);
-
-FORY_FIELD_CONFIG(Zoo,
+FORY_STRUCT(Zoo,
     (animal, fory::F(0).nullable()),              // Auto-detect (Animal is polymorphic)
     (maybe_mixed_breed, fory::F(1).dynamic(true)) // Force dynamic for concrete type
 );
@@ -296,6 +278,6 @@ FORY_FIELD_CONFIG(Zoo,
 
 ## Related Topics
 
-- [Field Nullability](field_nullability) - Controlling null handling for fields
-- [Field Reference Tracking](reference_tracking) - Managing shared/circular references
-- [Type Mapping](../../specification/xlang_type_mapping) - Cross-language type compatibility
+- [Field Nullability](field-nullability.md) - Controlling null handling for fields
+- [Field Reference Tracking](field-reference-tracking.md) - Managing shared/circular references
+- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type compatibility

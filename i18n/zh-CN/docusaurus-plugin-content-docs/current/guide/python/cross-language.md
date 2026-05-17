@@ -1,6 +1,6 @@
 ---
-title: 跨语言序列化
-sidebar_position: 10
+title: Cross-Language Serialization
+sidebar_position: 4
 id: cross_language
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,42 +19,41 @@ license: |
   limitations under the License.
 ---
 
-`pyfory` 支持跨语言对象图序列化，允许您在 Python 中序列化数据，并在 Java、Go、Rust 或其他支持的语言中反序列化。
+`pyfory` supports cross-language object graph serialization, allowing you to serialize data in Python and deserialize it in Java, Go, Rust, or other supported languages.
 
-## 启用跨语言模式
+## Create an Xlang Runtime
 
-要使用 xlang 模式，创建 `Fory` 时设置 `xlang=True`：
+Python defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
 
 ```python
 import pyfory
 fory = pyfory.Fory(xlang=True, ref=False, strict=True)
 ```
 
-## 跨语言示例
+## Cross-Language Example
 
-### Python（序列化器）
+### Python (Serializer)
 
 ```python
 import pyfory
 from dataclasses import dataclass
 
-# 跨语言模式实现互操作性
 f = pyfory.Fory(xlang=True, ref=True)
 
-# 注册类型以实现跨语言兼容性
+# Register type for cross-language compatibility
 @dataclass
 class Person:
     name: str
-    age: pyfory.int32
+    age: pyfory.Int32
 
 f.register(Person, typename="example.Person")
 
 person = Person("Charlie", 35)
 binary_data = f.serialize(person)
-# binary_data 现在可以发送到 Java、Go 等
+# binary_data can now be sent to Java, Go, etc.
 ```
 
-### Java（反序列化器）
+### Java (Deserializer)
 
 ```java
 import org.apache.fory.*;
@@ -65,7 +64,7 @@ public class Person {
 }
 
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)
+    .withXlang(true)
     .withRefTracking(true)
     .build();
 
@@ -73,7 +72,7 @@ fory.register(Person.class, "example.Person");
 Person person = (Person) fory.deserialize(binaryData);
 ```
 
-### Rust（反序列化器）
+### Rust (Deserializer)
 
 ```rust
 use fory::Fory;
@@ -85,56 +84,125 @@ struct Person {
     age: i32,
 }
 
-let mut fory = Fory::default()
-    .compatible(true)
-    .xlang(true);
+let mut fory = Fory::builder().xlang(true).build();
 
-fory.register_by_namespace::<Person>("example", "Person");
+fory.register_by_name::<Person>("example", "Person");
 let person: Person = fory.deserialize(&binary_data)?;
 ```
 
-## 跨语言的类型注解
+## Type Annotations for Cross-Language
 
-使用 pyfory 类型注解进行显式跨语言类型映射：
+Use pyfory type annotations for explicit cross-language type mapping:
 
 ```python
 from dataclasses import dataclass
+from typing import Dict, List
 import pyfory
 
 @dataclass
 class TypedData:
-    int_value: pyfory.int32      # 32 位整数
-    long_value: pyfory.int64     # 64 位整数
-    float_value: pyfory.float32  # 32 位浮点数
-    double_value: pyfory.float64 # 64 位浮点数
+    int_value: pyfory.Int32       # 32-bit integer
+    long_value: pyfory.Int64      # 64-bit integer
+    float_value: pyfory.Float32   # 32-bit float
+    double_value: pyfory.Float64  # 64-bit float
+    values: Dict[pyfory.Int32, List[pyfory.Int64]]
 ```
 
-## 类型映射
+Nested collection annotations are part of the field schema. Compatible-mode
+reads consume bytes with the remote schema metadata, then assign only when the
+decoded value safely satisfies the local schema.
 
-| Python           | Java     | Rust      | Go        |
-| ---------------- | -------- | --------- | --------- |
-| `str`            | `String` | `String`  | `string`  |
-| `int`            | `long`   | `i64`     | `int64`   |
-| `pyfory.int32`   | `int`    | `i32`     | `int32`   |
-| `pyfory.int64`   | `long`   | `i64`     | `int64`   |
-| `float`          | `double` | `f64`     | `float64` |
-| `pyfory.float32` | `float`  | `f32`     | `float32` |
-| `list`           | `List`   | `Vec`     | `[]T`     |
-| `dict`           | `Map`    | `HashMap` | `map[K]V` |
+## Reduced-Precision Types
 
-## 与 Python 原生模式的区别
+`pyfory.Float16` and `pyfory.BFloat16` are reserved annotation markers for xlang
+reduced-precision fields. They are not runtime value classes; scalar values deserialize as native
+Python `float`.
 
-二进制协议和 API 与 `pyfory` 的 Python 原生模式类似，但 Python 原生模式可以序列化任何 Python 对象——包括全局函数、局部函数、lambda、局部类以及使用 `__getstate__/__reduce__/__reduce_ex__` 自定义序列化的类型，这些在 xlang 模式中**不允许**。
+Dense reduced-precision arrays use public dense wrappers with list-like sequence behavior. Construct them from Python
+numeric values with `pyfory.Float16Array.from_values([...])` or
+`pyfory.BFloat16Array.from_values([...])`. Use `from_buffer(...)` and `to_buffer()` only when you
+already need packed little-endian `uint16` storage and want the raw-buffer fast path.
 
-## 另请参阅
+## Type Mapping
 
-- [跨语言序列化规范](https://fory.apache.org/docs/next/specification/fory_xlang_serialization_spec)
-- [类型映射参考](https://fory.apache.org/docs/next/specification/xlang_type_mapping)
-- [Java 跨语言指南](../java/cross-language.md)
-- [Rust 跨语言指南](../rust/cross-language.md)
+| Python marker/carrier  | Java           | Rust            | Go                    |
+| ---------------------- | -------------- | --------------- | --------------------- |
+| `str`                  | `String`       | `String`        | `string`              |
+| `int`                  | `long`         | `i64`           | `int64`               |
+| `pyfory.Int32`         | `int`          | `i32`           | `int32`               |
+| `pyfory.Int64`         | `long`         | `i64`           | `int64`               |
+| `float`                | `double`       | `f64`           | `float64`             |
+| `pyfory.Float32`       | `float`        | `f32`           | `float32`             |
+| `pyfory.Float16`       | `Float16`      | `Float16`       | `float16.Float16`     |
+| `pyfory.BFloat16`      | `BFloat16`     | `BFloat16`      | `bfloat16.BFloat16`   |
+| `pyfory.Float16Array`  | `Float16List`  | `Vec<Float16>`  | `[]float16.Float16`   |
+| `pyfory.BFloat16Array` | `BFloat16List` | `Vec<BFloat16>` | `[]bfloat16.BFloat16` |
+| `list`                 | `List`         | `Vec`           | `[]T`                 |
+| `dict`                 | `Map`          | `HashMap`       | `map[K]V`             |
 
-## 相关主题
+### Lists and Dense Arrays
 
-- [配置](configuration.md) - XLANG 模式设置
-- [Schema 演化](schema-evolution.md) - 兼容模式
-- [类型注册](type-registration.md) - 注册模式
+Python `List[T]` maps to Fory `list<T>`. Use `pyfory.Array[T]`,
+`pyfory.NDArray[T]`, or `pyfory.PyArray[T]` only when the schema is the dense
+one-dimensional `array<T>` kind.
+
+| Fory schema       | Python annotation and default carrier              |
+| ----------------- | -------------------------------------------------- |
+| `list<int32>`     | `List[pyfory.Int32]`                               |
+| `array<bool>`     | `pyfory.Array[bool]` -> `BoolArray`                |
+| `array<int8>`     | `pyfory.Array[pyfory.Int8]` -> `Int8Array`         |
+| `array<int16>`    | `pyfory.Array[pyfory.Int16]` -> `Int16Array`       |
+| `array<int32>`    | `pyfory.Array[pyfory.Int32]` -> `Int32Array`       |
+| `array<int64>`    | `pyfory.Array[pyfory.Int64]` -> `Int64Array`       |
+| `array<uint8>`    | `pyfory.Array[pyfory.UInt8]` -> `UInt8Array`       |
+| `array<uint16>`   | `pyfory.Array[pyfory.UInt16]` -> `UInt16Array`     |
+| `array<uint32>`   | `pyfory.Array[pyfory.UInt32]` -> `UInt32Array`     |
+| `array<uint64>`   | `pyfory.Array[pyfory.UInt64]` -> `UInt64Array`     |
+| `array<float16>`  | `pyfory.Array[pyfory.Float16]` -> `Float16Array`   |
+| `array<bfloat16>` | `pyfory.Array[pyfory.BFloat16]` -> `BFloat16Array` |
+| `array<float32>`  | `pyfory.Array[pyfory.Float32]` -> `Float32Array`   |
+| `array<float64>`  | `pyfory.Array[pyfory.Float64]` -> `Float64Array`   |
+
+The `pyfory.*Array` wrappers accept iterable constructors such as
+`pyfory.Float32Array([1, 2, 3])` and expose list-like sequence behavior over
+dense owned storage.
+
+`pyfory.Array[T]`, `pyfory.NDArray[T]`, and `pyfory.PyArray[T]` all describe
+the same Fory `array<T>` schema. They differ only in the Python carrier
+contract:
+
+| Python field annotation | Value accepted for that field                           | Deserialized carrier |
+| ----------------------- | ------------------------------------------------------- | -------------------- |
+| `pyfory.Array[T]`       | `pyfory.*Array`, `numpy.ndarray`, `array.array`, `list` | `pyfory.*Array`      |
+| `pyfory.NDArray[T]`     | `numpy.ndarray`                                         | `numpy.ndarray`      |
+| `pyfory.PyArray[T]`     | Python `array.array`                                    | Python `array.array` |
+
+In compatible mode, a writer and reader can use different Python carriers for
+the same named field as long as both annotations lower to the same Fory
+`array<T>` schema. For example, a writer field declared as
+`pyfory.Array[pyfory.Int32]` can be read by a Python class whose matching field
+is declared as `pyfory.NDArray[pyfory.Int32]`, and the reader receives a NumPy
+`int32` ndarray. The reverse pattern also works for `pyfory.PyArray[T]`; that
+name always means Python `array.array`.
+
+PyArrow is a separate row/columnar format surface, not a `pyfory.PyArray`
+carrier. Use `pyfory.format.from_arrow_schema(...)` and
+`pyfory.format.to_arrow_schema(...)` to convert between PyArrow schemas and
+Fory row-format schemas.
+
+## Differences from Python Native Mode
+
+The binary protocol and API are similar to `pyfory`'s Python native mode, but Python native mode can serialize any Python object—including global functions, local functions, lambdas, local classes, and types with customized serialization using `__getstate__/__reduce__/__reduce_ex__`, which are **not allowed** in xlang mode.
+
+## See Also
+
+- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Type Mapping Reference](../../specification/xlang_type_mapping.md)
+- [Java Cross-Language Guide](../java/cross-language.md)
+- [Rust Cross-Language Guide](../rust/cross-language.md)
+
+## Related Topics
+
+- [Configuration](configuration.md) - xlang mode settings
+- [Schema Evolution](schema-evolution.md) - Compatible mode
+- [Type Registration](type-registration.md) - Registration patterns

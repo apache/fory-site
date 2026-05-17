@@ -1,5 +1,5 @@
 ---
-title: Java 序列化指南
+title: Java Serialization Guide
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,41 +19,42 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ 提供极速的 Java 对象序列化，基于 JIT 编译和零拷贝技术。当只需要 Java 对象序列化时，这种模式相比跨语言对象图序列化提供更好的性能。
+Apache Fory™ provides blazingly fast Java object serialization with JIT compilation and zero-copy techniques. Java supports both xlang mode and native mode. Xlang mode is the default cross-language wire format and uses compatible schema evolution. Native mode is the Java-only wire format for same-language object serialization, JDK serialization replacement behavior, framework replacement, and Java-native object graph features.
 
-## 特性
+## Features
 
-### 高性能
+### High Performance
 
-- **JIT 代码生成**：高度可扩展的 JIT 框架在运行时使用异步多线程编译生成序列化器代码，通过以下方式提供 20-170 倍的加速：
-  - 内联变量以减少内存访问
-  - 内联方法调用以消除虚拟分派开销
-  - 最小化条件分支
-  - 消除哈希查找
-- **零拷贝**：直接内存访问，无中间缓冲区拷贝；行格式支持随机访问和部分序列化
-- **变长编码**：对整数和长整型进行优化压缩
-- **元数据共享**：缓存的类元数据减少冗余类型信息
-- **SIMD 加速**：支持 Java Vector API 用于数组操作（Java 16+）
+- **JIT Code Generation**: Highly-extensible JIT framework generates serializer code at runtime using async multi-threaded compilation, delivering 20-170x speedup through:
+  - Inlining variables to reduce memory access
+  - Inlining method calls to eliminate virtual dispatch overhead
+  - Minimizing conditional branching
+  - Eliminating hash lookups
+- **Zero-Copy**: Direct memory access without intermediate buffer copies; row format supports random access and partial serialization
+- **Variable-Length Encoding**: Optimized compression for integers, longs
+- **Meta Sharing**: Cached class metadata reduces redundant type information
+- **SIMD Acceleration**: Java Vector API support for array operations (Java 16+)
 
-### 即插即用替代
+### Drop-in Replacement
 
-- **100% JDK 序列化兼容**：支持 `writeObject`/`readObject`/`writeReplace`/`readResolve`/`readObjectNoData`/`Externalizable`
-- **Java 8-24 支持**：适用于所有现代 Java 版本，包括 Java 17+ 的 record
-- **GraalVM Native Image**：支持 AOT 编译，无需反射配置
+- **100% JDK Serialization Compatible**: Supports `writeObject`/`readObject`/`writeReplace`/`readResolve`/`readObjectNoData`/`Externalizable`
+- **Java 8-24 Support**: Works across all modern Java versions including Java 17+ records
+- **GraalVM Native Image**: AOT compilation support without reflection configuration
+- **Android API 26+ Support**: Core object serialization works on Android without runtime code generation.
 
-### 高级特性
+### Advanced Features
 
-- **引用跟踪**：自动处理共享引用和循环引用
-- **Schema 演化**：类 schema 变更的前向/后向兼容性
-- **多态性**：完全支持继承层次结构和接口
-- **深拷贝**：高效深度克隆复杂对象图并保留引用
-- **安全性**：类注册和可配置的反序列化策略
+- **Reference Tracking**: Automatic handling of shared and circular references
+- **Schema Evolution**: Forward/backward compatibility for class schema changes
+- **Polymorphism**: Full support for inheritance hierarchies and interfaces
+- **Deep Copy**: Efficient deep cloning of complex object graphs with reference preservation
+- **Security**: Class registration and configurable deserialization policies
 
-## 快速开始
+## Quick Start
 
-注意，Fory 的创建成本不低，**应该在多次序列化之间复用 Fory 实例**，而不是每次都创建。你应该将 Fory 作为静态全局变量，或者某个单例对象或有限对象的实例变量。
+Note that Fory creation is not cheap, the **Fory instances should be reused between serializations** instead of creating it every time. You should keep Fory as a static global variable, or instance variable of some singleton object or limited objects.
 
-### 单线程使用
+### Single-Thread Usage
 
 ```java
 import java.util.List;
@@ -65,13 +66,15 @@ import org.apache.fory.config.*;
 public class Example {
   public static void main(String[] args) {
     SomeClass object = new SomeClass();
-    // 注意 Fory 实例应该在多次不同对象的序列化之间复用。
-    Fory fory = Fory.builder().withLanguage(Language.JAVA)
+    // Note that Fory instances should be reused between
+    // multiple serializations of different objects.
+    Fory fory = Fory.builder()
+      .withXlang(true)
       .requireClassRegistration(true)
       .build();
-    // 注册类型可以减少类名序列化开销，但不是必须的。
-    // 如果启用了类注册，所有自定义类型都必须注册。
-    // 如果未指定 id，注册顺序必须一致
+    // Registering types can reduce class name serialization overhead, but not mandatory.
+    // If class registration enabled, all custom types must be registered.
+    // Registration order must be consistent if id is not specified
     fory.register(SomeClass.class);
     byte[] bytes = fory.serialize(object);
     System.out.println(fory.deserialize(bytes));
@@ -79,7 +82,7 @@ public class Example {
 }
 ```
 
-### 多线程使用
+### Multi-Thread Usage
 
 ```java
 import org.apache.fory.*;
@@ -89,7 +92,7 @@ public class Example {
   public static void main(String[] args) {
     SomeClass object = new SomeClass();
     ThreadSafeFory fory = Fory.builder()
-      .withLanguage(Language.JAVA)
+      .withXlang(true)
       .buildThreadSafeFory();
     fory.register(SomeClass.class, 1);
     byte[] bytes = fory.serialize(object);
@@ -98,7 +101,7 @@ public class Example {
 }
 ```
 
-### Fory 实例复用模式
+### Fory Instance Reuse Pattern
 
 ```java
 import org.apache.fory.*;
@@ -106,8 +109,8 @@ import org.apache.fory.config.*;
 
 public class Example {
   private static final ThreadSafeFory fory = Fory.builder()
-      .withLanguage(Language.JAVA)
-      .buildThreadSafeFory();
+    .withXlang(true)
+    .buildThreadSafeFory();
 
   static {
     fory.register(SomeClass.class, 1);
@@ -121,32 +124,41 @@ public class Example {
 }
 ```
 
-## 线程安全
+## Xlang Mode And Native Mode
 
-Fory 提供两种线程安全运行时风格：
+Use xlang mode for cross-language payloads and schemas shared with non-Java runtimes. It is the default Java wire mode, and Java examples that use it set `.withXlang(true)` explicitly so the mode choice is visible.
+
+Use native mode for Java-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and owns Java-specific object behavior such as JDK serialization hooks, `Externalizable`, dynamic object graphs, object copy, and Java native-mode zero-copy buffers. It is optimized for the JVM type system and supports a broader Java object surface than xlang mode. If you are replacing JDK serialization, Kryo, FST, Hessian, or Java-only Protocol Buffers payloads, start with native mode.
+
+See [Native Mode](native-mode.md) for Java-only serialization details and [Cross-Language Serialization](cross-language.md) for Java xlang registration and interoperability rules.
+
+## Thread Safety
+
+Fory provides two thread-safe runtime styles:
 
 ### `buildThreadSafeFory`
 
-这是默认选择。它会构建一个固定大小的共享 `ThreadPoolFory`，其大小为 `4 * availableProcessors()`，也是虚拟线程工作负载下的首选运行时：
+This is the default choice. It uses a fixed-size shared `ThreadPoolFory` sized to
+`4 * availableProcessors()` and is the preferred runtime for virtual-thread workloads:
 
 ```java
 ThreadSafeFory fory = Fory.builder()
-  .withLanguage(Language.JAVA)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
   .withAsyncCompilation(true)
   .buildThreadSafeFory();
 ```
 
-更多细节请参见 [虚拟线程](virtual-threads.md)。
+See more details in [Virtual Threads](virtual-threads.md).
 
 ### ThreadLocalFory
 
-仅当你明确希望为每个长期存在的平台线程分配一个 `Fory` 实例，或者无论 JDK 版本如何都要固定采用这种方式时，才使用 `buildThreadLocalFory()`：
+Use `buildThreadLocalFory()` only when you explicitly want one `Fory` instance per long-lived
+platform thread, or when you want to pin that choice regardless of JDK version:
 
 ```java
 ThreadSafeFory fory = Fory.builder()
-  .withLanguage(Language.JAVA)
+  .withXlang(true)
   .buildThreadLocalFory();
 fory.register(SomeClass.class, 1);
 byte[] bytes = fory.serialize(object);
@@ -155,51 +167,52 @@ System.out.println(fory.deserialize(bytes));
 
 ### `buildThreadSafeForyPool`
 
-如果你希望显式指定固定共享池大小，请使用 `buildThreadSafeForyPool(poolSize)`。它会预先创建 `poolSize` 个 `Fory` 实例，把它们放在共享固定槽位中，然后让任意调用方通过与线程无关的快速路径借用实例。只有当池中所有实例都在使用时，调用才会阻塞；运行时不会按照线程身份缓存实例：
+Use `buildThreadSafeForyPool(poolSize)` when you want to set that fixed shared pool size
+explicitly. It eagerly creates `poolSize` `Fory` instances, keeps them in shared fixed slots, and
+then lets any caller borrow one through a thread-agnostic fast path. Calls only block when every
+pooled instance is already in use; the runtime does not key cached instances by thread identity:
 
 ```java
 ThreadSafeFory fory = Fory.builder()
-  .withLanguage(Language.JAVA)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
   .withAsyncCompilation(true)
   .buildThreadSafeForyPool(poolSize);
 ```
 
-### Builder 方法
+### Builder Methods
 
 ```java
-// 单线程 Fory
+// Single-thread Fory
 Fory fory = Fory.builder()
-  .withLanguage(Language.JAVA)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
   .withAsyncCompilation(true)
   .build();
 
-// 线程安全 Fory（由 Fory 实例池支撑）
+// Thread-safe Fory (thread-safe Fory backed by a pool of Fory instances)
 ThreadSafeFory fory = Fory.builder()
-  .withLanguage(Language.JAVA)
+  .withXlang(true)
   .withRefTracking(false)
-  .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
   .withAsyncCompilation(true)
   .buildThreadSafeFory();
 
-// 显式线程本地运行时
+// Explicit thread-local runtime
 ThreadSafeFory threadLocalFory = Fory.builder()
-  .withLanguage(Language.JAVA)
+  .withXlang(true)
   .buildThreadLocalFory();
 ```
 
-## 后续步骤
+## Next Steps
 
-- [配置选项](configuration.md) - 了解 ForyBuilder 选项
-- [字段配置](field-configuration.md) - `@ForyField`、`@Ignore` 和整数编码注解
-- [枚举配置](enum-configuration.md) - `serializeEnumByName` 与 `@ForyEnumId`
-- [基础序列化](basic-serialization.md) - 详细的序列化模式
-- [压缩](compression.md) - 整数、long 和数组压缩选项
-- [虚拟线程](virtual-threads.md) - 虚拟线程使用方式与池大小建议
-- [类型注册](type-registration.md) - 类注册和安全性
-- [自定义序列化器](custom-serializers.md) - 实现自定义序列化器
-- [跨语言序列化](cross-language.md) - 为其他语言序列化数据
-- [GraalVM 支持](graalvm_support) - 面向原生镜像的构建期序列化器编译
+- [Configuration](configuration.md) - Learn about ForyBuilder options
+- [Schema Metadata](schema-metadata.md) - `@ForyField`, `@Ignore`, integer encoding annotations, `serializeEnumByName`, and `@ForyEnumId`
+- [Basic Serialization](basic-serialization.md) - Detailed serialization patterns
+- [Object Copy](object-copy.md) - Deep-copy Java object graphs in memory
+- [Compression](compression.md) - Integer, long, and array compression options
+- [Virtual Threads](virtual-threads.md) - Virtual-thread usage and pool sizing guidance
+- [Type Registration](type-registration.md) - Class registration and security
+- [Custom Serializers](custom-serializers.md) - Implement custom serializers
+- [Cross-Language Serialization](cross-language.md) - Serialize data for other languages
+- [Static Generated Serializers](static-generated-serializers.md) - Annotation-processor static generated serializers for `@ForyStruct`
+- [GraalVM Support](graalvm-support.md) - Build-time serializer compilation for native images

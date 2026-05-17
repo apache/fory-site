@@ -21,17 +21,17 @@ license: |
 
 **Apache Fory™** is a blazing fast multi-language serialization framework powered by **JIT compilation** and **zero-copy** techniques, providing up to **ultra-fast performance** while maintaining ease of use and safety.
 
-The Rust implementation provides versatile and high-performance serialization with automatic memory management and compile-time type safety.
+The Rust implementation provides versatile and high-performance serialization with automatic memory management and compile-time type safety. It supports both xlang mode for cross-language payloads and native mode for Rust-only payloads.
 
 ## Why Apache Fory™ Rust?
 
-- **🔥 Blazingly Fast**: Zero-copy deserialization and optimized binary protocols
-- **🌍 Cross-Language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
-- **🎯 Type-Safe**: Compile-time type checking with derive macros
-- **🔄 Circular References**: Automatic tracking of shared and circular references with `Rc`/`Arc` and weak pointers
-- **🧬 Polymorphic**: Serialize trait objects with `Box<dyn Trait>`, `Rc<dyn Trait>`, and `Arc<dyn Trait>`
-- **📦 Schema Evolution**: Compatible mode for independent schema changes
-- **⚡ Two Formats**: Object graph serialization and zero-copy row-based format
+- **Fast binary encoding**: Zero-copy deserialization and optimized binary protocols
+- **Cross-language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
+- **Type-safe**: Compile-time type checking with derive macros
+- **Circular references**: Automatic tracking of shared and circular references with `Rc`/`Arc` and weak pointers
+- **Polymorphic**: Serialize trait objects with `Box<dyn Trait>`, `Rc<dyn Trait>`, and `Arc<dyn Trait>`
+- **Schema evolution**: Compatible mode for independent schema changes
+- **Two formats**: Object graph serialization and zero-copy row-based format
 
 ## Crates
 
@@ -64,7 +64,7 @@ struct User {
 }
 
 fn main() -> Result<(), Error> {
-    let mut fory = Fory::default();
+    let mut fory = Fory::builder().xlang(true).build();
     fory.register::<User>(1)?;
 
     let user = User {
@@ -90,6 +90,14 @@ fn main() -> Result<(), Error> {
 }
 ```
 
+## Xlang Mode And Native Mode
+
+Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Rust wire mode, and Rust examples that use it set `.xlang(true)` explicitly so the mode choice is visible.
+
+Use native mode for Rust-only traffic. Native mode is selected with `.xlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps Rust object serialization on the Rust runtime path. It is optimized for Rust's type system and covers Rust-specific object features such as trait objects and shared-reference patterns that are not portable xlang payloads.
+
+See [Cross-Language Serialization](cross-language.md) for Rust xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode builder options.
+
 ## Thread Safety
 
 Apache Fory™ Rust is fully thread-safe: `Fory` implements both `Send` and `Sync`, so one configured instance can be shared across threads for concurrent work. The internal read/write context pools are lazily initialized with thread-safe primitives, letting worker threads reuse buffers without coordination.
@@ -106,7 +114,7 @@ struct Item {
 }
 
 fn main() -> Result<(), Error> {
-    let mut fory = Fory::default();
+    let mut fory = Fory::builder().xlang(true).build();
     fory.register::<Item>(1000)?;
 
     let fory = Arc::new(fory);
@@ -180,5 +188,5 @@ fory-derive/           # Procedural macros
 - [Basic Serialization](basic-serialization.md) - Object graph serialization
 - [References](references.md) - Shared and circular references
 - [Polymorphism](polymorphism.md) - Trait object serialization
-- [Cross-Language](cross-language.md) - XLANG mode
+- [Cross-Language](cross-language.md) - xlang mode
 - [Row Format](row-format.md) - Zero-copy row-based format

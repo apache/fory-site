@@ -1,6 +1,6 @@
 ---
 title: Type Registration
-sidebar_position: 3
+sidebar_position: 5
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

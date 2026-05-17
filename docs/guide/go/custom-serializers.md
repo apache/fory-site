@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 35
+sidebar_position: 90
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -75,7 +75,7 @@ func (s *MyExtSerializer) ReadData(ctx *fory.ReadContext, value reflect.Value) {
 }
 
 // Register the custom serializer
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 err := f.RegisterExtension(MyExt{}, 100, &MyExtSerializer{})
 ```
 
@@ -168,7 +168,7 @@ func (s *Point3DSerializer) ReadData(ctx *fory.ReadContext, value reflect.Value)
     }))
 }
 
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 f.RegisterExtension(Point3D{}, 101, &Point3DSerializer{})
 ```
 
@@ -260,7 +260,7 @@ f.RegisterExtensionByName(MyType{}, "myapp.MyType", &MySerializer{})
 
 ```go
 func TestMySerializer(t *testing.T) {
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterExtension(MyType{}, 100, &MySerializer{})
 
     original := MyType{Field: "test"}

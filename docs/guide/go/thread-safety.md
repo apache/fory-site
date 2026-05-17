@@ -1,6 +1,6 @@
 ---
 title: Thread Safety
-sidebar_position: 100
+sidebar_position: 110
 id: thread_safety
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -26,7 +26,7 @@ This guide covers concurrent usage patterns for Fory Go, including the thread-sa
 The default `Fory` instance is **not thread-safe**:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 // NOT SAFE: Concurrent access from multiple goroutines
 go func() {
@@ -148,7 +148,7 @@ However, for best performance, register all types at startup before concurrent u
 With the default Fory, returned byte slices are views into the internal buffer:
 
 ```go
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 
 data1, _ := f.Serialize(value1)
 // data1 is valid
@@ -184,7 +184,7 @@ This is safer but has allocation overhead.
 
 ```go
 func BenchmarkNonThreadSafe(b *testing.B) {
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterStruct(User{}, 1)
     user := &User{ID: 1, Name: "Alice"}
 
@@ -215,7 +215,7 @@ For maximum performance with known goroutine count:
 ```go
 func worker(id int) {
     // Each worker has its own Fory instance
-    f := fory.New()
+    f := fory.New(fory.WithXlang(true))
     f.RegisterStruct(User{}, 1)
 
     for task := range tasks {
@@ -282,7 +282,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 ```go
 // WRONG: Race condition
-var f = fory.New()
+var f = fory.New(fory.WithXlang(true))
 
 func handler1() {
     f.Serialize(value1)  // Race!
@@ -299,7 +299,7 @@ func handler2() {
 
 ```go
 // WRONG: Buffer invalidated on next call
-f := fory.New()
+f := fory.New(fory.WithXlang(true))
 data, _ := f.Serialize(value1)
 savedData := data  // Just copies the slice header!
 

@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-sidebar_position: 10
+sidebar_position: 11
 id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -51,7 +51,11 @@ Confirm that:
 - Ensure field types match across versions
 
 ```rust
-let fory = Fory::builder().compatible(true).build();
+// Add compatible(true) to the same builder configuration on every peer.
+let fory = Fory::builder()
+    // existing options
+    .compatible(true)
+    .build();
 ```
 
 ## Debugging Techniques

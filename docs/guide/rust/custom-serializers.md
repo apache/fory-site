@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 4
+sidebar_position: 9
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -25,7 +25,7 @@ For types that don't support `#[derive(ForyStruct)]`, implement the `Serializer`
 
 - External types from other crates
 - Types with special serialization requirements
-- Legacy data format compatibility
+- Existing data format compatibility
 - Performance-critical custom encoding
 
 ## Implementing the Serializer Trait
@@ -79,14 +79,14 @@ impl ForyDefault for CustomType {
 ## Registering Custom Serializers
 
 ```rust
-let mut fory = Fory::default();
-fory.register_serializer::<CustomType>(100);
+let mut fory = Fory::builder().xlang(false).build();
+fory.register_serializer::<CustomType>(100)?;
 
 let custom = CustomType {
     value: 42,
     name: "test".to_string(),
 };
-let bytes = fory.serialize(&custom);
+let bytes = fory.serialize(&custom)?;
 let decoded: CustomType = fory.deserialize(&bytes)?;
 assert_eq!(custom, decoded);
 ```

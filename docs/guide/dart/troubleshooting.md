@@ -1,7 +1,7 @@
 ---
 title: Troubleshooting
 sidebar_position: 11
-id: dart_troubleshooting
+id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -23,11 +23,11 @@ This page covers common Dart runtime issues and fixes.
 
 ## `Only xlang payloads are supported by the Dart runtime.`
 
-The writer is sending a native-mode (non-xlang) payload. Make sure every service uses the xlang-compatible path:
+The writer is sending a native-mode payload. Make sure every peer writes the xlang wire format:
 
-- **Java**: add `.withXlang(true).withCompatible(true)` to the Fory builder.
-- **Go**: use `WithXlang(true), WithCompatible(true)` in the Fory options.
-- **Other runtimes**: check their respective guides for enabling cross-language mode.
+- **Java**: configure the peer runtime for xlang mode instead of native mode.
+- **Go**: configure the peer runtime for xlang mode.
+- **Other runtimes**: check their respective guides for xlang mode.
 
 ## `Type ... is not registered.`
 
@@ -76,7 +76,7 @@ Checklist:
 2. Stable `@ForyField(id: ...)` assigned before the first payload was produced.
 3. Compatible numeric widths — use `@ForyField(type: Int32Type())` in Dart when the peer field is `int` (Java), `int32` (Go), or `int` (C#).
 4. `Timestamp` / `LocalDate` instead of raw `DateTime` for date/time fields.
-5. `compatible: true` on **both** sides if using schema evolution.
+5. Compatible schema evolution on both sides. Dart enables it by default; make sure peers have not explicitly selected schema-consistent mode.
 
 ## Int64 or Uint64 values fail on web
 
@@ -118,7 +118,7 @@ class FileBlock {
 field, but it does not remove the web integer precision limit. Use `Int64` for
 full-range signed values and `Uint64` for full-range unsigned values. See
 [Web Platform Support](web-platform-support.md) for the full browser support
-matrix and migration guidance.
+matrix and runtime guidance.
 
 ## Running Tests Locally
 
