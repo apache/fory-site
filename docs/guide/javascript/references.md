@@ -100,7 +100,7 @@ Leave it disabled when:
 - you want the lowest overhead
 - object identity does not matter
 
-## Cross-Language Note
+## Xlang Note
 
 Reference tracking is part of the Fory binary protocol and works across runtimes. Both sides must enable reference tracking and mark the same fields as reference-tracked for the behavior to be consistent.
 
@@ -108,4 +108,4 @@ Reference tracking is part of the Fory binary protocol and works across runtimes
 
 - [Basic Serialization](basic-serialization.md)
 - [Schema Evolution](schema-evolution.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

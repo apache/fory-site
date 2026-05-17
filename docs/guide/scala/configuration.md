@@ -158,3 +158,22 @@ val fory = ForyScala.builder()
 In xlang mode, Scala collections use canonical `list`, `set`, and `map`
 payloads instead of Scala factory payloads. Generated optional fields use
 `Option[T]`.
+
+## Security
+
+Scala uses the Java runtime configuration surface. Keep class registration enabled for production
+and any untrusted payload source:
+
+```scala
+val fory = ForyScala.builder()
+  .requireClassRegistration(true)
+  .withMaxDepth(50)
+  .build()
+```
+
+Security-related configuration:
+
+- Keep `requireClassRegistration(true)` and register application classes or generated modules.
+- Use `withMaxDepth(...)` to reject unexpectedly deep object graphs.
+- Follow [Java Configuration](../java/configuration.md#security) for allow-listing and unknown-class
+  controls.

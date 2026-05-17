@@ -1,6 +1,6 @@
 ---
 title: Type Registration
-sidebar_position: 4
+sidebar_position: 5
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -120,5 +120,5 @@ let handles: Vec<_> = (0..4)
 ## Related Topics
 
 - [Configuration](configuration.md) - Fory builder options
-- [Cross-Language](cross-language.md) - xlang mode registration
+- [Xlang Serialization](xlang-serialization.md) - xlang mode registration
 - [Custom Serializers](custom-serializers.md) - Custom serialization

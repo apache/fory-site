@@ -93,9 +93,9 @@ User decoded = fory.deserialize(bytes, User.class);
 
 When xlang bytes cross runtimes, every runtime must register the same type identity and compatible
 field metadata. The shared rules live in [Xlang](../xlang/index.md), while Java-specific API calls
-are in [Cross-Language](cross-language.md).
+are in [Xlang Serialization](xlang-serialization.md).
 
-## Use Native Mode For Java-Only Traffic
+## Use Native Serialization For Java-Only Traffic
 
 For same-language Java/JVM traffic, native mode is usually the better fit:
 
@@ -106,7 +106,7 @@ Fory fory = Fory.builder()
 ```
 
 Native mode supports the broad Java object serialization surface, including JDK serialization hooks,
-object copy, and native-mode zero-copy buffers. See [Native Mode](native-mode.md).
+object copy, and native-mode zero-copy buffers. See [Native Serialization](native-serialization.md).
 
 ## Common Options
 
@@ -126,7 +126,7 @@ object copy, and native-mode zero-copy buffers. See [Native Mode](native-mode.md
 ## Related Topics
 
 - [Configuration](configuration.md) - All ForyBuilder options
-- [Native Mode](native-mode.md) - Java-only serialization features
+- [Native Serialization](native-serialization.md) - Java-only serialization features
 - [Schema Metadata](schema-metadata.md) - Field IDs, nullability, reference tracking, and enum IDs
-- [Cross-Language](cross-language.md) - Java xlang interoperability
+- [Xlang Serialization](xlang-serialization.md) - Java xlang interoperability
 - [Troubleshooting](troubleshooting.md) - Common API usage issues

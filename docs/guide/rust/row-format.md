@@ -1,6 +1,6 @@
 ---
 title: Row Format
-sidebar_position: 10
+sidebar_position: 11
 id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -122,5 +122,5 @@ assert_eq!(prefs.values().get(0).unwrap(), "en");
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Object graph serialization
-- [Cross-Language](cross-language.md) - Row format across languages
+- [Xlang Serialization](xlang-serialization.md) - Row format across languages
 - [Row Format Specification](https://fory.apache.org/docs/specification/row_format_spec) - Protocol details

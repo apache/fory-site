@@ -1,6 +1,6 @@
 ---
 title: Configuration
-sidebar_position: 3
+sidebar_position: 4
 id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -68,6 +68,29 @@ Fory fory = Fory.builder()
   .withAsyncCompilation(true)
   .build();
 ```
+
+## Security
+
+Keep class registration enabled for production and any untrusted payload source:
+
+```java
+Fory fory = Fory.builder()
+    .requireClassRegistration(true)
+    .withMaxDepth(50)
+    .build();
+```
+
+Security-related options:
+
+- `requireClassRegistration(true)` restricts deserialization to registered classes.
+- `withMaxDepth(...)` rejects unexpectedly deep object graphs.
+- `withDeserializeUnknownClass(false)` avoids materializing unknown classes from metadata.
+- `checkJdkClassSerializable(true)` keeps the JDK serializability check for `java.*` classes.
+- Class registration warnings can be useful during security audits; use
+  `suppressClassRegistrationWarnings(false)` when you need to surface unexpected types.
+
+Use `requireClassRegistration(false)` only for trusted payloads, and pair it with a `TypeChecker`
+allow list when dynamic class loading is required.
 
 ## Related Topics
 

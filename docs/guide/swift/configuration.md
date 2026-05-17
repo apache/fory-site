@@ -111,3 +111,12 @@ let fory = Fory()
 ```swift
 let fory = Fory(ref: true)
 ```
+
+## Security
+
+Security-related configuration:
+
+- Register only the expected generated models before deserializing untrusted payloads.
+- Use `checkClassVersion` with `compatible: false` when exact schema matching is required.
+- Set `maxCollectionSize`, `maxBinarySize`, and `maxDepth` for the largest payload shape your
+  service accepts.

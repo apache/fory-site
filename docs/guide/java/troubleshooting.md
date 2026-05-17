@@ -198,4 +198,4 @@ FORY_LOG_LEVEL=INFO mvn test -Dtest=org.apache.fory.TestClass#testMethod
 - [Configuration](configuration.md) - All ForyBuilder options
 - [Schema Evolution](schema-evolution.md) - Compatible mode details
 - [Type Registration](type-registration.md) - Registration best practices
-- [Native Mode](native-mode.md) - Java-only serialization features
+- [Native Serialization](native-serialization.md) - Java-only serialization features

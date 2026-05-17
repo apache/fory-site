@@ -96,5 +96,5 @@ print(user.email)  # "unknown@example.com"
 ## Related Topics
 
 - [Configuration](configuration.md) - Compatible mode settings
-- [Cross-Language](cross-language.md) - Schema evolution across languages
+- [Xlang Serialization](xlang-serialization.md) - Schema evolution across languages
 - [Type Registration](type-registration.md) - Registration patterns

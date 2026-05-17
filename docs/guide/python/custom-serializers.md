@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 12
+sidebar_position: 10
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -135,4 +135,4 @@ fory.register(MyClass, typename="com.example.MyClass", serializer=MySerializer(f
 
 - [Type Registration](type-registration.md) - Registration patterns
 - [Configuration](configuration.md) - Fory parameters
-- [Cross-Language](cross-language.md) - type registration and schema rules for xlang
+- [Xlang Serialization](xlang-serialization.md) - type registration and schema rules for xlang

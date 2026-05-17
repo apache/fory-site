@@ -161,13 +161,13 @@ Use **names** when:
 - schemas are already identified by package/module name
 - slightly larger metadata overhead is acceptable
 
-## Cross-Language
+## Xlang
 
-For a message to round-trip between JavaScript and another runtime, both sides must use the same identity for a given type: same numeric ID, or same `namespace + typeName`. See [Cross-Language](cross-language.md).
+For a message to round-trip between JavaScript and another runtime, both sides must use the same identity for a given type: same numeric ID, or same `namespace + typeName`. See [Xlang Serialization](xlang-serialization.md).
 
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md)
 - [Schema Metadata](schema-metadata.md)
 - [Schema Evolution](schema-evolution.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

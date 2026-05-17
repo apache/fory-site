@@ -83,7 +83,7 @@ Use xlang mode for cross-language payloads and schemas shared with other Fory ru
 
 Use native mode for Scala/JVM-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and inherits the JVM native-mode object serialization path from Fory Java while adding Scala-specific serializers for case classes, collections, tuples, options, and enumerations. It is optimized for JVM and Scala type systems and is the right path for same-language Scala/JVM framework replacement payloads.
 
-See [Configuration](configuration.md) for Scala builder setup and [Java Native Mode](../java/native-mode.md) for the full JVM native-mode behavior.
+See [Configuration](configuration.md) for Scala builder setup and [Java Native Serialization](../java/native-serialization.md) for the full JVM native-mode behavior.
 
 ## Built on Fory Java
 

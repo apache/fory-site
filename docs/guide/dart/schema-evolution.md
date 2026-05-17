@@ -76,7 +76,7 @@ If you add field IDs after payloads are already in production, existing stored m
 - Change the registration identity (`id`, `namespace`, or `typeName`) of a type after messages are in production.
 - Change a field's logical meaning without changing its ID.
 
-## Cross-Language Notes
+## Xlang Notes
 
 Evolution only works when **all** runtimes that exchange messages agree on:
 
@@ -90,4 +90,4 @@ Test rolling-upgrade scenarios with real round trips before deploying.
 
 - [Configuration](configuration.md)
 - [Schema Metadata](schema-metadata.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

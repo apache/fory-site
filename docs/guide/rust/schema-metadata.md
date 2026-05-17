@@ -1,6 +1,6 @@
 ---
 title: Schema Metadata
-sidebar_position: 5
+sidebar_position: 6
 id: schema_metadata
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -456,4 +456,4 @@ struct User {
 
 - [Basic Serialization](basic-serialization.md) - Getting started with Fory serialization
 - [Schema Evolution](schema-evolution.md) - Compatible mode and schema evolution
-- [Cross-Language](cross-language.md) - Interoperability with Java, C++, Go, Python
+- [Xlang Serialization](xlang-serialization.md) - Interoperability with Java, C++, Go, Python

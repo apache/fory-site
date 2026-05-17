@@ -1,7 +1,7 @@
 ---
-title: Cross-Language Serialization
-sidebar_position: 20
-id: cross_language
+title: Xlang Serialization
+sidebar_position: 2
+id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Fory Go enables seamless data exchange with Java, Python, C++, Rust, and JavaScript. This guide covers cross-language compatibility and type mapping.
+Fory Go enables seamless data exchange with Java, Python, C++, Rust, and JavaScript. This guide covers xlang compatibility and type mapping.
 
 ## Create an Xlang Runtime
 
@@ -29,7 +29,7 @@ Go defaults to xlang mode with compatible schema evolution. Set the mode explici
 f := fory.New(fory.WithXlang(true))
 ```
 
-## Type Registration for Cross-Language
+## Type Registration for Xlang
 
 Use consistent type IDs across all languages:
 

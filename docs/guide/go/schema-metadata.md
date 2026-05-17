@@ -1,6 +1,6 @@
 ---
 title: Schema Metadata
-sidebar_position: 30
+sidebar_position: 5
 id: schema_metadata
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

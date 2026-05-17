@@ -1,6 +1,6 @@
 ---
 title: Row Format
-sidebar_position: 11
+sidebar_position: 12
 id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -189,6 +189,6 @@ std::string str = bar10->get_string(0);
 
 ## Related Topics
 
-- [Cross-Language Serialization](cross-language.md) - xlang mode
+- [Xlang Serialization](xlang-serialization.md) - xlang mode
 - [Advanced Features](advanced-features.md) - Zero-copy serialization
 - [Row Format Specification](https://fory.apache.org/docs/specification/row_format_spec) - Protocol details

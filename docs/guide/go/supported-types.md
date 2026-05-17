@@ -1,6 +1,6 @@
 ---
 title: Supported Types
-sidebar_position: 50
+sidebar_position: 7
 id: supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -337,7 +337,7 @@ status := StatusActive
 data, _ := f.Serialize(status)
 ```
 
-## Cross-Language Type Mapping
+## Xlang Type Mapping
 
 | Go Type         | Java       | Python    | C++                | Rust           |
 | --------------- | ---------- | --------- | ------------------ | -------------- |
@@ -354,7 +354,7 @@ data, _ := f.Serialize(status)
 | `time.Time`     | Instant    | datetime  | -                  | -              |
 | `time.Duration` | Duration   | timedelta | -                  | -              |
 
-See [Cross-Language Serialization](cross-language.md) for detailed mapping.
+See [Xlang Serialization](xlang-serialization.md) for detailed mapping.
 
 ## Unsupported Types
 
@@ -370,5 +370,5 @@ Attempting to serialize these types will result in an error.
 ## Related Topics
 
 - [Type Registration](type-registration.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [References](references.md)

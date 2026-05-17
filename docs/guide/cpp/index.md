@@ -26,7 +26,7 @@ The C++ implementation provides high-performance serialization with compile-time
 ## Why Apache Fory™ C++?
 
 - **Fast binary encoding**: Fast serialization and optimized binary protocols
-- **Cross-language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
+- **Xlang**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
 - **Type-safe**: Compile-time type checking with macro-based struct registration
 - **Reference tracking**: Automatic tracking of shared and circular references
 - **Schema evolution**: Compatible mode for independent schema changes
@@ -212,7 +212,7 @@ Use xlang mode for cross-language payloads and schemas shared with other Fory ru
 
 Use native mode for C++-only traffic. Native mode is selected with `.xlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps C++ object serialization on the C++ runtime path. It is optimized for C++ types and avoids portable xlang type-mapping constraints when the payload never leaves C++.
 
-See [Cross-Language Serialization](cross-language.md) for C++ xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode builder options.
+See [Xlang Serialization](xlang-serialization.md) for C++ xlang registration and interoperability rules, and [Native Serialization](native-serialization.md) for C++-only payloads.
 
 ## Thread Safety
 
@@ -262,9 +262,11 @@ std::thread t2([&]() {
 
 - [Configuration](configuration.md) - Builder options and modes
 - [Basic Serialization](basic-serialization.md) - Object graph serialization
-- [Cross-Language](cross-language.md) - xlang mode and interoperability
+- [Xlang Serialization](xlang-serialization.md) - xlang mode and interoperability
+- [Native Serialization](native-serialization.md) - C++-only serialization
 - [Schema Metadata](schema-metadata.md) - Field-level metadata (nullable, ref tracking)
 - [Schema Evolution](schema-evolution.md) - Compatible mode and schema changes
 - [Type Registration](type-registration.md) - Registering types
 - [Supported Types](supported-types.md) - All supported types
+- [Custom Serializers](custom-serializers.md) - Extend serialization behavior
 - [Row Format](row-format.md) - Zero-copy row-based format

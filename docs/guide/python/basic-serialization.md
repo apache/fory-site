@@ -83,7 +83,7 @@ assert result[0] is result[1]
 ```
 
 For arbitrary Python object graphs, local classes, functions, and methods, use
-[Python Native Mode](python-native.md).
+[Native Serialization](native-serialization.md).
 
 ## Performance Tips
 
@@ -108,5 +108,5 @@ for obj in objects:
 
 - [Configuration](configuration.md) - Fory parameters
 - [Type Registration](type-registration.md) - Registration patterns
-- [Python Native Mode](python-native.md) - Functions and lambdas
+- [Native Serialization](native-serialization.md) - Functions and lambdas
 - [Out-of-Band Serialization](out-of-band.md) - Buffer callback APIs

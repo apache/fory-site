@@ -1,6 +1,6 @@
 ---
 title: Schema Evolution
-sidebar_position: 8
+sidebar_position: 9
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -215,4 +215,4 @@ assert_eq!(data, decoded);
 
 - [Configuration](configuration.md) - Enabling compatible mode
 - [Polymorphism](polymorphism.md) - Trait objects with schema evolution
-- [Cross-Language](cross-language.md) - Schema evolution across languages
+- [Xlang Serialization](xlang-serialization.md) - Schema evolution across languages

@@ -1,6 +1,6 @@
 ---
 title: References
-sidebar_position: 60
+sidebar_position: 8
 id: references
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -353,4 +353,4 @@ func main() {
 
 - [Configuration](configuration.md)
 - [Struct Tags](schema-metadata.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

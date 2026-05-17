@@ -1,6 +1,6 @@
 ---
 title: Thread Safety
-sidebar_position: 110
+sidebar_position: 12
 id: thread_safety
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

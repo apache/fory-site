@@ -1,6 +1,6 @@
 ---
 title: Schema Evolution
-sidebar_position: 70
+sidebar_position: 9
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -228,7 +228,7 @@ if config.Retries == 0 {
 }
 ```
 
-## Cross-Language Schema Evolution
+## Xlang Schema Evolution
 
 Schema evolution works across languages:
 
@@ -360,5 +360,5 @@ func main() {
 ## Related Topics
 
 - [Configuration](configuration.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [Troubleshooting](troubleshooting.md)

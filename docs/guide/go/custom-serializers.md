@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 90
+sidebar_position: 10
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -282,4 +282,4 @@ func TestMySerializer(t *testing.T) {
 
 - [Type Registration](type-registration.md)
 - [Supported Types](supported-types.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

@@ -135,5 +135,5 @@ Skipping this step causes back-references to that object to resolve to `null`.
 ## Related Topics
 
 - [Type Registration](type-registration.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [Troubleshooting](troubleshooting.md)

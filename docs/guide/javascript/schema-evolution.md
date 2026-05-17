@@ -89,11 +89,11 @@ const fixedType = Type.struct(
 | Smallest possible messages      | best choice       | slightly larger     |
 | Rolling upgrades                | risky             | safe                |
 
-## Cross-Language Requirement
+## Xlang Requirement
 
-Compatible mode only protects you from schema differences in the _fields_ of a type. You still need the same type identity (same numeric ID or same `namespace + typeName`) on every side. See [Cross-Language](cross-language.md).
+Compatible mode only protects you from schema differences in the _fields_ of a type. You still need the same type identity (same numeric ID or same `namespace + typeName`) on every side. See [Xlang Serialization](xlang-serialization.md).
 
 ## Related Topics
 
 - [Type Registration](type-registration.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

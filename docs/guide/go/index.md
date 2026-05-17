@@ -24,7 +24,7 @@ Apache Fory Go is a high-performance serialization library for Go. It supports x
 ## Why Fory Go?
 
 - **High Performance**: Fast serialization and optimized binary protocols
-- **Cross-Language**: Seamless data exchange with Java, Python, C++, Rust, and JavaScript
+- **Xlang**: Seamless data exchange with Java, Python, C++, Rust, and JavaScript
 - **Automatic Serialization**: No IDL definitions or schema compilation required
 - **Reference Tracking**: Built-in support for circular references and shared objects
 - **Type Safety**: Strong typing with schema-aware serializers
@@ -90,7 +90,7 @@ Use xlang mode for cross-language payloads and schemas shared with other Fory ru
 
 Use native mode for Go-only traffic. Native mode is selected with `fory.WithXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps Go object serialization on the Go runtime path. It is optimized for Go structs, pointers, interfaces, and Go-specific type behavior that does not need a portable xlang mapping.
 
-See [Cross-Language Serialization](cross-language.md) for Go xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode options.
+See [Xlang Serialization](xlang-serialization.md) for Go xlang registration and interoperability rules, and [Native Serialization](native-serialization.md) for Go-only payloads.
 
 ## Configuration
 
@@ -118,7 +118,7 @@ Fory Go supports a wide range of types:
 
 See [Supported Types](supported-types.md) for the complete type mapping.
 
-## Cross-Language Serialization
+## Xlang Serialization
 
 Fory Go is fully compatible with other Fory implementations. Data serialized in Go can be deserialized in Java, Python, C++, Rust, or JavaScript:
 
@@ -130,25 +130,27 @@ data, _ := f.Serialize(&User{ID: 1, Name: "Alice"})
 // 'data' can be deserialized by Java, Python, etc.
 ```
 
-See [Cross-Language Serialization](cross-language.md) for type mapping and compatibility details.
+See [Xlang Serialization](xlang-serialization.md) for type mapping and compatibility details.
 
 ## Documentation
 
-| Topic                                         | Description                            |
-| --------------------------------------------- | -------------------------------------- |
-| [Basic Serialization](basic-serialization.md) | Core APIs and usage patterns           |
-| [Configuration](configuration.md)             | Options and settings                   |
-| [Cross-Language](cross-language.md)           | Multi-language serialization           |
-| [Schema Metadata](schema-metadata.md)         | Field-level configuration              |
-| [Type Registration](type-registration.md)     | Registering types for serialization    |
-| [Supported Types](supported-types.md)         | Complete type support reference        |
-| [References](references.md)                   | Circular references and shared objects |
-| [Schema Evolution](schema-evolution.md)       | Forward/backward compatibility         |
-| [Thread Safety](thread-safety.md)             | Concurrent usage patterns              |
-| [Troubleshooting](troubleshooting.md)         | Common issues and solutions            |
+| Topic                                           | Description                            |
+| ----------------------------------------------- | -------------------------------------- |
+| [Basic Serialization](basic-serialization.md)   | Core APIs and usage patterns           |
+| [Xlang Serialization](xlang-serialization.md)   | Multi-language serialization           |
+| [Native Serialization](native-serialization.md) | Go-only serialization                  |
+| [Configuration](configuration.md)               | Options and settings                   |
+| [Schema Metadata](schema-metadata.md)           | Field-level configuration              |
+| [Type Registration](type-registration.md)       | Registering types for serialization    |
+| [Supported Types](supported-types.md)           | Complete type support reference        |
+| [References](references.md)                     | Circular references and shared objects |
+| [Schema Evolution](schema-evolution.md)         | Forward/backward compatibility         |
+| [Custom Serializers](custom-serializers.md)     | Extend serialization behavior          |
+| [Thread Safety](thread-safety.md)               | Concurrent usage patterns              |
+| [Troubleshooting](troubleshooting.md)           | Common issues and solutions            |
 
 ## Related Resources
 
 - [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
-- [Cross-Language Type Mapping](../../specification/xlang_type_mapping.md)
+- [Xlang Type Mapping](../../specification/xlang_type_mapping.md)
 - [GitHub Repository](https://github.com/apache/fory)

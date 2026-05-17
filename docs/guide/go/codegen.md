@@ -1,6 +1,6 @@
 ---
 title: Code Generation
-sidebar_position: 100
+sidebar_position: 11
 id: codegen
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

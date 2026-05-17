@@ -1,6 +1,6 @@
 ---
 title: Configuration
-sidebar_position: 10
+sidebar_position: 4
 id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -339,6 +339,14 @@ for req := range requests {
 5. **Set appropriate max depth**: Increase for deeply nested structures, but be aware of memory usage.
 
 6. **Use compatible mode for evolving schemas**: Enable when struct definitions may change between service versions.
+
+## Security
+
+Security-related configuration:
+
+- Register only the expected structs before deserializing untrusted data.
+- Use `WithMaxDepth(...)` to reject unexpectedly deep payloads.
+- Prefer concrete struct fields over broad `any` or interface-typed fields for untrusted input.
 
 ## Related Topics
 

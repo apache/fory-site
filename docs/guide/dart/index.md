@@ -23,7 +23,7 @@ Apache Fory™ Dart lets you serialize Dart objects to bytes and deserialize the
 
 ## Why Fory Dart?
 
-- **Cross-language**: serialize in Dart, deserialize in Java, Go, C#, and more without writing any glue code
+- **Xlang**: serialize in Dart, deserialize in Java, Go, C#, and more without writing any glue code
 - **Platform support**: use the same generated-serializer API on Dart VM/AOT, Flutter, and web
 - **Fast**: generated serializer code replaces reflection at runtime
 - **Schema evolution**: add or remove fields without breaking existing messages
@@ -130,7 +130,7 @@ dart run build_runner build --delete-conflicting-outputs
 | [Configuration](configuration.md)               | Runtime options, compatible mode, and safety limits             |
 | [Basic Serialization](basic-serialization.md)   | `serialize`, `deserialize`, generated registration, root graphs |
 | [Code Generation](code-generation.md)           | `@ForyStruct`, build runner, and generated namespaces           |
-| [Cross-Language](cross-language.md)             | Interoperability rules and field alignment                      |
+| [Xlang Serialization](xlang-serialization.md)   | Interoperability rules and field alignment                      |
 | [Schema Metadata](schema-metadata.md)           | `@ForyField`, field IDs, nullability, references, polymorphism  |
 | [Type Registration](type-registration.md)       | ID-based vs name-based registration and registration rules      |
 | [Custom Serializers](custom-serializers.md)     | Manual `Serializer<T>` implementations and unions               |
@@ -143,5 +143,5 @@ dart run build_runner build --delete-conflicting-outputs
 
 - [Xlang serialization specification](../../specification/xlang_serialization_spec.md)
 - [Xlang implementation guide](../../specification/xlang_implementation_guide.md)
-- [Cross-language guide](../xlang/index.md)
+- [Xlang guide](../xlang/index.md)
 - [Dart runtime source directory](https://github.com/apache/fory/tree/main/dart)

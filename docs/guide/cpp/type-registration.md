@@ -1,6 +1,6 @@
 ---
 title: Type Registration
-sidebar_position: 6
+sidebar_position: 7
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -25,7 +25,7 @@ This page explains how to register types for serialization.
 
 Apache Fory™ requires explicit type registration for struct types. This design enables:
 
-- **Cross-Language Compatibility**: Registered type IDs are used across language boundaries
+- **Xlang compatibility**: Registered type IDs are used across language boundaries
 - **Type Safety**: Detects type mismatches at deserialization time
 - **Polymorphic Serialization**: Enables serialization of polymorphic objects via smart pointers
 
@@ -127,7 +127,7 @@ std::thread t2([&]() {
 });
 ```
 
-## Cross-Language Registration
+## Xlang Registration
 
 For cross-language compatibility, ensure:
 
@@ -250,5 +250,5 @@ if (!result.ok()) {
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Using registered types
-- [Cross-Language](cross-language.md) - Cross-language considerations
+- [Xlang Serialization](xlang-serialization.md) - Cross-language considerations
 - [Supported Types](supported-types.md) - All supported types

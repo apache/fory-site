@@ -1,7 +1,7 @@
 ---
-title: Cross-Language Serialization
-sidebar_position: 3
-id: cross_language
+title: Xlang Serialization
+sidebar_position: 2
+id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to use Fory for cross-language serialization between C++ and other languages.
+This page explains how to use Fory xlang serialization between C++ and other languages.
 
 ## Overview
 
-Apache Fory™ enables seamless data exchange between C++, Java, Python, Go, Rust, and JavaScript. The xlang (cross-language) mode ensures binary compatibility across all supported languages.
+Apache Fory™ enables seamless data exchange between C++, Java, Python, Go, Rust, and JavaScript. Xlang mode ensures binary compatibility across all supported languages.
 
 ## Create an Xlang Runtime
 
@@ -37,7 +37,7 @@ using namespace fory::serialization;
 auto fory = Fory::builder().xlang(true).build();
 ```
 
-## Cross-Language Example
+## Xlang Example
 
 ### C++ Producer
 

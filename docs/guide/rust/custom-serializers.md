@@ -1,6 +1,6 @@
 ---
 title: Custom Serializers
-sidebar_position: 9
+sidebar_position: 10
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

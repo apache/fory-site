@@ -142,4 +142,4 @@ When the same model is defined in multiple languages:
 
 - [Code Generation](code-generation.md)
 - [Schema Evolution](schema-evolution.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

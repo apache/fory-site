@@ -130,7 +130,7 @@ Use xlang mode for cross-language payloads and schemas shared with non-Java runt
 
 Use native mode for Java-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and owns Java-specific object behavior such as JDK serialization hooks, `Externalizable`, dynamic object graphs, object copy, and Java native-mode zero-copy buffers. It is optimized for the JVM type system and supports a broader Java object surface than xlang mode. If you are replacing JDK serialization, Kryo, FST, Hessian, or Java-only Protocol Buffers payloads, start with native mode.
 
-See [Native Mode](native-mode.md) for Java-only serialization details and [Cross-Language Serialization](cross-language.md) for Java xlang registration and interoperability rules.
+See [Native Serialization](native-serialization.md) for Java-only serialization details and [Xlang Serialization](xlang-serialization.md) for Java xlang registration and interoperability rules.
 
 ## Thread Safety
 
@@ -213,6 +213,7 @@ ThreadSafeFory threadLocalFory = Fory.builder()
 - [Virtual Threads](virtual-threads.md) - Virtual-thread usage and pool sizing guidance
 - [Type Registration](type-registration.md) - Class registration and security
 - [Custom Serializers](custom-serializers.md) - Implement custom serializers
-- [Cross-Language Serialization](cross-language.md) - Serialize data for other languages
+- [Xlang Serialization](xlang-serialization.md) - Serialize data for other languages
+- [Native Serialization](native-serialization.md) - Java-only serialization features
 - [Static Generated Serializers](static-generated-serializers.md) - Annotation-processor static generated serializers for `@ForyStruct`
 - [GraalVM Support](graalvm-support.md) - Build-time serializer compilation for native images

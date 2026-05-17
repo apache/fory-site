@@ -1,7 +1,7 @@
 ---
-title: Cross-Language Serialization
-sidebar_position: 4
-id: cross_language
+title: Xlang Serialization
+sidebar_position: 2
+id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,32 +19,43 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ supports seamless data exchange between Java and other languages (Python, Rust, Go, JavaScript, etc.) through the xlang serialization format. This enables multi-language microservices, polyglot data pipelines, and cross-platform data sharing.
+Apache Fory™ xlang serialization is the Java wire mode for payloads that must be read by Python,
+Rust, Go, JavaScript, C++, C#, Swift, Dart, or another non-Java Fory runtime. Java defaults to
+xlang mode with compatible schema evolution, but examples set the mode explicitly so the payload
+contract is visible in code.
 
 ## Create an Xlang Runtime
 
-Java defaults to xlang mode with compatible schema evolution. Set the mode explicitly in xlang examples:
+Use one long-lived `Fory` or `ThreadSafeFory` instance per configuration. Creating a runtime is
+expensive because Fory caches type metadata and generated serializers.
 
 ```java
-import org.apache.fory.*;
-import org.apache.fory.config.*;
+import org.apache.fory.Fory;
 
 Fory fory = Fory.builder()
     .withXlang(true)
-    .withRefTracking(true)  // Enable reference tracking for complex graphs
+    .requireClassRegistration(true)
+    .withRefTracking(true)
     .build();
 ```
 
-## Register Types for Cross-Language Compatibility
+`withRefTracking(true)` is required only when the cross-language data model includes shared object
+identity or cycles. Disable it for value-shaped schemas.
 
-Types must be registered with **consistent IDs or names** across all languages. Fory supports two registration methods:
+Use [Native Serialization](native-serialization.md) instead when every writer and reader is Java
+and the payload should preserve Java-specific object behavior.
+
+## Register Types
+
+Types must be registered with consistent IDs or names across all languages. Fory supports two
+registration methods.
 
 ### Register by ID (Recommended for Performance)
 
 ```java
 public record Person(String name, int age) {}
 
-// Register with numeric ID - faster and more compact
+// Numeric ID registration is compact and fast.
 fory.register(Person.class, 1);
 
 Person person = new Person("Alice", 30);
@@ -52,50 +63,55 @@ byte[] bytes = fory.serialize(person);
 // bytes can be deserialized by Python, Rust, Go, etc.
 ```
 
-**Benefits**: Faster serialization, smaller binary size
-**Trade-offs**: Requires coordination to avoid ID conflicts across teams/services
+Benefits: faster serialization and smaller binary size.
+
+Trade-off: every service must coordinate IDs so the same logical type uses the same number.
 
 ### Register by Name (Recommended for Flexibility)
 
 ```java
 public record Person(String name, int age) {}
 
-// Register with string name - more flexible
-fory.register(Person.class, "example.Person");
+// Namespace/type-name registration is easier to coordinate across teams.
+fory.register(Person.class, "example", "Person");
 
 Person person = new Person("Alice", 30);
 byte[] bytes = fory.serialize(person);
 // bytes can be deserialized by Python, Rust, Go, etc.
 ```
 
-**Benefits**: Less prone to conflicts, easier management across teams, no coordination needed
-**Trade-offs**: Slightly larger binary size due to string encoding
+Benefits: less risk of numeric ID conflicts and easier management across independently owned
+services.
 
-## Cross-Language Example: Java ↔ Python
+Trade-off: the payload includes string identity, so it is larger than ID-based registration.
+
+The Java API also supports a single string type name, such as
+`fory.register(Person.class, "example.Person")`. Use the same logical identity on every runtime.
+
+## Java To Python Example
 
 ### Java (Serializer)
 
 ```java
-import org.apache.fory.*;
-import org.apache.fory.config.*;
+import org.apache.fory.Fory;
 
 public record Person(String name, int age) {}
 
 public class Example {
-    public static void main(String[] args) {
-        Fory fory = Fory.builder()
-            .withXlang(true)
-            .withRefTracking(true)
-            .build();
+  public static void main(String[] args) {
+    Fory fory = Fory.builder()
+        .withXlang(true)
+        .withRefTracking(true)
+        .build();
 
-        // Register with consistent name
-        fory.register(Person.class, "example.Person");
+    // Register with the same logical name used by Python.
+    fory.register(Person.class, "example.Person");
 
-        Person person = new Person("Bob", 25);
-        byte[] bytes = fory.serialize(person);
+    Person person = new Person("Bob", 25);
+    byte[] bytes = fory.serialize(person);
 
-        // Send bytes to Python service via network/file/queue
-    }
+    // Send bytes to Python by your service transport.
+  }
 }
 ```
 
@@ -112,10 +128,9 @@ class Person:
 
 fory = pyfory.Fory(xlang=True, ref=True)
 
-# Register with the SAME name as Java
+# Register with the same name as Java.
 fory.register_type(Person, typename="example.Person")
 
-# Deserialize bytes from Java
 person = fory.deserialize(bytes_from_java)
 print(f"{person.name}, {person.age}")  # Output: Bob, 25
 ```
@@ -126,25 +141,24 @@ Xlang mode supports circular and shared references when reference tracking is en
 
 ```java
 public class Node {
-    public String value;
-    public Node next;
-    public Node parent;
+  public String value;
+  public Node next;
+  public Node parent;
 }
 
 Fory fory = Fory.builder()
     .withXlang(true)
-    .withRefTracking(true)  // Required for circular references
+    .withRefTracking(true)
     .build();
 
 fory.register(Node.class, "example.Node");
 
-// Create circular reference
 Node node1 = new Node();
 node1.value = "A";
 Node node2 = new Node();
 node2.value = "B";
 node1.next = node2;
-node2.parent = node1;  // Circular reference
+node2.parent = node1;
 
 byte[] bytes = fory.serialize(node1);
 // Python/Rust/Go can correctly deserialize this with circular references preserved
@@ -154,12 +168,16 @@ byte[] bytes = fory.serialize(node1);
 
 Not all Java types have equivalents in other languages. When using xlang mode:
 
-- Use **primitive types** (`int`, `long`, `double`, `String`) for maximum compatibility
-- Use **standard collections** (`List`, `Map`, `Set`) instead of language-specific ones
-- Use **reduced-precision carriers** (`Float16`, `BFloat16`, `Float16List`, `BFloat16List`) for 16-bit float payloads
-- Treat `Float16[]`, `BFloat16[]`, `Float16List`, and `BFloat16List` as `list<T>` carriers by default; use `@ArrayType` when the schema must be `array<float16>` or `array<bfloat16>`
-- Avoid **Java-specific types** like `Optional`, `BigDecimal` (unless the target language supports them)
-- See [Type Mapping Guide](../../specification/xlang_type_mapping.md) for complete compatibility matrix
+- Use primitive types (`int`, `long`, `double`, `String`) for maximum compatibility.
+- Use standard collections (`List`, `Map`, `Set`) instead of language-specific collections.
+- Use reduced-precision carriers (`Float16`, `BFloat16`, `Float16List`, `BFloat16List`) for
+  16-bit float payloads.
+- Treat `Float16[]`, `BFloat16[]`, `Float16List`, and `BFloat16List` as `list<T>` carriers by
+  default; use `@ArrayType` when the schema must be `array<float16>` or `array<bfloat16>`.
+- Avoid Java-specific types like `Optional`, `BigDecimal`, and `EnumSet` unless every target runtime
+  has an agreed mapping.
+- See [Type Mapping Guide](../../specification/xlang_type_mapping.md) for the complete
+  compatibility matrix.
 
 ### Lists and Dense Arrays
 
@@ -226,12 +244,14 @@ Xlang mode has additional overhead compared to Java native mode:
 - **Disable reference tracking** if you don't need circular references (`withRefTracking(false)`)
 - **Use native mode** (`withXlang(false)`) when only Java serialization is needed
 
-## Cross-Language Best Practices
+## Best Practices
 
-1. **Consistent Registration**: Ensure all services register types with identical IDs/names
-2. **Version Compatibility**: Keep compatible mode for schema evolution across services
+1. Use explicit type IDs or namespace/type names for every user type.
+2. Keep compatible mode for independently deployed services.
+3. Test payloads through every runtime before relying on a schema in production.
+4. Use native serialization for Java-only traffic that needs Java-specific object behavior.
 
-## Troubleshooting Cross-Language Serialization
+## Troubleshooting
 
 ### "Type not registered" errors
 
@@ -250,13 +270,14 @@ Xlang mode has additional overhead compared to Java native mode:
 
 ## See Also
 
-- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
 - [Type Mapping Reference](../../specification/xlang_type_mapping.md)
-- [Python Cross-Language Guide](../python/cross-language.md)
-- [Rust Cross-Language Guide](../rust/cross-language.md)
+- [Python Xlang Serialization Guide](../python/xlang-serialization.md)
+- [Rust Xlang Serialization Guide](../rust/xlang-serialization.md)
 
 ## Related Topics
 
 - [Schema Evolution](schema-evolution.md) - Compatible mode
 - [Type Registration](type-registration.md) - Registration methods
+- [Native Serialization](native-serialization.md) - Java-only serialization features
 - [Row Format](row-format.md) - Cross-language row format

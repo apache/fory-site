@@ -1,6 +1,6 @@
 ---
 title: Type Registration
-sidebar_position: 40
+sidebar_position: 6
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -25,7 +25,7 @@ Type registration tells Fory how to identify and serialize your custom types. Re
 
 1. **Type Identification**: Fory needs to identify the actual type during deserialization
 2. **Polymorphism**: When deserializing interface types, Fory must know which concrete type to create
-3. **Cross-Language Compatibility**: Other languages need to recognize and deserialize your types
+3. **Xlang compatibility**: Other languages need to recognize and deserialize your types
 
 ## Struct Registration
 
@@ -163,7 +163,7 @@ f.RegisterStruct(Address{}, 1)
 f.RegisterStruct(Person{}, 2)
 ```
 
-## Cross-Language Registration
+## Xlang Registration
 
 For cross-language serialization, types must be registered consistently across all languages.
 
@@ -259,6 +259,6 @@ Two types registered with the same ID will conflict.
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [Supported Types](supported-types.md)
 - [Troubleshooting](troubleshooting.md)

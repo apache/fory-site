@@ -20,7 +20,7 @@ license: |
 ---
 
 This page covers advanced Java runtime features that are not part of first-use serialization.
-Java native-mode zero-copy serialization is documented in [Native Mode](native-mode.md), and deep
+Java native-mode zero-copy serialization is documented in [Native Serialization](native-serialization.md), and deep
 copy semantics are documented in [Object Copy](object-copy.md).
 
 ## Memory Allocation Customization
@@ -155,6 +155,6 @@ static {
 
 - [Compression](compression.md) - Data compression options
 - [Configuration](configuration.md) - All ForyBuilder options
-- [Native Mode](native-mode.md) - Java-only serialization, JDK hooks, and zero-copy buffers
+- [Native Serialization](native-serialization.md) - Java-only serialization, JDK hooks, and zero-copy buffers
 - [Object Copy](object-copy.md) - Deep copy functionality
-- [Cross-Language](cross-language.md) - Java xlang interoperability
+- [Xlang Serialization](xlang-serialization.md) - Java xlang interoperability

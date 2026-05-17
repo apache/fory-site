@@ -1,6 +1,6 @@
 ---
 title: NumPy & Pandas
-sidebar_position: 10
+sidebar_position: 11
 id: numpy_integration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

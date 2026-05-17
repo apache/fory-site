@@ -1,6 +1,6 @@
 ---
 title: Configuration
-sidebar_position: 3
+sidebar_position: 4
 id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -158,9 +158,97 @@ fory = pyfory.Fory(
 
 Use `strict=False` only for trusted data, preferably with a `policy=` deserialization policy.
 
+## Security
+
+Treat native-mode bytes from untrusted sources the same way you would treat untrusted pickle bytes.
+Native mode can reconstruct Python objects, import modules, invoke reduction hooks, and rebuild
+dynamic classes or functions when `strict=False`.
+
+### Production Configuration
+
+Keep `strict=True` for production payloads unless the whole data source is trusted and a
+`DeserializationPolicy` owns the remaining trust decisions:
+
+```python
+import pyfory
+
+fory = pyfory.Fory(
+    xlang=True,
+    ref=False,
+    strict=True,
+    max_depth=50,
+)
+
+fory.register(UserModel, typename="example.User")
+fory.register(OrderModel, typename="example.Order")
+```
+
+Use dynamic native-mode deserialization (`strict=False`) only for trusted Python-only payloads:
+
+```python
+import pyfory
+
+fory = pyfory.Fory(
+    xlang=False,
+    ref=True,
+    strict=False,
+    max_depth=100,
+)
+```
+
+### DeserializationPolicy
+
+When `strict=False` is necessary, use `DeserializationPolicy` to restrict the dynamic types and
+hooks accepted during deserialization:
+
+```python
+import pyfory
+from pyfory import DeserializationPolicy
+
+dangerous_modules = {"subprocess", "os", "__builtin__"}
+
+class SafeDeserializationPolicy(DeserializationPolicy):
+    def validate_class(self, cls, is_local, **kwargs):
+        if cls.__module__ in dangerous_modules:
+            raise ValueError(f"Blocked dangerous class: {cls.__module__}.{cls.__name__}")
+        return None
+
+    def intercept_reduce_call(self, callable_obj, args, **kwargs):
+        if getattr(callable_obj, "__name__", "") == "Popen":
+            raise ValueError("Blocked attempt to invoke subprocess.Popen")
+        return None
+
+    def intercept_setstate(self, obj, state, **kwargs):
+        if isinstance(state, dict) and "password" in state:
+            state["password"] = "***REDACTED***"
+        return None
+
+policy = SafeDeserializationPolicy()
+fory = pyfory.Fory(xlang=False, ref=True, strict=False, policy=policy)
+```
+
+Available policy hooks include:
+
+| Hook                                         | Description                                         |
+| -------------------------------------------- | --------------------------------------------------- |
+| `validate_class(cls, is_local)`              | Validate or block class types                       |
+| `validate_module(module, is_local)`          | Validate or block module imports                    |
+| `validate_function(func, is_local)`          | Validate or block function references               |
+| `intercept_reduce_call(callable_obj, args)`  | Intercept `__reduce__` invocations                  |
+| `inspect_reduced_object(obj)`                | Inspect or replace objects created via `__reduce__` |
+| `intercept_setstate(obj, state)`             | Sanitize state before `__setstate__`                |
+| `authorize_instantiation(cls, args, kwargs)` | Control class instantiation                         |
+
+### Security Checklist
+
+- Keep `strict=True` for untrusted data.
+- Register all expected application types before deserialization.
+- Use `DeserializationPolicy` when `strict=False` is necessary.
+- Keep `max_depth` low enough to reject unexpectedly deep payloads.
+- Do not treat xlang/native mode choice as a security control.
+
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Using configured Fory
 - [Type Registration](type-registration.md) - Registration patterns
-- [Python Native Mode](python-native.md) - Python-only object serialization
-- [Security](security.md) - Security best practices
+- [Native Serialization](native-serialization.md) - Python-only object serialization

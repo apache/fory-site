@@ -1,7 +1,7 @@
 ---
-title: Cross-Language Serialization
+title: Xlang Serialization
 sidebar_position: 3
-id: cross_language
+id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ C# supports cross-language serialization with other Fory runtimes.
+Apache Fory™ C# supports xlang serialization with other Fory runtimes.
 
-## Cross-Language Runtime
+## Xlang Runtime
 
 C# always writes and reads the xlang frame header. There is no mode switch, so interoperability code
 only needs to configure the remaining runtime behavior such as compatibility mode and reference
@@ -58,7 +58,7 @@ Use the same ID mapping on all languages.
 fory.Register<Person>("com.example", "Person");
 ```
 
-## Cross-Language Example
+## Xlang Example
 
 ### C# (Serializer)
 

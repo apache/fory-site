@@ -1,6 +1,6 @@
 ---
 title: Configuration
-sidebar_position: 2
+sidebar_position: 4
 id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -128,8 +128,17 @@ let fory = Fory::builder()
 | `xlang(bool)`        | Use xlang mode                          | `true`                         |
 | `max_dyn_depth(u32)` | Maximum nesting depth for dynamic types | `5`                            |
 
+## Security
+
+Security-related configuration:
+
+- Register application structs and trait-object implementations before deserializing untrusted
+  payloads.
+- Use `max_dyn_depth(...)` to reject unexpectedly deep dynamic object graphs.
+- Prefer concrete typed fields over `dyn Any` or broad trait-object fields for untrusted input.
+
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Using configured Fory
 - [Schema Evolution](schema-evolution.md) - Compatible mode details
-- [Cross-Language](cross-language.md) - xlang mode
+- [Xlang Serialization](xlang-serialization.md) - xlang mode

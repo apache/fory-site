@@ -25,7 +25,7 @@ Apache Fory Swift provides high-performance object graph serialization with stro
 
 - Fast binary serialization for Swift value and reference types
 - `@ForyStruct`, `@ForyEnum`, and `@ForyUnion` macros for zero-boilerplate model serialization
-- Cross-language protocol compatibility (`xlang`) with Java, Rust, Go, Python, and more
+- Xlang protocol compatibility with Java, Rust, Go, Python, and more
 - Compatible mode for schema evolution across versions
 - Built-in support for dynamic values (`Any`, `AnyObject`, `any Serializer`, `AnyHashable`)
 - Reference tracking for shared/circular graphs, including weak references on classes
@@ -52,7 +52,7 @@ targets: [
 
 - [Configuration](configuration.md)
 - [Basic Serialization](basic-serialization.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [Schema Metadata](schema-metadata.md)
 - [Type Registration](type-registration.md)
 - [Custom Serializers](custom-serializers.md)

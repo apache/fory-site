@@ -1,6 +1,6 @@
 ---
 title: Schema Evolution
-sidebar_position: 5
+sidebar_position: 6
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -387,7 +387,7 @@ Test both upgrade and downgrade scenarios:
 // Test V3 -> V1
 ```
 
-## Cross-Language Schema Evolution
+## Xlang Schema Evolution
 
 Schema evolution works across languages when using xlang mode:
 
@@ -413,4 +413,4 @@ Both instances can exchange data even with different schema versions.
 
 - [Configuration](configuration.md) - Enabling compatible mode
 - [Type Registration](type-registration.md) - Type ID management
-- [Cross-Language](cross-language.md) - Cross-language considerations
+- [Xlang Serialization](xlang-serialization.md) - Cross-language considerations

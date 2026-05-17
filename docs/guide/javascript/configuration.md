@@ -96,6 +96,16 @@ const fory = new Fory({ hps });
 
 Leave this unset unless you run on Node.js 20+ and have benchmarked your workload.
 
+## Security
+
+Security-related configuration:
+
+- Register only the expected schemas before deserializing untrusted payloads.
+- Set `maxDepth`, `maxBinarySize`, and `maxCollectionSize` for the maximum payload shape your
+  service accepts.
+- Prefer explicit `Type.struct(...)` schemas over `Type.any()` for untrusted input.
+- Pass `hps` only from the official package version you deploy with the runtime.
+
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md)

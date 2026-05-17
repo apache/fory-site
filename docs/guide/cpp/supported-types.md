@@ -1,6 +1,6 @@
 ---
 title: Supported Types
-sidebar_position: 8
+sidebar_position: 9
 id: supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -278,4 +278,4 @@ Currently not supported:
 
 - [Basic Serialization](basic-serialization.md) - Using these types
 - [Type Registration](type-registration.md) - Registering types
-- [Cross-Language](cross-language.md) - Cross-language compatibility
+- [Xlang Serialization](xlang-serialization.md) - Cross-language compatibility

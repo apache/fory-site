@@ -174,4 +174,4 @@ For types that need completely custom encoding, use `Type.ext(...)` and pass a c
 
 - [Basic Serialization](basic-serialization.md)
 - [References](references.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

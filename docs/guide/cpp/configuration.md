@@ -1,6 +1,6 @@
 ---
 title: Configuration
-sidebar_position: 2
+sidebar_position: 4
 id: configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -170,8 +170,18 @@ auto fory = Fory::builder().xlang(true).build_thread_safe();  // Returns ThreadS
 | `max_dyn_depth(uint32_t)`    | Maximum nesting depth for dynamic types | `5`                            |
 | `check_struct_version(bool)` | Enable struct version checking          | `false`                        |
 
+## Security
+
+Security-related configuration:
+
+- Register all structs and polymorphic implementations before deserializing untrusted payloads.
+- Use `check_struct_version(true)` with `compatible(false)` when exact schema matching is required.
+- Keep `max_dyn_depth(...)` as low as your model permits to reject unexpectedly deep polymorphic
+  graphs.
+- Prefer concrete fields over broad polymorphic fields for untrusted input.
+
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md) - Using configured Fory
-- [Cross-Language](cross-language.md) - xlang mode details
+- [Xlang Serialization](xlang-serialization.md) - xlang mode details
 - [Type Registration](type-registration.md) - Registering types

@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-sidebar_position: 120
+sidebar_position: 13
 id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -242,7 +242,7 @@ type Good struct {
 }
 ```
 
-## Cross-Language Issues
+## Xlang Issues
 
 ### Field Order Mismatch
 
@@ -407,7 +407,7 @@ func TestRoundTrip(t *testing.T) {
 }
 ```
 
-### Test Cross-Language
+### Test Xlang
 
 ```bash
 cd java/fory-core
@@ -444,6 +444,6 @@ If you encounter issues not covered here:
 ## Related Topics
 
 - [Configuration](configuration.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [Schema Evolution](schema-evolution.md)
 - [Thread Safety](thread-safety.md)

@@ -242,5 +242,5 @@ public class DeserializeIntoType {
 ## Related Topics
 
 - [Configuration](configuration.md) - All ForyBuilder options
-- [Cross-Language Serialization](cross-language.md) - xlang mode
+- [Xlang Serialization](xlang-serialization.md) - xlang mode
 - [Troubleshooting](troubleshooting.md) - Common schema issues

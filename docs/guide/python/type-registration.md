@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-This page covers Python type registration APIs. Use [Security](security.md) for
+This page covers Python type registration APIs. Use [Configuration](configuration.md#security) for
 strict-mode policy, max-depth limits, and trusted-data guidance.
 
 ## Type Registration
@@ -81,5 +81,5 @@ same registration IDs or names on every peer that shares those payloads.
 ## Related Topics
 
 - [Configuration](configuration.md) - Fory parameters
-- [Security](security.md) - Strict mode, deserialization policies, and size limits
+- [Configuration](configuration.md#security) - Strict mode, deserialization policies, and size limits
 - [Custom Serializers](custom-serializers.md) - Custom serialization

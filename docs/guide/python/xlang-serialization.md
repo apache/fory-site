@@ -1,7 +1,7 @@
 ---
-title: Cross-Language Serialization
-sidebar_position: 4
-id: cross_language
+title: Xlang Serialization
+sidebar_position: 2
+id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-`pyfory` supports cross-language object graph serialization, allowing you to serialize data in Python and deserialize it in Java, Go, Rust, or other supported languages.
+`pyfory` supports xlang object graph serialization, allowing you to serialize data in Python and deserialize it in Java, Go, Rust, or other supported languages.
 
 ## Create an Xlang Runtime
 
@@ -30,7 +30,7 @@ import pyfory
 fory = pyfory.Fory(xlang=True, ref=False, strict=True)
 ```
 
-## Cross-Language Example
+## Xlang Example
 
 ### Python (Serializer)
 
@@ -40,7 +40,7 @@ from dataclasses import dataclass
 
 f = pyfory.Fory(xlang=True, ref=True)
 
-# Register type for cross-language compatibility
+# Register type for xlang compatibility
 @dataclass
 class Person:
     name: str
@@ -90,9 +90,9 @@ fory.register_by_name::<Person>("example", "Person");
 let person: Person = fory.deserialize(&binary_data)?;
 ```
 
-## Type Annotations for Cross-Language
+## Type Annotations for Xlang
 
-Use pyfory type annotations for explicit cross-language type mapping:
+Use pyfory type annotations for explicit xlang type mapping:
 
 ```python
 from dataclasses import dataclass
@@ -196,10 +196,10 @@ The binary protocol and API are similar to `pyfory`'s Python native mode, but Py
 
 ## See Also
 
-- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
 - [Type Mapping Reference](../../specification/xlang_type_mapping.md)
-- [Java Cross-Language Guide](../java/cross-language.md)
-- [Rust Cross-Language Guide](../rust/cross-language.md)
+- [Java Xlang Serialization Guide](../java/xlang-serialization.md)
+- [Rust Xlang Serialization Guide](../rust/xlang-serialization.md)
 
 ## Related Topics
 

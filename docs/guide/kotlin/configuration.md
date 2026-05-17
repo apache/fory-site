@@ -114,3 +114,22 @@ val fory = ForyKotlin.builder().withXlang(false)
     .withLongCompressed(true)
     .build()
 ```
+
+## Security
+
+Kotlin uses the Java runtime configuration surface. Keep class registration enabled for production
+and any untrusted payload source:
+
+```kotlin
+val fory = ForyKotlin.builder()
+    .requireClassRegistration(true)
+    .withMaxDepth(50)
+    .build()
+```
+
+Security-related configuration:
+
+- Keep `requireClassRegistration(true)` and register application classes or generated modules.
+- Use `withMaxDepth(...)` to reject unexpectedly deep object graphs.
+- Follow [Java Configuration](../java/configuration.md#security) for allow-listing and unknown-class
+  controls.

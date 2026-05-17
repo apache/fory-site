@@ -148,16 +148,17 @@ Use xlang mode for cross-language payloads and dataclass schemas shared with oth
 
 Use native mode for Python-only traffic. Native mode is selected with `xlang=False`, uses schema-consistent payloads unless compatible mode is enabled, and owns pickle/cloudpickle-style behavior such as functions, lambdas, classes, methods, `__reduce__`, `__getstate__`, and out-of-band pickle protocol 5 buffers. It is optimized for Python's type system and supports a broader Python object surface than xlang mode, so use it when replacing pickle or cloudpickle.
 
-See [Python Native Mode](python-native.md) for Python-only serialization details and [Cross-Language](cross-language.md) for Python xlang registration and interoperability rules.
+See [Native Serialization](native-serialization.md) for Python-only serialization details and [Xlang Serialization](xlang-serialization.md) for Python xlang registration and interoperability rules.
 
 ## Next Steps
 
-- [Configuration](configuration.md) - Fory parameters and modes
 - [Basic Serialization](basic-serialization.md) - Basic usage patterns
-- [Python Native Mode](python-native.md) - Functions, lambdas, classes
-- [Cross-Language](cross-language.md) - xlang mode
+- [Xlang Serialization](xlang-serialization.md) - xlang mode
+- [Native Serialization](native-serialization.md) - Python-only serialization
+- [Configuration](configuration.md) - Fory parameters, modes, and security
+- [Type Registration](type-registration.md) - User-defined type registration
+- [Custom Serializers](custom-serializers.md) - Extend serialization behavior
 - [Row Format](row-format.md) - Zero-copy row format
-- [Security](security.md) - Security best practices
 
 ## Links
 

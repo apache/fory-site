@@ -24,7 +24,7 @@ Apache Fory™ C# is a high-performance, cross-language serialization runtime fo
 ## Why Fory C#?
 
 - High performance binary serialization for .NET 8+
-- Cross-language compatibility with Fory implementations in Java, Python, C++, Go, Rust, and JavaScript
+- Xlang compatibility with Fory implementations in Java, Python, C++, Go, Rust, and JavaScript
 - Source-generator-based serializers for `[ForyObject]` types
 - Optional reference tracking for shared and circular object graphs
 - Compatible mode for schema evolution
@@ -87,7 +87,7 @@ User decoded = fory.Deserialize<User>(payload);
 | --------------------------------------------- | --------------------------------------------- |
 | [Configuration](configuration.md)             | Builder options and runtime modes             |
 | [Basic Serialization](basic-serialization.md) | Typed and dynamic serialization APIs          |
-| [Cross-Language](cross-language.md)           | Interoperability guidance                     |
+| [Xlang Serialization](xlang-serialization.md) | Interoperability guidance                     |
 | [Schema Metadata](schema-metadata.md)         | `[ForyField]` ids and schema type descriptors |
 | [Type Registration](type-registration.md)     | Registering user types and custom serializers |
 | [Custom Serializers](custom-serializers.md)   | Implementing `Serializer<T>`                  |
@@ -99,6 +99,6 @@ User decoded = fory.Deserialize<User>(payload);
 
 ## Related Resources
 
-- [Cross-language serialization specification](../../specification/xlang_serialization_spec.md)
-- [Cross-language guide](../xlang/index.md)
+- [Xlang serialization specification](../../specification/xlang_serialization_spec.md)
+- [Xlang guide](../xlang/index.md)
 - [C# source directory](https://github.com/apache/fory/tree/main/csharp)

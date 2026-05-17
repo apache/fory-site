@@ -26,7 +26,7 @@ The Rust implementation provides versatile and high-performance serialization wi
 ## Why Apache Fory™ Rust?
 
 - **Fast binary encoding**: Zero-copy deserialization and optimized binary protocols
-- **Cross-language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
+- **Xlang**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
 - **Type-safe**: Compile-time type checking with derive macros
 - **Circular references**: Automatic tracking of shared and circular references with `Rc`/`Arc` and weak pointers
 - **Polymorphic**: Serialize trait objects with `Box<dyn Trait>`, `Rc<dyn Trait>`, and `Arc<dyn Trait>`
@@ -96,7 +96,7 @@ Use xlang mode for cross-language payloads and schemas shared with other Fory ru
 
 Use native mode for Rust-only traffic. Native mode is selected with `.xlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps Rust object serialization on the Rust runtime path. It is optimized for Rust's type system and covers Rust-specific object features such as trait objects and shared-reference patterns that are not portable xlang payloads.
 
-See [Cross-Language Serialization](cross-language.md) for Rust xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode builder options.
+See [Xlang Serialization](xlang-serialization.md) for Rust xlang registration and interoperability rules, and [Native Serialization](native-serialization.md) for Rust-only payloads.
 
 ## Thread Safety
 
@@ -186,7 +186,9 @@ fory-derive/           # Procedural macros
 
 - [Configuration](configuration.md) - Fory builder options and modes
 - [Basic Serialization](basic-serialization.md) - Object graph serialization
+- [Xlang Serialization](xlang-serialization.md) - xlang mode
+- [Native Serialization](native-serialization.md) - Rust-only serialization
 - [References](references.md) - Shared and circular references
 - [Polymorphism](polymorphism.md) - Trait object serialization
-- [Cross-Language](cross-language.md) - xlang mode
+- [Custom Serializers](custom-serializers.md) - Extend serialization behavior
 - [Row Format](row-format.md) - Zero-copy row-based format

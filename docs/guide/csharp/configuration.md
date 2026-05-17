@@ -118,6 +118,15 @@ ThreadSafeFory fory = Fory.Builder()
     .BuildThreadSafe();
 ```
 
+## Security
+
+Security-related configuration:
+
+- Register only the expected types before deserializing untrusted payloads.
+- Use `CheckStructVersion(true)` with `Compatible(false)` when exact schema matching is required.
+- Set `MaxDepth(...)` to reject unexpectedly deep dynamic object graphs.
+- Prefer generated or registered concrete models over broad dynamic fields for untrusted input.
+
 ## Related Topics
 
 - [Basic Serialization](basic-serialization.md)

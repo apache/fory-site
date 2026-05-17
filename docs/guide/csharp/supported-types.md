@@ -97,4 +97,4 @@ Dynamic object payloads via `Serialize<object?>` / `Deserialize<object?>` suppor
 
 - [Basic Serialization](basic-serialization.md)
 - [Type Registration](type-registration.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)

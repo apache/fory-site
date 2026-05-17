@@ -23,7 +23,7 @@ Apache Fory JavaScript lets you serialize JavaScript and TypeScript objects to b
 
 ## Why Fory JavaScript?
 
-- **Cross-language**: serialize in JavaScript, deserialize in Java, Python, Go, and more without writing glue code
+- **Xlang**: serialize in JavaScript, deserialize in Java, Python, Go, and more without writing glue code
 - **Fast**: serializer code is generated and cached the first time you register a schema, not on every call
 - **Reference-aware**: shared references and circular object graphs are supported when enabled
 - **Explicit schemas**: field types, nullability, and polymorphism are declared once with `Type.*` builders or TypeScript decorators
@@ -113,10 +113,10 @@ options; see [Configuration](configuration.md).
 | [Supported Types](supported-types.md)         | Primitive, collection, time, enum, and struct mappings  |
 | [References](references.md)                   | Shared references and circular object graphs            |
 | [Schema Evolution](schema-evolution.md)       | Compatible mode and evolving structs                    |
-| [Cross-Language](cross-language.md)           | Interop guidance and mapping rules                      |
+| [Xlang Serialization](xlang-serialization.md) | Interop guidance and mapping rules                      |
 | [Troubleshooting](troubleshooting.md)         | Common issues, limits, and debugging tips               |
 
 ## Related Resources
 
 - [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
-- [Cross-Language Type Mapping](../../specification/xlang_type_mapping.md)
+- [Xlang Type Mapping](../../specification/xlang_type_mapping.md)

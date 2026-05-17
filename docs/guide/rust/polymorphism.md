@@ -1,6 +1,6 @@
 ---
 title: Trait Object Serialization
-sidebar_position: 7
+sidebar_position: 8
 id: polymorphism
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

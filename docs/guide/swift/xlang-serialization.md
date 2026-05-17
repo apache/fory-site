@@ -1,7 +1,7 @@
 ---
-title: Cross-Language Serialization
+title: Xlang Serialization
 sidebar_position: 3
-id: cross_language
+id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -21,7 +21,7 @@ license: |
 
 Fory Swift can exchange payloads with other Fory runtimes using the xlang protocol.
 
-## Recommended Cross-language Configuration
+## Recommended Xlang Configuration
 
 ```swift
 let fory = Fory()
@@ -48,7 +48,7 @@ fory.register(Order.self, id: 100)
 try fory.register(Order.self, namespace: "com.example", name: "Order")
 ```
 
-## Cross-language Rules
+## Xlang Rules
 
 - Keep type registration mapping consistent across languages
 - Keep compatible mode enabled when independently evolving schemas. Swift enables it by default.
@@ -92,7 +92,7 @@ Generated Swift code includes:
 - `ForyRegistration.register(_:)` helpers with transitive import registration
 - `toBytes` / `fromBytes` helpers on generated types
 
-Use generated registration before cross-language serialization:
+Use generated registration before xlang serialization:
 
 ```swift
 let fory = Fory(ref: true)
@@ -111,7 +111,7 @@ cd integration_tests/idl_tests
 
 This runs Swift roundtrip matrix tests and Java peer roundtrip checks (`IDL_PEER_LANG=swift`).
 
-## Debugging Cross-language Tests
+## Debugging Xlang Tests
 
 Enable debug output when running xlang tests:
 

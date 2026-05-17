@@ -146,7 +146,7 @@ This generates native language types with consistent field/type mappings across 
 | Topic                                                     | Description                                      |
 | --------------------------------------------------------- | ------------------------------------------------ |
 | [Getting Started](getting-started.md)                     | Installation and basic setup for all languages   |
-| [Type Mapping](../../specification/xlang_type_mapping.md) | Cross-language type mapping reference            |
+| [Type Mapping](../../specification/xlang_type_mapping.md) | Xlang type mapping reference                     |
 | [Serialization](serialization.md)                         | Built-in types, custom types, reference handling |
 | [Zero-Copy](zero-copy.md)                                 | Out-of-band serialization for large data         |
 | [Row Format](row_format.md)                               | Cache-friendly binary format with random access  |
@@ -156,10 +156,10 @@ This generates native language types with consistent field/type mappings across 
 
 For language-specific details and API reference:
 
-- [Java Cross-Language Guide](../java/cross-language.md)
-- [Python Cross-Language Guide](../python/cross-language.md)
-- [C++ Cross-Language Guide](../cpp/cross-language.md)
-- [Rust Cross-Language Guide](../rust/cross-language.md)
+- [Java Xlang Serialization Guide](../java/xlang-serialization.md)
+- [Python Xlang Serialization Guide](../python/xlang-serialization.md)
+- [C++ Xlang Serialization Guide](../cpp/xlang-serialization.md)
+- [Rust Xlang Serialization Guide](../rust/xlang-serialization.md)
 
 ## Specifications
 

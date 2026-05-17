@@ -87,12 +87,12 @@ See [Custom Serializers](custom-serializers.md) for how to implement a serialize
 - Keep IDs (or names) **stable** once payloads are persisted or exchanged across services. Changing them will break deserialization of old messages.
 - Do not mix a numeric ID on one side with a name on the other for the same type.
 
-## Cross-Language Requirements
+## Xlang Requirements
 
-The same numeric ID or `namespace + typeName` pair must be used in every runtime that reads or writes the type. See [Cross-Language](cross-language.md) for examples.
+The same numeric ID or `namespace + typeName` pair must be used in every runtime that reads or writes the type. See [Xlang Serialization](xlang-serialization.md) for examples.
 
 ## Related Topics
 
 - [Code Generation](code-generation.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [Custom Serializers](custom-serializers.md)

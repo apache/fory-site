@@ -155,5 +155,5 @@ width is one of the most common cross-language bugs.
 ## Related Topics
 
 - [Schema Metadata](schema-metadata.md)
-- [Cross-Language](cross-language.md)
+- [Xlang Serialization](xlang-serialization.md)
 - [Schema Evolution](schema-evolution.md)

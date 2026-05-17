@@ -1,7 +1,7 @@
 ---
-title: Cross-Language Serialization
-sidebar_position: 3
-id: cross_language
+title: Xlang Serialization
+sidebar_position: 2
+id: xlang_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -38,7 +38,7 @@ fory.register::<MyStruct>(100)?;
 fory.register_by_name::<MyStruct>("com.example", "MyStruct")?;
 ```
 
-## Type Registration for Cross-Language
+## Type Registration for Xlang
 
 ### Register by ID
 
@@ -58,7 +58,7 @@ For more flexible type naming:
 fory.register_by_name::<User>("com.example", "User")?;
 ```
 
-## Cross-Language Example
+## Xlang Example
 
 ### Rust (Serializer)
 
@@ -177,10 +177,10 @@ explicit array field attribute when the schema is dense `array<T>`.
 
 ## See Also
 
-- [Cross-Language Serialization Specification](../../specification/xlang_serialization_spec.md)
+- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
 - [Type Mapping Reference](../../specification/xlang_type_mapping.md)
-- [Java Cross-Language Guide](../java/cross-language.md)
-- [Python Cross-Language Guide](../python/cross-language.md)
+- [Java Xlang Serialization Guide](../java/xlang-serialization.md)
+- [Python Xlang Serialization Guide](../python/xlang-serialization.md)
 
 ## Related Topics
 
