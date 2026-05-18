@@ -229,14 +229,14 @@ message TreeNode {
 
 ### Field-Level Options
 
-| Option                       | Type   | Description                                           |
-| ---------------------------- | ------ | ----------------------------------------------------- |
-| `(fory).ref`                 | bool   | Enable reference tracking for this field              |
-| `(fory).nullable`            | bool   | Treat field as nullable (`optional`)                  |
-| `(fory).weak_ref`            | bool   | Generate weak pointer semantics (C++/Rust codegen)    |
-| `(fory).thread_safe_pointer` | bool   | Rust pointer flavor for ref fields (`Arc` vs `Rc`)    |
-| `(fory).deprecated`          | bool   | Mark field as deprecated                              |
-| `(fory).type`                | string | Primitive override for tagged 64-bit integer encoding |
+| Option                       | Type   | Description                                                                 |
+| ---------------------------- | ------ | --------------------------------------------------------------------------- |
+| `(fory).ref`                 | bool   | Enable reference tracking for this field                                    |
+| `(fory).nullable`            | bool   | Treat field as nullable (`optional`)                                        |
+| `(fory).weak_ref`            | bool   | Generate weak pointer semantics (C++/Rust codegen)                          |
+| `(fory).thread_safe_pointer` | bool   | Use Rust `Arc`/`ArcWeak` for ref fields; default `false` uses `Rc`/`RcWeak` |
+| `(fory).deprecated`          | bool   | Mark field as deprecated                                                    |
+| `(fory).type`                | string | Primitive override for tagged 64-bit integer encoding                       |
 
 Reference option behavior:
 
@@ -244,12 +244,16 @@ Reference option behavior:
 - For `repeated` fields, `(fory).ref = true` applies to list elements.
 - For `map<K, V>` fields, `(fory).ref = true` applies to map values.
 - `weak_ref` and `thread_safe_pointer` are codegen hints for C++/Rust.
+- `thread_safe_pointer` defaults to `false`; it changes only the generated Rust
+  pointer carrier and does not change the wire format.
+- In Rust codegen, `(fory).weak_ref = true` uses `RcWeak` by default and switches
+  to `ArcWeak` only when `(fory).thread_safe_pointer = true`.
 
 ### Option Examples by Shape
 
 ```protobuf
 message Graph {
-  Node root = 1 [(fory).ref = true, (fory).thread_safe_pointer = false];
+  Node root = 1 [(fory).ref = true, (fory).thread_safe_pointer = true];
   repeated Node nodes = 2 [(fory).ref = true];
   map<string, Node> cache = 3 [(fory).ref = true];
   Node parent = 4 [(fory).weak_ref = true];
