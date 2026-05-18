@@ -1,6 +1,6 @@
 ---
-title: Schema Evolution
-sidebar_position: 8
+title: Schema 演进
+sidebar_position: 7
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ C# supports schema evolution in `Compatible(true)` mode.
+Apache Fory™ C# 在 `Compatible(true)` 模式下支持 Schema 演进。
 
-## Compatible Mode
+## 兼容模式
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -29,9 +29,9 @@ Fory fory = Fory.Builder()
     .Build();
 ```
 
-Compatible mode writes type metadata that allows readers and writers with different struct definitions to interoperate.
+兼容模式会写入类型元信息，使结构体定义不同的读写端也能互操作。
 
-## Example: Add a Field
+## 示例：新增一个字段
 
 ```csharp
 using Apache.Fory;
@@ -63,9 +63,9 @@ System.Diagnostics.Debug.Assert(evolved.F1 == "hello");
 System.Diagnostics.Debug.Assert(evolved.F2 == string.Empty);
 ```
 
-## Schema-Consistent Mode with Version Check
+## 带版本校验的 Schema 一致模式
 
-If you want strict schema identity checks instead of evolution behavior:
+如果你需要严格的 Schema 身份校验，而不是演进行为：
 
 ```csharp
 Fory strict = Fory.Builder()
@@ -74,17 +74,17 @@ Fory strict = Fory.Builder()
     .Build();
 ```
 
-This mode throws on schema hash mismatches.
+这种模式会在 schema hash 不匹配时抛出异常。
 
-## Best Practices
+## 最佳实践
 
-1. Use `Compatible(true)` for independently deployed services.
-2. Keep stable type IDs across versions.
-3. Add new fields with safe defaults.
-4. Use `CheckStructVersion(true)` when strict matching is required.
+1. 对独立部署的服务启用 `Compatible(true)`。
+2. 在不同版本之间保持稳定的 type ID。
+3. 新增字段时提供安全的默认值。
+4. 如果要求严格匹配，使用 `CheckStructVersion(true)`。
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
-- [Type Registration](type-registration.md)
-- [Troubleshooting](troubleshooting.md)
+- [配置](configuration.md)
+- [类型注册](type-registration.md)
+- [故障排查](troubleshooting.md)

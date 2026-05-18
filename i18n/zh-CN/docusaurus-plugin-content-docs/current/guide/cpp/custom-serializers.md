@@ -1,6 +1,6 @@
 ---
-title: Custom Serializers
-sidebar_position: 10
+title: 自定义序列化器
+sidebar_position: 6
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-For types that don't support `FORY_STRUCT`, implement a `Serializer` template specialization manually.
+对于不支持 `FORY_STRUCT` 的类型，需要手动实现 `Serializer` 模板特化。
 
-## When to Use Custom Serializers
+## 何时使用自定义序列化器
 
-- External types from third-party libraries
-- Types with special serialization requirements
-- Existing data format compatibility
-- Performance-critical custom encoding
-- Cross-language interoperability with custom protocols
+- 来自第三方库的外部类型
+- 有特殊序列化要求的类型
+- 兼容遗留数据格式
+- 性能关键的自定义编码
+- 使用自定义协议实现跨语言互操作
 
-## Implementing the Serializer Template
+## 实现 Serializer 模板
 
-To create a custom serializer, specialize the `Serializer` template for your type within the `fory::serialization` namespace:
+要创建自定义序列化器，请在 `fory::serialization` 命名空间内为你的类型特化 `Serializer` 模板：
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -125,25 +125,25 @@ struct Serializer<MyExt> {
 } // namespace fory
 ```
 
-## Required Methods
+## 必需方法
 
-A custom serializer must implement these static methods:
+自定义序列化器必须实现以下静态方法：
 
-| Method                | Purpose                                         |
+| 方法 | 用途 |
 | --------------------- | ----------------------------------------------- |
-| `write`               | Main serialization entry point with type info   |
-| `write_data`          | Serialize data only (no type info)              |
-| `write_data_generic`  | Serialize data with generics support            |
-| `read`                | Main deserialization entry point with type info |
-| `read_data`           | Deserialize data only (no type info)            |
-| `read_data_generic`   | Deserialize data with generics support          |
-| `read_with_type_info` | Deserialize with pre-resolved TypeInfo          |
+| `write` | 带类型信息的主序列化入口 |
+| `write_data` | 只序列化数据（不含类型信息） |
+| `write_data_generic` | 序列化数据并支持泛型 |
+| `read` | 带类型信息的主反序列化入口 |
+| `read_data` | 只反序列化数据（不含类型信息） |
+| `read_data_generic` | 反序列化数据并支持泛型 |
+| `read_with_type_info` | 使用预先解析的 TypeInfo 反序列化 |
 
-The `type_id` constant should be set to `TypeId::EXT` for custom extension types.
+对于自定义扩展类型，`type_id` 常量应设置为 `TypeId::EXT`。
 
-## Registering Custom Serializers
+## 注册自定义序列化器
 
-Register your custom serializer with Fory before use:
+使用前需要先向 Fory 注册自定义序列化器：
 
 ```cpp
 auto fory = Fory::builder().xlang(true).build();
@@ -161,7 +161,7 @@ fory.register_extension_type<MyExt>("my_ext");
 fory.register_extension_type<MyExt>("com.example", "MyExt");
 ```
 
-## Complete Example
+## 完整示例
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -290,9 +290,9 @@ ctx.write_uint16(value);
 
 // Variable-length integers (compact encoding)
 ctx.write_var_uint32(value);   // Unsigned varint
-ctx.write_var_int32(value);    // Signed zigzag varint
+ctx.write_varint32(value);    // Signed zigzag varint
 ctx.write_var_uint64(value);   // Unsigned varint
-ctx.write_var_int64(value);    // Signed zigzag varint
+ctx.write_varint64(value);    // Signed zigzag varint
 
 // Tagged integers (for mixed-size encoding)
 ctx.write_tagged_uint64(value);
@@ -318,9 +318,9 @@ int8_t i8 = ctx.read_int8(ctx.error());
 
 // Variable-length integers
 uint32_t u32 = ctx.read_var_uint32(ctx.error());
-int32_t i32 = ctx.read_var_int32(ctx.error());
+int32_t i32 = ctx.read_varint32(ctx.error());
 uint64_t u64 = ctx.read_var_uint64(ctx.error());
-int64_t i64 = ctx.read_var_int64(ctx.error());
+int64_t i64 = ctx.read_varint64(ctx.error());
 
 // Check for errors after read operations
 if (ctx.has_error()) {
@@ -365,7 +365,7 @@ static MyType read_data(ReadContext &ctx) {
 
 ## Related Topics
 
-- [Type Registration](type-registration.md) - Registering serializers
-- [Basic Serialization](basic-serialization.md) - Using FORY_STRUCT macro
-- [Schema Evolution](schema-evolution.md) - Compatible mode
-- [Cross-Language](cross-language.md) - Cross-language serialization
+- [Type Registration](type_registration) - Registering serializers
+- [Basic Serialization](basic_serialization) - Using FORY_STRUCT macro
+- [Schema Evolution](schema_evolution) - Compatible mode
+- [Cross-Language](xlang_serialization) - Cross-language serialization

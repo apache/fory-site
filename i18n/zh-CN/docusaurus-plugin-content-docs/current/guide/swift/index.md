@@ -1,5 +1,5 @@
 ---
-title: Swift Serialization Guide
+title: Swift 序列化指南
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,20 +19,20 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory Swift provides high-performance object graph serialization with strong type safety, macro-based code generation, schema evolution, and cross-language compatibility.
+Apache Fory Swift 提供高性能对象图序列化，同时具备强类型安全、基于宏的代码生成、Schema 演进能力以及跨语言兼容性。
 
-## Why Fory Swift?
+## 为什么选择 Fory Swift？
 
-- Fast binary serialization for Swift value and reference types
-- `@ForyStruct`, `@ForyEnum`, and `@ForyUnion` macros for zero-boilerplate model serialization
-- Cross-language protocol compatibility (`xlang`) with Java, Rust, Go, Python, and more
-- Compatible mode for schema evolution across versions
-- Built-in support for dynamic values (`Any`, `AnyObject`, `any Serializer`, `AnyHashable`)
-- Reference tracking for shared/circular graphs, including weak references on classes
+- 面向 Swift 值类型和引用类型的高性能二进制序列化
+- 使用 `@ForyObject` 宏，几乎无需样板代码即可让模型支持序列化
+- 通过 `xlang` 协议与 Java、Rust、Go、Python 等运行时互通
+- 通过兼容模式支持跨版本 Schema 演进
+- 内置支持动态值，例如 `Any`、`AnyObject`、`any Serializer`、`AnyHashable`
+- 支持共享引用和循环引用跟踪，类类型还支持 `weak` 引用场景
 
-## Install
+## 安装
 
-Add Fory Swift from the Apache Fory GitHub repository:
+通过 Apache Fory GitHub 仓库将 Fory Swift 添加到 Swift Package Manager：
 
 ```swift
 dependencies: [
@@ -48,25 +48,26 @@ targets: [
 ]
 ```
 
-## Guide Contents
+## 指南目录
 
-- [Configuration](configuration.md)
-- [Basic Serialization](basic-serialization.md)
-- [Cross-Language Serialization](cross-language.md)
-- [Schema Metadata](schema-metadata.md)
-- [Type Registration](type-registration.md)
-- [Custom Serializers](custom-serializers.md)
-- [Shared and Circular References](references.md)
-- [Polymorphism and Dynamic Types](polymorphism.md)
-- [Schema Evolution](schema-evolution.md)
-- [Troubleshooting](troubleshooting.md)
+- [配置](configuration.md)
+- [基础序列化](basic-serialization.md)
+- [类型注册](type-registration.md)
+- [自定义序列化器](custom-serializers.md)
+- [字段配置](schema-metadata.md)
+- [共享引用与循环引用](references.md)
+- [多态与动态类型](polymorphism.md)
+- [Schema 演进](schema-evolution.md)
+- [跨语言序列化](xlang-serialization.md)
+- [Row Format 状态](../xlang/row_format.md)
+- [故障排查](troubleshooting.md)
 
-## Quick Example
+## 快速示例
 
 ```swift
 import Fory
 
-@ForyStruct
+@ForyObject
 struct User: Equatable {
     var name: String = ""
     var age: Int32 = 0

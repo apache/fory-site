@@ -1,5 +1,5 @@
 ---
-title: Field Type Meta
+title: 字段类型元信息
 sidebar_position: 46
 id: field_type_meta
 license: |
@@ -19,36 +19,36 @@ license: |
   limitations under the License.
 ---
 
-Field type meta configuration controls whether type information is written during serialization for struct fields. This is essential for supporting polymorphism where the actual runtime type may differ from the declared field type.
+字段类型元信息配置用于控制结构体字段序列化时是否写入类型信息。当实际运行时类型可能不同于声明字段类型时，它是支持多态的关键。
 
-## Overview
+## 概述
 
-When serializing a struct field, Fory needs to determine whether to write type metadata:
+序列化结构体字段时，Fory 需要判断是否写入类型元信息：
 
-- **Static typing**: Use the declared field type's serializer directly (no type info written)
-- **Dynamic typing**: Write type information to support runtime subtypes
+- **静态类型**：直接使用声明字段类型的序列化器（不写入类型信息）
+- **动态类型**：写入类型信息以支持运行时子类型
 
-## When Type Meta Is Needed
+## 何时需要类型元信息
 
-Type metadata is required when:
+以下场景需要类型元信息：
 
-1. **Interface/abstract fields**: The declared type is abstract, so concrete type must be recorded
-2. **Polymorphic fields**: The runtime type may be a subclass of the declared type
-3. **Cross-language compatibility**: When the receiver needs type information to deserialize correctly
+1. **接口/抽象字段**：声明类型是抽象类型，因此必须记录具体类型
+2. **多态字段**：运行时类型可能是声明类型的子类
+3. **跨语言兼容性**：接收端需要类型信息才能正确反序列化
 
-Type metadata is NOT needed when:
+以下场景不需要类型元信息：
 
-1. **Final/concrete types**: The declared type is final/sealed and cannot be subclassed
-2. **Primitive types**: Type is known at compile time
-3. **Performance optimization**: When you know the runtime type always matches the declared type
+1. **final/具体类型**：声明类型是 final/sealed，不能被继承
+2. **基本类型**：编译期已知类型
+3. **性能优化**：明确知道运行时类型始终与声明类型一致
 
-## Language-Specific Configuration
+## 各语言配置
 
 ### Java
 
-Java requires explicit configuration because concrete classes can be subclassed unless marked `final`.
+Java 需要显式配置，因为具体类只要没有标记为 `final` 就可能被继承。
 
-Use the `@ForyField` annotation with the `dynamic` parameter:
+使用带 `dynamic` 参数的 `@ForyField` 注解：
 
 ```java
 import org.apache.fory.annotation.ForyField;
@@ -69,23 +69,25 @@ public class Container {
 }
 ```
 
-**Dynamic Options**:
+**Dynamic 选项**：
 
-| Value   | Behavior                                               |
+| 值 | 行为 |
 | ------- | ------------------------------------------------------ |
-| `AUTO`  | Interface/abstract types are dynamic, concrete are not |
-| `FALSE` | Never write type info, use declared type's serializer  |
-| `TRUE`  | Always write type info to support runtime subtypes     |
+| `AUTO` | 接口/抽象类型为动态类型，具体类型不是 |
+| `FALSE` | 不写入类型信息，使用声明类型的序列化器 |
+| `TRUE` | 始终写入类型信息以支持运行时子类型 |
 
-**Use Cases**:
+**使用场景**：
 
-- `AUTO`: Default behavior, suitable for most cases
-- `FALSE`: Performance optimization when you know the exact type
-- `TRUE`: When a concrete field may hold subclass instances
+- `AUTO`：默认行为，适合大多数场景
+- `FALSE`：明确知道精确类型时用于性能优化
+- `TRUE`：具体字段可能持有子类实例时使用
 
 ### C++
 
-C++ uses the `.dynamic(bool)` builder method inside `FORY_STRUCT`:
+C++ 使用 `fory::dynamic<V>` 模板标签或 `.dynamic(bool)` 构建方法：
+
+**使用 `fory::field<>` 模板**：
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -98,31 +100,45 @@ struct Animal {
 
 struct Zoo {
     // Auto: type info written because Animal is polymorphic (std::is_polymorphic)
-    std::shared_ptr<Animal> animal;
+    fory::field<std::shared_ptr<Animal>, 0, fory::nullable> animal;
 
     // Force non-dynamic: skip type info even though Animal is polymorphic
-    std::shared_ptr<Animal> fixed_animal;
+    fory::field<std::shared_ptr<Animal>, 1, fory::nullable, fory::dynamic<false>> fixed_animal;
 
     // Force dynamic: write type info even for non-polymorphic types
+    fory::field<std::shared_ptr<Data>, 2, fory::dynamic<true>> polymorphic_data;
+};
+FORY_STRUCT(Zoo, animal, fixed_animal, polymorphic_data);
+```
+
+**使用 `FORY_FIELD_CONFIG` 宏**：
+
+```cpp
+struct Zoo {
+    std::shared_ptr<Animal> animal;
+    std::shared_ptr<Animal> fixed_animal;
     std::shared_ptr<Data> polymorphic_data;
 };
-FORY_STRUCT(Zoo,
+
+FORY_STRUCT(Zoo, animal, fixed_animal, polymorphic_data);
+
+FORY_FIELD_CONFIG(Zoo,
     (animal, fory::F(0).nullable()),                    // Auto-detect polymorphism
     (fixed_animal, fory::F(1).nullable().dynamic(false)), // Skip type info
     (polymorphic_data, fory::F(2).dynamic(true))        // Force type info
 );
 ```
 
-**Default Behavior**: Fory auto-detects polymorphism via `std::is_polymorphic<T>`. Types with pure virtual methods are treated as dynamic by default.
+**默认行为**：Fory 通过 `std::is_polymorphic<T>` 自动检测多态。带纯虚方法的类型默认按动态类型处理。
 
 ### Go and Rust
 
-Go and Rust do **not** require explicit dynamic configuration because:
+Go 和 Rust **不需要**显式动态配置，原因是：
 
-- **Go**: Interface types are inherently dynamic - Fory can determine from the type whether it's an interface
-- **Rust**: Trait objects (`dyn Trait`) are explicitly marked in the type system
+- **Go**：接口类型天然是动态的，Fory 可以从类型判断它是否为接口
+- **Rust**：trait object（`dyn Trait`）在类型系统中有显式标记
 
-The type system in these languages already indicates whether a field is polymorphic:
+这些语言的类型系统已经表明字段是否具备多态性：
 
 ```go
 // Go: interface types are automatically dynamic
@@ -142,7 +158,7 @@ struct Container {
 
 ### Python
 
-Use `pyfory.field()` with the `dynamic` parameter:
+使用带 `dynamic` 参数的 `pyfory.field()`：
 
 ```python
 from dataclasses import dataclass
@@ -173,49 +189,49 @@ class Container:
     fixed_circle: Circle = pyfory.field(id=2, dynamic=False)
 ```
 
-**Default Behavior**:
+**默认行为**：
 
-| Mode        | Abstract Class | Concrete Object Types | Numeric/str/time Types |
+| 模式 | 抽象类 | 具体对象类型 | 数值/str/time 类型 |
 | ----------- | -------------- | --------------------- | ---------------------- |
-| Native mode | `True`         | `True`                | `False`                |
-| Xlang mode  | `True`         | `False`               | `False`                |
+| Native 模式 | `True` | `True` | `False` |
+| Xlang 模式 | `True` | `False` | `False` |
 
-- **Abstract classes**: `dynamic` is always `True` (type info must be written)
-- **Native mode**: `dynamic` defaults to `True` for object types, `False` for numeric/str/time types
-- **Xlang mode**: `dynamic` defaults to `False` for concrete types
+- **抽象类**：`dynamic` 始终为 `True`（必须写入类型信息）
+- **Native 模式**：对象类型的 `dynamic` 默认为 `True`，数值/str/time 类型为 `False`
+- **Xlang 模式**：具体类型的 `dynamic` 默认为 `False`
 
-## Default Behavior
+## 默认行为
 
-| Language | Interface/Abstract Types | Concrete Types   |
+| 语言 | 接口/抽象类型 | 具体类型 |
 | -------- | ------------------------ | ---------------- |
-| Java     | Dynamic (write type)     | Static (no type) |
-| C++      | Dynamic (virtual)        | Static           |
-| Go       | Dynamic (interface)      | Static (struct)  |
-| Rust     | Dynamic (dyn Trait)      | Static           |
-| Python   | Dynamic (all objects)    | Dynamic          |
+| Java | 动态（写入类型） | 静态（不写入类型） |
+| C++ | 动态（virtual） | 静态 |
+| Go | 动态（interface） | 静态（struct） |
+| Rust | 动态（dyn Trait） | 静态 |
+| Python | 动态（所有对象） | 动态 |
 
-## Performance Considerations
+## 性能考虑
 
-Writing type metadata has overhead:
+写入类型元信息会带来开销：
 
-- **Space**: Type information adds bytes to serialized output
-- **Time**: Type resolution during serialization/deserialization
+- **空间**：类型信息会增加序列化输出的字节数
+- **时间**：序列化/反序列化期间需要解析类型
 
-Use `dynamic = FALSE` (Java) or `dynamic(false)` (C++) when:
+以下场景可使用 `dynamic = FALSE`（Java）或 `dynamic(false)`（C++）：
 
-- You're certain the runtime type matches the declared type
-- Performance is critical and polymorphism is not needed
-- The field type is effectively final
+- 确定运行时类型与声明类型一致
+- 对性能要求很高且不需要多态
+- 字段类型实际上等同于 final
 
-## Cross-Language Compatibility
+## 跨语言兼容性
 
-When serializing data for cross-language consumption:
+为跨语言消费序列化数据时：
 
-1. **Use consistent type registration**: Register types with the same ID across languages
-2. **Prefer explicit configuration**: Use `dynamic = TRUE` when unsure about receiver's expectations
-3. **Document polymorphic fields**: Make it clear which fields may contain subtypes
+1. **使用一致的类型注册**：在各语言中用相同 ID 注册类型
+2. **优先显式配置**：不确定接收端预期时使用 `dynamic = TRUE`
+3. **记录多态字段**：明确哪些字段可能包含子类型
 
-## Example: Polymorphic Container
+## 示例：多态容器
 
 ### Java
 
@@ -270,7 +286,9 @@ struct Zoo {
     std::shared_ptr<Dog> maybe_mixed_breed;
 };
 
-FORY_STRUCT(Zoo,
+FORY_STRUCT(Zoo, animal, maybe_mixed_breed);
+
+FORY_FIELD_CONFIG(Zoo,
     (animal, fory::F(0).nullable()),              // Auto-detect (Animal is polymorphic)
     (maybe_mixed_breed, fory::F(1).dynamic(true)) // Force dynamic for concrete type
 );
@@ -278,6 +296,6 @@ FORY_STRUCT(Zoo,
 
 ## Related Topics
 
-- [Field Nullability](field-nullability.md) - Controlling null handling for fields
-- [Field Reference Tracking](field-reference-tracking.md) - Managing shared/circular references
-- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type compatibility
+- [Field Nullability](field_nullability) - Controlling null handling for fields
+- [Field Reference Tracking](reference_tracking) - Managing shared/circular references
+- [Type Mapping](../../specification/xlang_type_mapping) - Cross-language type compatibility

@@ -1,5 +1,5 @@
 ---
-title: Rust Serialization Guide
+title: Rust 序列化指南
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,44 +19,44 @@ license: |
   limitations under the License.
 ---
 
-**Apache Fory™** is a blazing fast multi-language serialization framework powered by **JIT compilation** and **zero-copy** techniques, providing up to **ultra-fast performance** while maintaining ease of use and safety.
+**Apache Fory™** 是一个高性能的多语言序列化框架，基于 **JIT 编译**与**零拷贝**技术，在保持易用性和安全性的同时提供出色性能。
 
-The Rust implementation provides versatile and high-performance serialization with automatic memory management and compile-time type safety. It supports both xlang mode for cross-language payloads and native mode for Rust-only payloads.
+Rust 实现提供灵活而高性能的序列化能力，具备自动内存管理与编译时类型安全。
 
-## Why Apache Fory™ Rust?
+## 为什么选择 Apache Fory™ Rust？
 
-- **Fast binary encoding**: Zero-copy deserialization and optimized binary protocols
-- **Cross-language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
-- **Type-safe**: Compile-time type checking with derive macros
-- **Circular references**: Automatic tracking of shared and circular references with `Rc`/`Arc` and weak pointers
-- **Polymorphic**: Serialize trait objects with `Box<dyn Trait>`, `Rc<dyn Trait>`, and `Arc<dyn Trait>`
-- **Schema evolution**: Compatible mode for independent schema changes
-- **Two formats**: Object graph serialization and zero-copy row-based format
+- **高性能**：零拷贝反序列化与优化的二进制协议
+- **跨语言**：可在 Java、Python、C++、Go、JavaScript 和 Rust 之间无缝序列化与反序列化数据
+- **类型安全**：通过 derive macro 实现编译时类型检查
+- **循环引用**：借助 `Rc` / `Arc` 与弱指针自动跟踪共享引用和循环引用
+- **多态支持**：支持序列化 `Box<dyn Trait>`、`Rc<dyn Trait>` 和 `Arc<dyn Trait>` 等 trait 对象
+- **Schema 演进**：兼容模式支持独立的 Schema 变更
+- **双格式支持**：对象图序列化与零拷贝行格式
 
-## Crates
+## Crate
 
-| Crate                                                                       | Description                       | Version                                                                                               |
-| --------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [`fory`](https://github.com/apache/fory/blob/main/rust/fory)                | High-level API with derive macros | [![crates.io](https://img.shields.io/crates/v/fory.svg)](https://crates.io/crates/fory)               |
-| [`fory-core`](https://github.com/apache/fory/blob/main/rust/fory-core/)     | Core serialization engine         | [![crates.io](https://img.shields.io/crates/v/fory-core.svg)](https://crates.io/crates/fory-core)     |
-| [`fory-derive`](https://github.com/apache/fory/blob/main/rust/fory-derive/) | Procedural macros                 | [![crates.io](https://img.shields.io/crates/v/fory-derive.svg)](https://crates.io/crates/fory-derive) |
+| Crate                                                                       | 说明                           | 版本                                                                                                  |
+| --------------------------------------------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| [`fory`](https://github.com/apache/fory/blob/main/rust/fory)                | 带 derive macro 的高级 API     | [![crates.io](https://img.shields.io/crates/v/fory.svg)](https://crates.io/crates/fory)               |
+| [`fory-core`](https://github.com/apache/fory/blob/main/rust/fory-core/)     | 核心序列化引擎                 | [![crates.io](https://img.shields.io/crates/v/fory-core.svg)](https://crates.io/crates/fory-core)     |
+| [`fory-derive`](https://github.com/apache/fory/blob/main/rust/fory-derive/) | 过程宏                         | [![crates.io](https://img.shields.io/crates/v/fory-derive.svg)](https://crates.io/crates/fory-derive) |
 
-## Quick Start
+## 快速开始
 
-Add Apache Fory™ to your `Cargo.toml`:
+在你的 `Cargo.toml` 中添加 Apache Fory™：
 
 ```toml
 [dependencies]
-fory = "0.13"
+fory = "0.17.0"
 ```
 
-### Basic Example
+### 基础示例
 
 ```rust
 use fory::{Fory, Error, Reader};
-use fory::ForyStruct;
+use fory::ForyObject;
 
-#[derive(ForyStruct, Debug, PartialEq)]
+#[derive(ForyObject, Debug, PartialEq)]
 struct User {
     name: String,
     age: i32,
@@ -64,7 +64,7 @@ struct User {
 }
 
 fn main() -> Result<(), Error> {
-    let mut fory = Fory::builder().xlang(true).build();
+    let mut fory = Fory::default();
     fory.register::<User>(1)?;
 
     let user = User {
@@ -73,16 +73,16 @@ fn main() -> Result<(), Error> {
         email: "alice@example.com".to_string(),
     };
 
-    // Serialize
+    // 序列化
     let bytes = fory.serialize(&user)?;
-    // Deserialize
+    // 反序列化
     let decoded: User = fory.deserialize(&bytes)?;
     assert_eq!(user, decoded);
 
-    // Serialize to specified buffer
+    // 序列化到指定缓冲区
     let mut buf: Vec<u8> = vec![];
     fory.serialize_to(&mut buf, &user)?;
-    // Deserialize from specified buffer
+    // 从指定缓冲区反序列化
     let mut reader = Reader::new(&buf);
     let decoded: User = fory.deserialize_from(&mut reader)?;
     assert_eq!(user, decoded);
@@ -90,31 +90,23 @@ fn main() -> Result<(), Error> {
 }
 ```
 
-## Xlang Mode And Native Mode
+## 线程安全
 
-Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Rust wire mode, and Rust examples that use it set `.xlang(true)` explicitly so the mode choice is visible.
-
-Use native mode for Rust-only traffic. Native mode is selected with `.xlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps Rust object serialization on the Rust runtime path. It is optimized for Rust's type system and covers Rust-specific object features such as trait objects and shared-reference patterns that are not portable xlang payloads.
-
-See [Cross-Language Serialization](cross-language.md) for Rust xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode builder options.
-
-## Thread Safety
-
-Apache Fory™ Rust is fully thread-safe: `Fory` implements both `Send` and `Sync`, so one configured instance can be shared across threads for concurrent work. The internal read/write context pools are lazily initialized with thread-safe primitives, letting worker threads reuse buffers without coordination.
+Apache Fory™ Rust 完全线程安全：`Fory` 同时实现了 `Send` 和 `Sync`，因此一个配置好的实例可以在线程之间共享并发使用。内部读写上下文池通过线程安全原语延迟初始化，使工作线程无需额外协调即可复用缓冲区。
 
 ```rust
 use fory::{Fory, Error};
-use fory::ForyStruct;
+use fory::ForyObject;
 use std::sync::Arc;
 use std::thread;
 
-#[derive(ForyStruct, Clone, Copy, Debug, PartialEq)]
+#[derive(ForyObject, Clone, Copy, Debug, PartialEq)]
 struct Item {
     value: i32,
 }
 
 fn main() -> Result<(), Error> {
-    let mut fory = Fory::builder().xlang(true).build();
+    let mut fory = Fory::default();
     fory.register::<Item>(1000)?;
 
     let fory = Arc::new(fory);
@@ -138,55 +130,55 @@ fn main() -> Result<(), Error> {
 }
 ```
 
-**Tip:** Perform registrations (such as `fory.register::<T>(id)`) before spawning threads so every worker sees the same metadata. Once configured, wrapping the instance in `Arc` is enough to fan out serialization and deserialization tasks safely.
+**提示：** 请在启动线程之前完成注册操作，例如 `fory.register::<T>(id)`，确保每个工作线程看到一致的元数据。配置完成后，将实例包在 `Arc` 中即可安全地分发序列化和反序列化任务。
 
-## Architecture
+## 架构
 
-The Rust implementation consists of three main crates:
+Rust 实现由三个主要 crate 组成：
 
-```
-fory/                   # High-level API
-├── src/lib.rs         # Public API exports
+```text
+fory/                   # 高级 API
+├── src/lib.rs         # 公共 API 导出
 
-fory-core/             # Core serialization engine
+fory-core/             # 核心序列化引擎
 ├── src/
-│   ├── fory.rs       # Main serialization entry point
-│   ├── buffer.rs     # Binary buffer management
-│   ├── serializer/   # Type-specific serializers
-│   ├── resolver/     # Type resolution and metadata
-│   ├── meta/         # Meta string compression
-│   ├── row/          # Row format implementation
-│   └── types.rs      # Type definitions
+│   ├── fory.rs       # 主序列化入口
+│   ├── buffer.rs     # 二进制缓冲区管理
+│   ├── serializer/   # 类型特定序列化器
+│   ├── resolver/     # 类型解析与元数据
+│   ├── meta/         # 元字符串压缩
+│   ├── row/          # 行格式实现
+│   └── types.rs      # 类型定义
 
-fory-derive/           # Procedural macros
+fory-derive/           # 过程宏
 ├── src/
-│   ├── object/       # ForyStruct macro
-│   └── fory_row.rs  # ForyRow macro
+│   ├── object/       # ForyObject 宏
+│   └── fory_row.rs   # ForyRow 宏
 ```
 
-## Use Cases
+## 使用场景
 
-### Object Serialization
+### 对象序列化
 
-- Complex data structures with nested objects and references
-- Cross-language communication in microservices
-- General-purpose serialization with full type safety
-- Schema evolution with compatible mode
-- Graph-like data structures with circular references
+- 含嵌套对象和引用的复杂数据结构
+- 微服务中的跨语言通信
+- 具备完整类型安全的通用序列化
+- 使用兼容模式进行 Schema 演进
+- 带循环引用的图状数据结构
 
-### Row-Based Serialization
+### 行格式序列化
 
-- High-throughput data processing
-- Analytics workloads requiring fast field access
-- Memory-constrained environments
-- Real-time data streaming applications
-- Zero-copy scenarios
+- 高吞吐数据处理
+- 需要快速字段访问的分析型负载
+- 内存受限环境
+- 实时数据流应用
+- 零拷贝场景
 
-## Next Steps
+## 后续步骤
 
-- [Configuration](configuration.md) - Fory builder options and modes
-- [Basic Serialization](basic-serialization.md) - Object graph serialization
-- [References](references.md) - Shared and circular references
-- [Polymorphism](polymorphism.md) - Trait object serialization
-- [Cross-Language](cross-language.md) - xlang mode
-- [Row Format](row-format.md) - Zero-copy row-based format
+- [配置](configuration.md) - Fory 构建器选项与模式
+- [基础序列化](basic-serialization.md) - 对象图序列化
+- [引用](references.md) - 共享引用与循环引用
+- [多态](polymorphism.md) - Trait 对象序列化
+- [跨语言](xlang-serialization.md) - XLANG 模式
+- [行格式](row-format.md) - 零拷贝行格式

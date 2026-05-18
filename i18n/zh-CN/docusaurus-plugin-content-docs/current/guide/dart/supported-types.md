@@ -1,7 +1,7 @@
 ---
-title: Supported Types
+title: 支持的类型
 sidebar_position: 7
-id: supported_types
+id: dart_supported_types
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,104 +19,61 @@ license: |
   limitations under the License.
 ---
 
-This page lists the Dart types you can use in Fory messages, and flags where you need to be careful for cross-language compatibility.
+本页列出可在 Fory 消息中使用的 Dart 类型，并标出哪些地方在跨语言兼容性上需要特别小心。
 
-## Built-in Primitive Types
+## 内置原始类型
 
-The following Dart types serialize directly without any special handling:
+以下 Dart 类型可以直接序列化，不需要特殊处理：
 
-| Dart type            | Cross-language notes                                                                                                                                           |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bool`               | Direct mapping                                                                                                                                                 |
-| `int`                | Serialized as 64-bit by default. Use `@ForyField(type: Int8Type/Int16Type/Int32Type/Uint8Type/Uint16Type/Uint32Type)` when the peer expects a narrower integer |
-| `double`             | Maps to 64-bit float. Use `Float32` wrapper when the peer expects 32-bit                                                                                       |
-| `String`             | Direct mapping                                                                                                                                                 |
-| `Uint8List`          | Binary blob                                                                                                                                                    |
-| `List`, `Set`, `Map` | Supported; element types must also be supported                                                                                                                |
-| `DateTime`           | Use `Timestamp` or `LocalDate` wrappers for explicit semantics                                                                                                 |
+| Dart 类型            | 跨语言说明                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `bool`               | 直接映射                                                                                                     |
+| `int`                | 默认按 64 位序列化。如果对端期望更窄的整数，请使用包装类型或 `@Int32Type` 等注解 |
+| `double`             | 映射为 64 位浮点数。如果对端期望 32 位浮点，请使用 `Float32` 包装类型 |
+| `String`             | 直接映射                                                                                                     |
+| `Uint8List`          | 二进制 blob                                                                                                  |
+| `List`, `Set`, `Map` | 支持，但元素类型也必须是受支持类型                                                                           |
+| `DateTime`           | 如需明确语义，请使用 `Timestamp` 或 `LocalDate` 包装类型                                                    |
 
-## Integer Fields
+## 整数包装类型
 
-Dart VM/native `int` can represent signed 64-bit values, while Dart web `int`
-is limited to JavaScript-safe integer precision. If the peer language expects a
-32-bit integer (Java `int`, Go `int32`, C# `int`) and you send a Dart `int`,
-the deserialization may fail or silently truncate. For browser and Flutter web
-precision rules, see [Web Platform Support](web-platform-support.md).
+Dart `int` 在运行时是 64 位值。如果对端语言期望 32 位整数，例如 Java `int`、Go `int32`、C# `int`，而你发送的是 Dart `int`，反序列化可能失败，或者静默截断。
 
-Use field metadata to select the wire type explicitly for 8/16/32-bit fields:
+使用整数包装类型可以固定精确的编码宽度：
 
 ```dart
-@ForyStruct()
-class Metrics {
-  Metrics();
-
-  @ForyField(type: Int8Type())
-  int tiny = 0;
-
-  @ForyField(type: Int32Type(encoding: Encoding.fixed))
-  int age = 0;
-
-  @ForyField(type: Uint32Type())
-  int count = 0;
-
-  Int64 sequence = Int64(0);
-  Uint64 offset = Uint64(0);
-}
+final Int8 tiny = Int8(-1);        // 8-bit signed
+final Int16 shortValue = Int16(7); // 16-bit signed
+final Int32 age = Int32(36);       // 32-bit signed — matches Java int, C# int, Go int32
+final UInt8 flags = UInt8(255);    // 8-bit unsigned
+final UInt16 port = UInt16(65535); // 16-bit unsigned
+final UInt32 count = UInt32(4000000000); // 32-bit unsigned
 ```
 
-Generated serializers range-check annotated `int` values before writing them.
-Use `Int64` and `Uint64` when you need full-range 64-bit values, especially on
-web. A plain root `int` value serializes as xlang `int64`; exact 8/16/32-bit
-wire widths are selected through field metadata or low-level `Buffer` APIs.
+每个包装类型都会把存储值限制在目标位宽内。
 
-On Dart VM, `Int64` and `Uint64` are extension types over `int`. Once a value is
-passed through an `Object`-typed dynamic/root boundary, the VM cannot recover
-whether it was originally a plain `int`, `Int64`, or `Uint64`. Use generated
-field metadata or explicit `Buffer` APIs when native VM payloads must preserve
-unsigned 64-bit identity across dynamic boundaries. Dart web uses wrapper
-classes, so web root `Uint64` values keep `varuint64` metadata.
+## 浮点包装类型
 
-## Floating-Point Types
+Dart `double` 对应 64 位浮点。如果对端使用 32 位浮点，请改用包装类型：
 
-Dart `double` maps to 64-bit float by default. If the peer uses
-reduced-precision floating-point values, keep the Dart field as `double` and
-mark the exact wire type with field metadata:
+- `Float32`：32 位浮点，对应 Java `float`、C# `float`、Go `float32`
+- `Float16`：半精度浮点，适用于专门的数值载荷
 
-- `Float32` — 32-bit float (matches Java `float`, C# `float`, Go `float32`)
-- `@ForyField(type: Float16Type()) double value` — half-precision scalar
-- `@ForyField(type: Bfloat16Type()) double value` — bfloat16 scalar
+## 时间和日期类型
 
-For contiguous 16-bit floating-point arrays, use `Float16List` and
-`Bfloat16List` rather than `Uint16List` when the schema is `array<float16>`
-or `array<bfloat16>`.
+不要直接把原始 `DateTime` 跨语言发送。时区处理和 epoch 差异在不同语言间并不完全一致。请改用下面这些显式包装类型：
 
-## Time and Date Types
-
-Avoid sending raw `DateTime` across languages — time zone handling and epoch differences vary. Use the explicit wrappers instead:
-
-- `Timestamp` — a UTC instant with nanosecond precision (seconds + nanoseconds)
-- `LocalDate` — a calendar date without time or time zone
-- `Duration` — an elapsed time value using Dart's built-in `Duration`
+- `Timestamp`：带纳秒精度的 UTC 时间点，即秒数加纳秒数
+- `LocalDate`：不带时间和时区的日历日期
 
 ```dart
 final now = Timestamp.fromDateTime(DateTime.now().toUtc());
 final birthday = LocalDate(1990, 12, 1);
-final timeout = const Duration(seconds: 30);
 ```
 
-The temporal wrappers expose conversion helpers:
+## Struct 和 Enum
 
-- `Timestamp.fromDateTime(...)` and `timestamp.toDateTime()`
-- `LocalDate.fromEpochDay(Int64(...))`, `date.toEpochDay()` returns `Int64`
-- `LocalDate.fromDateTime(...)` and `date.toDateTime()`
-
-`Duration` support in Dart is exact to microseconds. Incoming xlang duration
-payloads that use sub-microsecond nanoseconds are rejected instead of being
-silently truncated.
-
-## Structs and Enums
-
-Annotate classes with `@ForyStruct()` and run `build_runner` to make them serializable. Enums in the same file are included automatically.
+给类添加 `@ForyStruct()`，然后运行 `build_runner`，它们就能序列化。定义在同一文件中的枚举会自动包含进去。
 
 ```dart
 @ForyStruct()
@@ -124,36 +81,22 @@ class User {
   User();
 
   String name = '';
-
-  @ForyField(type: Int32Type())
-  int age = 0; // use explicit field metadata when peers expect a 32-bit integer
+  Int32 age = Int32(0); // use Int32 when peers expect a 32-bit integer
 }
 ```
 
-See [Code Generation](code-generation.md).
+参见 [代码生成](code-generation.md)。
 
-## Collections
+## 集合
 
-Fory supports `List<T>`, `Set<T>`, and `Map<K, V>`. Element and key types must
-also be serializable types. Avoid using mutable objects as map keys.
+Fory 支持 `List<T>`、`Set<T>` 和 `Map<K, V>`。元素类型和键类型本身也必须可序列化。请避免使用可变对象作为 map 键。
 
-Generic `List<int>` with primitive element metadata still uses `list<T>` schema.
-Dedicated dense array schema comes from dedicated carriers:
+## 兼容性提示
 
-- `BoolList` plus `@ArrayField(element: BoolType())` for `array<bool>`.
-  Plain `List<bool>` maps to `list<bool>`.
-- `Int8List`, `Int16List`, `Int32List`, `Int64List`
-- `Uint8List`, `Uint16List`, `Uint32List`, `Uint64List`
-- `Float16List`, `Bfloat16List`, `Float32List`, `Float64List`
+一旦不确定某个 Dart 类型是否与对端预期一致，就优先使用显式包装类型。数字宽度选错，是跨语言场景里最常见的 bug 之一。
 
-## Compatibility Tip
+## 相关主题
 
-When in doubt about whether a Dart type will match what the peer expects, make
-the width explicit with `@ForyField(type: ...)`. Guessing the wrong numeric
-width is one of the most common cross-language bugs.
-
-## Related Topics
-
-- [Schema Metadata](schema-metadata.md)
-- [Cross-Language](cross-language.md)
-- [Schema Evolution](schema-evolution.md)
+- [字段配置](schema-metadata.md)
+- [跨语言](xlang-serialization.md)
+- [Schema 演进](schema-evolution.md)

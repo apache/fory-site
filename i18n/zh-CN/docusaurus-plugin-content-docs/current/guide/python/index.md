@@ -1,5 +1,5 @@
 ---
-title: Python Serialization Guide
+title: Python 序列化指南
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,68 +19,68 @@ license: |
   limitations under the License.
 ---
 
-**Apache Fory™** is a blazing fast multi-language serialization framework powered by **JIT compilation** and **zero-copy** techniques, providing up to **ultra-fast performance** while maintaining ease of use and safety.
+**Apache Fory™** 是一个极速的多语言序列化框架，基于 **JIT 编译**和**零拷贝**技术，在保持易用性和安全性的同时提供**超高性能**。
 
-`pyfory` provides the Python implementation of Apache Fory™, offering xlang mode for cross-language payloads, native mode for Python-only object serialization, and advanced row-format capabilities for data processing tasks.
+`pyfory` 提供 Apache Fory™ 的 Python 实现，为数据处理任务提供高性能对象序列化和先进的行格式能力。
 
-## Key Features
+## 核心特性
 
-### Flexible Serialization Modes
+### 灵活的序列化模式
 
-- **Xlang mode**: Default cross-language wire format with compatible schema evolution
-- **Python native mode**: Same-language mode and drop-in replacement for pickle/cloudpickle
-- **Row Format**: Zero-copy row format for analytics workloads
+- **Python 原生模式**：完全 Python 兼容，可替代 pickle/cloudpickle
+- **跨语言模式**：针对多语言数据交换优化
+- **行格式**：用于分析工作负载的零拷贝行格式
 
-### Versatile Serialization Features
+### 多功能序列化特性
 
-- **Reference tracking** for shared xlang schema objects and Python native-mode circular graphs
-- **Polymorphism support** for customized types with automatic type dispatching
-- **Schema evolution** support for backward/forward compatibility when using dataclasses in xlang mode
-- **Out-of-band buffer support** for zero-copy serialization of large data structures like NumPy arrays and Pandas DataFrames, compatible with pickle protocol 5
+- **共享/循环引用支持**：在 Python 原生和跨语言模式中支持复杂对象图
+- **多态支持**：自定义类型的自动类型分发
+- **Schema 演化支持**：在跨语言模式下使用 dataclass 时的向后/向前兼容性
+- **带外缓冲区支持**：零拷贝序列化大型数据结构（如 NumPy 数组和 Pandas DataFrame），兼容 pickle 协议 5
 
-### Blazing Fast Performance
+### 极速性能
 
-- **Extremely fast performance** compared to other serialization frameworks
-- **Runtime code generation** and **Cython-accelerated** core implementation for optimal performance
+- **超快性能**：相比其他序列化框架
+- **运行时代码生成**和 **Cython 加速**的核心实现，实现最优性能
 
-### Compact Data Size
+### 紧凑数据大小
 
-- **Compact object graph protocol** with minimal space overhead—up to 3× size reduction compared to pickle/cloudpickle
-- **Meta packing and sharing** to minimize type forward/backward compatibility space overhead
+- **紧凑的对象图协议**：最小空间开销——相比 pickle/cloudpickle 减少高达 3 倍大小
+- **元数据打包与共享**：最小化类型向前/向后兼容性的空间开销
 
-### Security & Safety
+### 安全性与安全
 
-- **Strict mode** prevents deserialization of untrusted types by type registration and checks.
-- **Reference tracking** for handling circular references safely
+- **严格模式**：通过类型注册和检查防止反序列化不受信任的类型
+- **引用跟踪**：安全处理循环引用
 
-## Installation
+## 安装
 
-### Basic Installation
+### 基础安装
 
 ```bash
 pip install pyfory
 ```
 
-### Optional Dependencies
+### 可选依赖
 
 ```bash
-# Install with row format support (requires Apache Arrow)
+# 安装行格式支持（需要 Apache Arrow）
 pip install pyfory[format]
 
-# Install from source for development
+# 从源码安装用于开发
 git clone https://github.com/apache/fory.git
 cd fory/python
 pip install -e ".[dev,format]"
 ```
 
-### Requirements
+### 系统要求
 
-- **Python**: 3.8 or higher
-- **OS**: Linux, macOS, Windows
+- **Python**：3.8 或更高版本
+- **操作系统**：Linux、macOS、Windows
 
-## Thread Safety
+## 线程安全
 
-`pyfory` provides `ThreadSafeFory` for thread-safe serialization using a pooled wrapper:
+`pyfory` 提供 `ThreadSafeFory` 用于线程安全序列化，使用线程本地存储：
 
 ```python
 import pyfory
@@ -92,11 +92,11 @@ class Person:
     name: str
     age: int
 
-# Create a thread-safe xlang Fory instance
-fory = pyfory.ThreadSafeFory(xlang=True, ref=True)
+# 创建线程安全的 Fory 实例
+fory = pyfory.ThreadSafeFory(xlang=False, ref=True)
 fory.register(Person)
 
-# Use in multiple threads safely
+# 在多线程中安全使用
 def serialize_in_thread(thread_id):
     person = Person(name=f"User{thread_id}", age=25 + thread_id)
     data = fory.serialize(person)
@@ -108,20 +108,20 @@ for t in threads: t.start()
 for t in threads: t.join()
 ```
 
-**Key Features:**
+**核心特性：**
 
-- **Instance Pool**: Maintains a pool of `Fory` instances protected by a lock for thread safety
-- **Shared Configuration**: All registrations must be done upfront and are applied to all instances
-- **Same API**: Drop-in replacement for `Fory` class with identical methods
-- **Registration Safety**: Prevents registration after first use to ensure consistency
+- **实例池**：维护一个受锁保护的 `Fory` 实例池，确保线程安全
+- **共享配置**：所有注册必须预先完成，并应用于所有实例
+- **相同 API**：与 `Fory` 类相同的方法，可直接替换
+- **注册安全**：防止首次使用后注册，确保一致性
 
-**When to Use:**
+**适用场景：**
 
-- **Multi-threaded Applications**: Web servers, concurrent workers, parallel processing
-- **Shared Fory Instances**: When multiple threads need to serialize/deserialize data
-- **Thread Pools**: Applications using thread pools or concurrent.futures
+- **多线程应用程序**：Web 服务器、并发工作线程、并行处理
+- **共享 Fory 实例**：当多个线程需要序列化/反序列化数据时
+- **线程池**：使用线程池或 concurrent.futures 的应用程序
 
-## Quick Start
+## 快速开始
 
 ```python
 import pyfory
@@ -132,8 +132,8 @@ class Person:
     name: str
     age: int
 
-# Create an xlang Fory instance
-fory = pyfory.Fory(xlang=True, ref=True)
+# 创建 Fory 实例
+fory = pyfory.Fory(xlang=False, ref=True)
 fory.register(Person)
 
 person = Person("Alice", 30)
@@ -142,27 +142,19 @@ result = fory.deserialize(data)
 print(result)  # Person(name='Alice', age=30)
 ```
 
-## Xlang Mode And Native Mode
+## 后续步骤
 
-Use xlang mode for cross-language payloads and dataclass schemas shared with other Fory runtimes. Xlang mode is the default Python wire mode, and Python examples that use it set `xlang=True` explicitly so the mode choice is visible.
+- [配置](configuration.md) - Fory 参数和模式
+- [基础序列化](basic-serialization.md) - 基础使用模式
+- [Python 原生模式](native-serialization.md) - 函数、lambda、类
+- [跨语言](xlang-serialization.md) - XLANG 模式
+- [行格式](row-format.md) - 零拷贝行格式
+- [安全性](configuration.md) - 安全最佳实践
 
-Use native mode for Python-only traffic. Native mode is selected with `xlang=False`, uses schema-consistent payloads unless compatible mode is enabled, and owns pickle/cloudpickle-style behavior such as functions, lambdas, classes, methods, `__reduce__`, `__getstate__`, and out-of-band pickle protocol 5 buffers. It is optimized for Python's type system and supports a broader Python object surface than xlang mode, so use it when replacing pickle or cloudpickle.
+## 链接
 
-See [Python Native Mode](python-native.md) for Python-only serialization details and [Cross-Language](cross-language.md) for Python xlang registration and interoperability rules.
-
-## Next Steps
-
-- [Configuration](configuration.md) - Fory parameters and modes
-- [Basic Serialization](basic-serialization.md) - Basic usage patterns
-- [Python Native Mode](python-native.md) - Functions, lambdas, classes
-- [Cross-Language](cross-language.md) - xlang mode
-- [Row Format](row-format.md) - Zero-copy row format
-- [Security](security.md) - Security best practices
-
-## Links
-
-- **Documentation**: https://fory.apache.org/docs/guide/python/
-- **GitHub**: https://github.com/apache/fory
-- **PyPI**: https://pypi.org/project/pyfory/
-- **Issues**: https://github.com/apache/fory/issues
-- **Slack**: https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw
+- **文档**：https://fory.apache.org/docs/latest/python_guide/
+- **GitHub**：https://github.com/apache/fory
+- **PyPI**：https://pypi.org/project/pyfory/
+- **问题反馈**：https://github.com/apache/fory/issues
+- **Slack**：https://join.slack.com/t/fory-project/shared_invite/zt-36g0qouzm-kcQSvV_dtfbtBKHRwT5gsw

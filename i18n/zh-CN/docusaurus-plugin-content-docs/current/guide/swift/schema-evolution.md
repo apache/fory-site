@@ -1,5 +1,5 @@
 ---
-title: Schema Evolution
+title: Schema 演进
 sidebar_position: 8
 id: schema_evolution
 license: |
@@ -19,37 +19,37 @@ license: |
   limitations under the License.
 ---
 
-Fory supports schema evolution through compatible mode, which is enabled by default in Swift.
+Fory 通过兼容模式支持 Schema 演进。
 
-## Default Compatible Mode
+## 启用兼容模式
 
 ```swift
-let fory = Fory()
+let fory = Fory(xlang: true, trackRef: false, compatible: true)
 ```
 
-## Example: Evolving a Struct
+## 示例：结构体演进
 
 ```swift
 import Fory
 
-@ForyStruct
+@ForyObject
 struct PersonV1 {
     var name: String = ""
     var age: Int32 = 0
     var address: String = ""
 }
 
-@ForyStruct
+@ForyObject
 struct PersonV2 {
     var name: String = ""
     var age: Int32 = 0
-    var phone: String? = nil // added field
+    var phone: String? = nil // 新增字段
 }
 
-let writer = Fory()
+let writer = Fory(xlang: true, compatible: true)
 writer.register(PersonV1.self, id: 1)
 
-let reader = Fory()
+let reader = Fory(xlang: true, compatible: true)
 reader.register(PersonV2.self, id: 1)
 
 let v1 = PersonV1(name: "alice", age: 30, address: "main st")
@@ -61,17 +61,17 @@ assert(v2.age == 30)
 assert(v2.phone == nil)
 ```
 
-## What Is Safe in Compatible Mode
+## 兼容模式下安全的变更
 
-- Add new fields
-- Remove old fields
-- Reorder fields
+- 新增字段
+- 删除旧字段
+- 重排字段顺序
 
-## What Is Not Safe
+## 不安全的变更
 
-- Arbitrary type changes for an existing field (for example `Int32` to `String`)
-- Inconsistent registration mapping across peers
+- 任意修改既有字段的类型，例如从 `Int32` 改成 `String`
+- 对端之间使用不一致的注册映射
 
-## Schema-consistent Mode Behavior
+## Schema 一致模式的行为
 
-With `compatible=false`, Fory validates schema hash and fails fast on mismatch.
+当 `compatible=false` 时，Fory 会校验 schema hash，并在不匹配时快速失败。

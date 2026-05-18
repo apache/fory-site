@@ -1,5 +1,5 @@
 ---
-title: Object Copy
+title: 对象复制
 sidebar_position: 9
 id: object_copy
 license: |
@@ -19,37 +19,34 @@ license: |
   limitations under the License.
 ---
 
-This page covers in-memory Java object graph copying with `Fory#copy(Object)`.
+本文介绍如何使用 `Fory#copy(Object)` 在内存中复制 Java 对象图。
 
-`Fory.copy` is a deep-copy operation for Java object graphs. It does not serialize to bytes first.
-Instead, it uses the same runtime type system and serializers to create a copied object graph in
-memory.
+`Fory.copy` 是面向 Java 对象图的深拷贝操作。它不会先序列化为字节，而是使用同一套运行时类型系统和序列化器，在内存中创建复制后的对象图。
 
-## When to Use Object Copy
+## 何时使用对象复制
 
-Use object copy when you want a detached in-memory clone of an existing Java object graph.
+当你希望为已有 Java 对象图创建一个分离的内存克隆时，可以使用对象复制。
 
-Typical use cases:
+典型使用场景包括：
 
-- Clone request or response models before mutation
-- Duplicate cached state for optimistic updates
-- Copy graphs that contain collections, maps, arrays, or nested beans
-- Preserve shared references and circular references during cloning
+- 在修改前克隆请求或响应模型
+- 为乐观更新复制缓存状态
+- 复制包含集合、映射、数组或嵌套 bean 的对象图
+- 在克隆过程中保留共享引用和循环引用
 
-Use serialization instead when you need bytes for transport, storage, or cross-process exchange.
+当你需要用于传输、存储或跨进程交换的字节时，应改用序列化。
 
-| Operation                | `Fory.copy`         | `serialize` / `deserialize`               |
-| ------------------------ | ------------------- | ----------------------------------------- |
-| Result                   | Java object graph   | Binary payload plus reconstructed objects |
-| Main use                 | In-memory deep copy | Transport, persistence, interoperability  |
-| Copy ref option          | `withRefCopy(...)`  | `withRefTracking(...)`                    |
-| Cross-language payload   | No                  | Yes, in xlang mode                        |
-| Intermediate byte buffer | No                  | Yes                                       |
+| 操作             | `Fory.copy`      | `serialize` / `deserialize` |
+| ---------------- | ---------------- | --------------------------- |
+| 结果             | Java 对象图      | 二进制载荷及重建后的对象    |
+| 主要用途         | 内存深拷贝       | 传输、持久化、互操作        |
+| 复制引用选项     | `withRefCopy(...)` | `withRefTracking(...)`      |
+| 跨语言载荷       | 否               | 是，在 xlang 模式下         |
+| 中间字节缓冲区   | 否               | 是                          |
 
-## Quick Start
+## 快速开始
 
-For general-purpose object graphs, enable `withRefCopy(true)` so shared references and cycles are
-handled correctly:
+对于通用对象图，启用 `withRefCopy(true)`，以便正确处理共享引用和循环：
 
 ```java
 import org.apache.fory.Fory;
@@ -67,16 +64,15 @@ public class Example {
 }
 ```
 
-`copy(null)` returns `null`.
+`copy(null)` 返回 `null`。
 
-## Reference Semantics
+## 引用语义
 
-The most important copy option is `ForyBuilder#withRefCopy(boolean)`.
+最重要的复制选项是 `ForyBuilder#withRefCopy(boolean)`。
 
 ### `withRefCopy(true)`
 
-This is the safe default for general object graphs. Shared references remain shared in the copied
-graph, and circular references can be copied correctly.
+这是通用对象图的安全默认值。共享引用在复制后的对象图中仍保持共享，循环引用也可以被正确复制。
 
 ```java
 import org.apache.fory.Fory;
@@ -112,8 +108,7 @@ public class Example {
 
 ### `withRefCopy(false)`
 
-Disable copy ref tracking only when you know the graph is tree-like and does not rely on shared or
-cyclic references. This can be faster, but repeated references are copied into different objects.
+只有在你确定对象图是树形结构，并且不依赖共享引用或循环引用时，才应禁用复制引用跟踪。这样可能更快，但重复引用会被复制为不同对象。
 
 ```java
 import org.apache.fory.Fory;
@@ -145,17 +140,16 @@ public class Example {
 }
 ```
 
-If you disable `withRefCopy` and the graph contains a cycle, copy can fail with stack overflow.
+如果禁用 `withRefCopy`，而对象图中包含循环，复制可能会因栈溢出而失败。
 
-## `withRefCopy` vs `withRefTracking`
+## `withRefCopy` 与 `withRefTracking`
 
-These two options control different operations:
+这两个选项控制不同的操作：
 
-- `withRefCopy(true)` affects `Fory.copy(...)`
-- `withRefTracking(true)` affects serialization and deserialization
+- `withRefCopy(true)` 影响 `Fory.copy(...)`
+- `withRefTracking(true)` 影响序列化和反序列化
 
-Enabling one does not automatically enable the other. If your application both serializes and
-copies graphs with shared or circular references, configure both options explicitly.
+启用其中一个不会自动启用另一个。如果应用既会序列化又会复制带有共享引用或循环引用的对象图，请显式配置这两个选项。
 
 ```java
 Fory fory = Fory.builder().withXlang(false)
@@ -164,23 +158,20 @@ Fory fory = Fory.builder().withXlang(false)
   .build();
 ```
 
-## Immutable vs Mutable Values
+## 不可变值与可变值
 
-Fory may reuse the original instance for immutable values. For mutable values, it creates a new
-object graph.
+对于不可变值，Fory 可能复用原始实例。对于可变值，它会创建新的对象图。
 
-In practice, this means:
+实践中，这意味着：
 
-- `String`, boxed primitives, enums, and many immutable JDK value types may be returned as-is
-- Primitive arrays, string arrays, collections, maps, beans, dates, and other mutable structures
-  are copied into distinct objects
+- `String`、装箱基本类型、枚举以及许多不可变的 JDK 值类型可能会原样返回
+- 基本类型数组、字符串数组、集合、映射、bean、日期以及其他可变结构会被复制为不同对象
 
-Do not use object identity alone to decide whether copy succeeded. Use the mutability contract of
-the value you are copying.
+不要只根据对象身份判断复制是否成功。应依据待复制值的可变性约定来判断。
 
-## Class Registration
+## 类注册
 
-If class registration is required, register copied classes before calling `copy`.
+如果要求类注册，请在调用 `copy` 前注册要复制的类。
 
 ```java
 import org.apache.fory.Fory;
@@ -198,14 +189,13 @@ public class Example {
 }
 ```
 
-This follows the same registration rules as the rest of the runtime: if the runtime requires class
-registration, copied runtime types must be registered first.
+这遵循与运行时其他部分相同的注册规则：如果运行时要求类注册，复制过程中出现的运行时类型必须先完成注册。
 
-## Thread-Safe Copy
+## 线程安全复制
 
-`ThreadSafeFory` also supports `copy(...)`.
+`ThreadSafeFory` 也支持 `copy(...)`。
 
-For general multi-threaded usage:
+对于通用多线程用法：
 
 ```java
 import org.apache.fory.Fory;
@@ -223,27 +213,25 @@ public class Example {
 }
 ```
 
-The same API also works for `buildThreadLocalFory()` and `buildThreadSafeForyPool(poolSize)`.
+同一 API 也适用于 `buildThreadLocalFory()` 和 `buildThreadSafeForyPool(poolSize)`。
 
-## Built-In Coverage
+## 内置覆盖范围
 
-Fory already provides copy support for many common Java runtime types, including:
+Fory 已经为许多常见 Java 运行时类型提供复制支持，包括：
 
-- Primitive values and boxed primitives
-- Strings and primitive arrays
-- Common JDK collections and maps
-- Java time and date/time values
-- Beans, records, and nested object graphs
+- 基本类型值和装箱基本类型
+- 字符串和基本类型数组
+- 常见 JDK 集合和映射
+- Java time 以及日期/时间值
+- bean、record 和嵌套对象图
 
-If the runtime already knows how to serialize a mutable type, it may still need an explicit copy
-implementation in that serializer. For mutable serializers, the default `Serializer.copy(...)`
-throws `UnsupportedOperationException` unless the serializer overrides it.
+如果运行时已经知道如何序列化某个可变类型，该序列化器仍可能需要显式的复制实现。对于可变序列化器，默认的 `Serializer.copy(...)` 会抛出 `UnsupportedOperationException`，除非该序列化器重写了它。
 
-## Custom Copy with `ForyCopyable`
+## 使用 `ForyCopyable` 自定义复制
 
-If a type needs custom copy logic, implement `ForyCopyable<T>`.
+如果某个类型需要自定义复制逻辑，请实现 `ForyCopyable<T>`。
 
-This is the simplest approach when the class itself should control how nested fields are copied:
+当类本身应该控制嵌套字段的复制方式时，这是最简单的方式：
 
 ```java
 import java.util.ArrayList;
@@ -268,17 +256,15 @@ public final class Node implements ForyCopyable<Node> {
 }
 ```
 
-Guidelines:
+指导原则：
 
-- Call `copyContext.reference(origin, copy)` immediately after creating a composite mutable object
-  if the type can participate in cycles or shared-reference graphs
-- Use `copyContext.copyObject(...)` for nested values instead of manually duplicating nested copy
-  logic
-- Keep copy logic consistent with the normal runtime semantics of the type
+- 如果类型可能参与循环或共享引用对象图，在创建复合可变对象后应立即调用 `copyContext.reference(origin, copy)`
+- 使用 `copyContext.copyObject(...)` 复制嵌套值，不要手动重复嵌套复制逻辑
+- 让复制逻辑与该类型的正常运行时语义保持一致
 
-## Custom Copy in a Serializer
+## 在序列化器中自定义复制
 
-When a type already uses a custom serializer, override `Serializer.copy(...)` for mutable values.
+当某个类型已经使用自定义序列化器时，请为可变值重写 `Serializer.copy(...)`。
 
 ```java
 import org.apache.fory.config.Config;
@@ -313,35 +299,21 @@ public final class EnvelopeSerializer extends Serializer<Envelope> {
 }
 ```
 
-Use this approach when copy behavior belongs with a serializer rather than the domain class.
+当复制行为应归属于序列化器而不是领域类时，使用这种方式。
 
-## Best Practices
+## 最佳实践
 
-- Reuse `Fory` or `ThreadSafeFory` instances instead of rebuilding them for each copy
-- Enable `withRefCopy(true)` unless you are certain the graph is acyclic and does not rely on
-  shared references
-- Treat `withRefCopy(false)` as a performance optimization for tree-like data, not as a default
-- Test custom copy implementations with both shared-reference and cyclic graphs
-- Keep mutable custom serializer copy paths explicit and do not rely on fallback behavior
+- 复用 `Fory` 或 `ThreadSafeFory` 实例，不要为每次复制重新构建
+- 除非你确定对象图无环且不依赖共享引用，否则启用 `withRefCopy(true)`
+- 将 `withRefCopy(false)` 视为面向树形数据的性能优化，而不是默认配置
+- 使用共享引用和循环对象图同时测试自定义复制实现
+- 让可变自定义序列化器的复制路径保持显式，不要依赖回退行为
 
-## Troubleshooting
+## 故障排查
 
-### Stack Overflow or Copy Failure on Cyclic Graphs
+### 循环对象图上的栈溢出或复制失败
 
-If copy fails on a cyclic object graph, enable `withRefCopy(true)`:
-
-```java
-Fory fory = Fory.builder().withXlang(false)
-  .withRefCopy(true)
-  .build();
-```
-
-Disabling copy ref tracking is only safe for acyclic graphs.
-
-### Shared References Are Not Preserved
-
-If the same source object is copied into multiple distinct target objects, `withRefCopy` is
-disabled. Turn it on:
+如果复制循环对象图失败，请启用 `withRefCopy(true)`：
 
 ```java
 Fory fory = Fory.builder().withXlang(false)
@@ -349,25 +321,36 @@ Fory fory = Fory.builder().withXlang(false)
   .build();
 ```
 
-`withRefTracking(true)` alone does not change `Fory.copy(...)` behavior.
+禁用复制引用跟踪只对无环对象图安全。
+
+### 共享引用未被保留
+
+如果同一个源对象被复制成多个不同的目标对象，说明 `withRefCopy` 被禁用了。请启用它：
+
+```java
+Fory fory = Fory.builder().withXlang(false)
+  .withRefCopy(true)
+  .build();
+```
+
+单独设置 `withRefTracking(true)` 不会改变 `Fory.copy(...)` 的行为。
 
 ### `Copy for ... is not supported`
 
-This means the mutable serializer for that type does not implement `copy(...)`.
+这表示该类型的可变序列化器没有实现 `copy(...)`。
 
-Fix it by either:
+可以通过以下方式修复：
 
-- Implementing `ForyCopyable<T>` on the class, or
-- Overriding `Serializer.copy(CopyContext, T)` in the registered serializer
+- 在类上实现 `ForyCopyable<T>`，或
+- 在已注册的序列化器中重写 `Serializer.copy(CopyContext, T)`
 
-### Registration Errors
+### 注册错误
 
-If your runtime uses `requireClassRegistration(true)`, make sure the copied runtime types are
-registered before calling `copy(...)`.
+如果运行时使用 `requireClassRegistration(true)`，请确保复制过程中出现的运行时类型已在调用 `copy(...)` 前注册。
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Runtime creation and core APIs
-- [Configuration](configuration.md) - Builder options including `withRefCopy`
-- [Custom Serializers](custom-serializers.md) - Serializer design and registration
-- [Virtual Threads](virtual-threads.md) - Thread-safe runtime guidance
+- [基础序列化](basic-serialization.md) - 运行时创建和核心 API
+- [配置](configuration.md) - 包括 `withRefCopy` 的构建器选项
+- [自定义序列化器](custom-serializers.md) - 序列化器设计和注册
+- [虚拟线程](virtual-threads.md) - 线程安全运行时指南

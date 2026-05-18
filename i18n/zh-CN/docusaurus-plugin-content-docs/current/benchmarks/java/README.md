@@ -1,6 +1,6 @@
-# Java Benchmarks
+# Java 基准测试
 
-## System Environment
+## 系统环境
 
 - Operation System：4.9.151-015.x86_64
 - CPU：Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
@@ -10,19 +10,19 @@
 - L2 cache： 1024K
 - L3 cache： 33792K
 
-## JMH params
+## JMH 参数
 
-Don't skip **warm up**, otherwise the results aren't accurate.
+不要跳过 **warm up**，否则结果不准确。
 
 ```bash
  -f 1 -wi 3 -i 3 -t 1 -w 2s -r 2s -rf cs
 ```
 
-## Benchmark Data
+## 基准数据
 
 ### Struct
 
-Struct is a class with 100 primitive fields:
+Struct 是一个包含 100 个基础类型字段的类：
 
 ```java
 public class Struct {
@@ -37,7 +37,7 @@ public class Struct {
 
 ### Struct2
 
-Struct2 is a class with 100 boxed fields:
+Struct2 是一个包含 100 个装箱类型字段的类：
 
 ```java
 public class Struct {
@@ -52,95 +52,95 @@ public class Struct {
 
 ### MediaContent
 
-MEDIA_CONTENT is a class from [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java).
+MEDIA_CONTENT 来自 [jvm-serializers](https://github.com/eishay/jvm-serializers/blob/master/tpc/src/data/media/MediaContent.java).
 
 ### Sample
 
-SAMPLE is a class from [kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/master/benchmarks/src/main/java/com/esotericsoftware/kryo/benchmarks/data/Sample.java)
+SAMPLE 来自 [kryo benchmark](https://github.com/EsotericSoftware/kryo/blob/master/benchmarks/src/main/java/com/esotericsoftware/kryo/benchmarks/data/Sample.java)
 
-## Java Benchmark
+## 基准图表
 
-### Serialize to heap buffer
+### 序列化到堆内缓冲区
 
-Serialize data java byte array.
+将数据序列化到 Java 字节数组。
 
-#### Java schema consistent serialization
+#### Java schema 一致性序列化
 
-The deserialization peer must have same class definition with the serialization peer.
-No class forward/backward compatibility are supported in this mode.
+反序列化端必须与序列化端使用相同的类定义。
+该模式不支持类的前向/后向兼容。
 
 ![Java Heap Schema Consistent Serialization](java_heap_serialize_consistent.png)
 
-#### Java schema compatible serialization
+#### Java schema 兼容模式序列化
 
-The deserialization peer can have different class definition with the serialization peer.
-Class forward/backward compatibility are supported in this mode.
+反序列化端可以与序列化端使用不同的类定义。
+该模式支持类的前向/后向兼容。
 
 ![Java Heap Schema Compatible Serialization](java_heap_serialize_compatible.png)
 
-#### Java schema consistent deserialization
+#### Java schema 一致性反序列化
 
-The deserialization peer must have same class definition with the serialization peer.
-No class forward/backward compatibility are supported in this mode.
+反序列化端必须与序列化端使用相同的类定义。
+该模式不支持类的前向/后向兼容。
 
 ![Java Heap Schema Consistent Deserialization](java_heap_deserialize_consistent.png)
 
-#### Java schema compatible deserialization
+#### Java schema 兼容模式反序列化
 
-The deserialization peer can have different class definition with the serialization peer.
-Class forward/backward compatibility are supported in this mode.
+反序列化端可以与序列化端使用不同的类定义。
+该模式支持类的前向/后向兼容。
 
 ![Java Heap Schema Compatible Deserialization](java_heap_deserialize_compatible.png)
 
-### Off-heap serialization
+### 堆外序列化
 
-Serialize data off-heap memory.
+将数据序列化到堆外内存。
 
-#### Java schema consistent serialization
+#### Java schema 一致性序列化
 
-The deserialization peer must have same class definition with the serialization peer.
-No class forward/backward compatibility are supported in this mode.
+反序列化端必须与序列化端使用相同的类定义。
+该模式不支持类的前向/后向兼容。
 
 ![Java Off Heap Schema Consistent Serialization](java_offheap_serialize_consistent.png)
 
-#### Java schema compatible serialization
+#### Java schema 兼容模式序列化
 
-The deserialization peer can have different class definition with the serialization peer.
-Class forward/backward compatibility are supported in this mode.
+反序列化端可以与序列化端使用不同的类定义。
+该模式支持类的前向/后向兼容。
 
 ![Java Off Heap Schema Compatible Serialization](java_offheap_serialize_compatible.png)
 
-#### Java schema consistent deserialization
+#### Java schema 一致性反序列化
 
-The deserialization peer must have same class definition with the serialization peer.
-No class forward/backward compatibility are supported in this mode.
+反序列化端必须与序列化端使用相同的类定义。
+该模式不支持类的前向/后向兼容。
 
 ![Java Off Heap Schema Consistent Deserialization](java_offheap_deserialize_consistent.png)
 
-#### Java schema compatible deserialization
+#### Java schema 兼容模式反序列化
 
-The deserialization peer can have different class definition with the serialization peer.
-Class forward/backward compatibility are supported in this mode.
+反序列化端可以与序列化端使用不同的类定义。
+该模式支持类的前向/后向兼容。
 
 ![Java Off Heap Schema Compatible Deserialization](java_offheap_deserialize_compatible.png)
 
-### Zero-copy serialization
+### 零拷贝序列化
 
-Note that zero-copy serialization just avoid the copy in serialization, if you send data to other machine, there may be copies.
+注意：零拷贝序列化只是在序列化阶段避免拷贝；如果将数据发送到其他机器，仍可能发生拷贝。
 
-But if you serialize data between processes on same node and use shared-memory, if the data are in off-heap before serialization, then other processes can read this buffer without any copies.
+但如果在同一节点进程间序列化并使用共享内存，且数据在序列化前已位于堆外，那么其他进程可无拷贝读取该缓冲区。
 
-#### Java zero-copy serialize to heap buffer
+#### Java 零拷贝序列化到堆内缓冲区
 
 ![Java Zero Copy Serialization](java_zero_copy_serialize.png)
 
-#### Java zero-copy serialize to direct buffer
+#### Java 零拷贝序列化到直接缓冲区
 
 ![Java Zero Copy Deserialization](java_zero_copy_deserialize.png)
 
-### Benchmark Data
+## 基准数据
 
-#### Java Serialization
+### Java Serialization
 
 | Benchmark              | objectType    | bufferType   | references | Fory           | ForyMetaShared  | Kryo           | Fst           | Hession       | Jdk           | Protostuff    |
 | ---------------------- | ------------- | ------------ | ---------- | -------------- | --------------- | -------------- | ------------- | ------------- | ------------- | ------------- |
@@ -209,10 +209,10 @@ But if you serialize data between processes on same node and use shared-memory, 
 | deserialize_compatible | SAMPLE        | directBuffer | False      | 2308111.633661 | 2289261.533644  | 201993.787890  |               | 124044.417439 |               |               |
 | deserialize_compatible | SAMPLE        | directBuffer | True       | 1820490.585648 | 1927548.827586  | 174534.710870  |               | 120276.449497 |               |               |
 
-#### Java Zero-copy
+### Java 零拷贝
 
 | Benchmark   | array_size | bufferType   | dataType        | Fory           | Kryo           | Fst            |
-| ----------- | ---------- | ------------ | --------------- | -------------- | -------------- | -------------- |
+| ---- | ---------- | ------------ | --------------- | -------------- | -------------- | -------------- |
 | serialize   | 200        | array        | BUFFER          | 5123572.914045 | 1985187.977633 | 2400193.220466 |
 | serialize   | 200        | array        | PRIMITIVE_ARRAY | 8297232.942927 | 147342.606262  | 313986.053417  |
 | serialize   | 200        | directBuffer | BUFFER          | 5400346.890126 | 1739454.519770 | 2282550.111756 |
@@ -237,31 +237,3 @@ But if you serialize data between processes on same node and use shared-memory, 
 | deserialize | 5000       | array        | PRIMITIVE_ARRAY | 40312.590172   | 6122.351228    | 10672.872798   |
 | deserialize | 5000       | directBuffer | BUFFER          | 3284441.570594 | 148614.476829  | 77950.612503   |
 | deserialize | 5000       | directBuffer | PRIMITIVE_ARRAY | 40413.743717   | 21826.040410   | 8561.694533    |
-
-## Xlang Benchmark
-
-Run from `benchmarks/java/run.sh`. Raw JMH JSON stays under the ignored local `benchmarks/java/reports/` directory; `throughput.png` and this xlang section are synced into `docs/benchmarks/java/`.
-
-```bash
-cd benchmarks/java
-./run.sh
-```
-
-JMH parameters: `-f 1 -wi 3 -i 3 -t 1 -w 3s -r 3s -bm thrpt -tu s`. Higher throughput is better.
-
-![Java Xlang Serialization Throughput](throughput.png)
-
-| Data type         | Operation   | Fory ops/sec | Protobuf ops/sec | Flatbuffer ops/sec | Fastest |
-| ----------------- | ----------- | ------------ | ---------------- | ------------------ | ------- |
-| NumericStruct     | Serialize   | 46,787,647   | 33,024,161       | 9,612,018          | Fory    |
-| NumericStruct     | Deserialize | 71,683,707   | 29,837,931       | 40,514,436         | Fory    |
-| Sample            | Serialize   | 17,406,902   | 2,071,963        | 3,153,672          | Fory    |
-| Sample            | Deserialize | 17,772,123   | 1,867,967        | 4,179,494          | Fory    |
-| MediaContent      | Serialize   | 10,783,325   | 1,781,338        | 1,444,737          | Fory    |
-| MediaContent      | Deserialize | 7,950,203    | 2,184,597        | 3,453,985          | Fory    |
-| NumericStructList | Serialize   | 21,263,673   | 2,511,081        | 3,047,836          | Fory    |
-| NumericStructList | Deserialize | 19,249,877   | 2,067,204        | 8,168,569          | Fory    |
-| SampleList        | Serialize   | 4,580,165    | 401,280          | 696,268            | Fory    |
-| SampleList        | Deserialize | 3,811,985    | 344,945          | 773,625            | Fory    |
-| MediaContentList  | Serialize   | 1,657,717    | 353,717          | 296,868            | Fory    |
-| MediaContentList  | Deserialize | 1,111,043    | 435,956          | 516,192            | Fory    |

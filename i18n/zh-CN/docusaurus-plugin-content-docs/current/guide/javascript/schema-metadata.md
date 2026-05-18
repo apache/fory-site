@@ -1,5 +1,5 @@
 ---
-title: Schema Metadata
+title: Schema 元信息
 sidebar_position: 35
 id: schema_metadata
 license: |
@@ -19,14 +19,11 @@ license: |
   limitations under the License.
 ---
 
-JavaScript schema metadata is declared with `Type.*` builders or TypeScript decorators. Metadata
-defines type identity, field types, nullability, reference tracking, dynamic fields, and per-struct
-schema evolution behavior.
+JavaScript schema 元信息通过 `Type.*` 构建器或 TypeScript 装饰器声明。元信息定义类型身份、字段类型、可空性、引用跟踪、动态字段以及每个 struct 的 Schema 演进行为。
 
-## Type Identity
+## 类型身份
 
-Structs and enums can use a numeric ID or a namespace/name pair. Pick one identity strategy for a
-type and use it consistently in every runtime that reads or writes the payload.
+Struct 和 enum 可以使用数字 ID，也可以使用 namespace/name 对。请为一个类型选择一种身份策略，并在所有读写该载荷的运行时中保持一致。
 
 ```ts
 import { Type } from "@apache-fory/core";
@@ -48,9 +45,9 @@ const byName = Type.struct(
 );
 ```
 
-## Decorator Metadata
+## 装饰器元信息
 
-Decorators keep the schema next to a TypeScript class declaration:
+装饰器会把 schema 放在 TypeScript 类声明旁边：
 
 ```ts
 @Type.struct({ typeName: "example.user" })
@@ -63,19 +60,19 @@ class User {
 }
 ```
 
-The decorator metadata is equivalent to the builder metadata registered with `fory.register(...)`.
+装饰器元信息等价于通过 `fory.register(...)` 注册的构建器元信息。
 
-## Field Types
+## 字段类型
 
-Use explicit scalar builders for stable contracts:
+使用显式的标量构建器来获得稳定契约：
 
 ```ts
 Type.int8();
 Type.int16();
 Type.int32();
-Type.int64(); // JavaScript value is bigint
+Type.int64(); // JavaScript 值是 bigint
 Type.uint32();
-Type.uint64(); // JavaScript value is bigint
+Type.uint64(); // JavaScript 值是 bigint
 Type.float16();
 Type.bfloat16();
 Type.float32();
@@ -84,7 +81,7 @@ Type.string();
 Type.binary();
 ```
 
-Use collection builders for nested values:
+使用集合构建器描述嵌套值：
 
 ```ts
 Type.list(Type.string());
@@ -94,9 +91,9 @@ Type.int32Array();
 Type.float64Array();
 ```
 
-## Nullability
+## 可空性
 
-Fields are non-nullable unless the schema says otherwise:
+字段默认不可空，除非 schema 另有声明：
 
 ```ts
 const userType = Type.struct("example.user", {
@@ -105,12 +102,11 @@ const userType = Type.struct("example.user", {
 });
 ```
 
-Passing `null` to a non-nullable field throws.
+向不可空字段传入 `null` 会抛出异常。
 
-## Reference Tracking
+## 引用跟踪
 
-When the same object instance can appear in multiple fields, or when an object graph can be
-circular, enable global reference tracking and mark reference-tracked fields:
+当同一个对象实例可能出现在多个字段中，或者对象图可能形成循环时，请启用全局引用跟踪，并标记需要引用跟踪的字段：
 
 ```ts
 import Fory, { Type } from "@apache-fory/core";
@@ -122,11 +118,11 @@ const nodeType = Type.struct("example.node", {
 });
 ```
 
-Field-level reference metadata has no effect unless `new Fory({ ref: true })` is also set.
+除非同时设置了 `new Fory({ ref: true })`，否则字段级引用元信息不会生效。
 
-## Dynamic Fields
+## 动态字段
 
-Use `Type.any()` when a field can hold different Fory values at runtime:
+当字段在运行时可以保存不同的 Fory 值时，使用 `Type.any()`：
 
 ```ts
 const eventType = Type.struct("example.event", {
@@ -135,14 +131,11 @@ const eventType = Type.struct("example.event", {
 });
 ```
 
-For a struct field with a declared type, `.setDynamic(Dynamic.FALSE)` always treats values as the
-declared type and `.setDynamic(Dynamic.TRUE)` always writes the runtime type. The default
-`Dynamic.AUTO` is appropriate for most fields.
+对于有声明类型的 struct 字段，`.setDynamic(Dynamic.FALSE)` 始终按声明类型处理值，`.setDynamic(Dynamic.TRUE)` 始终写入运行时类型。默认的 `Dynamic.AUTO` 适用于大多数字段。
 
-## Per-Struct Schema Evolution
+## 每个 Struct 的 Schema 演进
 
-JavaScript uses compatible schema evolution by default. For a stable struct that should omit
-evolution metadata, set `evolving: false`:
+JavaScript 默认使用兼容 Schema 演进。对于应省略演进元信息的稳定 struct，设置 `evolving: false`：
 
 ```ts
 const fixedType = Type.struct(
@@ -153,11 +146,11 @@ const fixedType = Type.struct(
 );
 ```
 
-Both writer and reader must agree on `evolving: false`.
+写入端和读取端都必须约定使用 `evolving: false`。
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
-- [Type Registration](type-registration.md)
-- [Supported Types](supported-types.md)
-- [Schema Evolution](schema-evolution.md)
+- [配置](configuration.md)
+- [类型注册](type-registration.md)
+- [支持的类型](supported-types.md)
+- [Schema 演进](schema-evolution.md)

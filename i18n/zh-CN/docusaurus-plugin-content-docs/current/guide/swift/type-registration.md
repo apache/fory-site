@@ -1,6 +1,6 @@
 ---
-title: Type Registration
-sidebar_position: 5
+title: 类型注册
+sidebar_position: 3
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,22 +19,22 @@ license: |
   limitations under the License.
 ---
 
-This page covers registration APIs for user-defined types.
+本页介绍用户定义类型的注册 API。
 
-## Why Registration Is Required
+## 为什么必须注册
 
-User types (`struct`, `class`, enum/union, ext types) must be registered before serialization/deserialization.
+用户类型，例如 `struct`、`class`、enum/union 和 ext 类型，在序列化和反序列化前必须先注册。
 
-If a type is missing, deserialization fails with:
+如果缺少注册，反序列化会失败，并抛出：
 
 - `Type not registered: ...`
 
-## Register by Numeric ID
+## 按数值 ID 注册
 
-Use a stable ID shared by serializer and deserializer peers.
+请为序列化端和反序列化端使用同一个稳定 ID。
 
 ```swift
-@ForyStruct
+@ForyObject
 struct User {
     var name: String = ""
     var age: Int32 = 0
@@ -44,33 +44,33 @@ let fory = Fory()
 fory.register(User.self, id: 1)
 ```
 
-## Register by Name
+## 按名称注册
 
-### Fully-qualified name
+### 使用全限定名
 
 ```swift
 try fory.register(User.self, name: "com.example.User")
 ```
 
-`name` is split by `.`:
+`name` 会按 `.` 拆分：
 
 - namespace: `com.example`
 - type name: `User`
 
-### Explicit namespace + name
+### 显式指定命名空间和类型名
 
 ```swift
 try fory.register(User.self, namespace: "com.example", name: "User")
 ```
 
-## Consistency Rules
+## 一致性规则
 
-Keep registration mapping consistent across peers:
+在不同对端之间保持注册映射一致：
 
-- ID mode: same type uses same numeric ID on all peers
-- Name mode: same type uses same namespace and type name on all peers
-- Do not mix ID and name mapping for the same logical type across services
+- ID 模式：同一个逻辑类型在所有对端都使用相同数值 ID
+- 名称模式：同一个逻辑类型在所有对端都使用相同 namespace 和 type name
+- 不要对同一逻辑类型在不同服务里混用 ID 映射和名称映射
 
-## Dynamic Types and Registration
+## 动态类型与注册
 
-When serializing dynamic values (`Any`, `AnyObject`, `any Serializer`) that contain user-defined types, the concrete runtime types must still be registered.
+当你序列化 `Any`、`AnyObject`、`any Serializer` 这类动态值，且其中包含用户定义类型时，具体运行时类型仍然需要提前注册。

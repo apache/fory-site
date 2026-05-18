@@ -1,6 +1,6 @@
 ---
-title: Type Registration
-sidebar_position: 5
+title: 类型注册与安全
+sidebar_position: 3
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-This page covers class registration mechanisms and security configurations.
+本页介绍类注册机制与安全配置。
 
-## Class Registration
+## 类注册
 
-`ForyBuilder#requireClassRegistration` can be used to disable class registration. This will allow deserializing objects of unknown types, which is more flexible but **may be insecure if the classes contain malicious code**.
+`ForyBuilder#requireClassRegistration` 可用于关闭类注册要求。这会允许反序列化未知类型的对象，灵活性更高，但**如果这些类包含恶意代码，就可能不安全**。
 
-**Do not disable class registration unless you can ensure your environment is secure**. Malicious code in `init/equals/hashCode` can be executed when deserializing unknown/untrusted types when this option is disabled.
+**除非你能确保运行环境安全，否则不要关闭类注册。** 当这个选项被关闭时，反序列化未知或不受信任的类型时，`init/equals/hashCode` 中的恶意代码可能被执行。
 
-Class registration can not only reduce security risks, but also avoid classname serialization cost.
+类注册不仅可以降低安全风险，也能避免写入类名带来的额外开销。
 
-### Register by ID
+### 按 ID 注册
 
-You can register class with API `Fory#register`:
+你可以通过 `Fory#register` 注册类：
 
 ```java
 Fory fory = xxx;
@@ -39,33 +39,32 @@ fory.register(SomeClass.class);
 fory.register(SomeClass1.class, 1);
 ```
 
-Note that class registration order is important. Serialization and deserialization peers should have the same registration order.
+注意，类注册顺序很重要。序列化端和反序列化端应该保持相同的注册顺序。
 
-Internal type IDs 0-32 are reserved for built-in xlang types. Java native built-ins start at
-`Types.NONE + 1`, and user IDs are encoded as `(user_id << 8) | internal_type_id`.
+内部类型 ID 的 `0-32` 预留给内置 xlang 类型。Java 原生内建类型从 `Types.NONE + 1` 开始，用户 ID 的编码形式是 `(user_id << 8) | internal_type_id`。
 
-### Register by Name
+### 按名称注册
 
-Register class by ID will have better performance and smaller space overhead. But in some cases, management for a bunch of type IDs is complex. In such cases, registering class by name using API `register(Class<?> cls, String namespace, String typeName)` is recommended:
+按 ID 注册有更好的性能和更小的空间开销。但在某些场景下，维护大量 type ID 也很复杂。这时，推荐使用 `register(Class<?> cls, String namespace, String typeName)` 按名称注册类：
 
 ```java
 fory.register(Foo.class, "demo", "Foo");
 ```
 
-If there are no duplicate names for types, `namespace` can be left as empty to reduce serialized size.
+如果类型名称不会冲突，可以将 `namespace` 留空以减小序列化体积。
 
-**Do not use this API to register class since it will increase serialized size a lot compared to registering class by ID.**
+**不要在应追求紧凑编码的场景中优先使用这个 API，因为它相比按 ID 注册会显著增加序列化体积。**
 
-## Security Configuration
+## 安全配置
 
 ### Type Checker
 
-If you invoke `ForyBuilder#requireClassRegistration(false)` to disable class registration check, you can configure `org.apache.fory.resolver.TypeChecker` by `ForyBuilder#withTypeChecker` or `TypeResolver#setTypeChecker` to control which classes are allowed for serialization.
+如果你调用 `ForyBuilder#requireClassRegistration(false)` 来关闭类注册检查，就可以通过 `ForyBuilder#withTypeChecker` 或 `TypeResolver#setTypeChecker` 配置 `org.apache.fory.resolver.TypeChecker`，从而控制哪些类允许被序列化。
 
-For example, you can allow classes started with `org.example.*`:
+例如，你可以允许所有以 `org.example.*` 开头的类：
 
 ```java
-Fory fory = Fory.builder().withXlang(false)
+Fory fory = Fory.builder()
   .requireClassRegistration(false)
   .withTypeChecker((typeResolver, className) -> className.startsWith("org.example."))
   .build();
@@ -73,45 +72,42 @@ Fory fory = Fory.builder().withXlang(false)
 
 ### AllowListChecker
 
-Fory provides a `org.apache.fory.resolver.AllowListChecker` which is an allowed/disallowed list based checker to simplify the customization of class check mechanism:
+Fory 提供了 `org.apache.fory.resolver.AllowListChecker`，这是一个基于允许/禁止列表的检查器，可简化类检查机制的定制：
 
 ```java
 AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
 checker.allowClass("org.example.*");
-ThreadSafeFory fory = Fory.builder().withXlang(false)
+ThreadSafeFory fory = Fory.builder()
   .requireClassRegistration(false)
   .withTypeChecker(checker)
   .buildThreadSafeFory();
 ```
 
-`withTypeChecker` installs the checker on every created runtime immediately, which also avoids the
-generic startup warning emitted when class registration is disabled without any checker. You can
-still use `TypeResolver#setTypeChecker` or `ThreadSafeFory#setTypeChecker` later if you need to
-replace the checker after build time.
+`withTypeChecker` 会在每个新建运行时上立即安装检查器，这也能避免在关闭类注册却没有配置检查器时产生通用启动警告。如果你需要在构建之后替换检查器，仍然可以继续使用 `TypeResolver#setTypeChecker` 或 `ThreadSafeFory#setTypeChecker`。
 
-## Limit Max Deserialization Depth
+## 限制最大反序列化深度
 
-Fory provides `ForyBuilder#withMaxDepth` to limit max deserialization depth. The default max depth is 50.
+Fory 提供 `ForyBuilder#withMaxDepth` 用于限制最大反序列化深度。默认最大深度为 50。
 
-If max depth is reached, Fory will throw `ForyException`. This can be used to prevent malicious data from causing stack overflow or other issues.
+当达到最大深度时，Fory 会抛出 `ForyException`。这可用于防止恶意数据导致的栈溢出等问题。
 
 ```java
 Fory fory = Fory.builder()
-  .withXlang(false)
-  .withMaxDepth(100)  // Set custom max depth
+  .withLanguage(Language.JAVA)
+  .withMaxDepth(100)  // 设置自定义最大深度
   .build();
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Always enable class registration in production**: Use `requireClassRegistration(true)`
-2. **Use ID-based registration for performance**: Numeric IDs are faster than string names
-3. **Maintain consistent registration order**: Same order on both serialization and deserialization sides
-4. **Set appropriate max depth**: Prevent stack overflow attacks
-5. **Use AllowListChecker for fine-grained control**: When you need flexible class filtering
+1. **生产环境始终启用类注册**：使用 `requireClassRegistration(true)`。
+2. **优先使用按 ID 注册**：数字 ID 比字符串名称更快。
+3. **保持注册顺序一致**：序列化端和反序列化端必须相同。
+4. **设置合适的最大深度**：防止栈溢出攻击。
+5. **需要细粒度控制时使用 AllowListChecker**：适合灵活的类过滤场景。
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md) - ForyBuilder security options
-- [Custom Serializers](custom-serializers.md) - Register custom serializers
-- [Troubleshooting](troubleshooting.md) - Common registration issues
+- [配置](configuration.md) - ForyBuilder 的安全相关选项
+- [自定义序列化器](custom-serializers.md) - 注册自定义序列化器
+- [故障排查](troubleshooting.md) - 常见注册问题

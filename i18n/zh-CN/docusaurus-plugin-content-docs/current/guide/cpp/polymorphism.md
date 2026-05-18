@@ -1,6 +1,6 @@
 ---
-title: Polymorphic Serialization
-sidebar_position: 7
+title: 多态序列化
+sidebar_position: 5
 id: polymorphism
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,16 +19,16 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ supports polymorphic serialization through smart pointers (`std::shared_ptr` and `std::unique_ptr`), enabling dynamic dispatch and type flexibility for inheritance hierarchies.
+Apache Fory™ 通过智能指针（`std::shared_ptr` 与 `std::unique_ptr`）支持多态序列化，为继承体系提供动态分派与类型灵活性。
 
-## Supported Polymorphic Types
+## 支持的多态类型
 
-- `std::shared_ptr<Base>` - Shared ownership with polymorphic dispatch
-- `std::unique_ptr<Base>` - Exclusive ownership with polymorphic dispatch
-- Collections: `std::vector<std::shared_ptr<Base>>`, `std::map<K, std::unique_ptr<Base>>`
-- Optional: `std::optional<std::shared_ptr<Base>>`
+- `std::shared_ptr<Base>` - 共享所有权并支持多态分派
+- `std::unique_ptr<Base>` - 独占所有权并支持多态分派
+- 集合：`std::vector<std::shared_ptr<Base>>`、`std::map<K, std::unique_ptr<Base>>`
+- 可选值：`std::optional<std::shared_ptr<Base>>`
 
-## Basic Polymorphic Serialization
+## 基础多态序列化
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -63,7 +63,7 @@ struct Zoo {
 FORY_STRUCT(Zoo, star_animal);
 
 int main() {
-  auto fory = Fory::builder().xlang(true).track_ref(true).build();
+  auto fory = Fory::builder().track_ref(true).build();
 
   // Register all types with unique type IDs
   fory.register_struct<Zoo>(100);
@@ -89,15 +89,14 @@ int main() {
   assert(decoded.star_animal->age == 3);
 
   auto* dog_ptr = dynamic_cast<Dog*>(decoded.star_animal.get());
-  if (dog_ptr == nullptr || dog_ptr->breed != "Labrador") {
-    return 1;
-  }
+  assert(dog_ptr != nullptr);
+  assert(dog_ptr->breed == "Labrador");
 }
 ```
 
-## Type Registration for Polymorphism
+## 多态类型注册
 
-For polymorphic serialization, register derived types with unique type IDs:
+对于多态序列化，需要使用唯一类型 ID 注册派生类型：
 
 ```cpp
 // Register with numeric type ID
@@ -105,15 +104,15 @@ fory.register_struct<Derived1>(100);
 fory.register_struct<Derived2>(101);
 ```
 
-**Why type ID registration?**
+**为什么要注册类型 ID？**
 
-- Compact binary representation
-- Fast type lookup and dispatch
-- Consistent with non-polymorphic type registration
+- 二进制表示更紧凑
+- 类型查找和分派更快
+- 与非多态类型注册保持一致
 
-## Automatic Polymorphism Detection
+## 自动多态检测
 
-Fory automatically detects polymorphic types using `std::is_polymorphic<T>`:
+Fory 使用 `std::is_polymorphic<T>` 自动检测多态类型：
 
 ```cpp
 struct Base {
@@ -136,10 +135,9 @@ struct Container2 {
 };
 ```
 
-## Controlling Dynamic Dispatch
+## 控制动态分派
 
-Use `fory::F().dynamic(V)` in `FORY_STRUCT` to override automatic
-polymorphism detection:
+使用 `fory::dynamic<V>` 覆盖自动多态检测：
 
 ```cpp
 struct Animal {
@@ -152,24 +150,23 @@ struct Pet {
   std::shared_ptr<Animal> animal1;
 
   // Force dynamic: type info written explicitly
-  std::shared_ptr<Animal> animal2;
+  fory::field<std::shared_ptr<Animal>, 0, fory::dynamic<true>> animal2;
 
   // Force non-dynamic: skip type info (faster but no runtime subtyping)
-  std::shared_ptr<Animal> animal3;
+  fory::field<std::shared_ptr<Animal>, 1, fory::dynamic<false>> animal3;
 };
-FORY_STRUCT(Pet, animal1, (animal2, fory::F().dynamic(true)),
-            (animal3, fory::F().dynamic(false)));
+FORY_STRUCT(Pet, animal1, animal2, animal3);
 ```
 
-**When to use `dynamic(false)`:**
+**何时使用 `fory::dynamic<false>`：**
 
-- You know the runtime type will always match the declared type
-- Performance is critical and you don't need subtype support
-- Working with monomorphic data despite having a polymorphic base class
+- 确定运行时类型始终与声明类型一致
+- 对性能要求很高且不需要子类型支持
+- 虽然有多态基类，但实际处理的是单态数据
 
-### Schema Metadata
+### 不使用包装类型的字段配置
 
-Configure field metadata directly in `FORY_STRUCT`:
+使用 `FORY_FIELD_CONFIG` 配置字段，无需 `fory::field<>` 包装器：
 
 ```cpp
 struct Zoo {
@@ -177,17 +174,21 @@ struct Zoo {
   std::shared_ptr<Animal> backup;    // Nullable polymorphic field
   std::shared_ptr<Animal> mascot;    // Non-dynamic (no subtype dispatch)
 };
-FORY_STRUCT(Zoo, (star, fory::F(0)),
-            (backup, fory::F(1).nullable()),
-            (mascot, fory::F(2).dynamic(false)));
+FORY_STRUCT(Zoo, star, backup, mascot);
+
+// Configure fields with tag IDs and options
+FORY_FIELD_CONFIG(Zoo,
+    (star, fory::F(0)),                    // Tag ID 0, default options
+    (backup, fory::F(1).nullable()),       // Tag ID 1, allow nullptr
+    (mascot, fory::F(2).dynamic(false))    // Tag ID 2, disable polymorphism
+);
 ```
 
-See [Schema Metadata](schema-metadata.md) for complete details on
-`nullable()`, `ref()`, and other field-level options.
+关于 `fory::nullable`、`fory::ref` 和其他字段级选项的完整细节，请参见[字段配置](schema_metadata)
 
-## std::unique_ptr Polymorphism
+## std::unique_ptr 多态
 
-`std::unique_ptr` works the same way as `std::shared_ptr` for polymorphic types:
+对于多态类型，`std::unique_ptr` 的工作方式与 `std::shared_ptr` 相同：
 
 ```cpp
 struct Container {
@@ -195,7 +196,7 @@ struct Container {
 };
 FORY_STRUCT(Container, pet);
 
-auto fory = Fory::builder().xlang(true).track_ref(true).build();
+auto fory = Fory::builder().track_ref(true).build();
 fory.register_struct<Container>(200);
 fory.register_struct<Dog>(201);
 
@@ -212,7 +213,7 @@ assert(dog != nullptr);
 assert(dog->breed == "Beagle");
 ```
 
-## Collections of Polymorphic Objects
+## 多态对象集合
 
 ```cpp
 #include <vector>
@@ -224,7 +225,7 @@ struct AnimalShelter {
 };
 FORY_STRUCT(AnimalShelter, animals, registry);
 
-auto fory = Fory::builder().xlang(true).track_ref(true).build();
+auto fory = Fory::builder().track_ref(true).build();
 fory.register_struct<AnimalShelter>(100);
 fory.register_struct<Dog>(101);
 fory.register_struct<Cat>(102);
@@ -243,14 +244,14 @@ assert(dynamic_cast<Cat*>(decoded.animals[1].get()) != nullptr);
 assert(dynamic_cast<Dog*>(decoded.registry["pet1"].get()) != nullptr);
 ```
 
-## Reference Tracking
+## 引用跟踪
 
-Reference tracking for `std::shared_ptr` works the same with polymorphic types.
-See [Supported Types](supported-types.md) for details and examples.
+多态类型中的 `std::shared_ptr` 引用跟踪行为相同。
+详情和示例请参见[支持的类型](supported_types)。
 
-## Nested Polymorphism Depth Limit
+## 嵌套多态深度限制
 
-To prevent stack overflow from deeply nested polymorphic structures, Fory limits the maximum dynamic nesting depth:
+为了防止深度嵌套的多态结构导致栈溢出，Fory 会限制最大动态嵌套深度：
 
 ```cpp
 struct Container {
@@ -261,11 +262,11 @@ struct Container {
 FORY_STRUCT(Container, value, nested);
 
 // Default max_dyn_depth is 5
-auto fory1 = Fory::builder().xlang(true).build();
+auto fory1 = Fory::builder().build();
 assert(fory1.config().max_dyn_depth == 5);
 
 // Increase limit for deeper nesting
-auto fory2 = Fory::builder().xlang(true).max_dyn_depth(10).build();
+auto fory2 = Fory::builder().max_dyn_depth(10).build();
 fory2.register_struct<Container>(1);
 
 // Create deeply nested structure
@@ -290,7 +291,7 @@ auto decoded = fory2.deserialize<std::shared_ptr<Container>>(bytes).value();
 **Depth exceeded error:**
 
 ```cpp
-auto fory_shallow = Fory::builder().xlang(true).max_dyn_depth(2).build();
+auto fory_shallow = Fory::builder().max_dyn_depth(2).build();
 fory_shallow.register_struct<Container>(1);
 
 // 3 levels exceeds max_dyn_depth=2
@@ -306,8 +307,8 @@ assert(!result.ok());  // Fails with depth exceeded error
 ## Nullability for Polymorphic Fields
 
 By default, `std::shared_ptr<T>` and `std::unique_ptr<T>` fields are treated as
-non-nullable in the schema. To allow `nullptr`, mark the field nullable in
-`FORY_STRUCT`.
+non-nullable in the schema. To allow `nullptr`, wrap the field with
+`fory::field<>` (or `FORY_FIELD_TAGS`) and opt in with `fory::nullable`.
 
 ```cpp
 struct Pet {
@@ -315,12 +316,12 @@ struct Pet {
   std::shared_ptr<Animal> primary;
 
   // Nullable via explicit field metadata
-  std::shared_ptr<Animal> optional;
+  fory::field<std::shared_ptr<Animal>, 0, fory::nullable> optional;
 };
-FORY_STRUCT(Pet, primary, (optional, fory::F().nullable()));
+FORY_STRUCT(Pet, primary, optional);
 ```
 
-See [Schema Metadata](schema-metadata.md) for more details.
+See [Field Configuration](schema_metadata) for more details.
 
 ## Combining Polymorphism with Other Features
 
@@ -340,7 +341,7 @@ struct WeightedNode : GraphNode {
 FORY_STRUCT(WeightedNode, id, neighbors, weight);
 
 // Enable ref tracking to handle shared references and cycles
-auto fory = Fory::builder().xlang(true).track_ref(true).build();
+auto fory = Fory::builder().track_ref(true).build();
 fory.register_struct<GraphNode>(100);
 fory.register_struct<WeightedNode>(101);
 
@@ -365,7 +366,6 @@ Use compatible mode for schema evolution with polymorphic types:
 
 ```cpp
 auto fory = Fory::builder()
-    .xlang(true)
     .compatible(true)  // Enable schema evolution
     .track_ref(true)
     .build();
@@ -382,7 +382,7 @@ auto fory = Fory::builder()
 2. **Enable reference tracking** for polymorphic types:
 
    ```cpp
-   auto fory = Fory::builder().xlang(true).track_ref(true).build();
+   auto fory = Fory::builder().track_ref(true).build();
    ```
 
 3. **Virtual destructors required**: Ensure base classes have virtual destructors:
@@ -412,13 +412,13 @@ auto fory = Fory::builder()
 6. **Adjust `max_dyn_depth`** based on your data structure depth:
 
    ```cpp
-   auto fory = Fory::builder().xlang(true).max_dyn_depth(10).build();
+   auto fory = Fory::builder().max_dyn_depth(10).build();
    ```
 
-7. **Use `nullable()`** for optional polymorphic fields:
+7. **Use `fory::nullable`** for optional polymorphic fields:
 
    ```cpp
-   FORY_STRUCT(Holder, (optional_ptr, fory::F().nullable()));
+   fory::field<std::shared_ptr<Base>, 0, fory::nullable> optional_ptr;
    ```
 
 ## Error Handling
@@ -455,10 +455,10 @@ if (!decoded_result.ok()) {
 
 **Optimization tips:**
 
-1. **Use `dynamic(false)`** when runtime type matches declared type:
+1. **Use `fory::dynamic<false>`** when runtime type matches declared type:
 
    ```cpp
-   FORY_STRUCT(Holder, (fixed_type, fory::F().dynamic(false)));
+   fory::field<std::shared_ptr<Base>, 0, fory::dynamic<false>> fixed_type;
    ```
 
 2. **Minimize nesting depth** to reduce metadata overhead
@@ -473,8 +473,8 @@ if (!decoded_result.ok()) {
 
 ## Related Topics
 
-- [Type Registration](type-registration.md) - Registering types for serialization
-- [Schema Metadata](schema-metadata.md) - Field-level metadata and options
-- [Supported Types](supported-types.md) - Smart pointers and collections
-- [Configuration](configuration.md) - `max_dyn_depth` and other settings
-- [Basic Serialization](basic-serialization.md) - Core serialization concepts
+- [Type Registration](type_registration) - Registering types for serialization
+- [Field Configuration](schema_metadata) - Field-level metadata and options
+- [Supported Types](supported_types) - Smart pointers and collections
+- [Configuration](configuration) - `max_dyn_depth` and other settings
+- [Basic Serialization](basic_serialization) - Core serialization concepts

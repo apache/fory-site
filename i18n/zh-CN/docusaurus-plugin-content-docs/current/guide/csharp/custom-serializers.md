@@ -1,6 +1,6 @@
 ---
-title: Custom Serializers
-sidebar_position: 11
+title: 自定义序列化器
+sidebar_position: 4
 id: custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Use custom serializers when a type is not generated with `[ForyObject]` or requires specialized encoding.
+当某个类型不是通过 `[ForyObject]` 生成，或者需要专门的编码方式时，可以使用自定义序列化器。
 
-## Implement `Serializer<T>`
+## 实现 `Serializer<T>`
 
 ```csharp
 using Apache.Fory;
@@ -53,7 +53,7 @@ public sealed class PointSerializer : Serializer<Point>
 }
 ```
 
-## Register the Serializer
+## 注册序列化器
 
 ```csharp
 Fory fory = Fory.Builder().Build();
@@ -64,21 +64,21 @@ byte[] payload = fory.Serialize(value);
 Point decoded = fory.Deserialize<Point>(payload);
 ```
 
-## Serializer Behavior Notes
+## 序列化器行为说明
 
-- `WriteData` / `ReadData` only handle payload content.
-- Ref flags and type info are handled by base `Serializer<T>.Write` / `Read` unless overridden.
-- `DefaultValue` is used for null/default fallback paths.
+- `WriteData` / `ReadData` 只负责处理载荷内容。
+- 除非显式重写，否则引用标志和类型信息由基类 `Serializer<T>.Write` / `Read` 处理。
+- `DefaultValue` 用于空值或默认值回退路径。
 
-## Best Practices
+## 最佳实践
 
-1. Keep serializers deterministic and symmetric.
-2. Use varint/fixed/tagged encoding intentionally for integer-heavy payloads.
-3. Register custom serializers on all reader/writer peers.
-4. Prefer generated `[ForyObject]` serializers for normal domain models.
+1. 保持序列化器逻辑确定且读写对称。
+2. 对整数密集型载荷要有意识地选择 varint、fixed 或 tagged 编码。
+3. 在所有读写端都注册自定义序列化器。
+4. 对常规领域模型优先使用 `[ForyObject]` 生成的序列化器。
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md)
-- [Schema Metadata](schema-metadata.md)
-- [Troubleshooting](troubleshooting.md)
+- [类型注册](type-registration.md)
+- [字段配置](schema-metadata.md)
+- [故障排查](troubleshooting.md)

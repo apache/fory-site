@@ -1,5 +1,5 @@
 ---
-title: Reference Tracking
+title: 引用跟踪
 sidebar_position: 45
 id: reference_tracking
 license: |
@@ -19,124 +19,111 @@ license: |
   limitations under the License.
 ---
 
-This page explains how Fory handles reference tracking for shared and circular references in cross-language serialization.
+本页说明 Fory 在跨语言序列化中如何处理共享引用与循环引用的引用跟踪。
 
-## Overview
+## 概述
 
-Reference tracking enables:
+引用跟踪支持：
 
-- **Shared references**: Same object referenced multiple times is serialized once
-- **Circular references**: Objects that reference themselves or form cycles
-- **Memory efficiency**: No duplicate data for repeated objects
+- **共享引用**：同一对象被多次引用时只序列化一次
+- **循环引用**：对象引用自身或形成环
+- **内存效率**：重复对象不会产生重复数据
 
-## Enabling Reference Tracking
+## 启用引用跟踪
 
 ### Java
 
 ```java
 Fory fory = Fory.builder()
-        .withXlang(true)
-        .withRefTracking(true)
+    .withLanguage(Language.XLANG)
+    .withRefTracking(true)
     .build();
 ```
 
 ### Python
 
 ```python
-fory = pyfory.Fory(xlang=True, ref=True)
+fory = pyfory.Fory(xlang=True, ref_tracking=True)
 ```
 
 ### Go
 
 ```go
-fory := forygo.NewFory(
-    forygo.WithXlang(true),
-    forygo.WithTrackRef(true),
-)
+fory := forygo.NewFory(true)  // true enables ref tracking
 ```
 
 ### C++
 
 ```cpp
-auto fory = fory::serialization::Fory::builder().xlang(true).track_ref(true).build();
+auto fory = fory::Fory::create(fory::Config{
+    .ref_tracking = true
+});
 ```
 
 ### Rust
 
 ```rust
 let fory = Fory::builder()
-    .xlang(true)
-    .track_ref(true).build();
+    .with_ref_tracking(true)
+    .build();
 ```
 
-### Scala
+## 编码格式
 
-```scala
-import org.apache.fory.scala.ForyScala
-
-val fory = ForyScala.builder()
-      .withXlang(true)
-      .withRefTracking(true)
-  .build()
-```
-
-## Wire Format
-
-When reference tracking is enabled, nullable fields write a **ref flag byte** before the value:
+启用引用跟踪后，可空字段会在值之前写入 **ref 标记字节**：
 
 ```
 [ref_flag] [value data if not null/ref]
 ```
 
-Where `ref_flag` is:
+其中 `ref_flag` 为：
 
-| Value                      | Meaning                                               |
+| 值 | 含义 |
 | -------------------------- | ----------------------------------------------------- |
-| `-1` (NULL_FLAG)           | Value is null                                         |
-| `-2` (NOT_NULL_VALUE_FLAG) | Value is present, first occurrence                    |
-| `≥0`                       | Reference ID pointing to previously serialized object |
+| `-1` (NULL_FLAG) | 值为 null |
+| `-2` (NOT_NULL_VALUE_FLAG) | 值存在，且是首次出现 |
+| `≥0` | 指向此前已序列化对象的引用 ID |
 
-## Reference Tracking vs Nullability
+## 引用跟踪与可空性
 
-These are **independent** concepts:
+二者是**相互独立**的概念：
 
-| Concept                | Purpose                                    | Controlled By                            |
+| 概念 | 目的 | 控制方式 |
 | ---------------------- | ------------------------------------------ | ---------------------------------------- |
-| **Nullability**        | Whether a field can hold null values       | Field type (`Optional<T>`) or annotation |
-| **Reference Tracking** | Whether duplicate objects are deduplicated | Global `refTracking` option              |
+| **可空性** | 字段是否可以保存 null 值 | 字段类型（`Optional<T>`）或注解 |
+| **引用跟踪** | 是否对重复对象去重 | 全局 `refTracking` 选项 |
 
-Key behavior:
+关键行为：
 
-- Ref flag bytes are **only written for nullable fields**
-- Non-nullable fields skip ref flags entirely, even with `refTracking=true`
-- Reference deduplication only applies to objects that appear multiple times
+- ref 标记字节**只会为可空字段写入**
+- 即使 `refTracking=true`，不可空字段也完全跳过 ref 标记
+- 引用去重只适用于多次出现的对象
 
 ```java
 // Reference tracking enabled, but non-nullable fields still skip ref flags
 Fory fory = Fory.builder()
-        .withXlang(true)
-        .withRefTracking(true)
+    .withLanguage(Language.XLANG)
+    .withRefTracking(true)
     .build();
 ```
 
-## Per-Field Reference Tracking
+## 按字段配置引用跟踪
 
-By default, **most fields do not track references** even when global `refTracking=true`. Only specific pointer/smart pointer types track references by default.
+默认情况下，即使全局 `refTracking=true`，**大多数字段也不会跟踪引用**。只有特定指针/智能指针类型默认跟踪引用。
 
-### Default Behavior by Language
+### 各语言默认行为
 
-| Language | Default Ref Tracking | Types That Track Refs by Default                           |
-| -------- | -------------------- | ---------------------------------------------------------- |
-| Java     | No                   | None (use annotation to enable)                            |
-| Python   | No                   | None (use annotation to enable)                            |
-| Go       | No                   | None (use `fory:"ref"` to enable)                          |
-| C++      | Yes                  | `std::shared_ptr<T>`, `fory::serialization::SharedWeak<T>` |
-| Rust     | No                   | `Rc<T>`, `Arc<T>`, `Weak<T>`                               |
-| Scala    | No                   | None (use `@Ref` to enable)                                |
+| 语言 | 默认引用跟踪 | 默认跟踪引用的类型 |
+| -------- | -------------------- | --------------------------------- |
+| Java | 否 | 无（使用注解启用） |
+| Python | 否 | 无（使用注解启用） |
+| Go | 否 | 无（使用 `fory:"ref"` 启用） |
+| C++ | 否 | `std::shared_ptr<T>` |
+| Rust | 否 | `Rc<T>`、`Arc<T>`、`Weak<T>` |
 
-### Customizing Per-Field Ref Tracking
+### 自定义字段级引用跟踪
 
-#### Java: @Ref Annotation
+#### Java：@ForyField 注解
 
 ```java
 public class Document {
@@ -144,44 +131,38 @@ public class Document {
     String title;
 
     // Enable ref tracking for this field
-    @Ref
+    @ForyField(trackingRef = true)
     Author author;
 
     // Shared across documents, track refs to avoid duplicates
-    List<@Ref Tag> tags;
+    @ForyField(trackingRef = true)
+    List<Tag> tags;
 }
 ```
 
-#### C++: FORY_STRUCT Field Config
+#### C++：fory::field 包装器
 
 ```cpp
 struct Document {
     std::string title;
 
-    // shared_ptr/SharedWeak track refs by default
+    // shared_ptr tracks refs by default
     std::shared_ptr<Author> author;
-    fory::serialization::SharedWeak<Data> data;
 
-    std::shared_ptr<Tag> tag_owner;
+    // Explicitly enable ref tracking
+    fory::field<std::vector<Tag>, 1, fory::track_ref<true>> tags;
+
+    // Explicitly disable ref tracking
+    fory::field<std::shared_ptr<Data>, 2, fory::track_ref<false>> data;
 };
-FORY_STRUCT(Document,
-    title,
-    author,
-    data,
-    (tag_owner, fory::F().ref())
-);
+FORY_STRUCT(Document, title, author, tags, data);
 ```
 
-To disable reference tracking for C++ entirely, set
-`Fory::builder().xlang(true).track_ref(false).build()` on the serializer.
-
-#### Rust: Field Attributes
+#### Rust：字段属性
 
 ```rust
-use fory::ForyStruct;
-use std::rc::Rc;
-
-#[derive(ForyStruct)]
+#[derive(Fory)]
+#[tag("example.Document")]
 struct Document {
     title: String,
 
@@ -189,36 +170,12 @@ struct Document {
     author: Rc<Author>,
 
     // Explicitly enable ref tracking
-    #[fory(ref = true)]
+    #[track_ref]
     tags: Vec<Tag>,
 }
 ```
 
-#### Scala: @Ref Annotation
-
-Scala schema IDL and Scala 3 macro derivation use the same shared JVM `@Ref`
-annotation:
-
-```scala
-import org.apache.fory.annotation.{ForyField, ForyStruct, Ref}
-import org.apache.fory.scala.ForySerializer
-
-@ForyStruct
-final class Node() derives ForySerializer {
-  @ForyField(id = 1)
-  var children: List[Node @Ref] = List.empty
-
-  @Ref
-  @ForyField(id = 2)
-  var parent: Option[Node] = None
-}
-```
-
-For Scala, top-level field reference tracking is owned by `@Ref` on the field or
-constructor parameter. Type-use `T @Ref` is for nested element/value/payload
-references, such as `List[Node @Ref]`.
-
-#### Go: Struct Tags
+#### Go：结构体 tag
 
 ```go
 type Document struct {
@@ -232,21 +189,21 @@ type Document struct {
 }
 ```
 
-### When to Enable Per-Field Ref Tracking
+### 何时启用字段级引用跟踪
 
-Enable ref tracking for fields that:
+以下字段应启用引用跟踪：
 
-- May contain the same object instance multiple times
-- Are part of circular reference chains
-- Hold large objects that might be shared
+- 可能多次包含同一个对象实例
+- 参与循环引用链
+- 持有可能被共享的大对象
 
-Disable (or leave default) for fields that:
+以下字段应禁用或保持默认：
 
-- Always contain unique values
-- Are primitives or simple value types
-- Don't participate in object sharing
+- 始终包含唯一值
+- 是基本类型或简单值类型
+- 不参与对象共享
 
-## Example: Shared References
+## 示例：共享引用
 
 ```java
 public class Container {
@@ -262,7 +219,7 @@ obj.sameData = obj.data;  // Shared reference
 // With refTracking=false: data serialized twice (duplicate)
 ```
 
-## Example: Circular References
+## 示例：循环引用
 
 ```java
 public class Node {
@@ -279,7 +236,7 @@ b.next = a;  // Circular reference
 // With refTracking=false: infinite recursion error
 ```
 
-## Language Support
+## 语言支持
 
 | Language   | Shared Refs | Circular Refs        |
 | ---------- | ----------- | -------------------- |
@@ -300,4 +257,4 @@ b.next = a;  // Circular reference
 
 - [Field Nullability](field-nullability.md) - How nullability affects serialization
 - [Serialization](serialization.md) - Basic cross-language serialization examples
-- [Xlang Specification](../../specification/xlang_serialization_spec.md) - Binary protocol details
+- [Xlang Specification](https://fory.apache.org/docs/specification/fory_xlang_serialization_spec) - Binary protocol details

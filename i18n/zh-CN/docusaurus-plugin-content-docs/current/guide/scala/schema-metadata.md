@@ -1,5 +1,5 @@
 ---
-title: Schema Metadata
+title: Schema 元信息
 sidebar_position: 3
 id: schema_metadata
 license: |
@@ -19,13 +19,11 @@ license: |
   limitations under the License.
 ---
 
-Scala schema metadata is used by schema IDL generated code and Scala 3 macro-derived xlang
-serializers. Metadata is declared with the shared JVM Fory annotations and Scala compile-time type
-information.
+Scala schema 元信息由 schema IDL 生成代码和 Scala 3 macro-derived xlang 序列化器使用。元信息通过共享的 JVM Fory 注解和 Scala 编译期类型信息声明。
 
-## Struct Fields
+## Struct 字段
 
-Schema messages can use `@ForyStruct` and `@ForyField(id = N)`:
+Schema messages 可以使用 `@ForyStruct` 和 `@ForyField(id = N)`：
 
 ```scala
 import org.apache.fory.annotation.{ForyField, ForyStruct}
@@ -38,12 +36,11 @@ final case class Person(
 ) derives ForySerializer
 ```
 
-Schema `optional T` fields are represented as `Option[T]`.
+Schema `optional T` 字段表示为 `Option[T]`。
 
-## Reference Tracking
+## 引用跟踪
 
-Reference tracking uses the shared JVM `@Ref` annotation. Use field or constructor-parameter
-`@Ref` for a top-level `ref T` field, and type-use `T @Ref` for nested collection or map payloads:
+引用跟踪使用共享的 JVM `@Ref` 注解。顶层 `ref T` 字段应在字段或构造函数参数上使用 `@Ref`，嵌套 collection 或 map 载荷应使用 type-use `T @Ref`：
 
 ```scala
 import org.apache.fory.annotation.{ForyField, ForyStruct, Ref}
@@ -61,7 +58,7 @@ final class Node() derives ForySerializer {
 
 ## Enum IDs
 
-IDL enums generate Scala 3 enums. Stable Fory enum IDs come from case-level `@ForyEnumId` metadata:
+IDL enums 会生成 Scala 3 enums。稳定的 Fory enum IDs 来自 case 级 `@ForyEnumId` 元信息：
 
 ```scala
 import org.apache.fory.annotation.ForyEnumId
@@ -75,12 +72,11 @@ enum Status {
 }
 ```
 
-Generated registration uses `ScalaSerializers.registerEnum(...)` so these stable IDs are used in
-xlang mode.
+生成的注册使用 `ScalaSerializers.registerEnum(...)`，因此 xlang 模式会使用这些稳定 ID。
 
 ## Unions
 
-IDL unions generate Scala 3 ADT enums with `@ForyUnion` and `@ForyCase` metadata:
+IDL unions 会生成带 `@ForyUnion` 和 `@ForyCase` 元信息的 Scala 3 ADT enums：
 
 ```scala
 import org.apache.fory.annotation.{ForyCase, ForyUnion, UInt32Type}
@@ -100,17 +96,14 @@ enum SearchTarget derives ForySerializer {
 }
 ```
 
-Schema-defined union cases must use positive IDs. Case ID `0` is reserved for the unknown-case
-carrier used when a reader sees a newer positive case ID.
+Schema 定义的 union cases 必须使用正 ID。Case ID `0` 预留给 reader 遇到更新的正 case ID 时使用的 unknown-case carrier。
 
-## Generated Metadata Source
+## 生成的元信息来源
 
-The Scala macro builds descriptor metadata from Scala compile-time types, including nested
-generics, `Option`, arrays, scalar encoding annotations, nullability, and `@Ref` metadata. Java
-reflection is not the source of truth for generated Scala metadata.
+Scala macro 会根据 Scala 编译期类型构建 descriptor metadata，包括嵌套 generics、`Option`、arrays、scalar encoding annotations、nullability 和 `@Ref` metadata。Java 反射不是生成 Scala metadata 的事实来源。
 
-## Related Topics
+## 相关主题
 
-- [Schema IDL And Xlang](schema-idl.md)
-- [Configuration](configuration.md)
-- [Default Values](default-values.md)
+- [Schema IDL 与 Xlang](schema-idl.md)
+- [配置](configuration.md)
+- [默认值](default-values.md)

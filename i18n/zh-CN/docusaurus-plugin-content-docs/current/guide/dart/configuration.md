@@ -1,7 +1,7 @@
 ---
-title: Configuration
-sidebar_position: 2
-id: configuration
+title: 配置
+sidebar_position: 1
+id: dart_configuration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,50 +19,49 @@ license: |
   limitations under the License.
 ---
 
-This page explains the `Fory` constructor options.
+本页介绍 `Fory` 构造函数的可选项。
 
-## Creating a `Fory` Instance
+## 创建 `Fory` 实例
 
-Pass options directly to the constructor:
+直接把选项传给构造函数：
 
 ```dart
 import 'package:fory/fory.dart';
 
-// defaults: xlang wire format with compatible schema evolution
+// 默认配置，适合大多数单服务场景
 final fory = Fory();
 
-// customize limits while keeping default compatible mode
+// 需要 Schema 演进的跨语言服务
 final fory = Fory(
+  compatible: true,
   maxDepth: 512,
 );
 ```
 
-Create one instance per application and reuse it; there is no benefit to creating a new `Fory` per request.
+每个应用创建一个实例并复用即可。按请求新建 `Fory` 没有任何收益。
 
-## Options
+## 选项
 
 ### `compatible`
 
-Compatible mode is enabled by default. Keep it enabled when your service needs to handle payloads
-from code that may have a different version of the same model, for example when you deploy services
-independently and cannot guarantee that both sides update at the same time.
+当你的服务需要处理来自另一份模型版本代码的载荷时，请设置为 `true`。例如各服务独立发布，无法保证通信双方同时升级。
 
 ```dart
-final fory = Fory();
+final fory = Fory(compatible: true);
 ```
 
-When `compatible: true`:
+当 `compatible: true` 时：
 
-- Adding or removing fields on one side does not break the other.
-- Peers must still use the same `namespace` + `typeName` (or numeric `id`) to identify types.
+- 一侧新增或删除字段不会破坏另一侧。
+- 各端仍然必须使用相同的 `namespace` + `typeName`，或者相同的数字 `id` 来标识类型。
 
-When `compatible: false`:
+当 `compatible: false`（默认）时：
 
-- Both sides must have exactly the same schema. This is slightly faster and is fine when schemas do not change or all services deploy schema changes at the same time.
+- 双方必须拥有完全相同的 Schema。这样会略快一些，适合仅有 Dart 服务或始终一起升级的场景。
 
 ### `checkStructVersion`
 
-Relevant only when `compatible: false`. When `true`, Fory validates that the schema version in the payload matches the one the receiver knows about, catching accidental schema mismatches at runtime.
+仅在 `compatible: false` 时相关。当它为 `true` 时，Fory 会校验载荷中的 Schema 版本是否与接收端已知版本一致，从而在运行时尽早发现误用的 Schema。
 
 ```dart
 final fory = Fory(
@@ -71,11 +70,11 @@ final fory = Fory(
 );
 ```
 
-This option has no effect when `compatible: true`.
+当 `compatible: true` 时，这个选项不起作用。
 
 ### `maxDepth`
 
-Limits how deeply nested an object graph can be. Increase this if you have legitimately deep trees; lower it to reject unexpectedly deep payloads fast.
+限制对象图的最大嵌套深度。如果你的数据确实有很深的树形结构，可以增大它；如果你想快速拒绝异常深的载荷，可以减小它。
 
 ```dart
 final fory = Fory(maxDepth: 128);
@@ -83,7 +82,7 @@ final fory = Fory(maxDepth: 128);
 
 ### `maxCollectionSize`
 
-Maximum number of elements accepted in any single list, set, or map field. Prevents runaway memory allocation from malformed messages.
+任意单个 list、set 或 map 字段可接受的最大元素数。用于防止畸形消息触发失控的内存分配。
 
 ```dart
 final fory = Fory(maxCollectionSize: 100000);
@@ -91,32 +90,32 @@ final fory = Fory(maxCollectionSize: 100000);
 
 ### `maxBinarySize`
 
-Maximum number of bytes accepted for any single binary blob field.
+任意单个二进制 blob 字段允许接受的最大字节数。
 
 ```dart
 final fory = Fory(maxBinarySize: 8 * 1024 * 1024);
 ```
 
-## Defaults
+## 默认值
 
-| Option               | Default   |
+| 选项                 | 默认值    |
 | -------------------- | --------- |
-| `compatible`         | `true`    |
-| `checkStructVersion` | `false`   |
+| `compatible`         | `false`   |
+| `checkStructVersion` | `true`    |
 | `maxDepth`           | 256       |
 | `maxCollectionSize`  | 1 048 576 |
 | `maxBinarySize`      | 64 MiB    |
 
-## Cross-Language Notes
+## 跨语言说明
 
-When Fory is used to communicate between services written in different languages:
+当 Fory 用于不同语言实现的服务之间通信时：
 
-- Keep compatible mode enabled on all sides if any side needs schema evolution.
-- Use the same numeric IDs or `namespace + typeName` pairs on every side.
-- Match the `compatible` setting on both the writing and reading side — mismatching modes will fail.
+- 如果任意一端需要 Schema 演进，则**所有**端都应设置 `compatible: true`。
+- 每一端都要使用相同的数字 ID，或者相同的 `namespace + typeName` 组合。
+- 写端和读端的 `compatible` 设置必须一致，模式不匹配会直接失败。
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md)
-- [Schema Evolution](schema-evolution.md)
-- [Cross-Language](cross-language.md)
+- [基础序列化](basic-serialization.md)
+- [Schema 演进](schema-evolution.md)
+- [跨语言](xlang-serialization.md)

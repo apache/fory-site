@@ -1,5 +1,5 @@
 ---
-title: Thread Safety
+title: 线程安全
 sidebar_position: 10
 id: thread_safety
 license: |
@@ -19,21 +19,21 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ C# provides two runtime forms with different threading guarantees.
+Apache Fory™ C# 提供两种运行时形态，它们的线程保证不同。
 
-## `Fory` (Single-Threaded Runtime)
+## `Fory`（单线程运行时）
 
-`Fory` is optimized for single-threaded reuse and must not be used concurrently by multiple threads.
+`Fory` 针对单线程复用做了优化，不能被多个线程并发使用。
 
 ```csharp
 Fory fory = Fory.Builder().Build();
 ```
 
-Use one `Fory` instance per thread when managing thread affinity explicitly.
+如果你显式管理线程亲和性，可以为每个线程分配一个 `Fory` 实例。
 
-## `ThreadSafeFory` (Concurrent Wrapper)
+## `ThreadSafeFory`（并发封装）
 
-`ThreadSafeFory` wraps one `Fory` instance per thread and exposes thread-safe APIs.
+`ThreadSafeFory` 为每个线程封装一个 `Fory` 实例，并对外提供线程安全 API。
 
 ```csharp
 using Apache.Fory;
@@ -52,22 +52,22 @@ Parallel.For(0, 64, i =>
 });
 ```
 
-## Registration Behavior
+## 注册行为
 
-- `ThreadSafeFory.Register(...)` stores registrations centrally.
-- Existing per-thread runtimes are updated.
-- New threads receive all previous registrations automatically.
+- `ThreadSafeFory.Register(...)` 会集中保存注册信息。
+- 已存在的线程内运行时会被更新。
+- 新线程会自动收到此前所有注册信息。
 
-## Disposal
+## 释放资源
 
-`ThreadSafeFory` implements `IDisposable` and should be disposed when no longer needed.
+`ThreadSafeFory` 实现了 `IDisposable`，在不再使用时应及时释放。
 
 ```csharp
 using ThreadSafeFory fory = Fory.Builder().BuildThreadSafe();
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
-- [Type Registration](type-registration.md)
-- [References](references.md)
+- [配置](configuration.md)
+- [类型注册](type-registration.md)
+- [引用](references.md)

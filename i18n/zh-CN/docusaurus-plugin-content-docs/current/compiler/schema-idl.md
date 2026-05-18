@@ -1,5 +1,5 @@
 ---
-title: Schema IDL
+title: Schema IDL 语法
 sidebar_position: 2
 id: syntax
 license: |
@@ -19,21 +19,19 @@ license: |
   limitations under the License.
 ---
 
-This document provides the syntax and semantic reference for Fory IDL.
+本文档给出 Fory IDL 的语法与语义参考，覆盖文件结构、类型系统、字段规则、选项与类型注册策略。
 
-For compiler usage and build integration, see
-[Compiler Guide](compiler-guide.md). For protobuf/FlatBuffers frontend mapping
-rules, see [Protocol Buffers IDL Support](protobuf-idl.md) and
-[FlatBuffers IDL Support](flatbuffers-idl.md).
+编译器使用方式与构建集成请参见 [Compiler Guide](compiler-guide.md)。
+protobuf/FlatBuffers 前端映射请参见 [Protocol Buffers IDL Support](protobuf-idl.md) 与 [FlatBuffers IDL Support](flatbuffers-idl.md)。
 
-## File Structure
+## 文件结构
 
-An Fory IDL file typically consists of:
+一个 Fory IDL 文件通常包含：
 
-1. Optional package declaration
-2. Optional file-level options
-3. Optional import statements
-4. Type definitions (enums, messages, and unions)
+1. 可选 `package` 声明
+2. 可选文件级 `option`
+3. 可选 `import` 语句
+4. 类型定义（`enum`、`message`、`union`）
 
 ```protobuf
 // Optional package declaration
@@ -52,9 +50,9 @@ message Order [id=102] { ... }
 union Event [id=103] { ... }
 ```
 
-## Comments
+## 注释
 
-Fory IDL supports both single-line and block comments:
+支持单行注释与块注释：
 
 ```protobuf
 // This is a single-line comment
@@ -69,55 +67,54 @@ message Example {
 }
 ```
 
-## Package Declaration
+## Package 声明
 
-The package declaration defines the namespace for all types in the file.
+`package` 定义文件中所有类型的命名空间。
 
 ```protobuf
 package com.example.models;
 ```
 
-You can optionally specify a package alias used for auto-generated type IDs:
+也可以配置 alias（用于自动类型 ID 计算）：
 
 ```protobuf
 package com.example.models alias models_v1;
 ```
 
-**Rules:**
+规则：
 
-- Optional but recommended
-- Must appear before any type definitions
-- Only one package declaration per file
-- Used for name-based type registration
-- Package alias is used for auto-ID hashing
+- 可选但推荐
+- 必须位于任何类型定义之前
+- 每个文件最多一个 `package`
+- 用于命名空间注册
+- `alias` 会参与 auto-ID 哈希
 
-**Language Mapping:**
+语言映射：
 
-| Language   | Package Usage                     |
-| ---------- | --------------------------------- |
-| Java       | Java package                      |
-| Python     | Module name (dots to underscores) |
-| Go         | Package name (last component)     |
-| Rust       | Module name (dots to underscores) |
-| C++        | Namespace (dots to `::`)          |
-| C#         | Namespace                         |
-| JavaScript | Module name (last segment)        |
-| Dart       | Library name (package segments)   |
-| Kotlin     | Kotlin package                    |
+| 语言       | package 用法              |
+| ---------- | ------------------------- |
+| Java       | Java package              |
+| Python     | 模块名（`.` 转 `_`）      |
+| Go         | 包名（通常取最后一段）    |
+| Rust       | 模块名（`.` 转 `_`）      |
+| C++        | 命名空间（`.` 转 `::`）   |
+| C#         | 命名空间                  |
+| JavaScript | 模块名（取最后一段）      |
+| Dart       | 库名（保留 package 各段） |
 
-## File-Level Options
+## 文件级选项
 
-Options can be specified at file level to control language-specific code generation.
+文件级选项用于控制语言定制代码生成。
 
-### Syntax
+### 语法
 
 ```protobuf
 option option_name = value;
 ```
 
-### Java Package Option
+### Java Package 选项
 
-Override the Java package for generated code:
+通过 `java_package` 覆盖 Java 输出包名：
 
 ```protobuf
 package payment;
@@ -128,15 +125,15 @@ message Payment {
 }
 ```
 
-**Effect:**
+效果：
 
-- Generated Java files will be in `com/mycorp/payment/v1/` directory
-- Java package declaration will be `package com.mycorp.payment.v1;`
-- Type registration still uses the Fory IDL package (`payment`) for cross-language compatibility
+- Java 文件输出到 `com/mycorp/payment/v1/`
+- Java `package` 声明使用该值
+- 跨语言类型注册仍以 Fory package（如 `payment`）为准
 
-### Go Package Option
+### Go Package 选项
 
-Specify the Go import path and package name:
+通过 `go_package` 指定 Go import path 与包名：
 
 ```protobuf
 package payment;
@@ -147,125 +144,11 @@ message Payment {
 }
 ```
 
-**Format:** `"import/path;package_name"` or just `"import/path"` (last segment used as package name)
+格式：`"import/path;package_name"` 或仅 `"import/path"`（包名取最后一段）。
 
-**Effect:**
+### Java Outer Classname 选项
 
-- Generated Go files will have `package paymentv1`
-- The import path can be used in other Go code
-- Type registration still uses the Fory IDL package (`payment`) for cross-language compatibility
-
-### C# Namespace Option
-
-Override the C# namespace for generated code:
-
-```protobuf
-package payment;
-option csharp_namespace = "MyCorp.Payment.V1";
-
-message Payment {
-    string id = 1;
-}
-```
-
-**Effect:**
-
-- Generated C# files use `namespace MyCorp.Payment.V1;`
-- Output path follows namespace segments (`MyCorp/Payment/V1/` under `--csharp_out`)
-- Type registration still uses the Fory IDL package (`payment`) for cross-language compatibility
-
-### Kotlin Package Option
-
-Override the Kotlin package for generated source:
-
-```protobuf
-package payment;
-option kotlin_package = "com.mycorp.payment.v1";
-
-message Payment {
-    string id = 1;
-}
-```
-
-**Effect:**
-
-- Generated Kotlin files are written under `com/mycorp/payment/v1/`
-- Kotlin source uses `package com.mycorp.payment.v1`
-- Type registration still uses the Fory IDL package (`payment`) for cross-language compatibility
-
-If `kotlin_package` is absent, Kotlin uses the FDL package. A Kotlin import
-graph cannot mix default-package schemas with named Kotlin packages.
-
-### Go Nested Type Style Option
-
-Control Go naming for nested message/enum/union types:
-
-```protobuf
-package payment;
-option go_nested_type_style = "camelcase";
-
-message Envelope {
-    message Payload {
-        string id = 1;
-    }
-}
-```
-
-**Values:**
-
-- `underscore` (default): `Envelope_Payload`
-- `camelcase`: `EnvelopePayload`
-
-The CLI flag `--go_nested_type_style` overrides this schema option when both are set.
-
-### Swift Namespace Style Option
-
-Control how package namespace is reflected in Swift generated type names:
-
-```protobuf
-package payment.v1;
-option swift_namespace_style = "flatten";
-
-message Payment {
-    string id = 1;
-}
-```
-
-**Values:**
-
-- `enum` (default): namespace wrappers (for example `Payment.V1.Payment`)
-- `flatten`: package prefix on top-level types (for example `Payment_V1_Payment`)
-
-**Important:** namespace wrapper/prefixing is only applied when package is non-empty. If package is empty, Swift emits top-level types directly for both styles.
-
-The CLI flag `--swift_namespace_style` overrides this schema option when both are set.
-
-### Rust Chrono Temporal Types Option
-
-Rust generated code uses Fory's lightweight temporal carrier types by default:
-`fory::Date`, `fory::Timestamp`, and `fory::Duration`. Set
-`rust_use_chrono_temporal_types` when the generated Rust API should expose
-chrono temporal types instead:
-
-```protobuf
-package payment;
-option rust_use_chrono_temporal_types = true;
-
-message Event {
-    date business_day = 1;
-    timestamp created_at = 2;
-    duration timeout = 3;
-}
-```
-
-With this option, Rust code maps `date` to `chrono::NaiveDate`, `timestamp` to
-`chrono::NaiveDateTime`, and `duration` to `chrono::Duration`. The Rust crate
-that compiles the generated code must depend on `chrono` and enable Fory's
-`chrono` feature.
-
-### Java Outer Classname Option
-
-Generate all types as inner classes of a single outer wrapper class:
+将多个类型包装到一个外层类：
 
 ```protobuf
 package payment;
@@ -282,49 +165,11 @@ message Payment {
 }
 ```
 
-**Effect:**
+默认会生成单文件，枚举与消息作为静态内部类型。
 
-- Generates a single file `DescriptorProtos.java` instead of separate files
-- All enums and messages become `public static` inner classes
-- The outer class is `public final` with a private constructor
-- Useful for grouping related types together
+### Java Multiple Files 选项
 
-**Generated structure:**
-
-```java
-public final class DescriptorProtos {
-    private DescriptorProtos() {}
-
-    public static enum Status {
-        UNKNOWN,
-        ACTIVE;
-    }
-
-    public static class Payment {
-        private String id;
-        private Status status;
-        // ...
-    }
-}
-```
-
-**Combined with java_package:**
-
-```protobuf
-package payment;
-option java_package = "com.example.proto";
-option java_outer_classname = "PaymentProtos";
-
-message Payment {
-    string id = 1;
-}
-```
-
-This generates `com/example/proto/PaymentProtos.java` with all types as inner classes.
-
-### Java Multiple Files Option
-
-Control whether types are generated in separate files or as inner classes:
+控制 Java 是否拆分多文件：
 
 ```protobuf
 package payment;
@@ -340,656 +185,361 @@ message Receipt {
 }
 ```
 
-**Behavior:**
+行为：
 
-| `java_outer_classname` | `java_multiple_files` | Result                                      |
-| ---------------------- | --------------------- | ------------------------------------------- |
-| Not set                | Any                   | Separate files (one per type)               |
-| Set                    | `false` (default)     | Single file with all types as inner classes |
-| Set                    | `true`                | Separate files (overrides outer class)      |
+| `java_outer_classname` | `java_multiple_files` | 结果             |
+| ---------------------- | --------------------- | ---------------- |
+| 未设置                 | 任意                  | 每个类型一个文件 |
+| 已设置                 | `false`（默认）       | 单文件 + 内部类  |
+| 已设置                 | `true`                | 强制拆分为多文件 |
 
-**Effect of `java_multiple_files = true`:**
-
-- Each top-level enum and message gets its own `.java` file
-- Overrides `java_outer_classname` behavior
-- Useful when you want separate files but still specify an outer class name for other purposes
-
-**Example without java_multiple_files (default):**
-
-```protobuf
-option java_outer_classname = "PaymentProtos";
-// Generates: PaymentProtos.java containing Payment and Receipt as inner classes
-```
-
-**Example with java_multiple_files = true:**
-
-```protobuf
-option java_outer_classname = "PaymentProtos";
-option java_multiple_files = true;
-// Generates: Payment.java, Receipt.java (separate files)
-```
-
-### Multiple Options
-
-Multiple options can be specified:
+### 多个选项组合
 
 ```protobuf
 package payment;
 option java_package = "com.mycorp.payment.v1";
 option go_package = "github.com/mycorp/apis/gen/payment/v1;paymentv1";
 option deprecated = true;
-
-message Payment {
-    string id = 1;
-}
 ```
 
-### Protobuf Extension Syntax
+### Protobuf 扩展语法说明
 
-In `.fdl` files, use native Fory IDL syntax only (for example, `[id=100]`, `ref`,
-`optional`, `nullable=true`).
+在 `.fdl` 中请使用 Fory 原生语法（如 `[id=100]`、`ref`、`optional`、`nullable=true`）。
+`(fory).xxx` 形式仅用于 `.proto`（protobuf 前端）。
 
-Protobuf extension syntax with `(fory).` is for `.proto` files and the protobuf
-frontend only.
+### 选项优先级
 
-For protobuf extension options, see
-[Protocol Buffers IDL Support](protobuf-idl.md#fory-extension-options-protobuf).
+语言包路径优先级：
 
-### Option Priority
+1. 命令行覆盖（最高）
+2. 语言选项（`java_package`、`go_package`）
+3. Fory IDL `package`（兜底）
 
-For language-specific packages/namespaces:
+### 跨语言类型注册
 
-1. Language-specific option (`java_package`, `go_package`, `csharp_namespace`,
-   `kotlin_package`)
-2. Fory IDL package declaration (fallback)
+默认情况下，注册名由 `package + type name`（或类型 ID）确定。建议长期保持 `package` 稳定，以避免跨版本注册不一致。
 
-**Example:**
+## Import 语句
 
-```protobuf
-package myapp.models;
-option java_package = "com.example.generated";
-```
-
-| Scenario               | Java Package Used         |
-| ---------------------- | ------------------------- |
-| `java_package` present | `com.example.generated`   |
-| No `java_package`      | `myapp.models` (fallback) |
-
-### Cross-Language Type Registration
-
-Language-specific options only affect where code is generated, not the type namespace used for serialization. This ensures cross-language compatibility:
-
-```protobuf
-package myapp.models;
-option java_package = "com.mycorp.generated";
-option go_package = "github.com/mycorp/gen;genmodels";
-
-message User {
-    string name = 1;
-}
-```
-
-All languages will register `User` with namespace `myapp.models`, enabling:
-
-- Java serialized data → Go deserialization
-- Go serialized data → Java deserialization
-- Any language combination works seamlessly
-
-## Import Statement
-
-Import statements allow you to use types defined in other Fory IDL files.
-
-### Basic Syntax
-
-```protobuf
-import "path/to/file.fdl";
-```
-
-### Multiple Imports
+### 基本语法
 
 ```protobuf
 import "common/types.fdl";
-import "common/enums.fdl";
-import "models/address.fdl";
 ```
 
-### Path Resolution
-
-Import paths are resolved relative to the importing file:
-
-```
-project/
-├── common/
-│   └── types.fdl
-├── models/
-│   ├── user.fdl      # import "../common/types.fdl"
-│   └── order.fdl     # import "../common/types.fdl"
-└── main.fdl          # import "common/types.fdl"
-```
-
-**Rules:**
-
-- Import paths are quoted strings (double or single quotes)
-- Paths are resolved relative to the importing file's directory
-- Imported types become available as if defined in the current file
-- Circular imports are detected and reported as errors
-- Transitive imports work (if A imports B and B imports C, A has access to C's types)
-
-### Complete Example
-
-**common/types.fdl:**
+### 多个导入
 
 ```protobuf
-package common;
+import "common/types.fdl";
+import "domain/user.fdl";
+import "domain/order.fdl";
+```
 
-enum Status [id=100] {
-    PENDING = 0;
-    ACTIVE = 1;
-    COMPLETED = 2;
-}
+### 路径解析
 
-message Address [id=101] {
-    string street = 1;
-    string city = 2;
-    string country = 3;
+导入解析顺序：
+
+1. 导入者文件所在目录
+2. 命令行 `-I/--proto_path/--import_path` 指定目录（按给定顺序）
+
+### 完整示例
+
+```protobuf
+// src/main.fdl
+package app;
+
+import "common.fdl";
+import "models/user.fdl";
+
+message Main {
+    common.Meta meta = 1;
+    models.User user = 2;
 }
 ```
 
-**models/user.fdl:**
+### 不支持的 import 写法
 
-```protobuf
-package models;
-import "../common/types.fdl";
+- URL 形式（如 `https://...`）
+- 绝对路径依赖（不推荐，会破坏可移植性）
 
-message User [id=200] {
-    string id = 1;
-    string name = 2;
-    Address home_address = 3;  // Uses imported type
-    Status status = 4;          // Uses imported enum
-}
-```
+### import 错误
 
-### Unsupported Import Syntax
+典型错误：
 
-The following protobuf import modifiers are **not supported**:
+- 文件不存在
+- 搜索路径未包含依赖目录
+- 同名文件冲突导致解析到错误版本
 
-```protobuf
-// NOT SUPPORTED - will produce an error
-import public "other.fdl";
-import weak "other.fdl";
-```
+## Enum 定义
 
-**`import public`**: Fory IDL uses a simpler import model. All imported types are available to the importing file only. Re-exporting is not supported. Import each file directly where needed.
-
-**`import weak`**: Fory IDL requires all imports to be present at compile time. Optional dependencies are not supported.
-
-### Import Errors
-
-The compiler reports errors for:
-
-- **File not found**: The imported file doesn't exist
-- **Circular import**: A imports B which imports A (directly or indirectly)
-- **Parse errors**: Syntax errors in imported files
-- **Unsupported syntax**: `import public` or `import weak`
-
-## Enum Definition
-
-Enums define a set of named integer constants.
-
-### Basic Syntax
+### 基本语法
 
 ```protobuf
 enum Status {
-    PENDING = 0;
+    UNKNOWN = 0;
     ACTIVE = 1;
-    COMPLETED = 2;
+    DISABLED = 2;
 }
 ```
 
-### With Explicit Type ID
+### 显式类型 ID
 
 ```protobuf
-enum Status [id=100] {
-    PENDING = 0;
+enum Status [id=101] {
+    UNKNOWN = 0;
     ACTIVE = 1;
-    COMPLETED = 2;
+    DISABLED = 2;
 }
 ```
 
-### Reserved Values
-
-Reserve field numbers or names to prevent reuse:
+### 预留值
 
 ```protobuf
 enum Status {
-    reserved 2, 15, 9 to 11, 40 to max;  // Reserved numbers
-    reserved "OLD_STATUS", "DEPRECATED"; // Reserved names
-    PENDING = 0;
+    UNKNOWN = 0;
     ACTIVE = 1;
-    COMPLETED = 3;
+    reserved 2, 3;
+    reserved 10 to 20;
 }
 ```
 
-### Enum Type Options
+### enum 类型选项
 
-Enum-level options are declared inline in `[]` after the enum name:
+常见：`id`、`alias`、`deprecated`。
 
-```protobuf
-enum Status [deprecated=true] {
-    PENDING = 0;
-    ACTIVE = 1;
-}
-```
+### 语言映射
 
-FDL does not support `option ...;` statements inside enum bodies.
-
-**Unsupported:**
-
-- `allow_alias` is **not supported**. Each enum value must have a unique integer.
-
-### Language Mapping
-
-| Language   | Implementation                         |
+| 语言       | 实现形式                               |
 | ---------- | -------------------------------------- |
 | Java       | `enum Status { UNKNOWN, ACTIVE, ... }` |
 | Python     | `class Status(IntEnum): UNKNOWN = 0`   |
-| Go         | `type Status int32` with constants     |
+| Go         | `type Status int32` 配合常量           |
 | Rust       | `#[repr(i32)] enum Status { Unknown }` |
 | C++        | `enum class Status : int32_t { ... }`  |
 | JavaScript | `export enum Status { UNKNOWN, ... }`  |
 | Dart       | `enum Status { unknown, active, ... }` |
 
-### Enum Prefix Stripping
+### 枚举前缀处理
 
-When enum values use a protobuf-style prefix (enum name in UPPER_SNAKE_CASE), the compiler automatically strips the prefix for languages with scoped enums:
+针对 protobuf 风格 `TYPE_NAME_VALUE`，生成器通常会按语言习惯去除冗余前缀，使 API 更自然。
 
-```protobuf
-// Input with prefix
-enum DeviceTier {
-    DEVICE_TIER_UNKNOWN = 0;
-    DEVICE_TIER_TIER1 = 1;
-    DEVICE_TIER_TIER2 = 2;
-}
-```
+| 语言       | 输出示例                                  | 风格             |
+| ---------- | ----------------------------------------- | ---------------- |
+| Java       | `UNKNOWN, TIER1, TIER2`                   | 作用域枚举       |
+| Rust       | `Unknown, Tier1, Tier2`                   | 作用域枚举       |
+| C++        | `UNKNOWN, TIER1, TIER2`                   | 作用域枚举       |
+| Python     | `UNKNOWN, TIER1, TIER2`                   | 作用域 `IntEnum` |
+| Go         | `DeviceTierUnknown, DeviceTierTier1, ...` | 非作用域常量     |
+| JavaScript | `UNKNOWN, TIER1, TIER2`                   | 作用域枚举       |
+| Dart       | `unknown, tier1, tier2`                   | 作用域枚举       |
 
-**Generated code:**
+## Message 定义
 
-| Language   | Output                                    | Style          |
-| ---------- | ----------------------------------------- | -------------- |
-| Java       | `UNKNOWN, TIER1, TIER2`                   | Scoped enum    |
-| Rust       | `Unknown, Tier1, Tier2`                   | Scoped enum    |
-| C++        | `UNKNOWN, TIER1, TIER2`                   | Scoped enum    |
-| Python     | `UNKNOWN, TIER1, TIER2`                   | Scoped IntEnum |
-| Go         | `DeviceTierUnknown, DeviceTierTier1, ...` | Unscoped const |
-| JavaScript | `UNKNOWN, TIER1, TIER2`                   | Scoped enum    |
-| Dart       | `unknown, tier1, tier2`                   | Scoped enum    |
-
-**Note:** The prefix is only stripped if the remainder is a valid identifier. For example, `DEVICE_TIER_1` is kept unchanged because `1` is not a valid identifier name.
-
-**Grammar:**
-
-```
-enum_def     := 'enum' IDENTIFIER [type_options] '{' enum_body '}'
-type_options := '[' type_option (',' type_option)* ']'
-type_option  := IDENTIFIER '=' option_value
-enum_body    := (reserved_stmt | enum_value)*
-reserved_stmt := 'reserved' reserved_items ';'
-enum_value   := IDENTIFIER '=' INTEGER ';'
-```
-
-**Rules:**
-
-- Enum names must be unique within the file
-- Enum values must have explicit integer assignments
-- Value integers must be unique within the enum (no aliases)
-- Type ID (`[id=100]`) is optional for enums but recommended for cross-language use
-
-**Example with All Features:**
-
-```protobuf
-// HTTP status code categories
-enum HttpCategory [id=200] {
-    reserved 10 to 20;           // Reserved for future use
-    reserved "UNKNOWN";          // Reserved name
-    INFORMATIONAL = 1;
-    SUCCESS = 2;
-    REDIRECTION = 3;
-    CLIENT_ERROR = 4;
-    SERVER_ERROR = 5;
-}
-```
-
-## Message Definition
-
-Messages define structured data types with typed fields.
-
-### Basic Syntax
-
-```protobuf
-message Person {
-    string name = 1;
-    int32 age = 2;
-}
-```
-
-### With Explicit Type ID
-
-```protobuf
-message Person [id=101] {
-    string name = 1;
-    int32 age = 2;
-}
-```
-
-### Without Explicit Type ID
-
-```protobuf
-message Person {  // Auto-generated when enable_auto_type_id = true
-    string name = 1;
-    int32 age = 2;
-}
-```
-
-### Language Mapping
-
-| Language   | Implementation                      |
-| ---------- | ----------------------------------- |
-| Java       | POJO class with getters/setters     |
-| Python     | `@dataclass` class                  |
-| Go         | Struct with exported fields         |
-| Rust       | Struct with `#[derive(ForyObject)]` |
-| C++        | Struct with `FORY_STRUCT` macro     |
-| JavaScript | `export interface` declaration      |
-| Dart       | `@ForyStruct` `final class`         |
-
-Type IDs control cross-language registration for messages, unions, and enums. See
-[Type IDs](#type-ids) for auto-generation, aliases, and collision handling.
-
-### Reserved Fields
-
-Reserve field numbers or names to prevent reuse after removing fields:
+### 基本语法
 
 ```protobuf
 message User {
-    reserved 2, 15, 9 to 11;       // Reserved field numbers
-    reserved "old_field", "temp";  // Reserved field names
-    string id = 1;
-    string name = 3;
+    string name = 1;
+    int32 age = 2;
 }
 ```
 
-### Message Type Options
-
-Message-level options are declared inline in `[]` after the message name:
+### 显式类型 ID
 
 ```protobuf
-message User [deprecated=true] {
-    string id = 1;
-    string name = 2;
+message User [id=100] {
+    string name = 1;
+    int32 age = 2;
 }
 ```
 
-FDL does not support `option ...;` statements inside message or enum bodies.
+### 无显式类型 ID
 
-**Grammar:**
+未声明 `[id=...]` 时，编译器可按配置自动生成类型 ID，或使用 namespace/name 注册。
 
-```
-message_def  := 'message' IDENTIFIER [type_options] '{' message_body '}'
-type_options := '[' type_option (',' type_option)* ']'
-type_option  := IDENTIFIER '=' option_value
-message_body := (reserved_stmt | nested_type | field_def)*
-nested_type  := enum_def | message_def | union_def
-```
+### 语言映射
 
-**Rules:**
+| 语言       | 实现形式                          |
+| ---------- | --------------------------------- |
+| Java       | 带 getter/setter 的 POJO          |
+| Python     | `@dataclass` 类                   |
+| Go         | 导出字段的 struct                 |
+| Rust       | `#[derive(ForyObject)]` 的 struct |
+| C++        | 带 `FORY_STRUCT` 宏的 struct      |
+| JavaScript | `export interface` 声明           |
+| Dart       | `@ForyStruct` `final class`       |
 
-- Type IDs follow the rules in [Type IDs](#type-ids).
-
-## Nested Types
-
-Messages can contain nested message, enum, and union definitions. This is useful for defining types that are closely related to their parent message.
-
-### Nested Messages
+### 预留字段
 
 ```protobuf
-message SearchResponse {
-    message Result {
-        string url = 1;
-        string title = 2;
-        list<string> snippets = 3;
+message User {
+    string name = 1;
+    reserved 2, 3;
+    reserved 10 to 20;
+}
+```
+
+### message 类型选项
+
+常见选项：`id`、`alias`、`evolving`、`deprecated`、`namespace`、`use_record_for_java`。
+
+## 嵌套类型
+
+### 嵌套 message
+
+```protobuf
+message Person {
+    message PhoneNumber {
+        string number = 1;
     }
-    list<Result> results = 1;
+    PhoneNumber phone = 1;
 }
 ```
 
-### Nested Enums
+### 嵌套 enum
 
 ```protobuf
-message Container {
-    enum Status {
-        STATUS_UNKNOWN = 0;
-        STATUS_ACTIVE = 1;
-        STATUS_INACTIVE = 2;
+message Person {
+    enum PhoneType {
+        MOBILE = 0;
+        HOME = 1;
     }
-    Status status = 1;
+    PhoneType type = 1;
 }
 ```
 
-### Qualified Type Names
+### 限定类型名
 
-Nested types can be referenced from other messages using qualified names (Parent.Child):
+可使用完整限定名引用嵌套类型，例如 `Person.PhoneNumber`。
 
-```protobuf
-message SearchResponse {
-    message Result {
-        string url = 1;
-        string title = 2;
-    }
-}
+### 深层嵌套类型
 
-message SearchResultCache {
-    // Reference nested type with qualified name
-    SearchResponse.Result cached_result = 1;
-    list<SearchResponse.Result> all_results = 2;
-}
-```
+支持多层嵌套，但建议控制层级，避免可读性下降。
 
-### Deeply Nested Types
+### 各语言生成形态
 
-Nesting can be multiple levels deep:
+| 语言       | 嵌套类型形态                                    |
+| ---------- | ----------------------------------------------- |
+| Java       | `Outer.Inner`                                   |
+| Python     | `Outer.Inner`                                   |
+| Rust       | `outer::Inner`                                  |
+| C++        | `Outer::Inner`                                  |
+| Go         | `Outer_Inner`（默认，可配置为 camelcase）       |
+| JavaScript | 扁平名称（如 `Result`）                         |
+| Dart       | 带下划线的扁平类名（如 `SearchResponse_Result`） |
 
-```protobuf
-message Outer {
-    message Middle {
-        message Inner {
-            string value = 1;
-        }
-        Inner inner = 1;
-    }
-    Middle middle = 1;
-}
+### 嵌套规则
 
-message OtherMessage {
-    // Reference deeply nested type
-    Outer.Middle.Inner deep_ref = 1;
-}
-```
+- 嵌套类型名在其父作用域内必须唯一
+- 可被同文件后续类型引用
+- 可通过 import + 限定名跨文件引用
 
-### Language-Specific Generation
+## Union 定义
 
-| Language   | Nested Type Generation                                                            |
-| ---------- | --------------------------------------------------------------------------------- |
-| Java       | Static inner classes (`SearchResponse.Result`)                                    |
-| Python     | Nested classes within dataclass                                                   |
-| Go         | Flat structs with underscore (`SearchResponse_Result`, configurable to camelcase) |
-| Rust       | Nested modules (`search_response::Result`)                                        |
-| C++        | Nested classes (`SearchResponse::Result`)                                         |
-| JavaScript | Flat names (`Result`)                                                             |
-| Dart       | Flat classes with underscore (`SearchResponse_Result`)                            |
-
-**Note:** Go defaults to underscore-separated nested names; set `option go_nested_type_style = "camelcase";` to use concatenated names. Rust emits nested modules for nested types.
-
-### Nested Type Rules
-
-- Nested type names must be unique within their parent message
-- Nested types can have their own type IDs
-- Numeric type IDs must be globally unique (including nested types); see [Type IDs](#type-ids)
-  for auto-generation and collision handling
-- Within a message, you can reference nested types by simple name
-- From outside, use the qualified name (Parent.Child)
-
-## Union Definition
-
-Unions define a value that can hold exactly one of several case types.
-
-### Basic Syntax
+### 基本语法
 
 ```protobuf
-union Animal [id=106] {
+union Animal {
     Dog dog = 1;
     Cat cat = 2;
 }
 ```
 
-### Using a Union in a Message
+### 在 message 中使用 union
 
 ```protobuf
-message Person [id=100] {
+message Person {
     Animal pet = 1;
-    optional Animal favorite_pet = 2;
 }
 ```
 
-### Rules
+### 规则
 
-- Case IDs must be positive and unique within the union
-- Case ID `0` is reserved for language runtimes that expose an unknown-case carrier
-- Cases cannot be `optional` or `ref`
-- Union cases do not support field options
-- Case types can be primitives, enums, messages, or other named types
-- Union type IDs follow the rules in [Type IDs](#type-ids).
+- case 字段号必须唯一
+- case 类型通常为消息类型或可序列化复合类型
+- 各语言会生成带 case 判别和访问器的 union 表达
 
-**Grammar:**
+## 字段定义
 
-```
-union_def  := 'union' IDENTIFIER [type_options] '{' union_field* '}'
-union_field := field_type IDENTIFIER '=' INTEGER ';'
-```
-
-## Field Definition
-
-Fields define the properties of a message.
-
-### Basic Syntax
+### 基本语法
 
 ```protobuf
-field_type field_name = field_number;
+string name = 1;
 ```
 
-### With Modifiers
+### 带修饰符语法
 
 ```protobuf
-optional list<string> tags = 1;  // Nullable list
-list<optional string> tags = 2;  // Elements may be null
-list<ref Node> nodes = 3;        // Elements tracked as references
+optional string nickname = 2;
+ref Node parent = 3;
+list<int32> scores = 4;
 ```
 
-**Grammar:**
-
-```
-field_def    := [modifiers] field_type IDENTIFIER '=' INTEGER ';'
-modifiers    := { 'optional' | 'ref' }
-field_type   := primitive_type | named_type | list_type | array_type | map_type
-list_type    := 'list' '<' { 'optional' | 'ref' | scalar_encoding } field_type '>'
-array_type   := 'array' '<' array_element_type '>'
-```
-
-`optional` before `list` applies to the collection field. `ref` is only valid
-for named message/union fields; for collection contents, use `list<ref T>` or
-`map<K, ref V>`. `repeated` is accepted as an alias for `list`.
-
-### Field Modifiers
+### 字段修饰符
 
 #### `optional`
 
-Marks the field as nullable:
+声明字段可为空（null/None）：
 
 ```protobuf
 message User {
-    string name = 1;           // Required, non-null
-    optional string email = 2; // Nullable
+    optional string email = 1;
 }
 ```
 
-**Generated Code:**
+建议在跨语言场景显式使用，以避免默认值差异。
 
-| Language   | Non-optional       | Optional                          |
-| ---------- | ------------------ | --------------------------------- |
-| Java       | `String name`      | `@Nullable String email`          |
-| Python     | `name: str`        | `name: Optional[str]`             |
-| Go         | `Name string`      | `Name *string`                    |
-| Rust       | `name: String`     | `name: Option<String>`            |
-| C++        | `std::string name` | `std::optional<std::string> name` |
-| JavaScript | `name: string`     | `name?: string \| null`           |
-| Dart       | `String name`      | `String? email`                   |
-| Scala      | `name: String`     | `email: Option[String]`           |
+**生成代码：**
 
-**Default Values:**
-
-| Type               | Default Value       |
-| ------------------ | ------------------- |
-| Non-optional types | Language default    |
-| Optional types     | `null`/`None`/`nil` |
+| 语言       | 非 optional         | optional                                        |
+| ---------- | ------------------- | ----------------------------------------------- |
+| Java       | `String name`       | `String email` 配合 `@ForyField(nullable=true)` |
+| Python     | `name: str`         | `name: Optional[str]`                           |
+| Go         | `Name string`       | `Name *string`                                  |
+| Rust       | `name: String`      | `name: Option<String>`                          |
+| C++        | `std::string name`  | `std::optional<std::string> name`               |
+| JavaScript | `name: string`      | `name?: string \| null`                         |
+| Dart       | `String name`       | `String? email`                                 |
 
 #### `ref`
 
-Enables reference tracking for shared/circular references:
+开启引用跟踪，用于共享对象与循环结构：
 
 ```protobuf
 message Node {
-    string value = 1;
-    ref Node parent = 2;     // Can point to shared object
+    string name = 1;
+    ref Node parent = 2;
     list<ref Node> children = 3;
 }
 ```
 
-**Use Cases:**
+当运行时全局 ref tracking 开启时，字段级 `ref` 才会生效。
 
-- Shared objects (same object referenced multiple times)
-- Circular references (object graphs with cycles)
-- Tree structures with parent pointers
+**生成代码：**
 
-**Generated Code:**
-
-| Language   | Without `ref`  | With `ref`                                 |
-| ---------- | -------------- | ------------------------------------------ |
-| Java       | `Node parent`  | `Node parent` with `@Ref`                  |
-| Python     | `parent: Node` | `parent: Node = pyfory.field(ref=True)`    |
-| Go         | `Parent Node`  | `Parent *Node` with `fory:"ref"`           |
-| Rust       | `parent: Node` | `parent: Arc<Node>`                        |
-| C++        | `Node parent`  | `std::shared_ptr<Node> parent`             |
-| JavaScript | `parent: Node` | `parent: Node` (no ref distinction)        |
-| Dart       | `Node parent`  | `Node parent` with `@ForyField(ref: true)` |
-| Scala      | `parent: Node` | `@Ref parent: Node`                        |
-
-Rust uses `Arc` by default; use `ref(thread_safe=false)` or `ref(weak=true)`
-to customize pointer types. For protobuf option syntax, see
-[Protocol Buffers IDL Support](protobuf-idl.md#field-level-options).
+| 语言       | 不使用 `ref`     | 使用 `ref`                                 |
+| ---------- | ---------------- | ------------------------------------------ |
+| Java       | `Node parent`    | `Node parent` 配合 `@ForyField(ref=true)`  |
+| Python     | `parent: Node`   | `parent: Node = pyfory.field(ref=True)`    |
+| Go         | `Parent Node`    | `Parent *Node` 配合 `fory:"ref"`           |
+| Rust       | `parent: Node`   | `parent: Arc<Node>`                        |
+| C++        | `Node parent`    | `std::shared_ptr<Node> parent`             |
+| JavaScript | `parent: Node`   | `parent: Node`（无额外 `ref` 区分）        |
+| Dart       | `Node parent`    | `Node parent` 配合 `@ForyField(ref: true)` |
 
 #### `list`
 
-Marks the field as an ordered collection:
+列表字段（`repeated` 为等价别名）：
 
 ```protobuf
-message Document {
+message Group {
     list<string> tags = 1;
-    list<User> authors = 2;
 }
 ```
 
-**Generated Code:**
+**生成代码：**
 
-| Language   | Type                       |
+| 语言       | 类型                       |
 | ---------- | -------------------------- |
 | Java       | `List<String>`             |
 | Python     | `List[str]`                |
@@ -999,617 +549,336 @@ message Document {
 | JavaScript | `string[]`                 |
 | Dart       | `List<String>`             |
 
-### Combining Modifiers
+### 组合修饰符
 
-Modifiers can be combined:
-
-```fdl
-message Example {
-    optional list<string> tags = 1;  // Nullable list
-    list<optional string> aliases = 2; // Elements may be null
-    list<ref Node> children = 3;       // Elements tracked as references
-    optional ref User owner = 4;       // Nullable tracked reference
-}
-```
-
-`optional` before `list` applies to the field/collection. `ref` before `list` or
-`map` is invalid; put `ref` inside the element/value type instead. `repeated` is
-accepted as an alias for `list`.
-
-**List modifier mapping:**
-
-| Fory IDL                | Java                               | Python                | Go                      | Rust                  | C++                                       | Dart                                                          | Scala                  |
-| ----------------------- | ---------------------------------- | --------------------- | ----------------------- | --------------------- | ----------------------------------------- | ------------------------------------------------------------- | ---------------------- |
-| `optional list<string>` | `@Nullable List<String>`           | `Optional[List[str]]` | `[]string` + `nullable` | `Option<Vec<String>>` | `std::optional<std::vector<std::string>>` | `List<String>?`                                               | `Option[List[String]]` |
-| `list<optional string>` | `List<String>` (nullable elements) | `List[Optional[str]]` | `[]*string`             | `Vec<Option<String>>` | `std::vector<std::optional<std::string>>` | `List<String?>`                                               | `List[Option[String]]` |
-| `list<ref User>`        | `List<@Ref User>`                  | `List[User]`          | `[]*User` + `ref=false` | `Vec<Arc<User>>`      | `std::vector<std::shared_ptr<User>>`      | `List<User>` + `@ListField(element: DeclaredType(ref: true))` | `List[User @Ref]`      |
-
-Use `ref(thread_safe=false)` in Fory IDL (or `[(fory).thread_safe_pointer = false]` in protobuf)
-to generate `Rc` instead of `Arc` in Rust.
-
-## Field Numbers
-
-Each field must have a unique positive integer identifier:
+可组合使用：
 
 ```protobuf
-message Example {
-    string first = 1;
-    string second = 2;
-    string third = 3;
+message Graph {
+    optional ref Node root = 1;
+    list<ref Node> nodes = 2;
 }
 ```
 
-**Rules and best practices:**
+## 字段号
 
-- Numbers must be unique within a message.
-- Numbers must be positive integers.
-- Gaps are allowed and are useful when fields are removed.
-- Prefer sequential numbering from `1`.
-- Never reuse a removed field number for a different field.
+字段号规则：
 
-## Type System
+- 同一 message 内必须唯一
+- 必须为正整数
+- 不应复用已删除字段号（建议使用 `reserved`）
+- 建议预留编号区间以便演进
 
-Fory IDL provides a cross-language type system for primitives, named types, and
-collections. Field modifiers (`optional`, `ref`) control nullability and
-reference tracking, while `list<T>` and `array<T>` choose collection schema kind
-(see [Field Modifiers](#field-modifiers)).
+## Type System {#type-system}
+
+Fory IDL 类型系统包括基础类型、命名类型和集合类型。
 
 ### Primitive Types
 
-| Type        | Description                                    | Size     |
-| ----------- | ---------------------------------------------- | -------- |
-| `bool`      | Boolean value                                  | 1 byte   |
-| `int8`      | Signed 8-bit integer                           | 1 byte   |
-| `int16`     | Signed 16-bit integer                          | 2 bytes  |
-| `int32`     | Signed 32-bit integer, varint by default       | 4 bytes  |
-| `int64`     | Signed 64-bit integer, PVL varint by default   | 8 bytes  |
-| `uint8`     | Unsigned 8-bit integer                         | 1 byte   |
-| `uint16`    | Unsigned 16-bit integer                        | 2 bytes  |
-| `uint32`    | Unsigned 32-bit integer, varint by default     | 4 bytes  |
-| `uint64`    | Unsigned 64-bit integer, PVL varint by default | 8 bytes  |
-| `float16`   | IEEE 754 binary16 floating point               | 2 bytes  |
-| `bfloat16`  | Brain floating point                           | 2 bytes  |
-| `float32`   | 32-bit floating point                          | 4 bytes  |
-| `float64`   | 64-bit floating point                          | 8 bytes  |
-| `string`    | UTF-8 string                                   | Variable |
-| `bytes`     | Binary data                                    | Variable |
-| `date`      | Calendar date                                  | Variable |
-| `timestamp` | Date and time with timezone                    | Variable |
-| `duration`  | Duration                                       | Variable |
-| `decimal`   | Decimal value                                  | Variable |
-| `any`       | Dynamic value (runtime type)                   | Variable |
+| 类型族   | 示例                              |
+| -------- | --------------------------------- |
+| 布尔     | `bool`                            |
+| 整数     | `int8/int16/int32/int64`、`uint*` |
+| 浮点     | `float32`、`float64`              |
+| 字符串   | `string`                          |
+| 字节数组 | `bytes`                           |
+| 时间     | `date`、`timestamp`、`duration`   |
+| 动态类型 | `any`                             |
 
 #### Boolean
 
-| Language   | Type                  | Notes              |
-| ---------- | --------------------- | ------------------ |
-| Java       | `boolean` / `Boolean` | Primitive or boxed |
-| Python     | `bool`                |                    |
-| Go         | `bool`                |                    |
-| Rust       | `bool`                |                    |
-| C++        | `bool`                |                    |
-| JavaScript | `boolean`             |                    |
-| Dart       | `bool`                |                    |
+`bool` 表示布尔值。
+
+| 语言       | 类型      | 说明 |
+| ---------- | --------- | ---- |
+| Java       | `boolean` |      |
+| Python     | `bool`    |      |
+| Go         | `bool`    |      |
+| Rust       | `bool`    |      |
+| C++        | `bool`    |      |
+| JavaScript | `boolean` |      |
+| Dart       | `bool`    |      |
 
 #### Integer Types
 
-Fory IDL provides fixed-width signed integers (varint encoding for 32/64-bit by default):
+支持有符号/无符号与不同位宽。跨语言场景建议明确编码策略并保持字段语义稳定。
 
-| Fory IDL Type | Size   | Range             |
-| ------------- | ------ | ----------------- |
-| `int8`        | 8-bit  | -128 to 127       |
-| `int16`       | 16-bit | -32,768 to 32,767 |
-| `int32`       | 32-bit | -2^31 to 2^31 - 1 |
-| `int64`       | 64-bit | -2^63 to 2^63 - 1 |
-
-**Language Mapping (Signed):**
+**有符号整数映射：**
 
 | Fory IDL | Java    | Python         | Go      | Rust  | C++       | JavaScript         | Dart    |
 | -------- | ------- | -------------- | ------- | ----- | --------- | ------------------ | ------- |
-| `int8`   | `byte`  | `pyfory.Int8`  | `int8`  | `i8`  | `int8_t`  | `number`           | `int`   |
-| `int16`  | `short` | `pyfory.Int16` | `int16` | `i16` | `int16_t` | `number`           | `int`   |
-| `int32`  | `int`   | `pyfory.Int32` | `int32` | `i32` | `int32_t` | `number`           | `int`   |
-| `int64`  | `long`  | `pyfory.Int64` | `int64` | `i64` | `int64_t` | `bigint \| number` | `Int64` |
+| `int8`   | `byte`  | `pyfory.int8`  | `int8`  | `i8`  | `int8_t`  | `number`           | `Int8`  |
+| `int16`  | `short` | `pyfory.int16` | `int16` | `i16` | `int16_t` | `number`           | `Int16` |
+| `int32`  | `int`   | `pyfory.int32` | `int32` | `i32` | `int32_t` | `number`           | `Int32` |
+| `int64`  | `long`  | `pyfory.int64` | `int64` | `i64` | `int64_t` | `bigint \| number` | `int`   |
 
-Fory IDL provides fixed-width unsigned integers (varint encoding for 32/64-bit by default):
-
-| Fory IDL | Size   | Range         |
-| -------- | ------ | ------------- |
-| `uint8`  | 8-bit  | 0 to 255      |
-| `uint16` | 16-bit | 0 to 65,535   |
-| `uint32` | 32-bit | 0 to 2^32 - 1 |
-| `uint64` | 64-bit | 0 to 2^64 - 1 |
-
-**Language Mapping (Unsigned):**
+**无符号整数映射：**
 
 | Fory IDL | Java    | Python          | Go       | Rust  | C++        | JavaScript         | Dart     |
 | -------- | ------- | --------------- | -------- | ----- | ---------- | ------------------ | -------- |
-| `uint8`  | `short` | `pyfory.UInt8`  | `uint8`  | `u8`  | `uint8_t`  | `number`           | `int`    |
-| `uint16` | `int`   | `pyfory.UInt16` | `uint16` | `u16` | `uint16_t` | `number`           | `int`    |
-| `uint32` | `long`  | `pyfory.UInt32` | `uint32` | `u32` | `uint32_t` | `number`           | `int`    |
-| `uint64` | `long`  | `pyfory.UInt64` | `uint64` | `u64` | `uint64_t` | `bigint \| number` | `Uint64` |
+| `uint8`  | `short` | `pyfory.uint8`  | `uint8`  | `u8`  | `uint8_t`  | `number`           | `UInt8`  |
+| `uint16` | `int`   | `pyfory.uint16` | `uint16` | `u16` | `uint16_t` | `number`           | `UInt16` |
+| `uint32` | `long`  | `pyfory.uint32` | `uint32` | `u32` | `uint32_t` | `number`           | `UInt32` |
+| `uint64` | `long`  | `pyfory.uint64` | `uint64` | `u64` | `uint64_t` | `bigint \| number` | `int`    |
 
-#### Integer Encoding Modifiers
+#### Integer Encoding Variants
 
-For 32/64-bit integers, Fory IDL uses variable-length encoding by default. Add a
-scalar encoding modifier when you need a different wire encoding:
+常见编码：
 
-| Modifier | Valid types                          | Notes                        |
-| -------- | ------------------------------------ | ---------------------------- |
-| `varint` | `int32`, `int64`, `uint32`, `uint64` | Explicit spelling of default |
-| `fixed`  | `int32`, `int64`, `uint32`, `uint64` | Fixed-width little-endian    |
-| `tagged` | `int64`, `uint64`                    | Tagged 64-bit encoding       |
-
-Modifiers are part of the scalar type expression, so they can be used in nested
-list and map positions:
-
-```protobuf
-fixed int32 id = 1;
-list<fixed int32> offsets = 2;
-map<string, tagged uint64> counters = 3;
-```
-
-Underscore spellings for integer encoding are not FDL type names.
+- `varint`：小值更省空间
+- `fixed`：固定长度，性能稳定
+- `tagged`：混合编码（特定类型可用）
 
 #### Floating-Point Types
 
-| Fory IDL Type | Size   | Precision     |
-| ------------- | ------ | ------------- |
-| `float32`     | 32-bit | ~7 digits     |
-| `float64`     | 64-bit | ~15-16 digits |
+- `float32`
+- `float64`
 
-**Language Mapping:**
-
-| Fory IDL   | Java       | Python annotation/value     | Go                  | Rust       | C++                | JavaScript | Dart      |
-| ---------- | ---------- | --------------------------- | ------------------- | ---------- | ------------------ | ---------- | --------- |
-| `float16`  | `Float16`  | `pyfory.Float16` / `float`  | `float16.Float16`   | `Float16`  | `fory::float16_t`  | `number`   | `double`  |
-| `bfloat16` | `BFloat16` | `pyfory.BFloat16` / `float` | `bfloat16.BFloat16` | `BFloat16` | `fory::bfloat16_t` | `number`   | `double`  |
-| `float32`  | `float`    | `pyfory.Float32`            | `float32`           | `f32`      | `float`            | `number`   | `Float32` |
-| `float64`  | `double`   | `pyfory.Float64`            | `float64`           | `f64`      | `double`           | `number`   | `double`  |
+| Fory IDL  | Java     | Python           | Go        | Rust  | C++      | JavaScript | Dart      |
+| --------- | -------- | ---------------- | --------- | ----- | -------- | ---------- | --------- |
+| `float32` | `float`  | `pyfory.float32` | `float32` | `f32` | `float`  | `number`   | `Float32` |
+| `float64` | `double` | `pyfory.float64` | `float64` | `f64` | `double` | `number`   | `double`  |
 
 #### String Type
 
-| Language   | Type          | Notes                 |
-| ---------- | ------------- | --------------------- |
-| Java       | `String`      | Immutable             |
-| Python     | `str`         |                       |
-| Go         | `string`      | Immutable             |
-| Rust       | `String`      | Owned, heap-allocated |
-| C++        | `std::string` |                       |
-| JavaScript | `string`      |                       |
-| Dart       | `String`      |                       |
+`string` 使用 UTF-8 文本语义。
+
+| 语言       | 类型          | 说明                 |
+| ---------- | ------------- | -------------------- |
+| Java       | `String`      | 不可变               |
+| Python     | `str`         |                      |
+| Go         | `string`      | 不可变               |
+| Rust       | `String`      | 所有权字符串，堆分配 |
+| C++        | `std::string` |                      |
+| JavaScript | `string`      |                      |
+| Dart       | `String`      |                      |
 
 #### Bytes Type
 
-| Language   | Type                   | Notes     |
-| ---------- | ---------------------- | --------- |
-| Java       | `byte[]`               |           |
-| Python     | `bytes`                | Immutable |
-| Go         | `[]byte`               |           |
-| Rust       | `Vec<u8>`              |           |
-| C++        | `std::vector<uint8_t>` |           |
-| JavaScript | `Uint8Array`           |           |
-| Dart       | `Uint8List`            |           |
+`bytes` 用于原始二进制载荷。
+
+| 语言       | 类型                   | 说明   |
+| ---------- | ---------------------- | ------ |
+| Java       | `byte[]`               |        |
+| Python     | `bytes`                | 不可变 |
+| Go         | `[]byte`               |        |
+| Rust       | `Vec<u8>`              |        |
+| C++        | `std::vector<uint8_t>` |        |
+| JavaScript | `Uint8Array`           |        |
+| Dart       | `Uint8List`            |        |
 
 #### Temporal Types
 
 ##### Date
 
-| Language   | Type                        | Notes                                                                       |
-| ---------- | --------------------------- | --------------------------------------------------------------------------- |
-| Java       | `java.time.LocalDate`       |                                                                             |
-| Python     | `datetime.date`             |                                                                             |
-| Go         | `time.Time`                 | Time portion ignored                                                        |
-| Rust       | `fory::Date`                | Set `rust_use_chrono_temporal_types = true` to generate `chrono::NaiveDate` |
-| C++        | `fory::serialization::Date` |                                                                             |
-| JavaScript | `Date`                      |                                                                             |
-| Dart       | `LocalDate`                 | Fory package type                                                           |
+`date` 表示日期（不含时区时间部分）。
+
+| 语言       | 类型                        | 说明                    |
+| ---------- | --------------------------- | ----------------------- |
+| Java       | `java.time.LocalDate`       |                         |
+| Python     | `datetime.date`             |                         |
+| Go         | `time.Time`                 | 会忽略时间部分          |
+| Rust       | `chrono::NaiveDate`         | 需依赖 `chrono` crate   |
+| C++        | `fory::serialization::Date` |                         |
+| JavaScript | `Date`                      |                         |
+| Dart       | `LocalDate`                 | Fory package 提供的类型 |
 
 ##### Timestamp
 
-| Language   | Type                             | Notes                                                                           |
-| ---------- | -------------------------------- | ------------------------------------------------------------------------------- |
-| Java       | `java.time.Instant`              | UTC-based                                                                       |
-| Python     | `datetime.datetime`              |                                                                                 |
-| Go         | `time.Time`                      |                                                                                 |
-| Rust       | `fory::Timestamp`                | Set `rust_use_chrono_temporal_types = true` to generate `chrono::NaiveDateTime` |
-| C++        | `fory::serialization::Timestamp` |                                                                                 |
-| JavaScript | `Date`                           |                                                                                 |
-| Dart       | `Timestamp`                      | Fory package type                                                               |
+`timestamp` 表示时间点（跨语言应统一时间语义与精度预期）。
 
-##### Duration
-
-| Language | Type                            | Notes                                                                      |
-| -------- | ------------------------------- | -------------------------------------------------------------------------- |
-| Java     | `java.time.Duration`            |                                                                            |
-| Python   | `datetime.timedelta`            |                                                                            |
-| Go       | `time.Duration`                 |                                                                            |
-| Rust     | `fory::Duration`                | Set `rust_use_chrono_temporal_types = true` to generate `chrono::Duration` |
-| C++      | `fory::serialization::Duration` |                                                                            |
-| Dart     | `Duration`                      |                                                                            |
+| 语言       | 类型                             | 说明                    |
+| ---------- | -------------------------------- | ----------------------- |
+| Java       | `java.time.Instant`              | 基于 UTC                |
+| Python     | `datetime.datetime`              |                         |
+| Go         | `time.Time`                      |                         |
+| Rust       | `chrono::NaiveDateTime`          | 需依赖 `chrono` crate   |
+| C++        | `fory::serialization::Timestamp` |                         |
+| JavaScript | `Date`                           |                         |
+| Dart       | `Timestamp`                      | Fory package 提供的类型 |
 
 #### Any
 
-| Language   | Type           | Notes                |
-| ---------- | -------------- | -------------------- |
-| Java       | `Object`       | Runtime type written |
-| Python     | `Any`          | Runtime type written |
-| Go         | `any`          | Runtime type written |
-| Rust       | `Box<dyn Any>` | Runtime type written |
-| C++        | `std::any`     | Runtime type written |
-| JavaScript | `any`          | Runtime type written |
-| Dart       | `Object?`      | Runtime type written |
+`any` 允许存储动态类型值。使用 `any` 时建议配合清晰的业务约束，避免滥用导致模型不稳定。
 
-**Example:**
-
-```protobuf
-enum EventType [id=120] {
-    CREATED = 0;
-    DELETED = 1;
-}
-
-message UserCreated [id=121] {
-    string user_id = 1;
-}
-
-message Envelope [id=122] {
-    EventType type = 1;
-    any payload = 2;
-}
-```
-
-**Generated Code (`Envelope.payload`):**
-
-| Language   | Generated Field Type    |
-| ---------- | ----------------------- |
-| Java       | `Object payload`        |
-| Python     | `payload: Any`          |
-| Go         | `Payload any`           |
-| Rust       | `payload: Box<dyn Any>` |
-| C++        | `std::any payload`      |
-| JavaScript | `payload: any`          |
-| Dart       | `Object? payload`       |
-
-**Notes:**
-
-- `any` always writes a null flag (same as `nullable`) because values may be empty.
-- Allowed runtime values are limited to `bool`, `string`, `enum`, `message`, and `union`.
-  Other primitives (numeric, bytes, date/time) and list/map are not supported; wrap them in a
-  message or use explicit fields instead.
-- `ref` is not allowed on `any` fields (including list/map values). Wrap `any` in a message
-  if you need reference tracking.
-- The runtime type must be registered in the target language schema/IDL registration; unknown
-  types fail to deserialize.
+| 语言       | 类型           | 说明           |
+| ---------- | -------------- | -------------- |
+| Java       | `Object`       | 写入运行时类型 |
+| Python     | `Any`          | 写入运行时类型 |
+| Go         | `any`          | 写入运行时类型 |
+| Rust       | `Box<dyn Any>` | 写入运行时类型 |
+| C++        | `std::any`     | 写入运行时类型 |
+| JavaScript | `any`          | 写入运行时类型 |
+| Dart       | `Object?`      | 写入运行时类型 |
 
 ### Named Types
 
-Reference other messages, enums, or unions by name:
+命名类型包括：
 
-```protobuf
-enum Status { ... }
-message User { ... }
+- `enum`
+- `message`
+- `union`
 
-message Order {
-    User customer = 1;    // Reference to User message
-    Status status = 2;    // Reference to Status enum
-}
-```
+支持跨文件 import 和限定名引用。
 
 ### Collection Types
 
 #### List (`list`)
 
-Use the `list<...>` type for list fields. `repeated` is accepted as an alias. See [Field Modifiers](#field-modifiers) for
-modifier combinations and language mapping.
-
-Nested collection support is target-capability based. The C++ generator accepts
-nested collection specs such as `list<list<...>>`, `list<map<...>>`, and
-`map<..., list<...>>`; targets that have not implemented nested field specs
-continue to reject them. Use a message wrapper when you need portable schemas
-across all targets.
-
-#### Array (`array`)
-
-Use `array<T>` for dynamic-length dense numeric data. `array<T>` is a distinct
-schema kind from `list<T>` and uses the packed primitive-array wire payload.
-
 ```protobuf
-message Embedding {
-    array<int32> indices = 1;
-    array<float32> values = 2;
-    array<uint8> pixels = 3;
-}
+list<T>
 ```
 
-`array<T>` accepts `bool`, integer, and floating-point element domains only. It
-does not accept `optional`, `ref`, named/object types, `string`, `bytes`, maps,
-or scalar integer encoding modifiers such as `array<fixed int32>`; array
-elements are always fixed-width by the array contract.
-
-Generated carriers are language-specific, but the schema kind is not:
-
-| IDL schema        | Java default                 | Python default         | Dart default   | JavaScript/TypeScript    |
-| ----------------- | ---------------------------- | ---------------------- | -------------- | ------------------------ |
-| `list<bool>`      | `BoolList` / `List<Boolean>` | `List[bool]`           | `List<bool>`   | `Type.list(Type.bool())` |
-| `array<bool>`     | `boolean[]`                  | `pyfory.BoolArray`     | `BoolList`     | `Type.boolArray()`       |
-| `array<int8>`     | `@Int8Type byte[]`           | `pyfory.Int8Array`     | `Int8List`     | `Type.int8Array()`       |
-| `array<int16>`    | `short[]`                    | `pyfory.Int16Array`    | `Int16List`    | `Type.int16Array()`      |
-| `array<int32>`    | `int[]`                      | `pyfory.Int32Array`    | `Int32List`    | `Type.int32Array()`      |
-| `array<int64>`    | `long[]`                     | `pyfory.Int64Array`    | `Int64List`    | `Type.int64Array()`      |
-| `array<uint8>`    | `@UInt8Type byte[]`          | `pyfory.UInt8Array`    | `Uint8List`    | `Type.uint8Array()`      |
-| `array<uint16>`   | `@UInt16Type short[]`        | `pyfory.UInt16Array`   | `Uint16List`   | `Type.uint16Array()`     |
-| `array<uint32>`   | `@UInt32Type int[]`          | `pyfory.UInt32Array`   | `Uint32List`   | `Type.uint32Array()`     |
-| `array<uint64>`   | `@UInt64Type long[]`         | `pyfory.UInt64Array`   | `Uint64List`   | `Type.uint64Array()`     |
-| `array<float16>`  | `Float16Array`               | `pyfory.Float16Array`  | `Float16List`  | `Type.float16Array()`    |
-| `array<bfloat16>` | `BFloat16Array`              | `pyfory.BFloat16Array` | `Bfloat16List` | `Type.bfloat16Array()`   |
-| `array<float32>`  | `float[]`                    | `pyfory.Float32Array`  | `Float32List`  | `Type.float32Array()`    |
-| `array<float64>`  | `double[]`                   | `pyfory.Float64Array`  | `Float64List`  | `Type.float64Array()`    |
-
-For handwritten Dart models, `array<bool>` requires `BoolList` plus
-`@ArrayField(element: BoolType())` or
-`@ForyField(type: ArrayType(element: BoolType()))`; `List<bool>` remains
-`list<bool>`. For handwritten Java models, unsigned primitive arrays use
-type-use annotations on the element type, for example
-`private @UInt32Type int[] ids;`.
-For generated Kotlin models, `array<int8>` uses `@ArrayType ByteArray`,
-including nested collection and map positions.
+等价别名：`repeated T`。
 
 #### Map
 
-Maps with typed keys and values:
-
 ```protobuf
-message Config {
-    map<string, string> properties = 1;
-    map<string, int32> counts = 2;
-    map<int32, User> users = 3;
-}
+map<K, V>
 ```
 
-**Language Mapping:**
+约束：
 
-| Fory IDL             | Java                   | Python            | Go                 | Rust                    | C++                              | JavaScript            | Dart                |
-| -------------------- | ---------------------- | ----------------- | ------------------ | ----------------------- | -------------------------------- | --------------------- | ------------------- |
-| `map<string, int32>` | `Map<String, Integer>` | `Dict[str, int]`  | `map[string]int32` | `HashMap<String, i32>`  | `std::map<std::string, int32_t>` | `Map<string, number>` | `Map<String, int>`  |
-| `map<string, User>`  | `Map<String, User>`    | `Dict[str, User]` | `map[string]User`  | `HashMap<String, User>` | `std::map<std::string, User>`    | `Map<string, User>`   | `Map<String, User>` |
+- `K` 一般应为可稳定比较的标量类型
+- `V` 可为任意支持类型
 
-**Key Type Restrictions:**
-
-- `string` (most common)
-- `bool`
-- Integer types (`int8`, `int16`, `int32`, `int64`, `uint8`, `uint16`, `uint32`, `uint64`)
-- Temporal scalar types (`date`, `timestamp`, `duration`)
-- Enums
-
-Map keys do not support binary `bytes`, floating-point types, `decimal`, `list<T>`, `array<T>`,
-or nested `map<K, V>` types. Put those types in map values or wrap them in a message with a
-portable scalar or enum key.
+| Fory IDL             | Java                   | Python            | Go                 | Rust                    | C++                              | JavaScript            | Dart                 |
+| -------------------- | ---------------------- | ----------------- | ------------------ | ----------------------- | -------------------------------- | --------------------- | -------------------- |
+| `map<string, int32>` | `Map<String, Integer>` | `Dict[str, int]`  | `map[string]int32` | `HashMap<String, i32>`  | `std::map<std::string, int32_t>` | `Map<string, number>` | `Map<String, Int32>` |
+| `map<string, User>`  | `Map<String, User>`    | `Dict[str, User]` | `map[string]User`  | `HashMap<String, User>` | `std::map<std::string, User>`    | `Map<string, User>`   | `Map<String, User>`  |
 
 ### Type Compatibility Matrix
 
-This matrix shows which type conversions are safe across languages:
+跨语言建议：
 
-| From -> To | bool | int8 | int16 | int32 | int64 | float32 | float64 | string |
-| ---------- | ---- | ---- | ----- | ----- | ----- | ------- | ------- | ------ |
-| bool       | Y    | Y    | Y     | Y     | Y     | -       | -       | -      |
-| int8       | -    | Y    | Y     | Y     | Y     | Y       | Y       | -      |
-| int16      | -    | -    | Y     | Y     | Y     | Y       | Y       | -      |
-| int32      | -    | -    | -     | Y     | Y     | -       | Y       | -      |
-| int64      | -    | -    | -     | -     | Y     | -       | -       | -      |
-| float32    | -    | -    | -     | -     | -     | Y       | Y       | -      |
-| float64    | -    | -    | -     | -     | -     | -       | Y       | -      |
-| string     | -    | -    | -     | -     | -     | -       | -       | Y      |
-
-Y = Safe conversion, - = Not recommended
+- 使用各语言都稳定支持的公共子集
+- 尽量避免平台相关宽度/语义差异
+- 对整数编码与可空语义显式声明
 
 ### Best Practices
 
-- Use `int32` as the default for most integers; use `int64` for large values.
-- Use `string` for text data (UTF-8) and `bytes` for binary data.
-- Use `optional` only when the field may legitimately be absent.
-- Use `ref` only when needed for shared or circular references.
-- Prefer `list` for ordered sequences and `map` for key-value lookups.
+1. 优先使用显式字段号与稳定命名
+2. 需要可空就显式 `optional`
+3. 存在共享/循环关系时使用 `ref`
+4. 降低 `any` 使用范围，优先强类型建模
+5. 预留字段号与枚举值区间
 
 ## Type IDs
 
-Type IDs enable efficient cross-language serialization and are used for
-messages, unions, and enums. When `enable_auto_type_id = true` (default) and
-`id` is omitted, the compiler auto-generates one using
-`MurmurHash3(utf8(package.type_name))` (32-bit) and annotates it in generated
-code. When `enable_auto_type_id = false`, types without explicit IDs are
-registered by namespace and name instead. Collisions are detected at
-compile-time across the current file and all imports; when a collision occurs,
-the compiler raises an error and asks for an explicit `id` or an `alias`.
-For Java and Scala generated code, nested name registration appends the parent
-path to the namespace and keeps the nested type's simple name. For example,
-`package demo; message Envelope { message Payload { ... } }` registers
-`Payload` as namespace `demo.Envelope` and type name `Payload` in those JVM
-targets.
+类型 ID 用于跨语言快速注册与解码匹配。
+
+### 显式类型 ID
 
 ```protobuf
-enum Color [id=100] { ... }
-message User [id=101] { ... }
-union Event [id=102] { ... }
+message User [id=100] {
+    string name = 1;
+}
 ```
 
-Enum type IDs remain optional; if omitted they are auto-generated using the same
-hash when `enable_auto_type_id = true`.
+### 无显式类型 ID
 
-### With Explicit Type ID
+未显式声明时可：
 
-```protobuf
-message User [id=101] { ... }
-message User [id=101, deprecated=true] { ... }  // Multiple options
-```
+- 自动生成数值 ID（默认配置）
+- 禁用自动 ID，改用 namespace/type-name 注册
 
-### Without Explicit Type ID
+### 实践说明
 
-```protobuf
-message Config { ... }  // Auto-generated when enable_auto_type_id = true
-```
+- 类型 ID 在协议层面应视为稳定标识
+- 一经发布，不建议更改
+- 建议按域规划 ID 段（如 100-199 用户域）
 
-You can set `[alias="..."]` to change the hash source without renaming the type.
+### ID 分配策略
 
-### Practical Notes
+- 核心高频模型优先分配固定 ID
+- 团队统一管理 ID 区间与分配规范
+- 在 CI 中增加 ID 冲突检查
 
-- If a type omits `id` and `enable_auto_type_id = true`, Fory generates an ID
-  with `MurmurHash3(utf8(package.type_name))` (32-bit).
-- Package alias and type alias change the hash input and can be used to resolve
-  hash collisions without renaming public types.
-- Manual IDs in the small varint range (`0-127`) are compact on the wire; auto
-  IDs are typically larger and usually consume 4-5 bytes.
-
-### ID Assignment Strategy
+## 完整示例
 
 ```protobuf
-// Enums: 100-199
-enum Status [id=100] { ... }
-enum Priority [id=101] { ... }
+package demo.order;
 
-// User domain: 200-299
-message User [id=200] { ... }
-message UserProfile [id=201] { ... }
+option java_package = "com.example.demo.order";
+option go_package = "github.com/example/demo/gen/order;order";
 
-// Order domain: 300-399
-message Order [id=300] { ... }
-message OrderItem [id=301] { ... }
-```
+import "demo/common.fdl";
 
-## Complete Example
-
-```protobuf
-// E-commerce domain model
-package com.shop.models;
-
-// Enums with type IDs
-enum OrderStatus [id=100] {
-    PENDING = 0;
-    CONFIRMED = 1;
-    SHIPPED = 2;
-    DELIVERED = 3;
-    CANCELLED = 4;
+enum Status [id=200] {
+    UNKNOWN = 0;
+    CREATED = 1;
+    PAID = 2;
+    SHIPPED = 3;
 }
 
-enum PaymentMethod [id=101] {
-    CREDIT_CARD = 0;
-    DEBIT_CARD = 1;
-    PAYPAL = 2;
-    BANK_TRANSFER = 3;
+message Item [id=201] {
+    string sku = 1;
+    int32 quantity = 2;
 }
 
-// Messages with type IDs
-message Address [id=200] {
-    string street = 1;
-    string city = 2;
-    string state = 3;
-    string country = 4;
-    string postal_code = 5;
-}
-
-message Customer [id=201] {
+message User [id=202] {
     string id = 1;
     string name = 2;
     optional string email = 3;
-    optional string phone = 4;
-    optional Address billing_address = 5;
-    optional Address shipping_address = 6;
 }
 
-message Product [id=202] {
-    string sku = 1;
-    string name = 2;
-    string description = 3;
-    float64 price = 4;
-    int32 stock = 5;
-    list<string> categories = 6;
-    map<string, string> attributes = 7;
+union Animal [id=203] {
+    Dog dog = 1;
+    Cat cat = 2;
 }
 
-message OrderItem [id=203] {
-    ref Product product = 1;  // Track reference to avoid duplication
-    int32 quantity = 2;
-    float64 unit_price = 3;
+message Dog [id=204] {
+    string name = 1;
 }
 
-message Order [id=204] {
+message Cat [id=205] {
+    string name = 1;
+}
+
+message Order [id=206] {
     string id = 1;
-    ref Customer customer = 2;
-    list<OrderItem> items = 3;
-    OrderStatus status = 4;
-    PaymentMethod payment_method = 5;
-    float64 total = 6;
-    optional string notes = 7;
-    timestamp created_at = 8;
-    optional timestamp shipped_at = 9;
-}
-
-// Config without explicit type ID (auto-generated when enable_auto_type_id = true)
-message ShopConfig {
-    string store_name = 1;
-    string currency = 2;
-    float64 tax_rate = 3;
-    list<string> supported_countries = 4;
+    ref User buyer = 2;
+    list<Item> items = 3;
+    Status status = 4;
+    map<string, string> metadata = 5;
+    optional Animal pet = 6;
 }
 ```
 
-For protobuf-specific extension options and `(fory).` syntax, see
-[Protocol Buffers IDL Support](protobuf-idl.md#fory-extension-options-protobuf).
+## 语法摘要
 
-## Grammar Summary
+以下为简化文法（便于快速查阅，具体以编译器实现为准）：
 
+```ebnf
+file            = [packageDecl] {optionDecl} {importDecl} {typeDecl} ;
+
+packageDecl     = "package" qualifiedName ["alias" identifier] ";" ;
+optionDecl      = "option" identifier "=" optionValue ";" ;
+importDecl      = "import" stringLiteral ";" ;
+
+typeDecl        = enumDecl | messageDecl | unionDecl ;
+
+enumDecl        = "enum" identifier [typeOptions] "{" {enumField | reservedDecl} "}" ;
+enumField       = identifier "=" intLiteral ";" ;
+
+messageDecl     = "message" identifier [typeOptions] "{" {fieldDecl | nestedTypeDecl | reservedDecl} "}" ;
+unionDecl       = "union" identifier [typeOptions] "{" {unionCaseDecl} "}" ;
+
+fieldDecl       = [fieldModifier] typeRef identifier "=" intLiteral [fieldOptions] ";" ;
+unionCaseDecl   = typeRef identifier "=" intLiteral [fieldOptions] ";" ;
+
+fieldModifier   = "optional" | "ref" | "list" ;
+
+typeRef         = primitiveType | qualifiedName | listType | mapType ;
+listType        = "list" "<" typeRef ">" ;
+mapType         = "map" "<" typeRef "," typeRef ">" ;
+
+typeOptions     = "[" optionPair {"," optionPair} "]" ;
+fieldOptions    = "[" optionPair {"," optionPair} "]" ;
+optionPair      = identifier "=" optionValue ;
+
+reservedDecl    = "reserved" reservedItem {"," reservedItem} ";" ;
+reservedItem    = intLiteral | intLiteral "to" intLiteral | stringLiteral ;
 ```
-file         := [package_decl] file_option* import_decl* type_def*
 
-package_decl := 'package' package_name ['alias' package_name] ';'
-package_name := IDENTIFIER ('.' IDENTIFIER)*
-
-file_option  := 'option' option_name '=' option_value ';'
-option_name  := IDENTIFIER
-
-import_decl  := 'import' STRING ';'
-
-type_def     := enum_def | message_def | union_def
-
-enum_def     := 'enum' IDENTIFIER [type_options] '{' enum_body '}'
-enum_body    := (reserved_stmt | enum_value)*
-enum_value   := IDENTIFIER '=' INTEGER ';'
-
-message_def  := 'message' IDENTIFIER [type_options] '{' message_body '}'
-message_body := (reserved_stmt | nested_type | field_def)*
-nested_type  := enum_def | message_def | union_def
-field_def    := [modifiers] field_type IDENTIFIER '=' INTEGER [field_options] ';'
-
-union_def    := 'union' IDENTIFIER [type_options] '{' union_field* '}'
-union_field  := ['repeated'] field_type IDENTIFIER '=' INTEGER [field_options] ';'
-option_value := 'true' | 'false' | IDENTIFIER | INTEGER | STRING
-
-reserved_stmt := 'reserved' reserved_items ';'
-reserved_items := reserved_item (',' reserved_item)*
-reserved_item := INTEGER | INTEGER 'to' INTEGER | INTEGER 'to' 'max' | STRING
-
-modifiers    := { 'optional' | 'ref' | 'repeated' }
-
-field_type   := [scalar_encoding] (primitive_type | named_type | list_type | array_type | map_type)
-primitive_type := 'bool'
-               | 'int8' | 'int16' | 'int32' | 'int64'
-               | 'uint8' | 'uint16' | 'uint32' | 'uint64'
-               | 'float16' | 'bfloat16' | 'float32' | 'float64'
-               | 'string' | 'bytes'
-               | 'date' | 'timestamp' | 'duration' | 'decimal'
-               | 'any'
-scalar_encoding := 'varint' | 'fixed' | 'tagged'
-named_type   := qualified_name
-qualified_name := IDENTIFIER ('.' IDENTIFIER)*   // e.g., Parent.Child
-list_type    := 'list' '<' { 'optional' | 'ref' | scalar_encoding } field_type '>'
-array_type   := 'array' '<' array_element_type '>'
-map_type     := 'map' '<' field_type ',' field_type '>'
-
-type_options := '[' type_option (',' type_option)* ']'
-type_option  := IDENTIFIER '=' option_value         // e.g., id=100, deprecated=true
-field_options := '[' field_option (',' field_option)* ']'
-field_option := IDENTIFIER '=' option_value         // e.g., deprecated=true, ref=true
-
-STRING       := '"' [^"\n]* '"' | "'" [^'\n]* "'"
-IDENTIFIER   := [a-zA-Z_][a-zA-Z0-9_]*
-INTEGER      := '-'? [0-9]+
-```
+实现建议：如需严谨验证，请以编译器语法解析器和测试用例为准。
