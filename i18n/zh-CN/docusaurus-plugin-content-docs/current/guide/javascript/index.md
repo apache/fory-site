@@ -1,5 +1,5 @@
 ---
-title: JavaScript Serialization Guide
+title: JavaScript 序列化指南
 sidebar_position: 0
 id: index
 license: |
@@ -19,34 +19,34 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory JavaScript lets you serialize JavaScript and TypeScript objects to bytes and deserialize them back — including across services written in Java, Python, Go, Rust, Swift, and other Fory-supported languages.
+Apache Fory JavaScript 让你可以把 JavaScript 和 TypeScript 对象序列化为字节，并再把它们反序列化回来，包括与 Java、Python、Go、Rust、Swift 以及其他 Fory 支持的语言编写的服务进行跨语言互通。
 
-## Why Fory JavaScript?
+## 为什么选择 Fory JavaScript？
 
-- **Cross-language**: serialize in JavaScript, deserialize in Java, Python, Go, and more without writing glue code
-- **Fast**: serializer code is generated and cached the first time you register a schema, not on every call
-- **Reference-aware**: shared references and circular object graphs are supported when enabled
-- **Explicit schemas**: field types, nullability, and polymorphism are declared once with `Type.*` builders or TypeScript decorators
-- **Safe defaults**: configurable depth, binary size, and collection size limits reject unexpectedly large or deep payloads
-- **Modern types**: `bigint`, typed arrays, `Map`, `Set`, `Date`, `float16`, and `bfloat16` are supported
+- **跨语言**：可以在 JavaScript 中序列化，在 Java、Python、Go 等语言中反序列化，无需编写胶水代码
+- **高性能**：序列化器代码会在首次注册 schema 时生成并缓存，而不是每次调用时都重新生成
+- **具备引用感知能力**：启用后可支持共享引用和循环对象图
+- **显式 schema**：字段类型、可空性和多态行为通过 `Type.*` builder 或 TypeScript decorator 一次性声明
+- **安全默认值**：可配置的深度、二进制大小和集合大小限制可以拒绝超出预期的大载荷或深层嵌套载荷
+- **现代类型支持**：支持 `bigint`、typed array、`Map`、`Set`、`Date`、`float16` 和 `bfloat16`
 
-## Installation
+## 安装
 
-Install the JavaScript packages from npm:
+从 npm 安装 JavaScript 包：
 
 ```bash
 npm install @apache-fory/core
 ```
 
-Optional Node.js string fast-path support is available through `@apache-fory/hps`:
+可选的 Node.js 字符串快速路径支持由 `@apache-fory/hps` 提供：
 
 ```bash
 npm install @apache-fory/core @apache-fory/hps
 ```
 
-`@apache-fory/hps` depends on Node.js 20+ and is optional. If it is unavailable, Fory still works correctly; omit `hps` from the configuration.
+`@apache-fory/hps` 依赖 Node.js 20+，并且是可选的。如果不可用，Fory 仍可正常工作；只需在配置中省略 `hps`。
 
-## Quick Start
+## 快速开始
 
 ```ts
 import Fory, { Type } from "@apache-fory/core";
@@ -74,49 +74,68 @@ console.log(user);
 // { id: 1n, name: 'Alice', age: 30 }
 ```
 
-## How it works
+## 工作原理
 
-Fory is schema-driven. You describe the shape of your data once with `Type.*` builders (or TypeScript decorators), then call `fory.register(schema)`. This returns a `{ serialize, deserialize }` pair that is fast to call repeatedly.
+Fory 是由 schema 驱动的。你先用 `Type.*` builder 或 TypeScript decorator 描述一次数据结构，然后调用 `fory.register(schema)`。这会返回一个可高频复用、调用开销较低的 `{ serialize, deserialize }` 对。
 
 ```ts
-// 1. Define the schema
+// 1. 定义 schema
 const personType = Type.struct("example.person", {
   name: Type.string(),
   email: Type.string().setNullable(true),
 });
 
-// 2. Register once
+// 2. 注册一次
 const fory = new Fory();
 const { serialize, deserialize } = fory.register(personType);
 
-// 3. Use as many times as needed
+// 3. 按需重复使用
 const bytes = serialize({ name: "Alice", email: null });
 const person = deserialize(bytes);
 ```
 
-Create one `Fory` instance per application and reuse it — creating a new one for every request wastes the work of schema registration.
+每个应用创建一个 `Fory` 实例并持续复用即可；如果每个请求都新建实例，就会浪费 schema 注册带来的缓存收益。
 
-## Configuration
+## 配置
 
-Fory JavaScript is xlang-only. `new Fory()` uses compatible schema evolution by default. Configure
-reference tracking, size limits, and optional Node.js string acceleration through constructor
-options; see [Configuration](configuration.md).
+```ts
+import Fory from "@apache-fory/core";
+import hps from "@apache-fory/hps";
 
-## Documentation
+const fory = new Fory({
+  ref: true,
+  compatible: true,
+  maxDepth: 100,
+  maxBinarySize: 64 * 1024 * 1024,
+  maxCollectionSize: 1_000_000,
+  hps,
+});
+```
 
-| Topic                                         | Description                                             |
-| --------------------------------------------- | ------------------------------------------------------- |
-| [Basic Serialization](basic-serialization.md) | Core APIs and everyday usage                            |
-| [Configuration](configuration.md)             | Runtime options, compatible mode, limits, and HPS       |
-| [Type Registration](type-registration.md)     | Numeric IDs, names, decorators, and schema registration |
-| [Schema Metadata](schema-metadata.md)         | Type builders, field options, and decorators            |
-| [Supported Types](supported-types.md)         | Primitive, collection, time, enum, and struct mappings  |
-| [References](references.md)                   | Shared references and circular object graphs            |
-| [Schema Evolution](schema-evolution.md)       | Compatible mode and evolving structs                    |
-| [Cross-Language](cross-language.md)           | Interop guidance and mapping rules                      |
-| [Troubleshooting](troubleshooting.md)         | Common issues, limits, and debugging tips               |
+| 选项                       | 默认值      | 说明                                                                                 |
+| -------------------------- | ----------- | ------------------------------------------------------------------------------------ |
+| `ref`                      | `false`     | 为共享引用或循环对象图启用引用跟踪                                                   |
+| `compatible`               | `false`     | 允许在不破坏现有消息的前提下新增或删除字段                                           |
+| `maxDepth`                 | `50`        | 最大嵌套深度，必须 `>= 2`。如果结构嵌套很深，可适当调大                              |
+| `maxBinarySize`            | 64 MiB      | 任意单个二进制字段可接受的最大字节数                                                 |
+| `maxCollectionSize`        | `1_000_000` | 任意 list、set 或 map 中可接受的最大元素数                                           |
+| `useSliceString`           | `false`     | Node.js 下的可选字符串读取优化。除非做过基准测试，否则保持默认即可                   |
+| `hps`                      | unset       | 来自 `@apache-fory/hps` 的可选快速字符串辅助模块（Node.js 20+）                      |
+| `hooks.afterCodeGenerated` | unset       | 用于查看生成后的序列化器代码的回调，对调试很有帮助                                   |
 
-## Related Resources
+## 文档导航
 
-- [Xlang Serialization Specification](../../specification/xlang_serialization_spec.md)
-- [Cross-Language Type Mapping](../../specification/xlang_type_mapping.md)
+| 主题                                          | 说明                                                   |
+| --------------------------------------------- | ------------------------------------------------------ |
+| [基础序列化](basic-serialization.md)          | 核心 API 与日常用法                                    |
+| [类型注册](type-registration.md)              | 数值 ID、名称、decorator 与 schema 注册方式            |
+| [支持的类型](supported-types.md)              | 原始类型、集合、时间、枚举与 struct 的映射方式         |
+| [引用](references.md)                         | 共享引用与循环对象图                                   |
+| [Schema 演进](schema-evolution.md)            | 兼容模式与 struct 演进                                 |
+| [跨语言](xlang-serialization.md)                   | 互操作指导与类型映射规则                               |
+| [故障排查](troubleshooting.md)                | 常见问题、限制项与调试技巧                             |
+
+## 相关资源
+
+- [Xlang 序列化规范](../../specification/xlang_serialization_spec.md)
+- [跨语言类型映射](../../specification/xlang_type_mapping.md)

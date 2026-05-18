@@ -1,6 +1,6 @@
 ---
-title: References
-sidebar_position: 60
+title: 引用
+sidebar_position: 8
 id: references
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,37 +19,37 @@ license: |
   limitations under the License.
 ---
 
-Fory Go supports reference tracking to handle circular references and shared objects. This is essential for serializing complex data structures like graphs, trees with parent pointers, and linked lists with cycles.
+Fory Go 支持引用跟踪，用于处理循环引用和共享对象。这对序列化图、带父指针的树、带环链表等复杂数据结构至关重要。
 
-## Enabling Reference Tracking
+## 启用引用跟踪
 
-Reference tracking is **disabled by default**. Enable it when creating a Fory instance:
+引用跟踪**默认禁用**。创建 Fory 实例时启用它：
 
 ```go
 f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 ```
 
-**Important**: Global reference tracking must be enabled for any reference tracking to occur. When `WithTrackRef(false)` (the default), all per-field reference tags are ignored.
+**重要**：必须启用全局引用跟踪，任何引用跟踪才会生效。当 `WithTrackRef(false)`（默认值）时，所有逐字段引用 tag 都会被忽略。
 
-## How Reference Tracking Works
+## 引用跟踪的工作方式
 
-### Without Reference Tracking (Default)
+### 不使用引用跟踪（默认）
 
-When disabled, each object is serialized independently:
+禁用时，每个对象都会独立序列化：
 
 ```go
-f := fory.New(fory.WithXlang(true))  // TrackRef disabled by default
+f := fory.New(fory.WithXlang(true))  // TrackRef 默认禁用
 
 shared := &Data{Value: 42}
 container := &Container{A: shared, B: shared}
 
 data, _ := f.Serialize(container)
-// 'shared' is serialized TWICE (no deduplication)
+// 'shared' 会被序列化两次（不去重）
 ```
 
-### With Reference Tracking
+### 使用引用跟踪
 
-When enabled, objects are tracked by identity:
+启用后，对象会按身份进行跟踪：
 
 ```go
 f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
@@ -58,64 +58,64 @@ shared := &Data{Value: 42}
 container := &Container{A: shared, B: shared}
 
 data, _ := f.Serialize(container)
-// 'shared' is serialized ONCE, second occurrence is a reference
+// 'shared' 只序列化一次，第二次出现会写为引用
 ```
 
-## Reference Flags
+## 引用标志
 
-Fory uses flags to indicate reference states during serialization:
+Fory 在序列化期间使用标志表示引用状态：
 
-| Flag               | Value | Meaning                                   |
-| ------------------ | ----- | ----------------------------------------- |
-| `NullFlag`         | -3    | Nil/null value                            |
-| `RefFlag`          | -2    | Reference to previously serialized object |
-| `NotNullValueFlag` | -1    | Non-null value (data follows)             |
-| `RefValueFlag`     | 0     | Reference value flag                      |
+| 标志               | 值    | 含义                         |
+| ------------------ | ----- | ---------------------------- |
+| `NullFlag`         | -3    | Nil/null 值                  |
+| `RefFlag`          | -2    | 指向先前已序列化对象的引用   |
+| `NotNullValueFlag` | -1    | 非 null 值（后续为数据）     |
+| `RefValueFlag`     | 0     | 引用值标志                   |
 
-## Referenceable Types
+## 可引用类型
 
-Only certain types support reference tracking. In xlang mode, the following types can track references:
+只有特定类型支持引用跟踪。在 xlang 模式中，以下类型可以跟踪引用：
 
-| Type                          | Reference Tracked | Notes                          |
-| ----------------------------- | ----------------- | ------------------------------ |
-| `*struct` (pointer to struct) | Yes               | Enable with `fory:"ref"` tag   |
-| `any` (interface)             | Yes               | Automatically tracked          |
-| `[]T` (slices)                | Yes               | Enable with `fory:"ref"` tag   |
-| `map[K]V`                     | Yes               | Enable with `fory:"ref"` tag   |
-| `*int`, `*string`, etc.       | No                | Pointer to primitives excluded |
-| Primitives                    | No                | Value types                    |
-| `time.Time`, `time.Duration`  | No                | Value types                    |
-| Arrays (`[N]T`)               | No                | Value types                    |
+| 类型                          | 是否跟踪引用 | 说明                         |
+| ----------------------------- | ------------ | ---------------------------- |
+| `*struct`（指向 struct 的指针） | 是           | 使用 `fory:"ref"` tag 启用   |
+| `any`（interface）            | 是           | 自动跟踪                     |
+| `[]T`（slice）                | 是           | 使用 `fory:"ref"` tag 启用   |
+| `map[K]V`                     | 是           | 使用 `fory:"ref"` tag 启用   |
+| `*int`、`*string` 等          | 否           | 排除指向基本类型的指针       |
+| 基本类型                      | 否           | 值类型                       |
+| `time.Time`、`time.Duration`  | 否           | 值类型                       |
+| 数组（`[N]T`）                | 否           | 值类型                       |
 
-## Per-Field Reference Control
+## 逐字段引用控制
 
-By default, reference tracking is **disabled** for individual fields even when global `WithTrackRef(true)` is set. You can enable reference tracking for specific fields using the `ref` struct tag:
+默认情况下，即使设置了全局 `WithTrackRef(true)`，单个字段的引用跟踪也**禁用**。可以使用 `ref` struct tag 为特定字段启用引用跟踪：
 
 ```go
 type Container struct {
-    // Enable ref tracking for this field
+    // 为此字段启用引用跟踪
     SharedData *Data `fory:"ref"`
 
-    // Explicitly disable ref tracking (same as default)
+    // 显式禁用引用跟踪（与默认值相同）
     SimpleData *Data `fory:"ref=false"`
 }
 ```
 
-**Important notes**:
+**重要说明**：
 
-- Per-field tags only take effect when global `WithTrackRef(true)` is set
-- When global `WithTrackRef(false)` (default), all field ref tags are ignored
-- Applies to slices, maps, and pointer to struct fields
-- Pointer to primitive types (e.g., `*int`, `*string`) cannot use this tag
-- Default is `ref=false` (no reference tracking per field)
+- 逐字段 tag 只有在设置全局 `WithTrackRef(true)` 时才会生效
+- 当全局 `WithTrackRef(false)`（默认）时，所有字段 ref tag 都会被忽略
+- 适用于 slice、map 和指向 struct 的指针字段
+- 指向基本类型的指针（例如 `*int`、`*string`）不能使用此 tag
+- 默认值为 `ref=false`（字段级别不启用引用跟踪）
 
-See [Struct Tags](schema-metadata.md) for more details.
+更多细节请参阅 [Struct Tags](schema-metadata.md)。
 
-## Circular References
+## 循环引用
 
-Reference tracking is required for circular data structures:
+循环数据结构需要启用引用跟踪：
 
-### Circular Linked List
+### 循环链表
 
 ```go
 type Node struct {
@@ -126,23 +126,23 @@ type Node struct {
 f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(Node{}, 1)
 
-// Create circular list
+// 创建循环链表
 n1 := &Node{Value: 1}
 n2 := &Node{Value: 2}
 n3 := &Node{Value: 3}
 n1.Next = n2
 n2.Next = n3
-n3.Next = n1  // Circular reference back to n1
+n3.Next = n1  // 循环引用回 n1
 
 data, _ := f.Serialize(n1)
 
 var result Node
 f.Deserialize(data, &result)
-// Circular structure is preserved
+// 循环结构会被保留
 // result.Next.Next.Next == &result
 ```
 
-### Parent-Child Tree
+### 父子树
 
 ```go
 type TreeNode struct {
@@ -166,7 +166,7 @@ f.Deserialize(data, &result)
 // result.Children[0].Parent == &result
 ```
 
-### Graph Structures
+### 图结构
 
 ```go
 type GraphNode struct {
@@ -177,12 +177,12 @@ type GraphNode struct {
 f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(GraphNode{}, 1)
 
-// Create a graph
+// 创建图
 a := &GraphNode{ID: 1}
 b := &GraphNode{ID: 2}
 c := &GraphNode{ID: 3}
 
-// Bidirectional connections
+// 双向连接
 a.Neighbors = []*GraphNode{b, c}
 b.Neighbors = []*GraphNode{a, c}
 c.Neighbors = []*GraphNode{a, b}
@@ -193,9 +193,9 @@ var result GraphNode
 f.Deserialize(data, &result)
 ```
 
-## Shared Object Deduplication
+## 共享对象去重
 
-Reference tracking also deduplicates shared objects:
+引用跟踪还会对共享对象去重：
 
 ```go
 type Config struct {
@@ -212,10 +212,10 @@ f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
 f.RegisterStruct(Config{}, 1)
 f.RegisterStruct(Application{}, 2)
 
-// Shared configuration
+// 共享配置
 config := &Config{Setting: "value"}
 
-// Multiple references to same object
+// 对同一对象的多个引用
 app := &Application{
     MainConfig:     config,
     BackupConfig:   config,
@@ -223,80 +223,80 @@ app := &Application{
 }
 
 data, _ := f.Serialize(app)
-// 'config' serialized once, others are references
+// 'config' 序列化一次，其余位置为引用
 
 var result Application
 f.Deserialize(data, &result)
 // result.MainConfig == result.BackupConfig == result.FallbackConfig
 ```
 
-## Performance Considerations
+## 性能注意事项
 
-### Overhead
+### 开销
 
-Reference tracking adds overhead:
+引用跟踪会增加开销：
 
-- Memory for tracking seen objects (hash map)
-- Hash lookups during serialization
-- Additional bytes for reference flags and IDs
+- 用于跟踪已见对象的内存（哈希表）
+- 序列化期间的哈希查找
+- 引用标志和 ID 产生的额外字节
 
-### When to Enable
+### 何时启用
 
-**Enable reference tracking when**:
+**在以下情况下启用引用跟踪**：
 
-- Data has circular references
-- Same object referenced multiple times
-- Serializing graph structures
-- Object identity must be preserved
+- 数据存在循环引用
+- 同一个对象被引用多次
+- 正在序列化图结构
+- 必须保留对象身份
 
-**Disable reference tracking when**:
+**在以下情况下禁用引用跟踪**：
 
-- Data is tree-structured (no cycles)
-- Each object appears only once
-- Maximum performance is required
-- Object identity doesn't matter
+- 数据是树状结构（无环）
+- 每个对象只出现一次
+- 需要最高性能
+- 对象身份不重要
 
-### Memory Usage
+### 内存使用
 
-Reference tracking maintains a map of serializing objects:
+引用跟踪会维护正在序列化对象的映射：
 
 ```go
-// Internal reference tracking structure
+// 内部引用跟踪结构
 type RefResolver struct {
-    writtenObjects map[refKey]int32  // pointer -> reference ID
-    readObjects    []reflect.Value   // reference ID -> object
+    writtenObjects map[refKey]int32  // 指针 -> 引用 ID
+    readObjects    []reflect.Value   // 引用 ID -> 对象
 }
 ```
 
-For large object graphs, this may increase memory usage.
+对于大型对象图，这可能增加内存使用。
 
-## Error Handling
+## 错误处理
 
-### Without Reference Tracking
+### 不使用引用跟踪
 
-Circular references without tracking cause stack overflow or max depth errors:
+未启用跟踪的循环引用会导致栈溢出或最大深度错误：
 
 ```go
-f := fory.New(fory.WithXlang(true))  // No reference tracking
+f := fory.New(fory.WithXlang(true))  // 不启用引用跟踪
 
 n1 := &Node{Value: 1}
-n1.Next = n1  // Self-reference
+n1.Next = n1  // 自引用
 
 data, err := f.Serialize(n1)
-// Error: max depth exceeded (or stack overflow)
+// 错误：max depth exceeded（或栈溢出）
 ```
 
-### Invalid Reference ID
+### 无效引用 ID
 
-During deserialization, an invalid reference ID produces an error:
+反序列化期间，无效引用 ID 会产生错误：
 
 ```go
-// Error type: ErrKindInvalidRefId
+// 错误类型：ErrKindInvalidRefId
 ```
 
-This occurs when serialized data contains a reference to an object that wasn't previously serialized.
+当序列化数据包含指向先前未序列化对象的引用时，就会发生这种情况。
 
-## Complete Example
+## 完整示例
 
 ```go
 package main
@@ -316,7 +316,7 @@ func main() {
     f := fory.New(fory.WithXlang(true), fory.WithTrackRef(true))
     f.RegisterStruct(Person{}, 1)
 
-    // Create people with mutual friendships
+    // 创建带相互好友关系的人
     alice := &Person{Name: "Alice"}
     bob := &Person{Name: "Bob"}
     charlie := &Person{Name: "Charlie"}
@@ -325,32 +325,32 @@ func main() {
     alice.BestFriend = bob
 
     bob.Friends = []*Person{alice, charlie}
-    bob.BestFriend = alice  // Mutual best friends
+    bob.BestFriend = alice  // 互为最好的朋友
 
     charlie.Friends = []*Person{alice, bob}
 
-    // Serialize
+    // 序列化
     data, err := f.Serialize(alice)
     if err != nil {
         panic(err)
     }
     fmt.Printf("Serialized %d bytes\n", len(data))
 
-    // Deserialize
+    // 反序列化
     var result Person
     if err := f.Deserialize(data, &result); err != nil {
         panic(err)
     }
 
-    // Verify circular references preserved
+    // 验证循环引用被保留
     fmt.Printf("Alice's best friend: %s\n", result.BestFriend.Name)
     fmt.Printf("Bob's best friend: %s\n", result.BestFriend.BestFriend.Name)
-    // Output: Alice (circular reference preserved)
+    // 输出：Alice（循环引用被保留）
 }
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
+- [配置](configuration.md)
 - [Struct Tags](schema-metadata.md)
-- [Cross-Language Serialization](cross-language.md)
+- [Xlang 序列化](xlang-serialization.md)

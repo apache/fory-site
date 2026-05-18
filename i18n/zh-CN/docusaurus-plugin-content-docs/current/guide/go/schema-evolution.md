@@ -1,6 +1,6 @@
 ---
-title: Schema Evolution
-sidebar_position: 70
+title: Schema 演进
+sidebar_position: 9
 id: schema_evolution
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,40 +19,39 @@ license: |
   limitations under the License.
 ---
 
-Schema evolution allows your data structures to change over time while maintaining compatibility with previously serialized data. Fory Go supports this through compatible mode. Xlang mode uses compatible schema evolution by default; native mode uses schema-consistent payloads by default and enables compatible mode explicitly.
+Schema 演进允许数据结构随时间变化，同时保持与先前序列化数据的兼容性。Fory Go 通过兼容模式支持这一点。Xlang 模式默认使用兼容的 Schema 演进；native 模式默认使用 schema-consistent 载荷，并显式启用兼容模式。
 
-## Compatible Mode Defaults
+## 兼容模式默认值
 
-For cross-language and default Go payloads, use the default runtime:
+对于跨语言和默认 Go 载荷，请使用默认运行时：
 
 ```go
 f := fory.New(fory.WithXlang(true))
 ```
 
-For Go-only native-mode payloads that need schema evolution, enable compatible
-mode explicitly:
+对于需要 Schema 演进的仅 Go native-mode 载荷，请显式启用兼容模式：
 
 ```go
 f := fory.New(fory.WithXlang(false), fory.WithCompatible(true))
 ```
 
-## How It Works
+## 工作方式
 
-### Schema-Consistent Native Mode
+### Schema-Consistent Native 模式
 
-- Compact serialization without metadata
-- Struct hash is checked during deserialization
-- Any schema change causes `ErrKindHashMismatch`
+- 紧凑序列化，不写入元数据
+- 反序列化期间会检查 struct 哈希
+- 任何 schema 变更都会导致 `ErrKindHashMismatch`
 
-### With Compatible Mode
+### 使用兼容模式
 
-- Type metadata is written to serialized data
-- Supports adding, removing, and reordering fields
-- Enables forward and backward compatibility
+- 类型元数据会写入序列化数据
+- 支持添加、移除和重排字段
+- 启用向前和向后兼容
 
-### Disable Evolution for Stable Structs
+### 为稳定 Struct 禁用演进
 
-If a struct schema is stable and will not change, you can disable evolution for that struct to avoid compatible metadata overhead. Implement the `ForyEvolving` interface and return `false`:
+如果 struct schema 稳定且不会变化，可以为该 struct 禁用演进，以避免兼容元数据开销。实现 `ForyEvolving` 接口并返回 `false`：
 
 ```go
 type StableMessage struct {
@@ -64,175 +63,175 @@ func (StableMessage) ForyEvolving() bool {
 }
 ```
 
-## Supported Schema Changes
+## 支持的 Schema 变更
 
-### Adding Fields
+### 添加字段
 
-New fields can be added; they receive zero values when deserializing old data:
+可以添加新字段；反序列化旧数据时，这些字段会获得零值：
 
 ```go
-// Version 1
+// 版本 1
 type UserV1 struct {
     ID   int64
     Name string
 }
 
-// Version 2 (added Email)
+// 版本 2（添加 Email）
 type UserV2 struct {
     ID    int64
     Name  string
-    Email string  // New field
+    Email string  // 新字段
 }
 
 f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(UserV1{}, 1)
 
-// Serialize with V1
+// 使用 V1 序列化
 userV1 := &UserV1{ID: 1, Name: "Alice"}
 data, _ := f.Serialize(userV1)
 
-// Deserialize with V2
+// 使用 V2 反序列化
 f2 := fory.New(fory.WithXlang(true))
 f2.RegisterStruct(UserV2{}, 1)
 
 var userV2 UserV2
 f2.Deserialize(data, &userV2)
-// userV2.Email = "" (zero value)
+// userV2.Email = ""（零值）
 ```
 
-### Removing Fields
+### 移除字段
 
-Removed fields are skipped during deserialization:
+反序列化时会跳过被移除的字段：
 
 ```go
-// Version 1
+// 版本 1
 type ConfigV1 struct {
     Host     string
     Port     int32
     Timeout  int64
-    Debug    bool  // Will be removed
+    Debug    bool  // 将被移除
 }
 
-// Version 2 (removed Debug)
+// 版本 2（移除 Debug）
 type ConfigV2 struct {
     Host    string
     Port    int32
     Timeout int64
-    // Debug field removed
+    // Debug 字段已移除
 }
 
 f := fory.New(fory.WithXlang(true))
 f.RegisterStruct(ConfigV1{}, 1)
 
-// Serialize with V1
+// 使用 V1 序列化
 config := &ConfigV1{Host: "localhost", Port: 8080, Timeout: 30, Debug: true}
 data, _ := f.Serialize(config)
 
-// Deserialize with V2
+// 使用 V2 反序列化
 f2 := fory.New(fory.WithXlang(true))
 f2.RegisterStruct(ConfigV2{}, 1)
 
 var configV2 ConfigV2
 f2.Deserialize(data, &configV2)
-// Debug field data is skipped
+// Debug 字段数据会被跳过
 ```
 
-### Reordering Fields
+### 重排字段
 
-Field order can change between versions:
+字段顺序可以在版本之间变化：
 
 ```go
-// Version 1
+// 版本 1
 type PersonV1 struct {
     FirstName string
     LastName  string
     Age       int32
 }
 
-// Version 2 (reordered)
+// 版本 2（重新排序）
 type PersonV2 struct {
-    Age       int32   // Moved up
+    Age       int32   // 上移
     LastName  string
-    FirstName string  // Moved down
+    FirstName string  // 下移
 }
 ```
 
-Compatible mode handles this automatically by matching fields by name.
+兼容模式会通过按名称匹配字段自动处理这种变化。
 
-## Incompatible Changes
+## 不兼容变更
 
-Some changes are NOT supported, even in compatible mode:
+即使在兼容模式中，也不支持某些变更：
 
-### Type Changes
+### 类型变更
 
 ```go
-// NOT SUPPORTED
+// 不支持
 type V1 struct {
     Value int32  // int32
 }
 
 type V2 struct {
-    Value string  // Changed to string - INCOMPATIBLE
+    Value string  // 改为 string，不兼容
 }
 ```
 
-### Renaming Fields
+### 重命名字段
 
 ```go
-// NOT SUPPORTED (treated as remove + add)
+// 不支持（会被视为移除 + 添加）
 type V1 struct {
     UserName string
 }
 
 type V2 struct {
-    Username string  // Different name - NOT a rename
+    Username string  // 名称不同，不是重命名
 }
 ```
 
-This is treated as removing `UserName` and adding `Username`, resulting in data loss.
+这会被视为移除 `UserName` 并添加 `Username`，从而导致数据丢失。
 
-## Best Practices
+## 最佳实践
 
-### 1. Use Compatible Mode for Persistent Data
+### 1. 对持久化数据使用兼容模式
 
 ```go
-// Default xlang payloads already use compatible mode.
+// 默认 xlang 载荷已经使用兼容模式。
 f := fory.New(fory.WithXlang(true))
 ```
 
-For Go-only native-mode data stored in databases, files, or caches, enable compatible mode:
+对于存储在数据库、文件或缓存中的仅 Go native-mode 数据，请启用兼容模式：
 
 ```go
 f := fory.New(fory.WithXlang(false), fory.WithCompatible(true))
 ```
 
-### 2. Provide Default Values
+### 2. 提供默认值
 
 ```go
 type ConfigV2 struct {
     Host    string
     Port    int32
     Timeout int64
-    Retries int32  // New field
+    Retries int32  // 新字段
 }
 
 func NewConfigV2() *ConfigV2 {
     return &ConfigV2{
-        Retries: 3,  // Default value
+        Retries: 3,  // 默认值
     }
 }
 
-// After deserialize, apply defaults
+// 反序列化后，应用默认值
 if config.Retries == 0 {
     config.Retries = 3
 }
 ```
 
-## Cross-Language Schema Evolution
+## Xlang Schema 演进
 
-Schema evolution works across languages:
+Schema 演进可跨语言工作：
 
-### Go (Producer)
+### Go（生产者）
 
 ```go
 type MessageV1 struct {
@@ -245,67 +244,67 @@ f.RegisterStruct(MessageV1{}, 1)
 data, _ := f.Serialize(&MessageV1{ID: 1, Content: "Hello"})
 ```
 
-### Java (Consumer with newer schema)
+### Java（使用较新 schema 的消费者）
 
 ```java
 public class Message {
     long id;
     String content;
-    String author;  // New field in Java
+    String author;  // Java 中的新字段
 }
 
 Fory fory = Fory.builder().withXlang(true).build();
 fory.register(Message.class, 1);
 Message msg = fory.deserialize(data, Message.class);
-// msg.author will be null
+// msg.author 将为 null
 ```
 
-## Performance Considerations
+## 性能注意事项
 
-Compatible mode mainly affects serialized size:
+兼容模式主要影响序列化尺寸：
 
-| Aspect             | Schema Consistent | Compatible Mode                                          |
-| ------------------ | ----------------- | -------------------------------------------------------- |
-| Serialized Size    | Smaller           | Larger (includes metadata, especially without field IDs) |
-| Speed              | Fast              | Similar (metadata is just memcpy)                        |
-| Schema Flexibility | None              | Full                                                     |
+| 方面            | Schema Consistent | 兼容模式                                      |
+| --------------- | ----------------- | --------------------------------------------- |
+| 序列化尺寸      | 更小              | 更大（包含元数据，尤其是没有字段 ID 时）      |
+| 速度            | 快                | 类似（元数据只是 memcpy）                     |
+| Schema 灵活性   | 无                | 完整                                          |
 
-**Note**: Using field IDs (`fory:"id=N"`) reduces metadata size in compatible mode.
+**说明**：在兼容模式中使用字段 ID（`fory:"id=N"`）可以减少元数据尺寸。
 
-**Recommendation**: Use compatible mode for:
+**建议**：以下场景使用兼容模式：
 
-- Persistent storage
-- Cross-service communication
-- Long-lived caches
+- 持久化存储
+- 跨服务通信
+- 长期缓存
 
-Use native schema-consistent mode for:
+以下场景使用 native schema-consistent 模式：
 
-- In-memory operations
-- Same-version communication
-- Minimum serialized size
+- 内存内操作
+- 同版本通信
+- 最小序列化尺寸
 
-## Error Handling
+## 错误处理
 
-### Hash Mismatch (Native Schema-Consistent Mode)
+### 哈希不匹配（Native Schema-Consistent 模式）
 
 ```go
-f := fory.New(fory.WithXlang(false))  // Compatible mode disabled
+f := fory.New(fory.WithXlang(false))  // 兼容模式禁用
 
-// Schema changed without compatible mode
+// 未启用兼容模式时 schema 发生变化
 err := f.Deserialize(oldData, &newStruct)
-// Error: ErrKindHashMismatch
+// 错误：ErrKindHashMismatch
 ```
 
-### Unknown Fields
+### 未知字段
 
-In compatible mode, unknown fields are skipped silently. To detect them:
+在兼容模式中，未知字段会被静默跳过。要检测它们：
 
 ```go
-// Currently, Fory skips unknown fields automatically
-// No explicit API for detecting unknown fields
+// 目前，Fory 会自动跳过未知字段
+// 没有用于检测未知字段的显式 API
 ```
 
-## Complete Example
+## 完整示例
 
 ```go
 package main
@@ -315,24 +314,24 @@ import (
     "github.com/apache/fory/go/fory"
 )
 
-// V1: Initial schema
+// V1：初始 schema
 type ProductV1 struct {
     ID    int64
     Name  string
     Price float64
 }
 
-// V2: Added fields
+// V2：添加字段
 type ProductV2 struct {
     ID          int64
     Name        string
     Price       float64
-    Description string  // New
-    InStock     bool    // New
+    Description string  // 新增
+    InStock     bool    // 新增
 }
 
 func main() {
-    // Serialize with V1
+    // 使用 V1 序列化
     f1 := fory.New(fory.WithXlang(true))
     f1.RegisterStruct(ProductV1{}, 1)
 
@@ -340,7 +339,7 @@ func main() {
     data, _ := f1.Serialize(product)
     fmt.Printf("V1 serialized: %d bytes\n", len(data))
 
-    // Deserialize with V2
+    // 使用 V2 反序列化
     f2 := fory.New(fory.WithXlang(true))
     f2.RegisterStruct(ProductV2{}, 1)
 
@@ -357,8 +356,8 @@ func main() {
 }
 ```
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
-- [Cross-Language Serialization](cross-language.md)
-- [Troubleshooting](troubleshooting.md)
+- [配置](configuration.md)
+- [Xlang 序列化](xlang-serialization.md)
+- [故障排查](troubleshooting.md)

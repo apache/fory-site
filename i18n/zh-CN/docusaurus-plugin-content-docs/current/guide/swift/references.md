@@ -1,5 +1,5 @@
 ---
-title: Shared and Circular References
+title: 共享引用与循环引用
 sidebar_position: 6
 id: references
 license: |
@@ -19,22 +19,22 @@ license: |
   limitations under the License.
 ---
 
-Swift reference tracking is controlled by `Config.trackRef`.
+Swift 中的引用跟踪由 `ForyConfig.trackRef` 控制。
 
-## Enable Reference Tracking
+## 启用引用跟踪
 
 ```swift
-let fory = Fory(ref: true, compatible: false)
+let fory = Fory(xlang: true, trackRef: true, compatible: false)
 ```
 
-When enabled, reference-trackable types preserve identity and cycles.
+启用后，可跟踪引用的类型会保留对象身份和循环结构。
 
-## Shared Reference Example
+## 共享引用示例
 
 ```swift
 import Fory
 
-@ForyStruct
+@ForyObject
 final class Animal {
     var name: String = ""
 
@@ -45,7 +45,7 @@ final class Animal {
     }
 }
 
-@ForyStruct
+@ForyObject
 final class AnimalPair {
     var first: Animal? = nil
     var second: Animal? = nil
@@ -58,7 +58,7 @@ final class AnimalPair {
     }
 }
 
-let fory = Fory(ref: true)
+let fory = Fory(xlang: true, trackRef: true)
 fory.register(Animal.self, id: 200)
 fory.register(AnimalPair.self, id: 201)
 
@@ -71,15 +71,14 @@ let decoded: AnimalPair = try fory.deserialize(data)
 assert(decoded.first === decoded.second)
 ```
 
-## Circular Reference Example (Use `weak`)
+## 循环引用示例：使用 `weak`
 
-`trackRef` preserves the reference graph, but it does not change ARC ownership.
-Use `weak` on at least one edge in a cycle to avoid leaks.
+`trackRef` 会保留引用图，但不会改变 ARC 的所有权规则。为了避免内存泄漏，循环边至少有一侧应使用 `weak`。
 
 ```swift
 import Fory
 
-@ForyStruct
+@ForyObject
 final class Node {
     var value: Int32 = 0
     weak var next: Node? = nil
@@ -92,7 +91,7 @@ final class Node {
     }
 }
 
-let fory = Fory(ref: true)
+let fory = Fory(xlang: true, trackRef: true)
 fory.register(Node.self, id: 300)
 
 let node = Node(value: 7)
@@ -104,8 +103,8 @@ let decoded: Node = try fory.deserialize(data)
 assert(decoded.next === decoded)
 ```
 
-## Notes
+## 说明
 
-- Value types (`struct`, primitive values) do not carry identity semantics
-- `trackRef` controls serialization graph identity, not ARC memory ownership
-- Use `trackRef=false` for purely value-based payloads to reduce overhead
+- 值类型，例如 `struct` 和基础值，不具备对象身份语义
+- `trackRef` 控制的是序列化时的引用图身份，而不是 ARC 内存管理
+- 纯值载荷可使用 `trackRef=false` 以减少开销

@@ -1,5 +1,5 @@
 ---
-title: Schema Evolution
+title: Schema 演进
 sidebar_position: 60
 id: schema_evolution
 license: |
@@ -19,28 +19,28 @@ license: |
   limitations under the License.
 ---
 
-Schema evolution lets different versions of your service exchange messages safely — a v2 writer can produce a message a v1 reader still understands, and vice versa.
+Schema 演进允许不同版本的服务安全地交换消息。也就是说，v2 写入端生成的消息，v1 读取端仍然可以理解，反之亦然。
 
-## Compatible And Schema-Consistent Evolution
+## 两种模式
 
-- **Compatible mode** (default): writes extra field metadata so readers can skip unknown fields and tolerate missing ones. Good for independent deployments, rolling upgrades, and xlang services.
-- **Schema-consistent mode**: more compact, but both sides must have exactly the same schema. Use it only when schemas do not change, or when all services update together.
+- **Schema-consistent 模式**（默认）：更紧凑，但双方必须拥有完全相同的 schema。适合所有服务统一升级的场景。
+- **兼容模式**：会写入额外的字段元信息，使读取端能够跳过未知字段并容忍缺失字段。适合独立部署或滚动升级场景。
 
-## Default Compatible Mode
+## 启用兼容模式
 
 ```ts
-const fory = new Fory();
+const fory = new Fory({ compatible: true });
 ```
 
-Use this when:
+以下情况建议使用：
 
-- services deploy schema changes independently
-- older readers may see newer payloads
-- newer readers may see older payloads from before a field was added
+- 服务会独立发布 schema 变更
+- 较旧的读取端可能会看到较新的载荷
+- 较新的读取端可能会看到字段尚未添加之前产生的旧载荷
 
-## Example
+## 示例
 
-Writer schema:
+写入端 schema：
 
 ```ts
 const writerType = Type.struct(
@@ -52,7 +52,7 @@ const writerType = Type.struct(
 );
 ```
 
-Reader schema with fewer fields:
+字段更少的读取端 schema：
 
 ```ts
 const readerType = Type.struct(
@@ -63,11 +63,11 @@ const readerType = Type.struct(
 );
 ```
 
-With compatible mode, the reader ignores fields it does not know about, and fills unknown fields with default values.
+启用 `compatible: true` 后，读取端会忽略自己不认识的字段，并为未知字段填充默认值。
 
-## Opting Out of Evolution for One Struct
+## 为单个 Struct 关闭演进
 
-You can disable evolution metadata for a specific struct even inside a `compatible: true` instance:
+即使实例启用了 `compatible: true`，你仍然可以为某个特定 struct 关闭演进元信息：
 
 ```ts
 const fixedType = Type.struct(
@@ -78,22 +78,22 @@ const fixedType = Type.struct(
 );
 ```
 
-`evolving: false` produces smaller messages for that struct, but **both the writer and reader must agree** on this setting. If one side writes with `evolving: false` and the other reads expecting compatible metadata, deserialization will fail.
+`evolving: false` 会让该 struct 的消息更小，但**写入端和读取端必须在这个设置上保持一致**。如果一侧以 `evolving: false` 写入，而另一侧按兼容元信息读取，反序列化将失败。
 
-## When to Use Each Mode
+## 何时使用每种模式
 
 |                                 | Schema-consistent | Compatible          |
 | ------------------------------- | ----------------- | ------------------- |
-| Services always update together | best choice       | works, but wasteful |
-| Independent deployments         | will break        | best choice         |
-| Smallest possible messages      | best choice       | slightly larger     |
-| Rolling upgrades                | risky             | safe                |
+| 服务总是同时更新                | ✔ 最佳选择        | 可用，但有浪费      |
+| 独立部署                        | 会出错            | ✔ 最佳选择          |
+| 需要尽可能小的消息              | ✔                 | 稍大一些            |
+| 滚动升级                        | 有风险            | ✔ 安全              |
 
-## Cross-Language Requirement
+## 跨语言要求
 
-Compatible mode only protects you from schema differences in the _fields_ of a type. You still need the same type identity (same numeric ID or same `namespace + typeName`) on every side. See [Cross-Language](cross-language.md).
+兼容模式只能帮你处理类型**字段**层面的 schema 差异。对于类型标识本身，你仍然需要在各端保持一致，即相同的数值 ID 或相同的 `namespace + typeName`。参见 [跨语言](xlang-serialization.md)。
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md)
-- [Cross-Language](cross-language.md)
+- [类型注册](type-registration.md)
+- [跨语言](xlang-serialization.md)

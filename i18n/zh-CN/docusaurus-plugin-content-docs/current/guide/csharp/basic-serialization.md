@@ -1,5 +1,5 @@
 ---
-title: Basic Serialization
+title: 基础序列化
 sidebar_position: 1
 id: basic_serialization
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers typed serialization APIs in Apache Fory™ C#.
+本页介绍 Apache Fory™ C# 的强类型序列化 API。
 
-## Object Graph Serialization
+## 对象图序列化
 
-Use `[ForyObject]` on your classes/structs and register them before use.
+在类或结构体上使用 `[ForyObject]`，并在使用前完成注册。
 
 ```csharp
 using Apache.Fory;
@@ -62,23 +62,23 @@ byte[] payload = fory.Serialize(person);
 Person decoded = fory.Deserialize<Person>(payload);
 ```
 
-## Typed API
+## 强类型 API
 
-### Serialize / Deserialize with byte arrays
+### 使用字节数组进行 Serialize / Deserialize
 
 ```csharp
 byte[] payload = fory.Serialize(value);
 MyType decoded = fory.Deserialize<MyType>(payload);
 ```
 
-### Deserialize from `ReadOnlySpan<byte>`
+### 从 `ReadOnlySpan<byte>` 反序列化
 
 ```csharp
 ReadOnlySpan<byte> span = payload;
 MyType decoded = fory.Deserialize<MyType>(span);
 ```
 
-### Stream-style frame consumption
+### 以流式方式消费帧
 
 ```csharp
 using System.Buffers;
@@ -88,9 +88,9 @@ MyType first = fory.Deserialize<MyType>(ref sequence);
 MyType second = fory.Deserialize<MyType>(ref sequence);
 ```
 
-## Dynamic Payloads via Generic Object API
+## 通过泛型对象 API 处理动态载荷
 
-When the compile-time type is unknown or heterogeneous, use the generic API with `object?`.
+当编译期类型未知或载荷包含异构对象时，可以配合 `object?` 使用泛型 API。
 
 ```csharp
 Dictionary<object, object?> value = new()
@@ -106,7 +106,7 @@ object? decoded = fory.Deserialize<object?>(payload);
 
 ## Buffer Writer API
 
-Serialize directly into `IBufferWriter<byte>` targets.
+直接序列化到 `IBufferWriter<byte>` 目标。
 
 ```csharp
 using System.Buffers;
@@ -118,14 +118,14 @@ ArrayBufferWriter<byte> dynamicWriter = new();
 fory.Serialize<object?>(dynamicWriter, value);
 ```
 
-## Notes
+## 说明
 
-- Reuse the same `Fory` or `ThreadSafeFory` instance for better performance.
-- Primitive types and collections do not require user registration.
-- User `[ForyObject]` and custom serializer types should be registered explicitly.
+- 复用同一个 `Fory` 或 `ThreadSafeFory` 实例可以获得更好的性能。
+- 基础类型和集合类型不需要用户手动注册。
+- 用户自定义的 `[ForyObject]` 类型和自定义序列化器类型应显式注册。
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md)
-- [Supported Types](supported-types.md)
-- [References](references.md)
+- [类型注册](type-registration.md)
+- [支持的类型](supported-types.md)
+- [引用](references.md)

@@ -1,6 +1,6 @@
 ---
-title: Basic Serialization
-sidebar_position: 1
+title: 基础序列化
+sidebar_position: 2
 id: basic_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,114 +19,119 @@ license: |
   limitations under the License.
 ---
 
-This page covers the Java xlang quickstart. Xlang mode is the default Java wire format and is the
-right first choice for cross-language payloads.
+本页介绍基本的序列化模式和 Fory 实例创建。
 
-## Create a Fory Runtime
+## 创建 Fory 实例
 
-For a single-threaded xlang runtime, set the mode explicitly:
+### 单线程 Fory
+
+对于单线程应用程序：
 
 ```java
-import org.apache.fory.Fory;
-
 Fory fory = Fory.builder()
-    .withXlang(true)
-    .requireClassRegistration(true)
-    .build();
+  .withLanguage(Language.JAVA)
+  // 启用引用跟踪以支持共享/循环引用。
+  // 如果没有重复引用，禁用它会有更好的性能。
+  .withRefTracking(false)
+  .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
+  // 启用类型前向/后向兼容性
+  // 禁用它以获得更小的大小和更好的性能。
+  // .withCompatibleMode(CompatibleMode.COMPATIBLE)
+  // 启用异步多线程编译。
+  .withAsyncCompilation(true)
+  .build();
+byte[] bytes = fory.serialize(object);
+System.out.println(fory.deserialize(bytes));
 ```
 
-For a thread-safe runtime, build `ThreadSafeFory` from the same builder:
+### 线程安全 Fory
+
+对于多线程应用程序：
 
 ```java
-import org.apache.fory.ThreadSafeFory;
-
 ThreadSafeFory fory = Fory.builder()
-    .withXlang(true)
-    .requireClassRegistration(true)
-    .buildThreadSafeFory();
+  .withLanguage(Language.JAVA)
+  // 启用引用跟踪以支持共享/循环引用。
+  // 如果没有重复引用，禁用它会有更好的性能。
+  .withRefTracking(false)
+  // 压缩 int 以获得更小的大小
+  // .withIntCompressed(true)
+  // 压缩 long 以获得更小的大小
+  // .withLongCompressed(true)
+  .withCompatibleMode(CompatibleMode.SCHEMA_CONSISTENT)
+  // 启用类型前向/后向兼容性
+  // 禁用它以获得更小的大小和更好的性能。
+  // .withCompatibleMode(CompatibleMode.COMPATIBLE)
+  // 启用异步多线程编译。
+  .withAsyncCompilation(true)
+  .buildThreadSafeFory();
+byte[] bytes = fory.serialize(object);
+System.out.println(fory.deserialize(bytes));
 ```
 
-Default Java xlang mode also defaults to compatible schema mode, so independently deployed services
-can add and remove fields when their schema metadata remains compatible. Use
-`withCompatible(false)` only when every peer updates schema together and you want schema-consistent
-xlang payloads.
+## 对象深拷贝
 
-## Register Custom Types
+Fory 提供高效的深拷贝功能：
 
-Register application classes with the same type identity on every peer. Numeric IDs are compact and
-fast, while namespace/type-name registration is easier to coordinate across independently owned
-services.
+### 启用引用跟踪
 
 ```java
-import org.apache.fory.annotation.ForyField;
-
-public class User {
-  @ForyField(id = 0)
-  public String name;
-
-  @ForyField(id = 1)
-  public int age;
-}
-
-Fory fory = Fory.builder()
-    .withXlang(true)
-    .requireClassRegistration(true)
-    .build();
-
-fory.register(User.class, "example", "User");
+Fory fory = Fory.builder().withRefCopy(true).build();
+SomeClass a = xxx;
+SomeClass copied = fory.copy(a);
 ```
 
-Use field IDs for long-lived schemas so field identity is stable even if Java field names change.
-See [Schema Metadata](schema-metadata.md) for Java annotations, nullability, reference tracking, and
-enum metadata.
+### 禁用引用跟踪（更好的性能）
 
-## Serialize And Deserialize
+禁用时，深拷贝将忽略循环引用和共享引用。对象图的相同引用将在一次 `Fory#copy` 中被复制为不同的对象：
 
 ```java
-User user = new User();
-user.name = "Alice";
-user.age = 30;
-
-byte[] bytes = fory.serialize(user);
-User decoded = fory.deserialize(bytes, User.class);
+Fory fory = Fory.builder().withRefCopy(false).build();
+SomeClass a = xxx;
+SomeClass copied = fory.copy(a);
 ```
 
-When xlang bytes cross runtimes, every runtime must register the same type identity and compatible
-field metadata. The shared rules live in [Xlang](../xlang/index.md), while Java-specific API calls
-are in [Cross-Language](cross-language.md).
+## 序列化 API
 
-## Use Native Mode For Java-Only Traffic
-
-For same-language Java/JVM traffic, native mode is usually the better fit:
+### 基本序列化/反序列化
 
 ```java
-Fory fory = Fory.builder()
-    .withXlang(false)
-    .build();
+// 将对象序列化为字节数组
+byte[] bytes = fory.serialize(object);
+
+// 将字节数组反序列化为对象
+Object obj = fory.deserialize(bytes);
 ```
 
-Native mode supports the broad Java object serialization surface, including JDK serialization hooks,
-object copy, and native-mode zero-copy buffers. See [Native Mode](native-mode.md).
+### 带类型的序列化/反序列化
 
-## Common Options
+```java
+// 使用显式类型序列化
+byte[] bytes = fory.serializeJavaObject(object);
 
-- `withRefTracking(true)` preserves shared references and circular references.
-- `requireClassRegistration(true)` keeps the default registered-type policy.
-- `withCompatible(true)` enables compatible mode explicitly for native-mode
-  schema evolution. Xlang mode already uses compatible mode by default.
-- `withAsyncCompilation(true)` enables asynchronous serializer compilation where supported.
+// 使用预期类型反序列化
+MyClass obj = fory.deserializeJavaObject(bytes, MyClass.class);
+```
 
-## Best Practices
+### 带类型信息的序列化/反序列化
 
-1. **Reuse Fory instances**: Creating Fory is expensive, always reuse instances
-2. **Use appropriate thread safety**: Choose between single-thread and thread-safe based on your needs
-3. **Register classes**: Keep type identity stable across every xlang peer
-4. **Configure reference tracking**: Enable it only when the object graph needs identity or cycles
+```java
+// 带类型信息序列化
+byte[] bytes = fory.serializeJavaObjectAndClass(object);
 
-## Related Topics
+// 使用嵌入的类型信息反序列化
+Object obj = fory.deserializeJavaObjectAndClass(bytes);
+```
 
-- [Configuration](configuration.md) - All ForyBuilder options
-- [Native Mode](native-mode.md) - Java-only serialization features
-- [Schema Metadata](schema-metadata.md) - Field IDs, nullability, reference tracking, and enum IDs
-- [Cross-Language](cross-language.md) - Java xlang interoperability
-- [Troubleshooting](troubleshooting.md) - Common API usage issues
+## 最佳实践
+
+1. **复用 Fory 实例**：创建 Fory 成本很高，始终复用实例
+2. **使用适当的线程安全性**：根据需要在单线程和线程安全之间选择
+3. **注册类**：注册常用类以获得更好的性能
+4. **配置引用跟踪**：如果没有循环/共享引用，请禁用它
+
+## 相关主题
+
+- [配置选项](configuration.md) - 所有 ForyBuilder 选项
+- [类型注册](type-registration.md) - 类注册
+- [故障排除](troubleshooting.md) - 常见 API 使用问题

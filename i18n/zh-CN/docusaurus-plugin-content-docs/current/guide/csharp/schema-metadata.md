@@ -1,5 +1,5 @@
 ---
-title: Schema Metadata
+title: Schema 元数据
 sidebar_position: 4
 id: schema_metadata
 license: |
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers field-level serializer configuration for C# generated serializers.
+本页介绍 C# 生成序列化器的字段级序列化器配置。
 
-## `[ForyObject]` and `[ForyField]`
+## `[ForyObject]` 和 `[ForyField]` {#foryobject-and-foryfield}
 
-Use `[ForyObject]` to enable source-generated serializers. Use `[ForyField]` to assign an optional stable non-negative field id or to override the Fory schema type used for a field.
+使用 `[ForyObject]` 启用源码生成的序列化器。使用 `[ForyField]` 分配一个可选、稳定、非负的字段 ID，或覆盖字段使用的 Fory schema 类型。
 
 ```csharp
 using Apache.Fory;
@@ -42,7 +42,7 @@ public sealed class Metrics
 }
 ```
 
-`Id` is optional. When it is omitted, compatible mode still matches the field by name.
+`Id` 是可选的。省略时，兼容模式仍会按名称匹配字段。
 
 ```csharp
 using Apache.Fory;
@@ -59,35 +59,35 @@ public sealed class NestedMetrics
 }
 ```
 
-## Schema Descriptor Types
+## Schema 描述符类型 {#schema-descriptor-types}
 
-Schema descriptors live under `Apache.Fory.Schema.Types` and are metadata only. They do not replace normal C# carrier types.
+Schema 描述符位于 `Apache.Fory.Schema.Types` 下，并且只作为元数据使用。它们不会取代普通的 C# 承载类型。
 
-Common scalar descriptors include:
+常见标量描述符包括：
 
 - `S.Int32`, `S.UInt32`
 - `S.Int64`, `S.UInt64`
 - `S.Float16`, `S.BFloat16`, `S.Float32`, `S.Float64`
 
-Container descriptors are composable:
+容器描述符可以组合：
 
-- `S.Fixed<TScalar>` and `S.Tagged<TScalar>` for scalar integer encodings
+- `S.Fixed<TScalar>` 和 `S.Tagged<TScalar>`，用于标量整数编码
 - `S.List<TElement>`
 - `S.Set<TElement>`
 - `S.Map<TKey, TValue>`
 - `S.Array<TElement>`
 
-Dense array fields use `S.Array<TElement>`, for example `S.Array<S.Int32>` or `S.Array<S.BFloat16>`.
+密集数组字段使用 `S.Array<TElement>`，例如 `S.Array<S.Int32>` 或 `S.Array<S.BFloat16>`。
 
-Nullability comes from the C# carrier type. Use `List<ulong?>` for nullable list elements and `NullableKeyDictionary<TKey, TValue>` when a map needs nullable keys.
+可空性来自 C# 承载类型。列表元素可空时使用 `List<ulong?>`，map 需要可空键时使用 `NullableKeyDictionary<TKey, TValue>`。
 
-## Nullability and Reference Tracking
+## 可空性和引用跟踪 {#nullability-and-reference-tracking}
 
-- Field nullability comes from C# type nullability (`string?`, nullable value types, etc.).
-- Reference tracking is controlled at runtime by `ForyBuilder.TrackRef(...)`.
+- 字段可空性来自 C# 类型可空性（`string?`、可空值类型等）。
+- 引用跟踪由运行时的 `ForyBuilder.TrackRef(...)` 控制。
 
-## Related Topics
+## 相关主题 {#related-topics}
 
-- [Configuration](configuration.md)
-- [Schema Evolution](schema-evolution.md)
-- [Supported Types](supported-types.md)
+- [配置](configuration.md)
+- [Schema 演进](schema-evolution.md)
+- [支持的类型](supported-types.md)

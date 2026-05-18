@@ -1,5 +1,5 @@
 ---
-title: Static Generated Serializers
+title: 静态生成序列化器
 sidebar_position: 5
 id: static_generated_serializers
 license: |
@@ -19,20 +19,19 @@ license: |
   limitations under the License.
 ---
 
-Use `fory-kotlin-ksp` when Kotlin classes must participate in Fory
-cross-language schema serialization. The processor generates Kotlin source
-serializers at build time. Those serializers call the existing Fory Java
-runtime, including `WriteContext`, `ReadContext`, and `MemoryBuffer`; there is
-no Kotlin-only protocol.
+当 Kotlin 类需要参与 Fory 跨语言 schema 序列化时，使用 `fory-kotlin-ksp`。
+该处理器会在构建时生成 Kotlin 源码序列化器。这些序列化器会调用现有的 Fory
+Java 运行时，包括 `WriteContext`、`ReadContext` 和 `MemoryBuffer`；不存在
+Kotlin 专用协议。
 
-Static generated Kotlin serializers are for Kotlin/JVM and Android xlang/schema
-mode. They are not Java native object serializers and do not preserve JVM object
-graph implementation details such as the exact concrete collection class.
+静态生成的 Kotlin 序列化器面向 Kotlin/JVM 和 Android 的 xlang/schema 模式。
+它们不是 Java 原生对象序列化器，也不会保留 JVM 对象图实现细节，例如确切的
+具体集合类。
 
-## Add KSP
+## 添加 KSP
 
-Add `fory-kotlin` at runtime and run `fory-kotlin-ksp` as a KSP processor in
-the module that compiles your `@ForyStruct` Kotlin classes.
+在运行时添加 `fory-kotlin`，并在编译 `@ForyStruct` Kotlin 类的模块中将
+`fory-kotlin-ksp` 作为 KSP 处理器运行。
 
 ```kotlin
 plugins {
@@ -45,13 +44,12 @@ dependencies {
 }
 ```
 
-For Android, configure KSP in the Android module or library module that owns
-the Kotlin model classes.
+对于 Android，请在拥有 Kotlin 模型类的 Android 模块或库模块中配置 KSP。
 
-## Define A Struct
+## 定义结构体
 
-Reuse the Java Fory annotations for schema concepts. Use Kotlin type-use
-annotations only when you need to override integer encoding.
+Schema 概念复用 Java Fory 注解。只有在需要覆盖整数编码时，才使用 Kotlin
+类型使用位置注解。
 
 ```kotlin
 import org.apache.fory.annotation.ForyField
@@ -72,46 +70,41 @@ data class User(
 )
 ```
 
-Use `@ForyField(id = 1)` on constructor properties. `@field:ForyField(id = 1)`
-is also accepted for field-backed properties. Do not use `@get:ForyField` or
-`@set:ForyField`; accessors are not schema fields and the processor rejects
-them.
+在构造函数属性上使用 `@ForyField(id = 1)`。对于有字段支撑的属性，也可以使用
+`@field:ForyField(id = 1)`。不要使用 `@get:ForyField` 或 `@set:ForyField`；
+访问器不是 schema 字段，处理器会拒绝它们。
 
-## Supported Structs
+## 支持的结构体
 
-The processor generates serializers for public or internal, concrete,
-non-generic classes in named packages. A supported class must have a primary
-constructor whose serialized parameters are `val` or `var` properties. `data
-class` is the common case, but it is not required.
+处理器会为具名包中的 public 或 internal、具体、非泛型类生成序列化器。受支持的
+类必须有主构造函数，且被序列化的参数必须是 `val` 或 `var` 属性。`data class`
+是常见用法，但不是必需条件。
 
-Internal Kotlin struct classes are supported when KSP runs in the same Kotlin
-module that owns the struct. The generated Kotlin serializer is also internal,
-so it can call the internal constructor and expose the internal type in
-overrides while still producing a JVM class that the Fory Java runtime can load.
-Application code outside that Kotlin module still cannot refer to the internal
-struct directly, so registration must happen from code that can see the class.
+当 KSP 运行在拥有该结构体的同一个 Kotlin 模块中时，支持 internal Kotlin
+结构体类。生成的 Kotlin 序列化器同样是 internal，因此它可以调用 internal
+构造函数，并在 override 中暴露 internal 类型，同时仍然生成 Fory Java 运行时
+可以加载的 JVM 类。该 Kotlin 模块外的应用代码仍然不能直接引用 internal
+结构体，因此注册必须从能够看到该类的代码中完成。
 
-The processor rejects these declarations:
+处理器会拒绝以下声明：
 
-- `private` struct classes.
-- local, anonymous, or nested `@ForyStruct` classes.
-- Kotlin `object` declarations.
-- interfaces, abstract classes, and sealed classes as serializer targets.
-- generic `@ForyStruct` classes.
-- private constructor properties.
-- private or protected primary constructors.
+- `private` 结构体类。
+- 局部、匿名或嵌套的 `@ForyStruct` 类。
+- Kotlin `object` 声明。
+- 作为序列化目标的接口、抽象类和 sealed class。
+- 泛型 `@ForyStruct` 类。
+- private 构造函数属性。
+- private 或 protected 主构造函数。
 
-Kotlin default constructor arguments are supported for compatible reads. A
-struct can have up to 12 defaulted constructor fields.
+兼容读取支持 Kotlin 默认构造函数参数。一个结构体最多可以有 12 个带默认值的
+构造函数字段。
 
-Constructor-based generated serializers support wide primary constructors.
-Compatible reads track remote field presence in generated side state instead of
-using constructor bit masks.
+基于构造函数的生成序列化器支持宽主构造函数。兼容读取会在生成的旁路状态中
+跟踪远端字段是否存在，而不是使用构造函数 bit mask。
 
-## Nullability
+## 可空性
 
-Use Kotlin `?` to describe nullable schema positions. Nullability is preserved
-inside collections and maps.
+使用 Kotlin `?` 描述可空 schema 位置。集合和 map 内部的可空性也会保留。
 
 ```kotlin
 @ForyStruct
@@ -130,45 +123,37 @@ data class NullabilityExample(
 )
 ```
 
-Do not use Fory `@Nullable` in hand-written constructor-based Kotlin structs.
-The KSP processor rejects it so the schema is always read from Kotlin source
-nullability. Compiler-generated Kotlin IDL sources follow the same rule and use
-Kotlin `?` for nullable fields.
+不要在手写的、基于构造函数的 Kotlin 结构体中使用 Fory `@Nullable`。KSP
+处理器会拒绝它，因此 schema 始终从 Kotlin 源码可空性读取。编译器生成的
+Kotlin IDL 源码遵循同一规则，并用 Kotlin `?` 表示可空字段。
 
-## References
+## 引用
 
-Kotlin generated serializers preserve `@Ref` metadata for fields, list
-elements, and map values. Constructor-owned reads construct Kotlin values
-through primary constructors. Schema IDL classes that need reference
-publication are emitted as mutable no-arg classes, and their KSP-generated
-serializers publish the instance before reading fields. In both shapes, KSP owns
-field descriptors, nested nullability, and `@Ref` metadata.
+Kotlin 生成序列化器会保留字段、list 元素和 map 值上的 `@Ref` 元数据。构造函数
+拥有的读取路径通过主构造函数构造 Kotlin 值。需要发布引用的 Schema IDL 类会
+生成为可变的无参类，其 KSP 生成序列化器会在读取字段前发布实例。在这两种形态
+中，字段描述符、嵌套可空性和 `@Ref` 元数据都由 KSP 负责。
 
-## Collections
+## 集合
 
-Collection declarations carry schema shape, not JVM implementation identity.
-For example, `List<String>` is encoded as `list<string>` and
-`Map<String, Int>` is encoded as `map<string, int32>`.
+集合声明承载的是 schema 形态，而不是 JVM 实现身份。例如，`List<String>` 编码为
+`list<string>`，`Map<String, Int>` 编码为 `map<string, int32>`。
 
-Deserialization only guarantees that the result is assignable to the declared
-field type. Fory does not preserve whether the original runtime value was an
-`ArrayList`, `LinkedList`, `Collections.unmodifiableList`, synchronized
-collection wrapper, or another JVM-specific collection implementation.
+反序列化只保证结果可以赋值给声明的字段类型。Fory 不会保留原始运行时值究竟是
+`ArrayList`、`LinkedList`、`Collections.unmodifiableList`、同步集合包装器，
+还是其他 JVM 特有集合实现。
 
-Supported collection declarations include Kotlin and Java list, set, and map
-types. Mutable collection interface fields are deserialized to mutable
-implementations assignable to the declared type. Sorted collections without an
-explicit comparator, such as `TreeSet` and `ConcurrentSkipListSet`, are accepted
-only for non-null scalar or string elements. Concurrent map declarations are
-accepted only with non-null values because JVM concurrent map implementations
-reject null entries.
+支持的集合声明包括 Kotlin 和 Java 的 list、set、map 类型。可变集合接口字段会
+反序列化为可赋值给声明类型的可变实现。没有显式 comparator 的有序集合（例如
+`TreeSet` 和 `ConcurrentSkipListSet`）只接受非 null 标量或字符串元素。并发
+map 声明只接受非 null 值，因为 JVM 并发 map 实现会拒绝 null 条目。
 
-`Set<*>`, `Map<*, T>`, `Map<*, *>`, and raw Java collections are rejected.
-`List<*>` and `Map<K, *>` are accepted and use dynamic nullable values.
+`Set<*>`、`Map<*, T>`、`Map<*, *>` 和原始 Java 集合会被拒绝。`List<*>` 和
+`Map<K, *>` 会被接受，并使用动态可空值。
 
-## Dense Arrays
+## 密集数组
 
-Kotlin dense primitive and unsigned array fields are supported:
+支持 Kotlin 密集基本类型数组和无符号数组字段：
 
 - `BooleanArray`
 - `ByteArray`
@@ -182,46 +167,41 @@ Kotlin dense primitive and unsigned array fields are supported:
 - `UIntArray`
 - `ULongArray`
 
-Dense arrays with unambiguous Kotlin carriers are supported in fields,
-collection elements, map values, and union cases. `array<float16>` and
-`array<bfloat16>` use the Java core `Float16Array` and `BFloat16Array` carriers.
+字段、集合元素、map 值和 union case 中都支持拥有明确 Kotlin 承载类型的密集
+数组。`array<float16>` 和 `array<bfloat16>` 使用 Java core 的 `Float16Array`
+和 `BFloat16Array` 承载类型。
 
-`ByteArray` is encoded as Fory `binary` unless the `ByteArray` type use is
-annotated with Java `@ArrayType`. Generated Kotlin IDL uses
-`@ArrayType ByteArray` for `array<int8>`, including nested collection and map
-positions.
+除非 `ByteArray` 类型使用位置带有 Java `@ArrayType` 注解，否则 `ByteArray`
+会编码为 Fory `binary`。生成的 Kotlin IDL 对 `array<int8>` 使用
+`@ArrayType ByteArray`，包括嵌套集合和 map 位置。
 
-`@ArrayType` is also supported on top-level `List<T>` fields when `T` is a
-non-null boolean or numeric dense-array element type. In that case the field is
-encoded as dense `array<T>` schema, and generated reads convert decoded JVM list
-elements back to the declared Kotlin element carrier.
+当 `T` 是非 null 布尔或数值密集数组元素类型时，顶层 `List<T>` 字段也支持
+`@ArrayType`。此时该字段编码为密集 `array<T>` schema，生成的读取代码会把
+解码后的 JVM list 元素转换回声明的 Kotlin 元素承载类型。
 
-## Integer Encoding
+## 整数编码
 
-Kotlin type-use encoding annotations map to Fory xlang integer encodings:
+Kotlin 类型使用位置编码注解映射到 Fory xlang 整数编码：
 
-| Annotation | Valid Kotlin types             |
+| 注解 | 有效 Kotlin 类型 |
 | ---------- | ------------------------------ |
 | `@Fixed`   | `Int`, `Long`, `UInt`, `ULong` |
 | `@VarInt`  | `Int`, `Long`, `UInt`, `ULong` |
 | `@Tagged`  | `Long`, `ULong`                |
 
-Without an annotation, xlang `Int`, `Long`, `UInt`, and `ULong` use varint
-encoding. This is required by xlang mode and is not controlled by Java native
-mode numeric compression options.
+如果没有注解，xlang `Int`、`Long`、`UInt` 和 `ULong` 使用 varint 编码。这是
+xlang 模式的要求，不受 Java 原生模式数值压缩选项控制。
 
 ## Duration
 
-Xlang `duration` maps to `kotlin.time.Duration`. Infinite Kotlin durations
-cannot be represented by the xlang duration payload and fail during
-serialization.
+Xlang `duration` 映射到 `kotlin.time.Duration`。无限 Kotlin duration 无法用
+xlang duration 载荷表示，序列化时会失败。
 
-## Sealed Unions
+## Sealed Union
 
-KSP generates serializers for top-level sealed classes annotated with
-`@ForyUnion`. Each schema case is a nested class annotated with `@ForyCase` and
-one constructor property named `value`. Case ID `0` is reserved for the unknown
-case carrier:
+KSP 会为带 `@ForyUnion` 注解的顶层 sealed class 生成序列化器。每个 schema
+case 都是一个带 `@ForyCase` 注解的嵌套类，并且有一个名为 `value` 的构造函数
+属性。Case ID `0` 保留给未知 case 承载类型：
 
 ```kotlin
 @ForyUnion
@@ -234,15 +214,14 @@ sealed class Animal {
 }
 ```
 
-Generated schema modules register sealed unions through `KotlinSerializers.registerUnion`.
-The runtime discovers the generated `<Target>_ForySerializer` automatically, so
-callers do not pass a serializer instance.
+生成的 schema 模块通过 `KotlinSerializers.registerUnion` 注册 sealed union。
+运行时会自动发现生成的 `<Target>_ForySerializer`，因此调用方不需要传入序列化器
+实例。
 
-## Register Classes
+## 注册类
 
-Register Kotlin struct classes with the Kotlin `register<T>` extension. You
-choose the xlang namespace and type name; generated serializers do not choose
-IDs or names for you.
+使用 Kotlin `register<T>` 扩展注册 Kotlin 结构体类。xlang 命名空间和类型名由
+你选择；生成的序列化器不会替你选择 ID 或名称。
 
 ```kotlin
 import org.apache.fory.kotlin.ForyKotlin
@@ -256,49 +235,44 @@ val fory = ForyKotlin.builder()
 fory.register<User>("example", "User")
 ```
 
-`ForyKotlin.builder()` installs the Kotlin runtime bootstrap for the Fory
-instance. The `fory.register<T>(...)` extension registers your xlang schema type
-name and resolves the generated serializer from the target class.
+`ForyKotlin.builder()` 会为 Fory 实例安装 Kotlin 运行时引导逻辑。
+`fory.register<T>(...)` 扩展会注册 xlang schema 类型名，并从目标类解析生成的
+序列化器。
 
-Do not register or reference generated serializer classes in application code.
-The runtime resolves them from the registered target class.
+不要在应用代码中注册或引用生成的序列化器类。运行时会从已注册的目标类解析它们。
 
-Generated Schema IDL modules use the same path. They call
-`KotlinSerializers.registerType`, `registerSerializer`, `registerEnum`, and
-`registerUnion` as appropriate and never emit Java files.
+生成的 Schema IDL 模块使用同一路径。它们会按需调用
+`KotlinSerializers.registerType`、`registerSerializer`、`registerEnum` 和
+`registerUnion`，并且不会生成 Java 文件。
 
-## Generated Names
+## 生成名称
 
-The generated serializer is emitted in the same package as the target class.
-Its name is `<target>_ForySerializer`. For nested binary names, `$` is encoded
-as `_`; source underscores are encoded as `_u_`.
+生成的序列化器会输出到与目标类相同的包中。名称为 `<target>_ForySerializer`。
+对于嵌套二进制名称，`$` 会编码为 `_`；源码中的下划线会编码为 `_u_`。
 
-These names are an implementation detail. They matter for diagnostics and
-Android shrinking, but user code should only register target classes.
+这些名称属于实现细节。它们对诊断和 Android shrink 有意义，但用户代码只应注册
+目标类。
 
-If a constructor-owned Kotlin xlang struct is registered but its KSP generated
-serializer is missing, Fory fails with a configuration error. Compile generated
-IDL sources with KSP before registering generated Kotlin classes.
+如果注册了由构造函数拥有的 Kotlin xlang 结构体，但缺少对应的 KSP 生成序列化器，
+Fory 会以配置错误失败。注册生成的 Kotlin 类之前，请先用 KSP 编译生成的 IDL
+源码。
 
-## Android And R8
+## Android 与 R8
 
-Android apps should not need user-written keep rules for generated Kotlin
-serializers. KSP emits generated consumer R8/ProGuard rules under
-`META-INF/proguard/` for the generated serializer constructors used by Fory and
-the Kotlin metadata needed to detect required Kotlin generated serializers.
+Android 应用通常不需要为生成的 Kotlin 序列化器手写 keep 规则。KSP 会在
+`META-INF/proguard/` 下生成 consumer R8/ProGuard 规则，用于 Fory 使用的生成
+序列化器构造函数，以及检测必需 Kotlin 生成序列化器所需的 Kotlin 元数据。
 
-For library modules, package the generated `META-INF/proguard/` resources into
-the produced artifact. For Android application modules, make sure your KSP
-setup includes generated resources in the minified variant.
+对于库模块，请把生成的 `META-INF/proguard/` 资源打包进产物。对于 Android 应用
+模块，请确保 KSP 设置会把生成资源包含到 minified variant 中。
 
-See [Android Support](android-support.md) for Android Gradle setup and
-release-minified validation guidance.
+Android Gradle 设置和 release-minified 验证指南请参见
+[Android 支持](android-support.md)。
 
-## Native Object Mode
+## 原生对象模式
 
-Kotlin KSP generated serializers are only for xlang/schema mode. They do not
-replace Fory Java native object serializers and do not preserve JVM object graph
-identity. If you use Fory with `withXlang(false)`, Fory uses the normal Java and
-Kotlin runtime serializers instead.
+Kotlin KSP 生成序列化器只面向 xlang/schema 模式。它们不会替代 Fory Java 原生
+对象序列化器，也不会保留 JVM 对象图身份。如果使用 `withXlang(false)` 创建 Fory，
+Fory 会改用普通 Java 和 Kotlin 运行时序列化器。
 
-Kotlin/Native and Kotlin/JS are not supported by this module.
+该模块不支持 Kotlin/Native 和 Kotlin/JS。

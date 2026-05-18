@@ -1,6 +1,6 @@
 ---
-title: Thread Safety
-sidebar_position: 110
+title: 线程安全
+sidebar_position: 12
 id: thread_safety
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,45 +19,45 @@ license: |
   limitations under the License.
 ---
 
-This guide covers concurrent usage patterns for Fory Go, including the thread-safe wrapper and best practices for multi-goroutine environments.
+本指南介绍 Fory Go 的并发使用模式，包括线程安全包装器以及多 goroutine 环境中的最佳实践。
 
-## Default Fory Instance
+## 默认 Fory 实例
 
-The default `Fory` instance is **not thread-safe**:
+默认 `Fory` 实例**不是线程安全的**：
 
 ```go
 f := fory.New(fory.WithXlang(true))
 
-// NOT SAFE: Concurrent access from multiple goroutines
+// 不安全：多个 goroutine 并发访问
 go func() {
-    f.Serialize(value1)  // Race condition!
+    f.Serialize(value1)  // 竞态条件！
 }()
 go func() {
-    f.Serialize(value2)  // Race condition!
+    f.Serialize(value2)  // 竞态条件！
 }()
 ```
 
-### Why Not Thread-Safe?
+### 为什么不是线程安全的？
 
-For performance, Fory reuses internal state:
+出于性能考虑，Fory 会复用内部状态：
 
-- Buffer is cleared and reused between calls
-- Reference resolvers are reset
-- Context objects are recycled
+- Buffer 会在调用之间清空并复用
+- 引用解析器会被重置
+- Context 对象会被回收
 
-This avoids allocations but requires exclusive access.
+这避免了内存分配，但要求独占访问。
 
-## Thread-Safe Wrapper
+## 线程安全包装器
 
-For concurrent use, use the `threadsafe` package:
+并发使用时，请使用 `threadsafe` 包：
 
 ```go
 import "github.com/apache/fory/go/fory/threadsafe"
 
-// Create thread-safe Fory
+// 创建线程安全的 Fory
 f := threadsafe.New()
 
-// Safe for concurrent use
+// 可安全并发使用
 go func() {
     data, _ := f.Serialize(value1)
 }()
@@ -66,17 +66,17 @@ go func() {
 }()
 ```
 
-### How It Works
+### 工作方式
 
-The thread-safe wrapper uses `sync.Pool`:
+线程安全包装器使用 `sync.Pool`：
 
-1. **Acquire**: Gets a Fory instance from the pool
-2. **Use**: Performs serialization/deserialization
-3. **Copy**: Copies result data (buffer will be reused)
-4. **Release**: Returns instance to pool
+1. **获取**：从池中获取一个 Fory 实例
+2. **使用**：执行序列化/反序列化
+3. **复制**：复制结果数据（buffer 将被复用）
+4. **释放**：将实例返回到池中
 
 ```go
-// Simplified implementation
+// 简化实现
 func (f *Fory) Serialize(v any) ([]byte, error) {
     fory := f.pool.Get().(*fory.Fory)
     defer f.pool.Put(fory)
@@ -86,7 +86,7 @@ func (f *Fory) Serialize(v any) ([]byte, error) {
         return nil, err
     }
 
-    // Copy because underlying buffer will be reused
+    // 复制，因为底层 buffer 将被复用
     result := make([]byte, len(data))
     copy(result, data)
     return result, nil
@@ -96,91 +96,91 @@ func (f *Fory) Serialize(v any) ([]byte, error) {
 ### API
 
 ```go
-// Create thread-safe instance
+// 创建线程安全实例
 f := threadsafe.New()
 
-// Instance methods
+// 实例方法
 data, err := f.Serialize(value)
 err = f.Deserialize(data, &target)
 
-// Generic functions
+// 泛型函数
 data, err := threadsafe.Serialize(f, &value)
 err = threadsafe.Deserialize(f, data, &target)
 
-// Global convenience functions
+// 全局便捷函数
 data, err := threadsafe.Marshal(&value)
 err = threadsafe.Unmarshal(data, &target)
 ```
 
-## Type Registration
+## 类型注册
 
-Type registration should be done before concurrent use:
+类型注册应在并发使用前完成：
 
 ```go
 f := threadsafe.New()
 
-// Register types BEFORE concurrent access
+// 并发访问前注册类型
 f.RegisterStruct(User{}, 1)
 f.RegisterStruct(Order{}, 2)
 
-// Now safe to use concurrently
+// 现在可以安全并发使用
 go func() {
     f.Serialize(&User{ID: 1})
 }()
 ```
 
-### Thread-Safe Registration
+### 线程安全注册
 
-The thread-safe wrapper handles registration safely:
+线程安全包装器会安全地处理注册：
 
 ```go
-// Safe: Registration is synchronized
+// 安全：注册过程会同步
 f := threadsafe.New()
-f.RegisterStruct(User{}, 1)  // Thread-safe
+f.RegisterStruct(User{}, 1)  // 线程安全
 ```
 
-However, for best performance, register all types at startup before concurrent use.
+不过，为获得最佳性能，建议在启动时、并发使用前注册所有类型。
 
-## Zero-Copy Considerations
+## 零拷贝注意事项
 
-### Non-Thread-Safe Instance
+### 非线程安全实例
 
-With the default Fory, returned byte slices are views into the internal buffer:
+使用默认 Fory 时，返回的字节 slice 是内部 buffer 的视图：
 
 ```go
 f := fory.New(fory.WithXlang(true))
 
 data1, _ := f.Serialize(value1)
-// data1 is valid
+// data1 目前有效
 
 data2, _ := f.Serialize(value2)
-// data1 is NOW INVALID (buffer was reused)
+// data1 现在已失效（buffer 被复用）
 ```
 
-### Thread-Safe Instance
+### 线程安全实例
 
-The thread-safe wrapper copies data automatically:
+线程安全包装器会自动复制数据：
 
 ```go
 f := threadsafe.New()
 
 data1, _ := f.Serialize(value1)
 data2, _ := f.Serialize(value2)
-// Both data1 and data2 are valid (independent copies)
+// data1 和 data2 都有效（独立副本）
 ```
 
-This is safer but has allocation overhead.
+这更安全，但会带来分配开销。
 
-## Performance Comparison
+## 性能对比
 
-| Scenario            | Non-Thread-Safe | Thread-Safe            |
-| ------------------- | --------------- | ---------------------- |
-| Single goroutine    | Fastest         | Slower (pool overhead) |
-| Multiple goroutines | Unsafe          | Safe, good scaling     |
-| Memory allocations  | Minimal         | Per-call copy          |
-| Buffer reuse        | Yes             | Per-pool-instance      |
+| 场景           | 非线程安全        | 线程安全                 |
+| -------------- | ----------------- | ------------------------ |
+| 单 goroutine   | 最快              | 较慢（池开销）           |
+| 多 goroutine   | 不安全            | 安全，扩展性好           |
+| 内存分配       | 最少              | 每次调用复制             |
+| Buffer 复用    | 是                | 每个池内实例各自复用     |
 
-### Benchmarking
+### 基准测试
 
 ```go
 func BenchmarkNonThreadSafe(b *testing.B) {
@@ -206,15 +206,15 @@ func BenchmarkThreadSafe(b *testing.B) {
 }
 ```
 
-## Patterns
+## 使用模式
 
-### Per-Goroutine Instance
+### 每个 Goroutine 一个实例
 
-For maximum performance with known goroutine count:
+当 goroutine 数量已知并追求最高性能时：
 
 ```go
 func worker(id int) {
-    // Each worker has its own Fory instance
+    // 每个 worker 都有自己的 Fory 实例
     f := fory.New(fory.WithXlang(true))
     f.RegisterStruct(User{}, 1)
 
@@ -224,18 +224,18 @@ func worker(id int) {
     }
 }
 
-// Start workers
+// 启动 worker
 for i := 0; i < numWorkers; i++ {
     go worker(i)
 }
 ```
 
-### Shared Thread-Safe Instance
+### 共享线程安全实例
 
-For dynamic goroutine count or simplicity:
+当 goroutine 数量动态变化或希望保持简单时：
 
 ```go
-// Single shared instance
+// 单个共享实例
 var f = threadsafe.New()
 
 func init() {
@@ -243,13 +243,13 @@ func init() {
 }
 
 func handleRequest(user *User) []byte {
-    // Safe from any goroutine
+    // 可从任何 goroutine 安全调用
     data, _ := f.Serialize(user)
     return data
 }
 ```
 
-### HTTP Handler Example
+### HTTP Handler 示例
 
 ```go
 var fory = threadsafe.New()
@@ -264,7 +264,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
         Data:   getData(),
     }
 
-    // Safe: threadsafe.Fory handles concurrency
+    // 安全：threadsafe.Fory 会处理并发
     data, err := fory.Serialize(response)
     if err != nil {
         http.Error(w, err.Error(), 500)
@@ -276,72 +276,72 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-## Common Mistakes
+## 常见错误
 
-### Sharing Non-Thread-Safe Instance
+### 共享非线程安全实例
 
 ```go
-// WRONG: Race condition
+// 错误：竞态条件
 var f = fory.New(fory.WithXlang(true))
 
 func handler1() {
-    f.Serialize(value1)  // Race!
+    f.Serialize(value1)  // 竞态！
 }
 
 func handler2() {
-    f.Serialize(value2)  // Race!
+    f.Serialize(value2)  // 竞态！
 }
 ```
 
-**Fix**: Use `threadsafe.New()` or per-goroutine instances.
+**修复**：使用 `threadsafe.New()` 或每个 goroutine 一个实例。
 
-### Keeping Reference to Buffer
+### 保留 Buffer 引用
 
 ```go
-// WRONG: Buffer invalidated on next call
+// 错误：下一次调用会使 buffer 失效
 f := fory.New(fory.WithXlang(true))
 data, _ := f.Serialize(value1)
-savedData := data  // Just copies the slice header!
+savedData := data  // 只复制了 slice 头！
 
-f.Serialize(value2)  // Invalidates data and savedData
+f.Serialize(value2)  // 使 data 和 savedData 失效
 ```
 
-**Fix**: Clone the data or use thread-safe wrapper.
+**修复**：克隆数据或使用线程安全包装器。
 
 ```go
-// Correct: Clone the data
+// 正确：克隆数据
 data, _ := f.Serialize(value1)
 savedData := make([]byte, len(data))
 copy(savedData, data)
 
-// Or use thread-safe (auto-copies)
+// 或使用线程安全实例（自动复制）
 f := threadsafe.New()
-data, _ := f.Serialize(value1)  // Already copied
+data, _ := f.Serialize(value1)  // 已经复制
 ```
 
-### Registering Types Concurrently
+### 并发注册类型
 
 ```go
-// RISKY: Concurrent registration
+// 有风险：并发注册
 go func() {
     f.RegisterStruct(TypeA{}, 1)
 }()
 go func() {
-    f.Serialize(value)  // May not see TypeA
+    f.Serialize(value)  // 可能看不到 TypeA
 }()
 ```
 
-**Fix**: Register all types before concurrent use.
+**修复**：在并发使用前注册所有类型。
 
-## Best Practices
+## 最佳实践
 
-1. **Register types at startup**: Before any concurrent operations
-2. **Clone data if keeping references**: With non-thread-safe instance
-3. **Use per-worker instances for hot paths**: Eliminates pool contention
-4. **Profile before optimizing**: Thread-safe overhead may be negligible
+1. **启动时注册类型**：在任何并发操作之前完成
+2. **保留引用时克隆数据**：使用非线程安全实例时
+3. **热路径使用每个 worker 一个实例**：消除池竞争
+4. **优化前先做性能分析**：线程安全开销可能可以忽略
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
-- [Basic Serialization](basic-serialization.md)
-- [Troubleshooting](troubleshooting.md)
+- [配置](configuration.md)
+- [基础序列化](basic-serialization.md)
+- [故障排查](troubleshooting.md)

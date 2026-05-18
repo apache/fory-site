@@ -1,7 +1,7 @@
 ---
-title: Basic Serialization
-sidebar_position: 1
-id: basic_serialization
+title: 基础序列化
+sidebar_position: 2
+id: dart_basic_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page shows how to serialize and deserialize values with Apache Fory™ Dart.
+本页介绍如何使用 Apache Fory™ Dart 对值进行序列化和反序列化。
 
-## Create a `Fory` Instance
+## 创建 `Fory` 实例
 
-Create one instance and reuse it — creating a new `Fory` for every call wastes resources.
+创建一个实例并复用它。每次调用都新建 `Fory` 只会浪费资源。
 
 ```dart
 import 'package:fory/fory.dart';
@@ -31,7 +31,7 @@ import 'package:fory/fory.dart';
 final fory = Fory();
 ```
 
-## Serialize and Deserialize Annotated Types
+## 序列化和反序列化带注解的类型
 
 ```dart
 import 'package:fory/fory.dart';
@@ -43,9 +43,7 @@ class Person {
   Person();
 
   String name = '';
-
-  @ForyField(type: Int32Type())
-  int age = 0;
+  Int32 age = Int32(0);
 }
 
 void main() {
@@ -59,7 +57,7 @@ void main() {
 
   final person = Person()
     ..name = 'Ada'
-    ..age = 36;
+    ..age = Int32(36);
 
   final bytes = fory.serialize(person);
   final roundTrip = fory.deserialize<Person>(bytes);
@@ -67,11 +65,11 @@ void main() {
 }
 ```
 
-`deserialize<T>` returns the decoded value cast to `T`. If the payload describes a different type than `T`, it throws.
+`deserialize<T>` 会返回并转换为 `T` 的解码结果。如果载荷描述的类型与 `T` 不一致，就会抛出异常。
 
-## Null Values
+## Null 值
 
-Serializing `null` is supported directly:
+支持直接序列化 `null`：
 
 ```dart
 final fory = Fory();
@@ -79,27 +77,27 @@ final bytes = fory.serialize(null);
 final value = fory.deserialize<Object?>(bytes);
 ```
 
-## Serialize Collections and Dynamic Payloads
+## 序列化集合和动态载荷
 
-You can serialize collection values directly:
+你可以直接序列化集合值：
 
 ```dart
 final fory = Fory();
 final bytes = fory.serialize(<Object?>[
   'hello',
-  42,
+  Int32(42),
   true,
 ]);
 final value = fory.deserialize<List<Object?>>(bytes);
 ```
 
-For heterogeneous collections, deserialize to `Object?`, `List<Object?>`, or `Map<Object?, Object?>`.
+对于异构集合，请反序列化为 `Object?`、`List<Object?>` 或 `Map<Object?, Object?>`。
 
-## Reference Tracking
+## 引用跟踪
 
-By default, Fory does not track object identity — if the same object appears twice in a list, it is serialized twice. Enable reference tracking when your data contains shared references or circular structures.
+默认情况下，Fory 不会跟踪对象标识。如果同一个对象在列表中出现两次，它会被序列化两次。当数据包含共享引用或循环结构时，请启用引用跟踪。
 
-For a top-level collection:
+对于顶层集合：
 
 ```dart
 final fory = Fory();
@@ -109,25 +107,25 @@ final roundTrip = fory.deserialize<List<Object?>>(bytes);
 print(identical(roundTrip[0], roundTrip[1])); // true
 ```
 
-For fields inside a generated struct, use `@ForyField(ref: true)` on that field instead.
+对于生成结构体中的字段，请改用该字段上的 `@ForyField(ref: true)`。
 
-## Reusing a Buffer
+## 复用缓冲区
 
-If you want to avoid allocating a new `Uint8List` on every call, use `serializeTo` and `deserializeFrom` with an explicit `Buffer`:
+如果你想避免每次调用都分配新的 `Uint8List`，可以配合显式 `Buffer` 使用 `serializeTo` 和 `deserializeFrom`：
 
 ```dart
 final fory = Fory();
 final buffer = Buffer();
 
-fory.serializeTo('Ada', buffer);
-final value = fory.deserializeFrom<String>(buffer);
+fory.serializeTo(Int32(42), buffer);
+final value = fory.deserializeFrom<Int32>(buffer);
 ```
 
-This is an optimization. For most applications the default `serialize`/`deserialize` pair is fine.
+这是性能优化手段。对大多数应用来说，默认的 `serialize` / `deserialize` 就足够了。
 
-## Register Your Types Before Serializing
+## 在序列化前注册类型
 
-Before you can serialize a custom class or enum, register it with `Fory`. The generated code makes this easy:
+在序列化自定义类或枚举之前，必须先把它注册到 `Fory` 中。生成代码会让这件事变得很简单：
 
 ```dart
 PersonFory.register(
@@ -137,10 +135,10 @@ PersonFory.register(
 );
 ```
 
-If you skip registration, you will get a `Type ... is not registered` error at runtime. See [Type Registration](type-registration.md) and [Code Generation](code-generation.md).
+如果跳过注册，运行时会得到 `Type ... is not registered` 错误。参见 [类型注册](type-registration.md) 和 [代码生成](code-generation.md)。
 
-## Related Topics
+## 相关主题
 
-- [Configuration](configuration.md)
-- [Type Registration](type-registration.md)
-- [Schema Metadata](schema-metadata.md)
+- [配置](configuration.md)
+- [类型注册](type-registration.md)
+- [字段配置](schema-metadata.md)

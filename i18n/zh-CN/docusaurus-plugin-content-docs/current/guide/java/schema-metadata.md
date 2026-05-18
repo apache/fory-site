@@ -1,5 +1,5 @@
 ---
-title: Schema Metadata
+title: Schema 元数据
 sidebar_position: 7
 id: schema_metadata
 license: |
@@ -19,30 +19,30 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to configure field-level metadata for serialization in Java.
+本文说明如何在 Java 中为序列化配置字段级元数据。
 
-## Overview
+## 概览
 
-Apache Fory™ provides field-level configuration through annotations:
+Apache Fory™ 通过注解提供字段级配置：
 
-- **`@ForyField`**: Configure field metadata (id, dynamic)
-- **`@Nullable`**: Mark a field type or nested type position as nullable
-- **`@Ref`**: Enable field or nested-element reference tracking
-- **`@Ignore`**: Exclude fields from serialization
-- **Integer type annotations**: Control integer encoding (varint, fixed, tagged, unsigned)
+- **`@ForyField`**：配置字段元数据（id、dynamic）
+- **`@Nullable`**：将字段类型或嵌套类型位置标记为可空
+- **`@Ref`**：启用字段或嵌套元素的引用跟踪
+- **`@Ignore`**：从序列化中排除字段
+- **整数类型注解**：控制整数编码（varint、fixed、tagged、unsigned）
 
-This enables:
+这支持：
 
-- **Tag IDs**: Assign compact numeric IDs to reduce struct field meta size overhead for compatible mode
-- **Nullability**: Control whether fields can be null
-- **Reference Tracking**: Enable reference tracking for shared objects
-- **Field Skipping**: Exclude fields from serialization
-- **Encoding Control**: Specify how integers are encoded
-- **Polymorphism Control**: Control type info writing for struct fields
+- **Tag ID**：分配紧凑的数值 ID，降低兼容模式下 struct 字段元数据大小开销
+- **可空性**：控制字段是否可以为 null
+- **引用跟踪**：为共享对象启用引用跟踪
+- **字段跳过**：从序列化中排除字段
+- **编码控制**：指定整数如何编码
+- **多态控制**：控制 struct 字段的类型信息写入
 
-## Basic Syntax
+## 基本语法
 
-Use annotations on fields:
+在字段上使用注解：
 
 ```java
 import org.apache.fory.annotation.ForyField;
@@ -61,9 +61,9 @@ public class Person {
 }
 ```
 
-## The `@ForyField` Annotation
+## `@ForyField` 注解
 
-Use `@ForyField` to configure field-level metadata:
+使用 `@ForyField` 配置字段级元数据：
 
 ```java
 public class User {
@@ -85,20 +85,18 @@ public class User {
 }
 ```
 
-### Parameters
+### 参数
 
-| Parameter | Type      | Default | Description                            |
-| --------- | --------- | ------- | -------------------------------------- |
-| `id`      | `int`     | `-1`    | Non-negative field tag ID, or no ID    |
-| `dynamic` | `Dynamic` | `AUTO`  | Control polymorphism for struct fields |
+| 参数      | 类型      | 默认值 | 说明                                  |
+| --------- | --------- | ------ | ------------------------------------- |
+| `id`      | `int`     | `-1`   | 非负字段 tag ID，或无 ID              |
+| `dynamic` | `Dynamic` | `AUTO` | 控制 struct 字段的多态行为            |
 
-Use `@Nullable` on the field type or nested type position for nullable schema
-metadata and `@Ref` for reference tracking. `@ForyField` does not carry either
-setting.
+在字段类型或嵌套类型位置上使用 `@Nullable` 来配置可空 Schema 元数据，使用 `@Ref` 进行引用跟踪。`@ForyField` 本身不携带这两项设置。
 
-## Field ID (`id`)
+## 字段 ID (`id`)
 
-Assigns a numeric ID to a field to minimize struct field meta size overhead for compatible mode:
+为字段分配数值 ID，以最小化兼容模式下 struct 字段元数据大小开销：
 
 ```java
 public class User {
@@ -113,22 +111,21 @@ public class User {
 }
 ```
 
-**Benefits**:
+**优点**：
 
-- Smaller serialized size (numeric IDs vs field names in metadata)
-- Reduced struct field meta overhead
-- Allows renaming fields without breaking binary compatibility
+- 序列化大小更小（元数据中使用数值 ID，而不是字段名）
+- struct 字段元数据开销更低
+- 允许重命名字段而不破坏二进制兼容性
 
-**Recommendation**: It is recommended to configure field IDs for compatible mode since it reduces serialization cost.
+**建议**：建议为兼容模式配置字段 ID，因为它可以降低序列化成本。
 
-**Notes**:
+**说明**：
 
-- IDs must be unique within a class
-- IDs must be >= 0 when configured
-- If not specified, the annotation default `-1` is ignored and field name is used in metadata
-  (larger overhead)
+- ID 在同一个类内必须唯一
+- 配置 ID 时，ID 必须 >= 0
+- 如果未指定，注解默认值 `-1` 会被忽略，并在元数据中使用字段名（开销更大）
 
-**Without field IDs** (field names used in metadata):
+**没有字段 ID**（元数据中使用字段名）：
 
 ```java
 public class User {
@@ -137,41 +134,41 @@ public class User {
 }
 ```
 
-## Nullable Fields (`@Nullable`)
+## 可空字段 (`@Nullable`)
 
-Use `@Nullable` for fields that can be `null`:
+对可以为 `null` 的字段使用 `@Nullable`：
 
 ```java
 public class Record {
-    // Nullable string field
+    // 可空字符串字段
     @Nullable
     @ForyField(id = 0)
     private String optionalName;
 
-    // Nullable Integer field (boxed type)
+    // 可空 Integer 字段（装箱类型）
     @Nullable
     @ForyField(id = 1)
     private Integer optionalCount;
 
-    // Non-nullable field (default)
+    // 非可空字段（默认）
     @ForyField(id = 2)
     private String requiredName;
 }
 ```
 
-**Notes**:
+**说明**：
 
-- Xlang fields are non-nullable by default.
-- When a field is non-nullable, Fory skips writing the null flag.
-- Boxed types (`Integer`, `Long`, etc.) that can be null should use `@Nullable`.
+- Xlang 字段默认不可空。
+- 当字段不可空时，Fory 会跳过 null 标记的写入。
+- 可以为 null 的装箱类型（`Integer`、`Long` 等）应使用 `@Nullable`。
 
-## Reference Tracking (`@Ref`)
+## 引用跟踪 (`@Ref`)
 
-Enable reference tracking for fields that may be shared or circular:
+为可能共享或循环的字段启用引用跟踪：
 
 ```java
 public class RefOuter {
-    // Both fields may point to the same inner object
+    // 两个字段都可能指向同一个 inner 对象
     @Nullable
     @ForyField(id = 0)
     @Ref
@@ -187,7 +184,7 @@ public class CircularRef {
     @ForyField(id = 0)
     private String name;
 
-    // Self-referencing field for circular references
+    // 用于循环引用的自引用字段
     @Nullable
     @ForyField(id = 1)
     @Ref
@@ -195,50 +192,50 @@ public class CircularRef {
 }
 ```
 
-**Use Cases**:
+**使用场景**：
 
-- Enable for fields that may be circular or shared
-- When the same object is referenced from multiple fields
+- 为可能循环或共享的字段启用
+- 同一对象会被多个字段引用时启用
 
-**Notes**:
+**说明**：
 
-- Fields without `@Ref` do not use field-wrapper reference tracking
-- Avoid `@Ref` when values are not shared or circular, so Fory can skip the reference flag
-- Reference tracking only takes effect when global ref tracking is enabled
+- 没有 `@Ref` 的字段不会使用字段包装层面的引用跟踪
+- 当值既不共享也不循环时，应避免使用 `@Ref`，这样 Fory 可以跳过引用标记
+- 引用跟踪只有在全局引用跟踪启用时才会生效
 
-## Dynamic (Polymorphism Control)
+## Dynamic（多态控制）
 
-Controls polymorphism behavior for struct fields in cross-language serialization:
+控制跨语言序列化中 struct 字段的多态行为：
 
 ```java
 public class Container {
-    // AUTO: Interface/abstract types are dynamic, concrete types are not
+    // AUTO：接口/抽象类型是 dynamic，具体类型不是
     @ForyField(id = 0, dynamic = ForyField.Dynamic.AUTO)
-    private Animal animal;  // Interface - type info written
+    private Animal animal;  // 接口 - 写入类型信息
 
-    // FALSE: No type info written, uses declared type's serializer
+    // FALSE：不写入类型信息，使用声明类型的序列化器
     @ForyField(id = 1, dynamic = ForyField.Dynamic.FALSE)
-    private Dog dog;  // Concrete - no type info
+    private Dog dog;  // 具体类型 - 不写入类型信息
 
-    // TRUE: Type info written to support runtime subtypes
+    // TRUE：写入类型信息以支持运行时子类型
     @ForyField(id = 2, dynamic = ForyField.Dynamic.TRUE)
-    private Object data;  // Force polymorphic
+    private Object data;  // 强制多态
 }
 ```
 
-**Options**:
+**选项**：
 
-| Value   | Description                                                         |
-| ------- | ------------------------------------------------------------------- |
-| `AUTO`  | Auto-detect: interface/abstract are dynamic, concrete types are not |
-| `FALSE` | No type info written, uses declared type's serializer directly      |
-| `TRUE`  | Type info written to support subtypes at runtime                    |
+| 值      | 说明                                            |
+| ------- | ----------------------------------------------- |
+| `AUTO`  | 自动检测：接口/抽象类型是 dynamic，具体类型不是 |
+| `FALSE` | 不写入类型信息，直接使用声明类型的序列化器      |
+| `TRUE`  | 写入类型信息，以支持运行时子类型                |
 
-## Skipping Fields
+## 跳过字段
 
-### Using `@Ignore`
+### 使用 `@Ignore`
 
-Exclude fields from serialization:
+从序列化中排除字段：
 
 ```java
 import org.apache.fory.annotation.Ignore;
@@ -251,67 +248,65 @@ public class User {
     private String name;
 
     @Ignore
-    private String password;  // Not serialized
+    private String password;  // 不序列化
 
     @Ignore
-    private Object internalState;  // Not serialized
+    private Object internalState;  // 不序列化
 }
 ```
 
-### Using `transient`
+### 使用 `transient`
 
-Java's `transient` keyword also excludes fields:
+Java 的 `transient` 关键字也会排除字段：
 
 ```java
 public class User {
     @ForyField(id = 0)
     private long id;
 
-    private transient String password;  // Not serialized
-    private transient Object cache;     // Not serialized
+    private transient String password;  // 不序列化
+    private transient Object cache;     // 不序列化
 }
 ```
 
-## Integer Type Annotations
+## 整数类型注解
 
-Fory provides annotations to control integer encoding for cross-language compatibility.
-Integer schema annotations are Java type-use annotations. Put them on the field type, after any
-field modifiers and alongside `@ForyField` when both are present.
+Fory 提供注解来控制整数编码，以实现跨语言兼容性。整数 Schema 注解是 Java 类型使用注解。当字段修饰符存在时，将它们放在字段类型上、字段修饰符之后；如果同时存在 `@ForyField`，则与其配合使用。
 
-### Signed 32-bit Integer (`@Int32Type`)
+### 有符号 32 位整数 (`@Int32Type`)
 
 ```java
 import org.apache.fory.annotation.Int32Type;
 import org.apache.fory.config.Int32Encoding;
 
 public class MyStruct {
-    // Variable-length encoding (default) - compact for small values
+    // 变长编码（默认）- 对小值更紧凑
     private @Int32Type(encoding = Int32Encoding.VARINT) int compactId;
 
-    // Fixed 4-byte encoding - consistent size
+    // 固定 4 字节编码 - 大小一致
     private @Int32Type(encoding = Int32Encoding.FIXED) int fixedId;
 }
 ```
 
-### Signed 64-bit Integer (`@Int64Type`)
+### 有符号 64 位整数 (`@Int64Type`)
 
 ```java
 import org.apache.fory.annotation.Int64Type;
 import org.apache.fory.config.Int64Encoding;
 
 public class MyStruct {
-    // Variable-length encoding (default)
+    // 变长编码（默认）
     private @Int64Type(encoding = Int64Encoding.VARINT) long compactId;
 
-    // Fixed 8-byte encoding
+    // 固定 8 字节编码
     private @Int64Type(encoding = Int64Encoding.FIXED) long fixedTimestamp;
 
-    // Tagged encoding (4 bytes for small values, 9 bytes otherwise)
+    // Tagged 编码（小值占 4 字节，否则占 9 字节）
     private @Int64Type(encoding = Int64Encoding.TAGGED) long taggedValue;
 }
 ```
 
-### Unsigned Integers
+### 无符号整数
 
 ```java
 import org.apache.fory.annotation.UInt8Type;
@@ -322,19 +317,19 @@ import org.apache.fory.config.Int32Encoding;
 import org.apache.fory.config.Int64Encoding;
 
 public class UnsignedStruct {
-    // Unsigned 8-bit [0, 255]
+    // 无符号 8 位 [0, 255]
     private @UInt8Type int flags;
 
-    // Unsigned 16-bit [0, 65535]
+    // 无符号 16 位 [0, 65535]
     private @UInt16Type int port;
 
-    // Unsigned 32-bit with varint encoding (default)
+    // 使用 varint 编码的无符号 32 位（默认）
     private @UInt32Type(encoding = Int32Encoding.VARINT) long compactCount;
 
-    // Unsigned 32-bit with fixed encoding
+    // 使用 fixed 编码的无符号 32 位
     private @UInt32Type(encoding = Int32Encoding.FIXED) long fixedCount;
 
-    // Unsigned 64-bit with various encodings
+    // 使用多种编码的无符号 64 位
     private @UInt64Type(encoding = Int64Encoding.VARINT) long varintU64;
 
     private @UInt64Type(encoding = Int64Encoding.FIXED) long fixedU64;
@@ -343,36 +338,33 @@ public class UnsignedStruct {
 }
 ```
 
-### Encoding Summary
+### 编码汇总
 
-| Annotation                       | Type ID | Encoding | Size         |
-| -------------------------------- | ------- | -------- | ------------ |
-| `@Int32Type(encoding = VARINT)`  | 5       | varint   | 1-5 bytes    |
-| `@Int32Type(encoding = FIXED)`   | 4       | fixed    | 4 bytes      |
-| `@Int64Type(encoding = VARINT)`  | 7       | varint   | 1-10 bytes   |
-| `@Int64Type(encoding = FIXED)`   | 6       | fixed    | 8 bytes      |
-| `@Int64Type(encoding = TAGGED)`  | 8       | tagged   | 4 or 9 bytes |
-| `@UInt8Type`                     | 9       | fixed    | 1 byte       |
-| `@UInt16Type`                    | 10      | fixed    | 2 bytes      |
-| `@UInt32Type(encoding = VARINT)` | 12      | varint   | 1-5 bytes    |
-| `@UInt32Type(encoding = FIXED)`  | 11      | fixed    | 4 bytes      |
-| `@UInt64Type(encoding = VARINT)` | 14      | varint   | 1-10 bytes   |
-| `@UInt64Type(encoding = FIXED)`  | 13      | fixed    | 8 bytes      |
-| `@UInt64Type(encoding = TAGGED)` | 15      | tagged   | 4 or 9 bytes |
+| 注解                             | 类型 ID | 编码   | 大小         |
+| -------------------------------- | ------- | ------ | ------------ |
+| `@Int32Type(encoding = VARINT)`  | 5       | varint | 1-5 字节     |
+| `@Int32Type(encoding = FIXED)`   | 4       | fixed  | 4 字节       |
+| `@Int64Type(encoding = VARINT)`  | 7       | varint | 1-10 字节    |
+| `@Int64Type(encoding = FIXED)`   | 6       | fixed  | 8 字节       |
+| `@Int64Type(encoding = TAGGED)`  | 8       | tagged | 4 或 9 字节  |
+| `@UInt8Type`                     | 9       | fixed  | 1 字节       |
+| `@UInt16Type`                    | 10      | fixed  | 2 字节       |
+| `@UInt32Type(encoding = VARINT)` | 12      | varint | 1-5 字节     |
+| `@UInt32Type(encoding = FIXED)`  | 11      | fixed  | 4 字节       |
+| `@UInt64Type(encoding = VARINT)` | 14      | varint | 1-10 字节    |
+| `@UInt64Type(encoding = FIXED)`  | 13      | fixed  | 8 字节       |
+| `@UInt64Type(encoding = TAGGED)` | 15      | tagged | 4 或 9 字节  |
 
-**When to Use**:
+**何时使用**：
 
-- `varint`: Best for values that are often small (default)
-- `fixed`: Best for values that use full range (e.g., timestamps, hashes)
-- `tagged`: Good balance between size and performance
-- Unsigned types: For cross-language compatibility with Rust, Go, C++
+- `varint`：最适合经常较小的值（默认）
+- `fixed`：最适合使用完整范围的值（例如时间戳、哈希）
+- `tagged`：在大小和性能之间提供良好平衡
+- 无符号类型：用于与 Rust、Go、C++ 中的无符号数字保持跨语言兼容
 
-Unsigned Java scalar carriers are `int`/`Integer` for `@UInt8Type` and
-`@UInt16Type`, and `long`/`Long` for `@UInt32Type` and `@UInt64Type`.
-Annotating `byte` with `@UInt8Type` is invalid because Java `byte` cannot
-represent the unsigned range.
+无符号 Java 标量承载类型是：`@UInt8Type` 和 `@UInt16Type` 使用 `int`/`Integer`，`@UInt32Type` 和 `@UInt64Type` 使用 `long`/`Long`。用 `@UInt8Type` 注解 `byte` 是无效的，因为 Java `byte` 无法表示无符号范围。
 
-Integer annotations can also be applied to nested generic type arguments:
+整数注解也可以应用到嵌套泛型类型参数上：
 
 ```java
 import java.util.List;
@@ -390,12 +382,9 @@ public class NestedStruct {
 }
 ```
 
-Specialized unsigned list carriers use the `list<T>` schema by default, so
-their element annotations are preserved in list metadata. Add `@ArrayType` only
-when the field should use dense `array<T>` schema.
+专用无符号列表承载类型默认使用 `list<T>` Schema，因此其元素注解会保留在列表元数据中。只有当字段应使用紧凑的 `array<T>` Schema 时，才添加 `@ArrayType`。
 
-Primitive unsigned arrays can use scalar element annotations for dense
-`array<T>` metadata:
+基本类型无符号数组可以使用标量元素注解来生成紧凑的 `array<T>` 元数据：
 
 ```java
 import org.apache.fory.annotation.UInt32Type;
@@ -405,7 +394,7 @@ public class IdBatch {
 }
 ```
 
-## Complete Example
+## 完整示例
 
 ```java
 import org.apache.fory.Fory;
@@ -421,19 +410,19 @@ import java.util.Map;
 import java.util.Set;
 
 public class Document {
-    // Fields with tag IDs (recommended for compatible mode)
+    // 带 tag ID 的字段（兼容模式推荐）
     @ForyField(id = 0)
     private String title;
 
     @ForyField(id = 1)
     private int version;
 
-    // Nullable field
+    // 可空字段
     @Nullable
     @ForyField(id = 2)
     private String description;
 
-    // Collection fields
+    // 集合字段
     @ForyField(id = 3)
     private List<String> tags;
 
@@ -443,29 +432,29 @@ public class Document {
     @ForyField(id = 5)
     private Set<String> categories;
 
-    // Integer with different encodings
+    // 使用不同编码的整数
     @ForyField(id = 6)
-    private @UInt64Type(encoding = Int64Encoding.VARINT) long viewCount;  // varint encoding
+    private @UInt64Type(encoding = Int64Encoding.VARINT) long viewCount;  // varint 编码
 
     @ForyField(id = 7)
-    private @UInt64Type(encoding = Int64Encoding.FIXED) long fileSize;   // fixed encoding
+    private @UInt64Type(encoding = Int64Encoding.FIXED) long fileSize;   // fixed 编码
 
     @ForyField(id = 8)
-    private @UInt64Type(encoding = Int64Encoding.TAGGED) long checksum;   // tagged encoding
+    private @UInt64Type(encoding = Int64Encoding.TAGGED) long checksum;   // tagged 编码
 
-    // Reference-tracked field for shared/circular references
+    // 为共享/循环引用进行引用跟踪的字段
     @Nullable
     @ForyField(id = 9)
     @Ref
     private Document parent;
 
-    // Ignored field (not serialized)
+    // 被忽略的字段（不序列化）
     private transient Object cache;
 
-    // Getters and setters...
+    // Getter 和 setter...
 }
 
-// Usage
+// 用法
 public class Main {
     public static void main(String[] args) {
         Fory fory = Fory.builder()
@@ -481,22 +470,22 @@ public class Main {
         doc.setVersion(1);
         doc.setDescription("A sample document");
 
-        // Serialize
+        // 序列化
         byte[] data = fory.serialize(doc);
 
-        // Deserialize
+        // 反序列化
         Document decoded = (Document) fory.deserialize(data);
     }
 }
 ```
 
-## Cross-Language Compatibility
+## 跨语言兼容性
 
-When serializing data to be read by other languages (Python, Rust, C++, Go), use field IDs and matching type annotations:
+当序列化的数据需要由其他语言（Python、Rust、C++、Go）读取时，请使用字段 ID 和匹配的类型注解：
 
 ```java
 public class CrossLangData {
-    // Use field IDs for cross-language compatibility
+    // 使用字段 ID 以实现跨语言兼容性
     @ForyField(id = 0)
     private @Int32Type(encoding = Int32Encoding.VARINT) int intVar;
 
@@ -512,12 +501,12 @@ public class CrossLangData {
 }
 ```
 
-## Schema Evolution
+## Schema 演进
 
-Compatible mode supports schema evolution. It is recommended to configure field IDs to reduce serialization cost:
+兼容模式支持 Schema 演进。建议配置字段 ID 以降低序列化成本：
 
 ```java
-// Version 1
+// 版本 1
 public class DataV1 {
     @ForyField(id = 0)
     private long id;
@@ -526,7 +515,7 @@ public class DataV1 {
     private String name;
 }
 
-// Version 2: Added new field
+// 版本 2：新增字段
 public class DataV2 {
     @ForyField(id = 0)
     private long id;
@@ -536,13 +525,13 @@ public class DataV2 {
 
     @Nullable
     @ForyField(id = 2)
-    private String email;  // New field
+    private String email;  // 新字段
 }
 ```
 
-Data serialized with V1 can be deserialized with V2 (new field will be `null`).
+使用 V1 序列化的数据可以用 V2 反序列化（新字段将为 `null`）。
 
-Alternatively, field IDs can be omitted (field names will be used in metadata with larger overhead):
+也可以省略字段 ID（元数据中会使用字段名，开销更大）：
 
 ```java
 public class Data {
@@ -551,11 +540,9 @@ public class Data {
 }
 ```
 
-## Enum Metadata
+## 枚举元数据
 
-Java enums are serialized by numeric tag in xlang mode. The default tag is the declaration ordinal.
-When an enum needs stable ids that do not depend on declaration order, annotate exactly one id
-source with `@ForyEnumId`, or annotate every enum constant with explicit tag values.
+在 xlang 模式下，Java 枚举按数值 tag 序列化。默认 tag 是声明顺序 ordinal。当枚举需要不依赖声明顺序的稳定 ID 时，请用 `@ForyEnumId` 精确注解一个 ID 来源，或为每个枚举常量显式标注 tag 值。
 
 ```java
 import org.apache.fory.annotation.ForyEnumId;
@@ -578,30 +565,28 @@ enum Status {
 }
 ```
 
-Java also supports annotating one enum instance field with `@ForyEnumId`, or annotating every enum
-constant directly, such as `@ForyEnumId(10) Unknown`.
+Java 还支持在一个枚举实例字段上标注 `@ForyEnumId`，或直接为每个枚举常量标注，例如 `@ForyEnumId(10) Unknown`。
 
-`@ForyEnumId` supports exactly three configuration styles:
+`@ForyEnumId` 只支持三种配置方式：
 
-1. Annotate one enum instance field and store the numeric id there.
-2. Annotate one zero-argument public instance method such as `getId()`.
-3. Annotate every enum constant directly with an explicit value such as `@ForyEnumId(10) Unknown`.
+1. 注解一个枚举实例字段，并在其中存储数值 ID。
+2. 注解一个无参数的 public 实例方法，例如 `getId()`。
+3. 直接为每个枚举常量标注显式值，例如 `@ForyEnumId(10) Unknown`。
 
-Validation rules:
+校验规则：
 
-1. Use exactly one of those three styles for a given enum.
-2. Field and method annotations must leave `value()` at its default `-1`.
-3. Enum-constant annotations must appear on every constant once any constant uses `@ForyEnumId`.
-4. All ids must be non-negative, unique, and fit in Java `int`.
+1. 对同一个枚举，只能使用这三种方式中的一种。
+2. 字段和方法注解必须让 `value()` 保持默认值 `-1`。
+3. 一旦任何常量使用 `@ForyEnumId`，每个枚举常量都必须且只能标注一次。
+4. 所有 ID 必须非负、唯一，并且能放入 Java `int`。
 
-Lookup behavior:
+查找行为：
 
-1. Without `@ForyEnumId`, Fory writes the declaration ordinal.
-2. With `@ForyEnumId`, Fory writes the configured stable numeric tag instead.
-3. Small dense tags use an array lookup internally; sparse larger tags fall back to a map.
+1. 没有 `@ForyEnumId` 时，Fory 写入声明顺序 ordinal。
+2. 有 `@ForyEnumId` 时，Fory 写入配置的稳定数值 tag。
+3. 小而稠密的 tag 在内部使用数组查找；稀疏且较大的 tag 会回退到 map。
 
-Use `serializeEnumByName(true)` only for Java native-mode peers that should match enum constants by
-name instead of numeric tag:
+只有当 Java 原生模式对等端应按名称而不是数值 tag 匹配枚举常量时，才使用 `serializeEnumByName(true)`：
 
 ```java
 Fory fory = Fory.builder()
@@ -610,53 +595,52 @@ Fory fory = Fory.builder()
     .build();
 ```
 
-This runtime option does not change xlang enum encoding; xlang uses numeric enum tags. Prefer
-`@ForyEnumId` for cross-language payloads or any schema where numeric wire ids must stay stable.
+这个运行时选项不会改变 xlang 枚举编码；xlang 使用数值枚举 tag。对于跨语言载荷，或任何数值编码 ID 必须保持稳定的 Schema，应优先使用 `@ForyEnumId`。
 
-## Native Mode vs Xlang Mode
+## 原生模式与 Xlang 模式
 
-Field configuration behaves differently depending on the serialization mode:
+字段配置会因序列化模式不同而表现不同：
 
-### Native Mode (Java-only)
+### 原生模式（仅 Java）
 
-Native mode has **relaxed default values** for maximum compatibility:
+为了获得最大兼容性，原生模式具有**更宽松的默认值**：
 
-- **Nullable**: Reference types are nullable by default
-- **Ref tracking**: Enabled by default for object references (except `String`, boxed types, and time types)
-- **Polymorphism**: All non-final classes support polymorphism by default
+- **可空**：引用类型默认可空
+- **引用跟踪**：对象引用默认启用（`String`、装箱类型和时间类型除外）
+- **多态**：所有非 final 类默认支持多态
 
-In native mode, you typically **don't need to configure field annotations** unless you want to:
+在原生模式下，通常**不需要配置字段注解**，除非你希望：
 
-- Reduce serialized size by using field IDs
-- Optimize performance by disabling unnecessary ref tracking
-- Control integer encoding for specific fields
+- 通过使用字段 ID 减小序列化大小
+- 通过禁用不必要的引用跟踪优化性能
+- 为特定字段控制整数编码
 
 ```java
-// Native mode: works without any annotations
+// 原生模式：没有任何注解也能工作
 public class User {
     private long id;
     private String name;
-    private List<String> tags;  // Nullable and ref-tracked by default
+    private List<String> tags;  // 默认可空并进行引用跟踪
 }
 ```
 
-### Xlang Mode (Cross-language)
+### Xlang 模式（跨语言）
 
-Xlang mode has **stricter default values** due to type system differences between languages:
+由于不同语言之间类型系统存在差异，xlang 模式具有**更严格的默认值**：
 
-- **Nullable**: Fields are non-nullable by default
-- **Ref tracking**: Disabled by default unless the field type uses `@Ref`
-- **Polymorphism**: Concrete types are non-polymorphic by default
+- **可空**：字段默认不可空
+- **引用跟踪**：默认禁用，除非字段类型使用 `@Ref`
+- **多态**：具体类型默认非多态
 
-In xlang mode, you **need to configure fields** when:
+在 xlang 模式下，以下情况**需要配置字段**：
 
-- A field can be null (use `@Nullable`)
-- A field needs reference tracking for shared/circular objects (use `@Ref`)
-- Integer types need specific encoding for cross-language compatibility
-- You want to reduce metadata size (use field IDs)
+- 字段可以为 null（使用 `@Nullable`）
+- 字段需要为共享/循环对象启用引用跟踪（使用 `@Ref`）
+- 整数类型需要特定编码以实现跨语言兼容性
+- 希望减小元数据大小（使用字段 ID）
 
 ```java
-// Xlang mode: explicit configuration required for nullable/ref fields
+// Xlang 模式：可空/引用字段需要显式配置
 public class User {
     @ForyField(id = 0)
     private long id;
@@ -665,53 +649,53 @@ public class User {
     private String name;
 
     @Nullable
-    @ForyField(id = 2) // Must declare @Nullable
+    @ForyField(id = 2) // 必须声明 @Nullable
     private String email;
 
     @Nullable
     @ForyField(id = 3)
-    @Ref // Must declare @Ref for shared objects
+    @Ref // 共享对象必须声明 @Ref
     private User friend;
 }
 ```
 
-### Default Values Summary
+### 默认值汇总
 
-| Option     | Native Mode Default      | Xlang Mode Default                |
-| ---------- | ------------------------ | --------------------------------- |
-| `nullable` | `true` (reference types) | `false`                           |
-| `ref`      | `true`                   | `false`                           |
-| `dynamic`  | `true` (non-final)       | `AUTO` (concrete types are final) |
+| 选项       | 原生模式默认值         | Xlang 模式默认值               |
+| ---------- | ---------------------- | ------------------------------ |
+| `nullable` | `true`（引用类型）     | `false`                        |
+| `ref`      | `true`                 | `false`                        |
+| `dynamic`  | `true`（非 final）     | `AUTO`（具体类型为 final）     |
 
-## Best Practices
+## 最佳实践
 
-1. **Configure field IDs**: Recommended for compatible mode to reduce serialization cost
-2. **Use `@Nullable` for nullable fields**: Required for fields that can be null
-3. **Enable ref tracking for shared objects**: Use `@Ref` when objects are shared or circular
-4. **Use `@Ignore` or `transient` for sensitive data**: Passwords, tokens, internal state
-5. **Choose appropriate encoding**: `varint` for small values, `fixed` for full-range values
-6. **Keep IDs stable**: Once assigned, don't change field IDs
-7. **Configure unsigned types for cross-language compatibility**: When interoperating with unsigned numbers in Rust, Go, C++
+1. **配置字段 ID**：兼容模式推荐使用，以降低序列化成本
+2. **对可空字段使用 `@Nullable`**：可以为 null 的字段必须使用
+3. **为共享对象启用引用跟踪**：当对象共享或循环时使用 `@Ref`
+4. **对敏感数据使用 `@Ignore` 或 `transient`**：密码、令牌、内部状态
+5. **选择合适的编码**：小值使用 `varint`，全范围值使用 `fixed`
+6. **保持 ID 稳定**：字段 ID 一旦分配就不要更改
+7. **为跨语言兼容配置无符号类型**：与 Rust、Go、C++ 中的无符号数字互操作时使用
 
-## Annotations Reference
+## 注解参考
 
-| Annotation                    | Description                            |
-| ----------------------------- | -------------------------------------- |
-| `@ForyField(id = N)`          | Field tag ID to reduce metadata size   |
-| `@Nullable`                   | Mark field or nested type as nullable  |
-| `@Ref`                        | Enable reference tracking              |
-| `@ForyField(dynamic = ...)`   | Control polymorphism for struct fields |
-| `@Ignore`                     | Exclude field from serialization       |
-| `@Int32Type(encoding = ...)`  | 32-bit signed integer encoding         |
-| `@Int64Type(encoding = ...)`  | 64-bit signed integer encoding         |
-| `@UInt8Type`                  | Unsigned 8-bit integer                 |
-| `@UInt16Type`                 | Unsigned 16-bit integer                |
-| `@UInt32Type(encoding = ...)` | Unsigned 32-bit integer encoding       |
-| `@UInt64Type(encoding = ...)` | Unsigned 64-bit integer encoding       |
+| 注解                          | 说明                         |
+| ----------------------------- | ---------------------------- |
+| `@ForyField(id = N)`          | 用于减小元数据大小的字段 tag ID |
+| `@Nullable`                   | 将字段或嵌套类型标记为可空   |
+| `@Ref`                        | 启用引用跟踪                 |
+| `@ForyField(dynamic = ...)`   | 控制 struct 字段的多态       |
+| `@Ignore`                     | 从序列化中排除字段           |
+| `@Int32Type(encoding = ...)`  | 32 位有符号整数编码          |
+| `@Int64Type(encoding = ...)`  | 64 位有符号整数编码          |
+| `@UInt8Type`                  | 无符号 8 位整数              |
+| `@UInt16Type`                 | 无符号 16 位整数             |
+| `@UInt32Type(encoding = ...)` | 无符号 32 位整数编码         |
+| `@UInt64Type(encoding = ...)` | 无符号 64 位整数编码         |
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Getting started with Fory serialization
-- [Configuration](configuration.md) - Runtime builder options
-- [Schema Evolution](schema-evolution.md) - Compatible mode and schema evolution
-- [Cross-Language](cross-language.md) - Interoperability with Python, Rust, C++, Go
+- [基础序列化](basic-serialization.md) - Fory 序列化入门
+- [配置](configuration.md) - 运行时构建器选项
+- [Schema 演进](schema-evolution.md) - 兼容模式和 Schema 演进
+- [Xlang 序列化](xlang-serialization.md) - 与 Python、Rust、C++、Go 的互操作

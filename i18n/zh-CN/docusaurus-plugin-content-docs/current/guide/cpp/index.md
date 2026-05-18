@@ -1,5 +1,5 @@
 ---
-title: C++ Serialization Guide
+title: C++ 序列化指南
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,32 +19,32 @@ license: |
   limitations under the License.
 ---
 
-**Apache Fory™** is a blazing fast multi-language serialization framework powered by **JIT compilation** and **zero-copy** techniques, providing up to **ultra-fast performance** while maintaining ease of use and safety.
+**Apache Fory™** 是一个高性能的多语言序列化框架，基于 **JIT 编译**与**零拷贝**技术，在保持易用性和安全性的同时提供出色性能。
 
-The C++ implementation provides high-performance serialization with compile-time type safety using modern C++17 features and template metaprogramming. It supports both xlang mode for cross-language payloads and native mode for C++-only payloads.
+C++ 实现基于现代 C++17 特性和模板元编程，提供具备编译时类型安全的高性能序列化能力。
 
-## Why Apache Fory™ C++?
+## 为什么选择 Apache Fory™ C++？
 
-- **Fast binary encoding**: Fast serialization and optimized binary protocols
-- **Cross-language**: Seamlessly serialize/deserialize data across Java, Python, C++, Go, JavaScript, and Rust
-- **Type-safe**: Compile-time type checking with macro-based struct registration
-- **Reference tracking**: Automatic tracking of shared and circular references
-- **Schema evolution**: Compatible mode for independent schema changes
-- **Two formats**: Object graph serialization and zero-copy row-based format
-- **Thread safety**: Both single-threaded and thread-safe variants
+- **高性能**：快速序列化与优化的二进制协议
+- **跨语言**：可在 Java、Python、C++、Go、JavaScript 和 Rust 之间无缝序列化与反序列化数据
+- **类型安全**：通过基于宏的结构体注册实现编译时类型检查
+- **引用跟踪**：自动跟踪共享引用和循环引用
+- **Schema 演进**：兼容模式支持独立的 Schema 变更
+- **双格式支持**：对象图序列化与零拷贝行格式
+- **线程安全**：同时提供单线程（最快）和线程安全两种变体
 
-## Installation
+## 安装
 
-The C++ implementation supports both CMake and Bazel build systems.
+C++ 实现同时支持 CMake 和 Bazel 构建系统。
 
-### Prerequisites
+### 前置条件
 
-- CMake 3.16+ (for CMake build) or Bazel 8+ (for Bazel build)
-- C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
+- CMake 3.16+（用于 CMake 构建）或 Bazel 8+（用于 Bazel 构建）
+- 支持 C++17 的编译器（GCC 7+、Clang 5+、MSVC 2017+）
 
-### Using CMake (Recommended)
+### 使用 CMake（推荐）
 
-The easiest way to use Fory is with CMake's `FetchContent` module:
+最简单的集成方式是使用 CMake 的 `FetchContent` 模块：
 
 ```cmake
 cmake_minimum_required(VERSION 3.16)
@@ -68,7 +68,7 @@ add_executable(my_app main.cc)
 target_link_libraries(my_app PRIVATE fory::serialization)
 ```
 
-Then build and run:
+然后构建并运行：
 
 ```bash
 mkdir build && cd build
@@ -77,9 +77,9 @@ cmake --build . --parallel
 ./my_app
 ```
 
-### Using Bazel
+### 使用 Bazel
 
-Create a `MODULE.bazel` file in your project root:
+在项目根目录创建 `MODULE.bazel` 文件：
 
 ```bazel
 module(
@@ -93,11 +93,11 @@ bazel_dep(name = "fory", version = "0.17.0")
 git_override(
     module_name = "fory",
     remote = "https://github.com/apache/fory.git",
-    commit = "v0.17.0",  # Or use a specific commit hash for reproducibility
+    commit = "v0.17.0",  # 或使用特定 commit hash 以确保可复现性
 )
 ```
 
-Create a `BUILD` file for your application:
+为应用程序创建 `BUILD` 文件：
 
 ```bazel
 cc_binary(
@@ -107,14 +107,14 @@ cc_binary(
 )
 ```
 
-Then build and run:
+然后构建并运行：
 
 ```bash
 bazel build //:my_app
 bazel run //:my_app
 ```
 
-For local development, you can use `local_path_override` instead:
+对于本地开发，也可以改用 `local_path_override`：
 
 ```bazel
 bazel_dep(name = "fory", version = "0.17.0")
@@ -124,16 +124,16 @@ local_path_override(
 )
 ```
 
-### Examples
+### 示例
 
-See the [examples/cpp](https://github.com/apache/fory/tree/main/examples/cpp) directory for complete working examples:
+完整可运行示例请参见 [examples/cpp](https://github.com/apache/fory/tree/main/examples/cpp) 目录：
 
-- [hello_world](https://github.com/apache/fory/tree/main/examples/cpp/hello_world) - Object graph serialization
-- [hello_row](https://github.com/apache/fory/tree/main/examples/cpp/hello_row) - Row format encoding
+- [hello_world](https://github.com/apache/fory/tree/main/examples/cpp/hello_world) - 对象图序列化
+- [hello_row](https://github.com/apache/fory/tree/main/examples/cpp/hello_row) - 行格式编码
 
-## Quick Start
+## 快速开始
 
-### Basic Example
+### 基础示例
 
 ```cpp
 #include "fory/serialization/fory.h"
@@ -142,7 +142,7 @@ See the [examples/cpp](https://github.com/apache/fory/tree/main/examples/cpp) di
 
 using namespace fory::serialization;
 
-// Define a struct
+// 定义结构体
 struct Person {
   std::string name;
   int32_t age;
@@ -155,30 +155,30 @@ struct Person {
 FORY_STRUCT(Person, name, age, hobbies);
 
 int main() {
-  // Create an xlang Fory instance
+  // 创建 Fory 实例
   auto fory = Fory::builder()
-      .xlang(true)
-      .track_ref(false)     // Disable reference tracking for simple types
+      .xlang(true)          // 启用跨语言模式
+      .track_ref(false)     // 对简单类型禁用引用跟踪
       .build();
 
-  // Register the type with a unique ID
+  // 为类型注册唯一 ID
   fory.register_struct<Person>(1);
 
-  // Create an object
+  // 创建对象
   Person person{"Alice", 30, {"reading", "coding"}};
 
-  // Serialize
+  // 序列化
   auto result = fory.serialize(person);
   if (!result.ok()) {
-    // Handle error
+    // 处理错误
     return 1;
   }
   std::vector<uint8_t> bytes = std::move(result).value();
 
-  // Deserialize
+  // 反序列化
   auto deser_result = fory.deserialize<Person>(bytes);
   if (!deser_result.ok()) {
-    // Handle error
+    // 处理错误
     return 1;
   }
   Person decoded = std::move(deser_result).value();
@@ -188,11 +188,9 @@ int main() {
 }
 ```
 
-### Inherited Fields
+### 继承字段
 
-To include base-class fields in a derived type, list `FORY_BASE(Base)` inside
-`FORY_STRUCT`. The base must define its own `FORY_STRUCT` so its fields can be
-referenced.
+如果希望派生类型包含基类字段，请在 `FORY_STRUCT` 中写入 `FORY_BASE(Base)`。基类本身也必须定义自己的 `FORY_STRUCT`，这样其字段才能被引用。
 
 ```cpp
 struct Base {
@@ -206,32 +204,28 @@ struct Derived : Base {
 };
 ```
 
-## Xlang Mode And Native Mode
+## 线程安全
 
-Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default C++ wire mode, and C++ examples that use it set `.xlang(true)` explicitly so the mode choice is visible.
+Apache Fory™ C++ 面向不同线程需求提供两种变体：
 
-Use native mode for C++-only traffic. Native mode is selected with `.xlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and keeps C++ object serialization on the C++ runtime path. It is optimized for C++ types and avoids portable xlang type-mapping constraints when the payload never leaves C++.
-
-See [Cross-Language Serialization](cross-language.md) for C++ xlang registration and interoperability rules, and [Configuration](configuration.md) for native-mode builder options.
-
-## Thread Safety
-
-Apache Fory™ C++ provides two variants for different threading needs:
-
-### Single-Threaded (Fastest)
+### 单线程（最快）
 
 ```cpp
-// Single-threaded Fory - fastest, NOT thread-safe
-auto fory = Fory::builder().xlang(true).build();
+// 单线程 Fory：速度最快，但不是线程安全的
+auto fory = Fory::builder()
+    .xlang(true)
+    .build();
 ```
 
-### Thread-Safe
+### 线程安全
 
 ```cpp
-// Thread-safe Fory - uses context pools
-auto fory = Fory::builder().xlang(true).build_thread_safe();
+// 线程安全 Fory：使用上下文池
+auto fory = Fory::builder()
+    .xlang(true)
+    .build_thread_safe();
 
-// Can be used from multiple threads safely
+// 可安全用于多线程
 std::thread t1([&]() {
   auto result = fory.serialize(obj1);
 });
@@ -240,31 +234,31 @@ std::thread t2([&]() {
 });
 ```
 
-**Tip:** Perform type registrations before spawning threads so every worker sees the same metadata.
+**提示：** 请在启动线程之前完成类型注册，以确保每个工作线程都能看到一致的元数据。
 
-## Use Cases
+## 使用场景
 
-### Object Serialization
+### 对象序列化
 
-- Complex data structures with nested objects and references
-- Cross-language communication in microservices
-- General-purpose serialization with full type safety
-- Schema evolution with compatible mode
+- 含嵌套对象和引用的复杂数据结构
+- 微服务中的跨语言通信
+- 具备完整类型安全的通用序列化
+- 使用兼容模式进行 Schema 演进
 
-### Row-Based Serialization
+### 行格式序列化
 
-- High-throughput data processing
-- Analytics workloads requiring fast field access
-- Memory-constrained environments
-- Zero-copy scenarios
+- 高吞吐数据处理
+- 需要快速字段访问的分析型负载
+- 内存受限环境
+- 零拷贝场景
 
-## Next Steps
+## 后续步骤
 
-- [Configuration](configuration.md) - Builder options and modes
-- [Basic Serialization](basic-serialization.md) - Object graph serialization
-- [Cross-Language](cross-language.md) - xlang mode and interoperability
-- [Schema Metadata](schema-metadata.md) - Field-level metadata (nullable, ref tracking)
-- [Schema Evolution](schema-evolution.md) - Compatible mode and schema changes
-- [Type Registration](type-registration.md) - Registering types
-- [Supported Types](supported-types.md) - All supported types
-- [Row Format](row-format.md) - Zero-copy row-based format
+- [配置](configuration.md) - 构建器选项与模式
+- [基础序列化](basic-serialization.md) - 对象图序列化
+- [Schema 演进](schema-evolution.md) - 兼容模式与 Schema 变更
+- [类型注册](type-registration.md) - 注册类型
+- [字段配置](schema-metadata.md) - 字段级元数据（可空、引用跟踪）
+- [支持的类型](supported-types.md) - 全部支持的类型
+- [跨语言](xlang-serialization.md) - XLANG 模式
+- [行格式](row-format.md) - 零拷贝行格式

@@ -1,6 +1,6 @@
 ---
-title: Row Format
-sidebar_position: 11
+title: 行格式
+sidebar_position: 9
 id: row_format
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ provides a random-access row format that enables reading nested fields from binary data without full deserialization. This drastically reduces overhead when working with large objects where only partial data access is needed.
+Apache Fory™ 提供了一种随机访问行格式，能够在不完全反序列化的情况下从二进制数据中读取嵌套字段。当处理大对象且只需要部分数据访问时，这大大减少了开销。
 
-## Overview
+## 概述
 
-Row format is a cache-friendly binary random access format that supports:
+行格式是一种缓存友好的二进制随机访问格式，支持：
 
-- **Zero-copy access**: Read fields directly from binary without allocating objects
-- **Partial deserialization**: Access only the fields you need
-- **Skipping serialization**: Skip serialization of fields you don't need
-- **Cross-language compatibility**: Works across Python, Java, C++, and other languages
-- **Column format conversion**: Can convert to Apache Arrow columnar format automatically
+- **零拷贝访问**：直接从二进制读取字段，无需分配对象
+- **部分反序列化**：只访问你需要的字段
+- **跳过序列化**：跳过不需要的字段的序列化
+- **跨语言兼容性**：在 Python、Java、C++ 和其他语言之间工作
+- **列格式转换**：可以自动转换为 Apache Arrow 列格式
 
-## Basic Usage
+## 基本使用
 
 ```java
 public class Bar {
@@ -48,7 +48,7 @@ public class Foo {
 
 RowEncoder<Foo> encoder = Encoders.bean(Foo.class);
 
-// Create large dataset
+// 创建大型数据集
 Foo foo = new Foo();
 foo.f1 = 10;
 foo.f2 = IntStream.range(0, 1_000_000).boxed().collect(Collectors.toList());
@@ -62,60 +62,47 @@ for (int i = 0; i < 1_000_000; i++) {
 }
 foo.f4 = bars;
 
-// Encode to row format (cross-language compatible with Python/C++)
+// 编码为行格式（跨语言兼容 Python/C++）
 BinaryRow binaryRow = encoder.toRow(foo);
 
-// Zero-copy random access without full deserialization
-BinaryArray f2Array = binaryRow.getArray(1);              // Access f2 list
-BinaryArray f4Array = binaryRow.getArray(3);              // Access f4 list
-BinaryRow bar10 = f4Array.getStruct(10);                  // Access 11th Bar
-long value = bar10.getArray(1).getInt64(5);               // Access 6th element of bar.f2
+// 零拷贝随机访问，无需完全反序列化
+BinaryArray f2Array = binaryRow.getArray(1);              // 访问 f2 列表
+BinaryArray f4Array = binaryRow.getArray(3);              // 访问 f4 列表
+BinaryRow bar10 = f4Array.getStruct(10);                  // 访问第 11 个 Bar
+long value = bar10.getArray(1).getInt64(5);               // 访问 bar.f2 的第 6 个元素
 
-// Name-based access without repeated schema lookups
-Schema schema = encoder.schema();
-Schema.Int32Field f1 = schema.int32Field("f1");
-Schema.ArrayField f4 = schema.arrayField("f4");
-int f1Value = f1.get(binaryRow);
-ArrayData f4ByName = f4.get(binaryRow);
-
-// Partial deserialization - only deserialize what you need
+// 部分反序列化 - 只反序列化你需要的
 RowEncoder<Bar> barEncoder = Encoders.bean(Bar.class);
-Bar bar1 = barEncoder.fromRow(f4Array.getStruct(10));     // Deserialize 11th Bar only
-Bar bar2 = barEncoder.fromRow(f4Array.getStruct(20));     // Deserialize 21st Bar only
+Bar bar1 = barEncoder.fromRow(f4Array.getStruct(10));     // 只反序列化第 11 个 Bar
+Bar bar2 = barEncoder.fromRow(f4Array.getStruct(20));     // 只反序列化第 21 个 Bar
 
-// Full deserialization when needed
+// 需要时完全反序列化
 Foo newFoo = encoder.fromRow(binaryRow);
 ```
 
-Cache the returned `Schema.*Field` handles in user code and reuse them for all rows with the same
-schema. Calling `schema.int32Field("f1")` creates a typed handle by resolving the field name to an
-ordinal, accepting Java lower-camel field names for bean-derived schemas, validating the expected
-row-format type, and storing the resolved ordinal. Later calls such as `f1.get(binaryRow)` go
-straight to the ordinal row getter without another schema map lookup or typed handle construction.
+## 主要优势
 
-## Key Benefits
+| 特性         | 描述                                   |
+| ------------ | -------------------------------------- |
+| 零拷贝访问   | 读取嵌套字段而无需反序列化整个对象     |
+| 内存效率     | 直接从磁盘内存映射大数据集             |
+| 跨语言       | Java、Python、C++ 之间的二进制格式兼容 |
+| 部分反序列化 | 只反序列化你需要的特定元素             |
+| 高性能       | 跳过不必要的数据解析用于分析工作负载   |
 
-| Feature                 | Description                                            |
-| ----------------------- | ------------------------------------------------------ |
-| Zero-Copy Access        | Read nested fields without deserializing entire object |
-| Memory Efficiency       | Memory-map large datasets directly from disk           |
-| Cross-Language          | Binary format compatible between Java, Python, C++     |
-| Partial Deserialization | Deserialize only specific elements you need            |
-| High Performance        | Skip unnecessary data parsing for analytics workloads  |
+## 何时使用行格式
 
-## When to Use Row Format
+行格式适用于：
 
-Row format is ideal for:
+- **分析工作负载**：当你只需要访问特定字段时
+- **大数据集**：当完全反序列化成本太高时
+- **内存映射文件**：处理大于 RAM 的数据
+- **数据管道**：无需完整对象重建即可处理数据
+- **跨语言数据共享**：当数据需要从多种语言访问时
 
-- **Analytics workloads**: When you only need to access specific fields
-- **Large datasets**: When full deserialization is too expensive
-- **Memory-mapped files**: Working with data larger than RAM
-- **Data pipelines**: Processing data without full object reconstruction
-- **Cross-language data sharing**: When data needs to be accessed from multiple languages
+## 跨语言兼容性
 
-## Cross-Language Compatibility
-
-Row format works seamlessly across languages. The same binary data can be accessed from:
+行格式在语言之间无缝工作。相同的二进制数据可以从以下语言访问：
 
 ### Python
 
@@ -140,7 +127,7 @@ class Foo:
 encoder = pyfory.encoder(Foo)
 binary: bytes = encoder.to_row(foo).to_bytes()
 
-# Zero-copy access
+# 零拷贝访问
 foo_row = pyfory.RowData(encoder.schema, binary)
 print(foo_row.f2[100000])
 print(foo_row.f4[100000].f1)
@@ -155,40 +142,42 @@ print(foo_row.f4[100000].f1)
 struct Bar {
   std::string f1;
   std::vector<int64_t> f2;
-  FORY_STRUCT(Bar, f1, f2);
 };
+
+FORY_FIELD_INFO(Bar, f1, f2);
 
 struct Foo {
   int32_t f1;
   std::vector<int32_t> f2;
   std::map<std::string, int32_t> f3;
   std::vector<Bar> f4;
-  FORY_STRUCT(Foo, f1, f2, f3, f4);
 };
 
-fory::row::encoder::RowEncoder<Foo> encoder;
-encoder.encode(foo);
-auto row = encoder.get_writer().to_row();
+FORY_FIELD_INFO(Foo, f1, f2, f3, f4);
 
-// Zero-copy random access
-auto f2_array = row->get_array(1);
-auto f4_array = row->get_array(3);
-auto bar10 = f4_array->get_struct(10);
-int64_t value = bar10->get_array(1)->get_int64(5);
-std::string str = bar10->get_string(0);
+fory::encoder::RowEncoder<Foo> encoder;
+encoder.Encode(foo);
+auto row = encoder.GetWriter().ToRow();
+
+// 零拷贝随机访问
+auto f2_array = row->GetArray(1);
+auto f4_array = row->GetArray(3);
+auto bar10 = f4_array->GetStruct(10);
+int64_t value = bar10->GetArray(1)->GetInt64(5);
+std::string str = bar10->GetString(0);
 ```
 
-## Performance Comparison
+## 性能比较
 
-| Operation            | Object Format                 | Row Format                      |
-| -------------------- | ----------------------------- | ------------------------------- |
-| Full deserialization | Allocates all objects         | Zero allocation                 |
-| Single field access  | Full deserialization required | Direct offset read              |
-| Memory usage         | Full object graph in memory   | Only accessed fields            |
-| Suitable for         | Small objects, full access    | Large objects, selective access |
+| 操作         | 对象格式           | 行格式             |
+| ------------ | ------------------ | ------------------ |
+| 完全反序列化 | 分配所有对象       | 零分配             |
+| 单字段访问   | 需要完全反序列化   | 直接偏移读取       |
+| 内存使用     | 完整对象图在内存中 | 仅访问的字段       |
+| 适用于       | 小对象，完全访问   | 大对象，选择性访问 |
 
-## Related Topics
+## 相关主题
 
-- [Cross-Language Serialization](cross-language.md) - xlang mode
-- [Advanced Features](advanced-features.md) - Zero-copy serialization
-- [Row Format Specification](https://fory.apache.org/docs/specification/row_format_spec) - Protocol details
+- [跨语言序列化](xlang-serialization.md) - XLANG 模式
+- [高级特性](advanced-features.md) - 零拷贝序列化
+- [行格式规范](https://fory.apache.org/docs/specification/row_format_spec) - 协议详情

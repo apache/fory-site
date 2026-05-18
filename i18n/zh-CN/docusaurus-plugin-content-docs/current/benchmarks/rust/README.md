@@ -1,8 +1,8 @@
-# Rust Benchmark Performance Report
+# Rust 基准性能报告
 
-_Generated on 2026-05-08 17:55:12_
+_生成于 2026-05-08 17:55:12_
 
-## How to Generate This Report
+## 如何生成本报告
 
 ```bash
 cd benchmarks/rust
@@ -11,63 +11,63 @@ cargo run --release --bin fory_profiler -- --print-all-serialized-sizes | tee re
 python benchmark_report.py --log-file results/cargo_bench.log --size-file results/serialized_sizes.txt --output-dir results
 ```
 
-## Benchmark Plot
+## 基准图表
 
-The plot shows throughput (ops/sec); higher is better.
+图表展示吞吐量（ops/sec）；数值越高越好。
 
 ![Throughput](throughput.png)
 
-## Hardware & OS Info
+## 硬件与操作系统信息
 
-| Key                  | Value               |
+| 键                  | 值               |
 | -------------------- | ------------------- |
-| OS                   | Darwin 24.6.0       |
-| Machine              | arm64               |
-| Processor            | arm                 |
-| CPU Cores (Physical) | 12                  |
-| CPU Cores (Logical)  | 12                  |
-| Total RAM (GB)       | 48.0                |
-| Benchmark Date       | 2026-05-08T16:47:49 |
+| 操作系统                   | Darwin 24.6.0       |
+| 机器架构              | arm64               |
+| 处理器            | arm                 |
+| CPU 核心数（物理） | 12                  |
+| CPU 核心数（逻辑）  | 12                  |
+| 总内存（GB）       | 48.0                |
+| 基准日期       | 2026-05-08T16:47:49 |
 
-## Benchmark Results
+## 基准结果
 
-### Timing Results (nanoseconds)
+### 延迟结果（纳秒）
 
-| Datatype          | Operation   | fory (ns) | protobuf (ns) | msgpack (ns) | Fastest |
-| ----------------- | ----------- | --------- | ------------- | ------------ | ------- |
-| NumericStruct     | Serialize   | 38.1      | 94.6          | 239.5        | fory    |
-| NumericStruct     | Deserialize | 32.6      | 62.4          | 107.3        | fory    |
-| Sample            | Serialize   | 95.3      | 591.8         | 601.1        | fory    |
-| Sample            | Deserialize | 410.1     | 925.8         | 805.9        | fory    |
-| MediaContent      | Serialize   | 120.0     | 553.9         | 446.9        | fory    |
-| MediaContent      | Deserialize | 566.7     | 713.0         | 902.6        | fory    |
-| NumericStructList | Serialize   | 121.5     | 512.0         | 618.0        | fory    |
-| NumericStructList | Deserialize | 137.9     | 404.9         | 615.9        | fory    |
-| SampleList        | Serialize   | 267.7     | 2920.2        | 2011.1       | fory    |
-| SampleList        | Deserialize | 1831.9    | 4636.4        | 4141.4       | fory    |
-| MediaContentList  | Serialize   | 367.1     | 2835.6        | 1441.7       | fory    |
-| MediaContentList  | Deserialize | 2703.8    | 3622.3        | 4832.3       | fory    |
+| 数据类型          | 操作   | fory (ns) | protobuf (ns) | msgpack (ns) | 最快 |
+| ----------------- | ---- | --------- | ------------- | ------------ | ------- |
+| NumericStruct     | 序列化   | 38.1      | 94.6          | 239.5        | fory    |
+| NumericStruct     | 反序列化 | 32.6      | 62.4          | 107.3        | fory    |
+| Sample            | 序列化   | 95.3      | 591.8         | 601.1        | fory    |
+| Sample            | 反序列化 | 410.1     | 925.8         | 805.9        | fory    |
+| MediaContent      | 序列化   | 120.0     | 553.9         | 446.9        | fory    |
+| MediaContent      | 反序列化 | 566.7     | 713.0         | 902.6        | fory    |
+| NumericStructList | 序列化   | 121.5     | 512.0         | 618.0        | fory    |
+| NumericStructList | 反序列化 | 137.9     | 404.9         | 615.9        | fory    |
+| SampleList        | 序列化   | 267.7     | 2920.2        | 2011.1       | fory    |
+| SampleList        | 反序列化 | 1831.9    | 4636.4        | 4141.4       | fory    |
+| MediaContentList  | 序列化   | 367.1     | 2835.6        | 1441.7       | fory    |
+| MediaContentList  | 反序列化 | 2703.8    | 3622.3        | 4832.3       | fory    |
 
-### Throughput Results (ops/sec)
+### 吞吐结果（ops/sec）
 
-| Datatype          | Operation   | fory TPS   | protobuf TPS | msgpack TPS | Fastest |
-| ----------------- | ----------- | ---------- | ------------ | ----------- | ------- |
-| NumericStruct     | Serialize   | 26,237,767 | 10,572,613   | 4,174,668   | fory    |
-| NumericStruct     | Deserialize | 30,720,079 | 16,035,920   | 9,322,271   | fory    |
-| Sample            | Serialize   | 10,494,611 | 1,689,874    | 1,663,700   | fory    |
-| Sample            | Deserialize | 2,438,311  | 1,080,170    | 1,240,895   | fory    |
-| MediaContent      | Serialize   | 8,331,945  | 1,805,445    | 2,237,687   | fory    |
-| MediaContent      | Deserialize | 1,764,633  | 1,402,426    | 1,107,960   | fory    |
-| NumericStructList | Serialize   | 8,232,485  | 1,953,125    | 1,618,071   | fory    |
-| NumericStructList | Deserialize | 7,250,580  | 2,469,563    | 1,623,535   | fory    |
-| SampleList        | Serialize   | 3,735,664  | 342,442      | 497,240     | fory    |
-| SampleList        | Deserialize | 545,881    | 215,685      | 241,464     | fory    |
-| MediaContentList  | Serialize   | 2,724,350  | 352,659      | 693,626     | fory    |
-| MediaContentList  | Deserialize | 369,850    | 276,068      | 206,941     | fory    |
+| 数据类型          | 操作   | fory TPS   | protobuf TPS | msgpack TPS | 最快 |
+| ----------------- | ---- | ---------- | ------------ | ---- | ------- |
+| NumericStruct     | 序列化   | 26,237,767 | 10,572,613   | 4,174,668   | fory    |
+| NumericStruct     | 反序列化 | 30,720,079 | 16,035,920   | 9,322,271   | fory    |
+| Sample            | 序列化   | 10,494,611 | 1,689,874    | 1,663,700   | fory    |
+| Sample            | 反序列化 | 2,438,311  | 1,080,170    | 1,240,895   | fory    |
+| MediaContent      | 序列化   | 8,331,945  | 1,805,445    | 2,237,687   | fory    |
+| MediaContent      | 反序列化 | 1,764,633  | 1,402,426    | 1,107,960   | fory    |
+| NumericStructList | 序列化   | 8,232,485  | 1,953,125    | 1,618,071   | fory    |
+| NumericStructList | 反序列化 | 7,250,580  | 2,469,563    | 1,623,535   | fory    |
+| SampleList        | 序列化   | 3,735,664  | 342,442      | 497,240     | fory    |
+| SampleList        | 反序列化 | 545,881    | 215,685      | 241,464     | fory    |
+| MediaContentList  | 序列化   | 2,724,350  | 352,659      | 693,626     | fory    |
+| MediaContentList  | 反序列化 | 369,850    | 276,068      | 206,941     | fory    |
 
-### Serialized Data Sizes (bytes)
+### 序列化数据大小（字节）
 
-| Datatype          | fory | protobuf | msgpack |
+| 数据类型          | fory | protobuf | msgpack |
 | ----------------- | ---- | -------- | ------- |
 | NumericStruct     | 78   | 93       | 87      |
 | Sample            | 445  | 375      | 590     |

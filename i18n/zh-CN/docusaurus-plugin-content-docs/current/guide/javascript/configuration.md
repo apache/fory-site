@@ -1,5 +1,5 @@
 ---
-title: Configuration
+title: 配置
 sidebar_position: 2
 id: configuration
 license: |
@@ -19,10 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Fory JavaScript is an xlang-only runtime. `new Fory()` writes xlang payloads and uses compatible
-schema evolution by default. There is no native-mode switch in the JavaScript API.
+Fory JavaScript 是仅支持 xlang 的运行时。`new Fory()` 会写入 xlang 载荷，并默认使用兼容 Schema 演进。JavaScript API 中没有原生模式开关。
 
-## Basic Configuration
+## 基本配置
 
 ```ts
 import Fory from "@apache-fory/core";
@@ -30,10 +29,9 @@ import Fory from "@apache-fory/core";
 const fory = new Fory();
 ```
 
-Create one `Fory` instance per application area and reuse it. Registration generates and caches
-serializer code for each schema.
+每个应用区域创建一个 `Fory` 实例并复用它。注册会为每个 schema 生成并缓存序列化器代码。
 
-## Constructor Options
+## 构造函数选项
 
 ```ts
 import Fory from "@apache-fory/core";
@@ -49,44 +47,40 @@ const fory = new Fory({
 });
 ```
 
-| Option                     | Default     | Description                                                                           |
-| -------------------------- | ----------- | ------------------------------------------------------------------------------------- |
-| `ref`                      | `false`     | Enable reference tracking for shared or circular object graphs                        |
-| `compatible`               | `true`      | Allow field additions/removals without breaking existing messages                     |
-| `maxDepth`                 | `50`        | Maximum nesting depth. Must be `>= 2`. Increase for deeply nested structures          |
-| `maxBinarySize`            | 64 MiB      | Maximum bytes accepted for any single binary field                                    |
-| `maxCollectionSize`        | `1_000_000` | Maximum elements accepted in any list, set, or map                                    |
-| `useSliceString`           | `false`     | Optional string-reading optimization for Node.js. Leave at default unless benchmarked |
-| `hps`                      | unset       | Optional fast string helper from `@apache-fory/hps` (Node.js 20+)                     |
-| `hooks.afterCodeGenerated` | unset       | Callback to inspect the generated serializer code, useful for debugging               |
+| 选项                       | 默认值      | 说明                                                             |
+| -------------------------- | ----------- | ---------------------------------------------------------------- |
+| `ref`                      | `false`     | 为共享或循环对象图启用引用跟踪                                   |
+| `compatible`               | `true`      | 允许新增或删除字段而不破坏现有消息                               |
+| `maxDepth`                 | `50`        | 最大嵌套深度。必须 `>= 2`。对于深度嵌套结构可以调大              |
+| `maxBinarySize`            | 64 MiB      | 任意单个二进制字段可接受的最大字节数                             |
+| `maxCollectionSize`        | `1_000_000` | 任意 list、set 或 map 可接受的最大元素数                         |
+| `useSliceString`           | `false`     | Node.js 的可选字符串读取优化。除非已做基准测试，否则保持默认值   |
+| `hps`                      | 未设置      | 来自 `@apache-fory/hps` 的可选快速字符串辅助库（Node.js 20+）    |
+| `hooks.afterCodeGenerated` | 未设置      | 用于检查生成的序列化器代码的回调，便于调试                       |
 
-## Reference Tracking
+## 引用跟踪
 
-Global reference tracking must be enabled before field-level reference metadata can take effect:
+必须先启用全局引用跟踪，字段级引用元信息才会生效：
 
 ```ts
 const fory = new Fory({ ref: true });
 ```
 
-Then mark reference-tracked fields in the schema, for example with
-`Type.struct("example.node").setTrackingRef(true)`. See [References](references.md) and
-[Schema Metadata](schema-metadata.md).
+然后在 schema 中标记需要引用跟踪的字段，例如 `Type.struct("example.node").setTrackingRef(true)`。参见[引用](references.md)和 [Schema 元信息](schema-metadata.md)。
 
-## Compatible Schema Evolution
+## 兼容 Schema 演进
 
-Compatible mode is the default:
+兼容模式是默认设置：
 
 ```ts
 const fory = new Fory();
 ```
 
-Use this default for rolling upgrades, independently deployed services, and cross-language payloads.
-You can opt out for one stable struct with `evolving: false`; see
-[Schema Evolution](schema-evolution.md).
+对于滚动升级、独立部署的服务以及跨语言载荷，请使用该默认设置。你可以通过 `evolving: false` 为某个稳定 struct 关闭它；参见 [Schema 演进](schema-evolution.md)。
 
-## Optional HPS String Path
+## 可选 HPS 字符串路径
 
-`@apache-fory/hps` provides an optional Node.js string fast path:
+`@apache-fory/hps` 提供可选的 Node.js 字符串快速路径：
 
 ```ts
 import hps from "@apache-fory/hps";
@@ -94,11 +88,20 @@ import hps from "@apache-fory/hps";
 const fory = new Fory({ hps });
 ```
 
-Leave this unset unless you run on Node.js 20+ and have benchmarked your workload.
+除非你运行在 Node.js 20+ 且已经对工作负载做过基准测试，否则保持未设置。
 
-## Related Topics
+## 安全
 
-- [Basic Serialization](basic-serialization.md)
-- [Schema Metadata](schema-metadata.md)
-- [Schema Evolution](schema-evolution.md)
-- [References](references.md)
+安全相关配置：
+
+- 在反序列化不可信载荷前，只注册预期的 schema。
+- 根据服务可接受的最大载荷形状设置 `maxDepth`、`maxBinarySize` 和 `maxCollectionSize`。
+- 对不可信输入，优先使用显式的 `Type.struct(...)` schema，而不是 `Type.any()`。
+- 只传入与你部署的运行时版本配套的官方包中的 `hps`。
+
+## 相关主题
+
+- [基本序列化](basic-serialization.md)
+- [Schema 元信息](schema-metadata.md)
+- [Schema 演进](schema-evolution.md)
+- [引用](references.md)

@@ -1,5 +1,5 @@
 ---
-title: Polymorphism and Dynamic Types
+title: 多态与动态类型
 sidebar_position: 7
 id: polymorphism
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-Fory Swift supports dynamic serialization for `Any`, `AnyObject`, and `any Serializer`.
+Fory Swift 支持对 `Any`、`AnyObject` 和 `any Serializer` 进行动态序列化。
 
-## Top-level Dynamic APIs
+## 顶层动态 API
 
 ```swift
 let fory = Fory()
@@ -31,7 +31,7 @@ let data = try fory.serialize(dynamic)
 let decoded: Any = try fory.deserialize(data)
 ```
 
-Equivalent overloads exist for:
+还提供了等价重载，可用于：
 
 - `AnyObject`
 - `any Serializer`
@@ -41,10 +41,10 @@ Equivalent overloads exist for:
 - `[Int32: Any]`
 - `[AnyHashable: Any]`
 
-## Dynamic Fields in Fory Model Types
+## `@ForyObject` 类型中的动态字段
 
 ```swift
-@ForyStruct
+@ForyObject
 struct DynamicHolder {
     var value: Any = ForyAnyNullValue()
     var list: [Any] = []
@@ -54,12 +54,12 @@ struct DynamicHolder {
 }
 ```
 
-## Concrete Type Registration Still Applies
+## 仍然需要注册具体类型
 
-If dynamic values contain user-defined runtime types, register those concrete types.
+如果动态值中包含用户定义的运行时类型，仍然需要注册这些具体类型。
 
 ```swift
-@ForyStruct
+@ForyObject
 struct Address {
     var street: String = ""
     var zip: Int32 = 0
@@ -69,12 +69,12 @@ let fory = Fory()
 fory.register(Address.self, id: 100)
 ```
 
-## Null Semantics
+## 空值语义
 
-- `Any` null representation: `ForyAnyNullValue`
-- `AnyObject` null representation: `NSNull`
-- Optional dynamic values map to the corresponding null representation on decode
+- `Any` 的空值表示：`ForyAnyNullValue`
+- `AnyObject` 的空值表示：`NSNull`
+- 可选动态值在反序列化后会映射到相应的空值表示
 
-## Current Limitations
+## 当前限制
 
-- `AnyHashable` keys must wrap runtime values that are both `Hashable` and supported by Fory dynamic serialization
+- `AnyHashable` 键所包裹的运行时值，必须同时满足 `Hashable` 和 Fory 动态序列化支持

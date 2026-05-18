@@ -1,7 +1,7 @@
 ---
-title: Custom Serializers
-sidebar_position: 9
-id: custom_serializers
+title: 自定义序列化器
+sidebar_position: 5
+id: dart_custom_serializers
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,17 +19,17 @@ license: |
   limitations under the License.
 ---
 
-A custom serializer lets you control exactly how a type is encoded and decoded. You only need one when:
+自定义序列化器让你可以完全控制某个类型如何编码和解码。通常只有在以下情况才需要使用它：
 
-- the type comes from a package you cannot modify and cannot be annotated with `@ForyStruct()`
-- you need a completely custom binary layout
-- you are implementing a union/discriminated type
+- 类型来自你无法修改的第三方包，无法添加 `@ForyStruct()`
+- 你需要完全自定义的二进制布局
+- 你要实现 union / discriminated type
 
-For your own models, `@ForyStruct()` with code generation is almost always the better choice.
+对于你自己的模型，`@ForyStruct()` 配合代码生成几乎总是更好的选择。
 
-## Implement `Serializer<T>`
+## 实现 `Serializer<T>`
 
-Subclass `Serializer<T>` and implement `write` and `read`. Use `context.buffer` to read and write raw bytes:
+继承 `Serializer<T>` 并实现 `write` 和 `read`。通过 `context.buffer` 直接读写原始字节：
 
 ```dart
 import 'package:fory/fory.dart';
@@ -48,18 +48,18 @@ final class PersonSerializer extends Serializer<Person> {
   void write(WriteContext context, Person value) {
     final buffer = context.buffer;
     buffer.writeUtf8(value.name);
-    buffer.writeInt64FromInt(value.age);
+    buffer.writeInt64(value.age);
   }
 
   @override
   Person read(ReadContext context) {
     final buffer = context.buffer;
-    return Person(buffer.readUtf8(), buffer.readInt64AsInt());
+    return Person(buffer.readUtf8(), buffer.readInt64());
   }
 }
 ```
 
-Register the serializer before you use it:
+在使用前先注册这个序列化器：
 
 ```dart
 final fory = Fory();
@@ -71,9 +71,9 @@ fory.registerSerializer(
 );
 ```
 
-## Writing Nested Objects
+## 写入嵌套对象
 
-When your serializer has a field that is itself a Fory-managed type, use `context.writeRef` and `context.readRef` rather than calling `fory.serialize` recursively. This keeps reference tracking correct and avoids writing a full root frame inside a nested payload.
+如果自定义序列化器中的某个字段本身也是由 Fory 管理的类型，请使用 `context.writeRef` 和 `context.readRef`，而不是递归调用 `fory.serialize`。这样才能保持引用跟踪正确，也避免在嵌套载荷里再写入完整根帧。
 
 ```dart
 @override
@@ -87,15 +87,15 @@ Wrapper read(ReadContext context) {
 }
 ```
 
-If you do not need reference identity tracking for a nested value (i.e., you know the value will never appear more than once in a graph), use `writeNonRef`:
+如果你明确知道某个嵌套值永远不会在对象图中重复出现，也不需要保持引用标识，可以用 `writeNonRef`：
 
 ```dart
 context.writeNonRef(value.child);
 ```
 
-## Unions
+## Union
 
-For a discriminated/tagged union, extend `UnionSerializer<T>` instead of `Serializer<T>`. Write a discriminant value first, then the active variant; read the discriminant and dispatch accordingly.
+对于带判别标签的 union，请继承 `UnionSerializer<T>` 而不是 `Serializer<T>`。先写入判别值，再写入当前激活的变体；读取时先解析判别值，再分派到正确分支。
 
 ```dart
 final class ShapeSerializer extends UnionSerializer<Shape> {
@@ -114,9 +114,9 @@ final class ShapeSerializer extends UnionSerializer<Shape> {
 }
 ```
 
-## Circular References in Custom Serializers
+## 自定义序列化器中的循环引用
 
-If your serializer can encounter circular object graphs, bind the object to the reference tracker **before** reading its nested fields:
+如果你的序列化器会遇到循环对象图，那么在读取嵌套字段之前，必须先把对象绑定到引用跟踪器中：
 
 ```dart
 final value = Node.empty();
@@ -125,15 +125,15 @@ value.next = context.readRef() as Node?;  // now nested reads can refer back to 
 return value;
 ```
 
-Skipping this step causes back-references to that object to resolve to `null`.
+跳过这一步会导致指向该对象的回溯引用解析成 `null`。
 
-## Tips
+## 提示
 
-- Use `context.buffer` for direct byte reads/writes in hot paths.
-- Register the serializer with the same identity (`id` or `namespace + typeName`) on every side.
+- 在热点路径中，优先使用 `context.buffer` 直接读写字节。
+- 在所有端上，都用相同的身份注册该序列化器，即相同的 `id` 或相同的 `namespace + typeName`。
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md)
-- [Cross-Language](cross-language.md)
-- [Troubleshooting](troubleshooting.md)
+- [类型注册](type-registration.md)
+- [跨语言](xlang-serialization.md)
+- [故障排查](troubleshooting.md)

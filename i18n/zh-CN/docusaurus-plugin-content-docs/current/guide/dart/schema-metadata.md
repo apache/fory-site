@@ -1,5 +1,5 @@
 ---
-title: Schema Metadata
+title: Schema 元信息
 sidebar_position: 5
 id: schema_metadata
 license: |
@@ -19,23 +19,23 @@ license: |
   limitations under the License.
 ---
 
-Add `@ForyField(...)` to a field inside a `@ForyStruct()` class to change how that field is serialized.
+在 `@ForyStruct()` 类中的字段上添加 `@ForyField(...)`，即可改变该字段的序列化方式。
 
-## Quick Reference
+## 快速参考
 
 ```dart
 @ForyField(
-  skip: false,      // include the field; set true to exclude it
-  id: 10,           // stable field ID for schema evolution
-  nullable: true,   // override nullability detection
-  ref: true,        // enable reference tracking for this field
-  dynamic: false,   // control whether the runtime type is written
+  skip: false,      // 包含该字段；设为 true 可排除它
+  id: 10,           // 用于 Schema 演进的稳定字段 ID
+  nullable: true,   // 覆盖可空性检测
+  ref: true,        // 为该字段启用引用跟踪
+  dynamic: false,   // 控制是否写入运行时类型
 )
 ```
 
 ## `skip`
 
-Exclude a field from serialization entirely. Useful for cached, computed, or UI-only values that should not land in a persisted or transmitted message.
+完全排除某个字段，不参与序列化。适用于缓存值、计算值或仅 UI 使用且不应落入持久化消息或传输消息的值。
 
 ```dart
 @ForyField(skip: true)
@@ -44,53 +44,53 @@ String cachedDisplayName = '';
 
 ## `id`
 
-Assigns a stable identity to the field so that Fory can match it by ID after a schema change (a field rename or reorder). **If you plan to add, remove, or rename fields in the future, assign IDs to all fields now** — before you ship the first payload.
+为字段分配稳定身份，使 Fory 能在 schema 变更（字段重命名或重排序）后按 ID 匹配字段。**如果你计划将来新增、删除或重命名字段，请现在就为所有字段分配 ID**，也就是在交付第一个载荷之前完成。
 
 ```dart
 @ForyField(id: 1)
 String name = '';
 ```
 
-Once a payload is shared across services, never reuse an `id` for a different field.
+一旦载荷已在服务之间共享，就不要把同一个 `id` 复用于另一个字段。
 
 ## `nullable`
 
-Explicitly marks a field as nullable or non-nullable, overriding what Fory infers from the Dart type. Use this when the Dart type is non-nullable but you want Fory to accept `null` on the wire (e.g., reading messages from an older producer that can omit the field).
+显式将字段标记为可空或不可空，覆盖 Fory 从 Dart 类型推断出的结果。当 Dart 类型不可空，但你希望 Fory 接受编码格式中的 `null` 时使用它，例如读取来自较旧生产者且可能省略字段的消息。
 
 ```dart
 @ForyField(nullable: true)
 String nickname = '';
 ```
 
-In cross-language scenarios, make sure the nullability contract also matches what peer runtimes expect.
+在跨语言场景中，确保可空性契约也符合对端运行时的预期。
 
 ## `ref`
 
-Enables reference tracking for a specific field. Use this when multiple objects in the graph can point to the same instance, or when the field type can be circular. Without `ref: true`, Fory serializes the same object value twice if it appears in two fields.
+为特定字段启用引用跟踪。当图中的多个对象可能指向同一个实例，或者字段类型可能形成循环时使用它。如果没有 `ref: true`，同一个对象值出现在两个字段中时，Fory 会序列化两次。
 
 ```dart
 @ForyField(ref: true)
 List<Object?> sharedNodes = <Object?>[];
 ```
 
-Note: scalar types like `int`, `double`, and `bool` never benefit from reference tracking even if `ref: true` is set.
+注意：即使设置了 `ref: true`，`int`、`double` 和 `bool` 等标量类型也不会从引用跟踪中受益。
 
 ## `dynamic`
 
-Controls whether Fory writes the concrete runtime type of the field value into the payload.
+控制 Fory 是否把字段值的具体运行时类型写入载荷。
 
-- `null` (default) — Fory decides automatically based on the declared type.
-- `false` — always use the declared field type; more compact but the deserializer must know the exact type.
-- `true` — always write the actual runtime type; needed when the field is declared as `Object?` or a base class but can hold different concrete types at runtime (polymorphism).
+- `null`（默认）- Fory 根据声明类型自动决定。
+- `false` - 始终使用声明的字段类型；更紧凑，但反序列化器必须知道精确类型。
+- `true` - 始终写入实际运行时类型；当字段声明为 `Object?` 或基类，但运行时可以保存不同具体类型时需要它（多态）。
 
 ```dart
 @ForyField(dynamic: true)
-Object? payload;  // can hold any registered type at runtime
+Object? payload;  // 运行时可以保存任何已注册类型
 ```
 
-## Numeric Field Types
+## 数值字段类型
 
-Dart `int` is a 64-bit value at runtime. When exchanging messages with Java, Go, or C#, the receiving side may expect a narrower integer. Use `@ForyField(type: ...)` to pin the exact wire format:
+Dart `int` 在运行时是 64 位值。与 Java、Go 或 C# 交换消息时，接收端可能期望更窄的整数。使用 `@ForyField(type: ...)` 固定精确的编码格式：
 
 ```dart
 @ForyStruct()
@@ -108,12 +108,9 @@ class Sample {
 }
 ```
 
-Available scalar type nodes include `Int8Type`, `Int16Type`, `Int32Type`,
-`Int64Type`, `Uint8Type`, `Uint16Type`, `Uint32Type`, `Uint64Type`,
-`Float16Type`, `Bfloat16Type`, and `Float32Type`.
+可用的标量类型节点包括 `Int8Type`、`Int16Type`、`Int32Type`、`Int64Type`、`Uint8Type`、`Uint16Type`、`Uint32Type`、`Uint64Type`、`Float16Type`、`Bfloat16Type` 和 `Float32Type`。
 
-For nested containers, use `ListField`, `SetField`, `MapField`, or a full
-`ForyField(type: ...)` tree:
+对于嵌套容器，使用 `ListField`、`SetField`、`MapField`，或完整的 `ForyField(type: ...)` 树：
 
 ```dart
 @MapField(
@@ -124,22 +121,18 @@ For nested containers, use `ListField`, `SetField`, `MapField`, or a full
 Map<String, List<int?>> metrics = <String, List<int?>>{};
 ```
 
-Generic `List<int>` still uses the `list` wire type even with primitive element
-specs. Packed `*_array` wire kinds come from dedicated carriers such as
-`Int32List`, `Uint32List`, `Int64List`, and `Uint64List`. If you annotate a
-generic `List<int>` with a non-null fixed-width primitive element spec, code
-generation rejects it and tells you to use the matching typed list carrier.
+即使指定了原始元素规格，泛型 `List<int>` 仍使用 `list` 编码格式类型。打包的 `*_array` 编码格式种类来自专用承载类型，例如 `Int32List`、`Uint32List`、`Int64List` 和 `Uint64List`。如果你为泛型 `List<int>` 标注非空定长原始元素规格，代码生成会拒绝它，并提示你使用匹配的类型化 list 承载类型。
 
-## Aligning Fields Across Languages
+## 跨语言对齐字段
 
-When the same model is defined in multiple languages:
+当同一个模型在多种语言中定义时：
 
-- Assign stable `id` values to every field that might change over time.
-- Use `dynamic: true` for fields that are genuinely polymorphic.
-- Keep the logical meaning of each field consistent across languages — Fory matches fields by name or ID, but cannot reconcile semantic differences.
+- 为每个可能随时间变化的字段分配稳定的 `id` 值。
+- 对真正多态的字段使用 `dynamic: true`。
+- 保持每个字段的逻辑含义在各语言中一致。Fory 会按名称或 ID 匹配字段，但无法协调语义差异。
 
-## Related Topics
+## 相关主题
 
-- [Code Generation](code-generation.md)
-- [Schema Evolution](schema-evolution.md)
-- [Cross-Language](cross-language.md)
+- [代码生成](code-generation.md)
+- [Schema 演进](schema-evolution.md)
+- [Xlang 序列化](xlang-serialization.md)

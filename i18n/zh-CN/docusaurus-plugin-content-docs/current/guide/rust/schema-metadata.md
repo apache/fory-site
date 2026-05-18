@@ -1,6 +1,6 @@
 ---
-title: Schema Metadata
-sidebar_position: 5
+title: Schema 元数据
+sidebar_position: 6
 id: schema_metadata
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,21 +19,21 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to configure field-level metadata for serialization in Rust.
+本页说明如何在 Rust 中为序列化配置字段级元数据。
 
-## Overview
+## 概览 {#overview}
 
-Apache Fory™ provides the `#[fory(...)]` attribute macro to specify optional field-level metadata at compile time. This enables:
+Apache Fory™ 提供 `#[fory(...)]` 属性宏，用于在编译期指定可选的字段级元数据。它支持：
 
-- **Tag IDs**: Assign compact numeric IDs to minimize struct field meta size overhead
-- **Nullability**: Control whether fields can be null
-- **Reference Tracking**: Enable reference tracking for shared ownership types
-- **Field Skipping**: Exclude fields from serialization
-- **Encoding Control**: Specify how integers are encoded (varint, fixed, tagged)
+- **Tag ID**：分配紧凑的数字 ID，以减少结构体字段元信息的大小开销
+- **可空性**：控制字段是否可以为 null
+- **引用跟踪**：为共享所有权类型启用引用跟踪
+- **跳过字段**：从序列化中排除字段
+- **编码控制**：指定整数的编码方式（varint、fixed、tagged）
 
-## Basic Syntax
+## 基本语法 {#basic-syntax}
 
-The `#[fory(...)]` attribute is placed on individual struct fields:
+`#[fory(...)]` 属性放在单个结构体字段上：
 
 ```rust
 use fory::ForyStruct;
@@ -51,13 +51,13 @@ struct Person {
 }
 ```
 
-Multiple options are separated by commas.
+多个选项用逗号分隔。
 
-## Available Options
+## 可用选项 {#available-options}
 
-### Field ID (`id = N`)
+### 字段 ID（`id = N`） {#field-id-id--n}
 
-Assigns a numeric ID to a field to minimize struct field meta size overhead:
+为字段分配数字 ID，以减少结构体字段元信息的大小开销：
 
 ```rust
 #[derive(ForyStruct)]
@@ -73,22 +73,22 @@ struct User {
 }
 ```
 
-**Benefits**:
+**优点**：
 
-- Smaller serialized size (numeric IDs vs field names in metadata)
-- Allows renaming fields without breaking binary compatibility
+- 序列化体积更小（元数据中使用数字 ID，而不是字段名）
+- 允许重命名字段而不破坏二进制兼容性
 
-**Recommendation**: It is recommended to configure field IDs for compatible mode since it reduces serialization cost.
+**建议**：建议在兼容模式下配置字段 ID，因为这能降低序列化成本。
 
-**Notes**:
+**说明**：
 
-- IDs must be unique within a struct
-- IDs must be non-negative
-- If not specified, field name is used in metadata (larger overhead)
+- ID 在同一结构体内必须唯一
+- ID 必须是非负数
+- 如果未指定，则在元数据中使用字段名（开销更大）
 
-### Skipping Fields (`skip`)
+### 跳过字段（`skip`） {#skipping-fields-skip}
 
-Excludes a field from serialization:
+从序列化中排除字段：
 
 ```rust
 #[derive(ForyStruct)]
@@ -100,44 +100,44 @@ struct User {
     name: String,
 
     #[fory(skip)]
-    password: String, // Not serialized
+    password: String, // 不会被序列化
 }
 ```
 
-The `password` field will not be included in serialized output and will remain at its default value after deserialization.
+`password` 字段不会包含在序列化输出中，反序列化后会保持其默认值。
 
-### Nullable (`nullable`)
+### 可空（`nullable`） {#nullable-nullable}
 
-Controls whether null flags are written for fields:
+控制是否为字段写入 null 标志：
 
 ```rust
 use fory::{Fory, RcWeak};
 
 #[derive(ForyStruct)]
 struct Record {
-    // RcWeak is nullable by default, override to non-nullable
+    // RcWeak 默认可空，这里覆盖为不可空
     #[fory(id = 0, nullable = false)]
     required_ref: RcWeak<Data>,
 }
 ```
 
-**Default Behavior**:
+**默认行为**：
 
-| Type                      | Default Nullable |
-| ------------------------- | ---------------- |
-| `Option<T>`               | `true`           |
-| `RcWeak<T>`, `ArcWeak<T>` | `true`           |
-| All other types           | `false`          |
+| 类型                      | 默认可空 |
+| ------------------------- | -------- |
+| `Option<T>`               | `true`   |
+| `RcWeak<T>`, `ArcWeak<T>` | `true`   |
+| 所有其他类型              | `false`  |
 
-**Notes**:
+**说明**：
 
-- For `Option<T>`, `RcWeak<T>`, `ArcWeak<T>`, nullable defaults to true
-- For all other types, nullable defaults to false
-- Use `nullable = false` to override defaults for types that are nullable by default
+- 对 `Option<T>`、`RcWeak<T>`、`ArcWeak<T>`，可空性默认为 true
+- 对所有其他类型，可空性默认为 false
+- 对默认可空的类型，可使用 `nullable = false` 覆盖默认值
 
-### Reference Tracking (`ref`)
+### 引用跟踪（`ref`） {#reference-tracking-ref}
 
-Controls per-field reference tracking for shared ownership types:
+控制共享所有权类型的逐字段引用跟踪：
 
 ```rust
 use std::rc::Rc;
@@ -145,68 +145,67 @@ use std::sync::Arc;
 
 #[derive(ForyStruct)]
 struct Container {
-    // Enable reference tracking (default for Rc/Arc)
+    // 启用引用跟踪（Rc/Arc 默认启用）
     #[fory(id = 0, ref = true)]
     shared_data: Rc<Data>,
 
-    // Disable reference tracking
+    // 禁用引用跟踪
     #[fory(id = 1, ref = false)]
     unique_data: Rc<Data>,
 }
 ```
 
-**Default Behavior**:
+**默认行为**：
 
-| Type                              | Default Ref Tracking |
-| --------------------------------- | -------------------- |
-| `Rc<T>`, `Arc<T>`                 | `true`               |
-| `RcWeak<T>`, `ArcWeak<T>`         | `true`               |
-| `Option<Rc<T>>`, `Option<Arc<T>>` | `true` (inherited)   |
-| All other types                   | `false`              |
+| 类型                              | 默认引用跟踪       |
+| --------------------------------- | ------------------ |
+| `Rc<T>`, `Arc<T>`                 | `true`             |
+| `RcWeak<T>`, `ArcWeak<T>`         | `true`             |
+| `Option<Rc<T>>`, `Option<Arc<T>>` | `true`（继承而来） |
+| 所有其他类型                      | `false`            |
 
-**Use Cases**:
+**使用场景**：
 
-- Enable for fields that may be circular or shared
-- Disable for fields that are always unique (optimization)
+- 对可能存在循环或共享的字段启用
+- 对始终唯一的字段禁用（优化）
 
-### Encoding (`encoding`)
+### 编码（`encoding`） {#encoding-encoding}
 
-Controls how integer fields are encoded:
+控制整数字段的编码方式：
 
 ```rust
 #[derive(ForyStruct)]
 struct Metrics {
-    // Variable-length encoding (smaller for small values)
+    // 变长编码（小值占用更少空间）
     #[fory(id = 0, encoding = varint)]
     count: i64,
 
-    // Fixed-length encoding (consistent size)
+    // 定长编码（大小固定）
     #[fory(id = 1, encoding = fixed)]
     timestamp: i64,
 
-    // Tagged encoding (includes type tag, u64 only)
+    // 带 tag 的编码（包含类型 tag，仅 u64）
     #[fory(id = 2, encoding = tagged)]
     value: u64,
 }
 ```
 
-**Supported Encodings**:
+**支持的编码**：
 
-| Type         | Options                     | Default  |
+| 类型         | 选项                        | 默认值   |
 | ------------ | --------------------------- | -------- |
 | `i32`, `u32` | `varint`, `fixed`           | `varint` |
 | `i64`, `u64` | `varint`, `fixed`, `tagged` | `varint` |
 
-**When to Use**:
+**何时使用**：
 
-- `varint`: Best for values that are often small (default)
-- `fixed`: Best for values that use full range (e.g., timestamps, hashes)
-- `tagged`: When type information needs to be preserved (u64 only)
+- `varint`：最适合通常较小的值（默认）
+- `fixed`：最适合使用完整取值范围的值（例如时间戳、哈希）
+- `tagged`：需要保留类型信息时使用（仅 u64）
 
-### Nested Collection Configuration
+### 嵌套集合配置 {#nested-collection-configuration}
 
-Use `list(element(...))` and `map(key(...), value(...))` when an override belongs
-to a nested element instead of the outer field:
+当覆盖配置属于嵌套元素而不是外层字段时，使用 `list(element(...))` 和 `map(key(...), value(...))`：
 
 ```rust
 use std::collections::HashMap;
@@ -221,26 +220,25 @@ struct Data {
 }
 ```
 
-`compress` has been removed. Use `encoding = varint` or `encoding = fixed`
-directly.
+`compress` 已被移除。请直接使用 `encoding = varint` 或 `encoding = fixed`。
 
-## Type Classification
+## 类型分类 {#type-classification}
 
-Fory classifies field types to determine default behavior:
+Fory 会对字段类型分类，以确定默认行为：
 
-| Type Class | Examples                       | Default Nullable | Default Ref |
-| ---------- | ------------------------------ | ---------------- | ----------- |
-| Primitive  | `i8`, `i32`, `f64`, `bool`     | `false`          | `false`     |
-| Option     | `Option<T>`                    | `true`           | `false`     |
-| Rc         | `Rc<T>`                        | `false`          | `true`      |
-| Arc        | `Arc<T>`                       | `false`          | `true`      |
-| RcWeak     | `RcWeak<T>` (fory type)        | `true`           | `true`      |
-| ArcWeak    | `ArcWeak<T>` (fory type)       | `true`           | `true`      |
-| Other      | `String`, `Vec<T>`, user types | `false`          | `false`     |
+| 类型类别  | 示例                         | 默认可空 | 默认引用跟踪 |
+| --------- | ---------------------------- | -------- | ------------ |
+| Primitive | `i8`, `i32`, `f64`, `bool`   | `false`  | `false`      |
+| Option    | `Option<T>`                  | `true`   | `false`      |
+| Rc        | `Rc<T>`                      | `false`  | `true`       |
+| Arc       | `Arc<T>`                     | `false`  | `true`       |
+| RcWeak    | `RcWeak<T>`（fory 类型）     | `true`   | `true`       |
+| ArcWeak   | `ArcWeak<T>`（fory 类型）    | `true`   | `true`       |
+| Other     | `String`, `Vec<T>`, 用户类型 | `false`  | `false`      |
 
-**Special Case**: `Option<Rc<T>>` and `Option<Arc<T>>` inherit the inner type's ref tracking behavior.
+**特殊情况**：`Option<Rc<T>>` 和 `Option<Arc<T>>` 会继承内部类型的引用跟踪行为。
 
-## Complete Example
+## 完整示例 {#complete-example}
 
 ```rust
 use fory::ForyStruct;
@@ -248,34 +246,34 @@ use std::rc::Rc;
 
 #[derive(ForyStruct, Default)]
 struct Document {
-    // Required fields with tag IDs
+    // 带 tag ID 的必需字段
     #[fory(id = 0)]
     title: String,
 
     #[fory(id = 1)]
     version: i32,
 
-    // Optional field (nullable by default for Option)
+    // 可选字段（Option 默认可空）
     #[fory(id = 2)]
     description: Option<String>,
 
-    // Reference-tracked shared pointer
+    // 启用引用跟踪的共享指针
     #[fory(id = 3)]
     parent: Rc<Document>,
 
-    // Nullable + reference-tracked
+    // 可空 + 引用跟踪
     #[fory(id = 4, nullable)]
     related: Option<Rc<Document>>,
 
-    // Counter with varint encoding (small values)
+    // 使用 varint 编码的计数器（小值）
     #[fory(id = 5, encoding = varint)]
     view_count: u64,
 
-    // Timestamp with fixed encoding (full range values)
+    // 使用 fixed 编码的时间戳（完整范围值）
     #[fory(id = 6, encoding = fixed)]
     created_at: i64,
 
-    // Skip sensitive field
+    // 跳过敏感字段
     #[fory(skip)]
     internal_state: String,
 }
@@ -288,10 +286,10 @@ fn main() {
         version: 1,
         description: Some("A sample document".to_string()),
         parent: Rc::new(Document::default()),
-        related: None, // Allowed because nullable
+        related: None, // 允许，因为可空
         view_count: 42,
         created_at: 1704067200,
-        internal_state: "secret".to_string(), // Will be skipped
+        internal_state: "secret".to_string(), // 会被跳过
     };
 
     let bytes = fory.serialize(&doc).unwrap();
@@ -299,67 +297,67 @@ fn main() {
 }
 ```
 
-## Compile-Time Validation
+## 编译期校验 {#compile-time-validation}
 
-Invalid configurations are caught at compile time:
+无效配置会在编译期被捕获：
 
 ```rust
-// Error: duplicate field IDs
+// 错误：重复的字段 ID
 #[derive(ForyStruct)]
 struct Bad {
     #[fory(id = 0)]
     field1: String,
 
-    #[fory(id = 0)]  // Compile error: duplicate id
+    #[fory(id = 0)]  // 编译错误：重复 id
     field2: String,
 }
 
-// Error: invalid id value
+// 错误：无效的 id 值
 #[derive(ForyStruct)]
 struct Bad2 {
-    #[fory(id = -1)]  // Compile error: id must be non-negative
+    #[fory(id = -1)]  // 编译错误：id 必须是非负数
     field: String,
 }
 
-// Error: invalid encoding for i32
+// 错误：i32 使用了无效编码
 #[derive(ForyStruct)]
 struct Bad3 {
-    #[fory(encoding = tagged)]  // Compile error: tagged is only valid for i64/u64
+    #[fory(encoding = tagged)]  // 编译错误：tagged 仅对 i64/u64 有效
     field: i32,
 }
 ```
 
-## Cross-Language Compatibility
+## 跨语言兼容性 {#cross-language-compatibility}
 
-When serializing data to be read by other languages (Java, C++, Go, Python), use schema metadata to match encoding expectations:
+当序列化的数据需要由其他语言（Java、C++、Go、Python）读取时，请使用 schema 元数据匹配编码预期：
 
 ```rust
 #[derive(ForyStruct)]
 struct CrossLangData {
-    // Matches Java Integer with varint
+    // 匹配使用 varint 的 Java Integer
     #[fory(id = 0, encoding = varint)]
     int_var: i32,
 
-    // Matches Java Integer with fixed
+    // 匹配使用 fixed 的 Java Integer
     #[fory(id = 1, encoding = fixed)]
     int_fixed: i32,
 
-    // Matches Java Long with tagged encoding
+    // 匹配使用 tagged 编码的 Java Long
     #[fory(id = 2, encoding = tagged)]
     long_tagged: u64,
 
-    // Nullable pointer matches Java nullable reference
+    // 可空指针匹配 Java 可空引用
     #[fory(id = 3, nullable)]
     optional: Option<String>,
 }
 ```
 
-## Schema Evolution
+## Schema 演进 {#schema-evolution}
 
-Compatible mode supports schema evolution. It is recommended to configure field IDs to reduce serialization cost:
+兼容模式支持 Schema 演进。建议配置字段 ID，以降低序列化成本：
 
 ```rust
-// Version 1
+// 版本 1
 #[derive(ForyStruct)]
 struct DataV1 {
     #[fory(id = 0)]
@@ -369,7 +367,7 @@ struct DataV1 {
     name: String,
 }
 
-// Version 2: Added new field
+// 版本 2：新增字段
 #[derive(ForyStruct)]
 struct DataV2 {
     #[fory(id = 0)]
@@ -379,13 +377,13 @@ struct DataV2 {
     name: String,
 
     #[fory(id = 2)]
-    email: Option<String>,  // New nullable field
+    email: Option<String>,  // 新的可空字段
 }
 ```
 
-Data serialized with V1 can be deserialized with V2 (new field will be `None`).
+用 V1 序列化的数据可以用 V2 反序列化（新字段将为 `None`）。
 
-Alternatively, field IDs can be omitted (field names will be used in metadata with larger overhead):
+也可以省略字段 ID（元数据中会使用字段名，开销更大）：
 
 ```rust
 #[derive(ForyStruct)]
@@ -395,65 +393,65 @@ struct Data {
 }
 ```
 
-## Default Values
+## 默认值 {#default-values}
 
-- **Nullable**: `Option<T>`, `RcWeak<T>`, and `ArcWeak<T>` are nullable by default; all other types are non-nullable
-- **Ref tracking**: `Rc<T>`, `Arc<T>`, `RcWeak<T>`, and `ArcWeak<T>` enable ref tracking by default; all other types are disabled
+- **可空性**：`Option<T>`、`RcWeak<T>` 和 `ArcWeak<T>` 默认可空；所有其他类型不可空
+- **引用跟踪**：`Rc<T>`、`Arc<T>`、`RcWeak<T>` 和 `ArcWeak<T>` 默认启用引用跟踪；所有其他类型默认禁用
 
-You **need to configure fields** when:
+在以下情况下，你**需要配置字段**：
 
-- A field can be None (use `Option<T>`)
-- A field needs reference tracking for shared/circular objects (use `ref = true`)
-- Integer types need specific encoding for cross-language compatibility
-- You want to reduce metadata size (use field IDs)
+- 字段可以为 None（使用 `Option<T>`）
+- 字段需要为共享/循环对象启用引用跟踪（使用 `ref = true`）
+- 整数类型需要特定编码以实现跨语言兼容性
+- 你想减少元数据大小（使用字段 ID）
 
 ```rust
-// Xlang mode: explicit configuration required
+// Xlang 模式：需要显式配置
 #[derive(ForyStruct)]
 struct User {
     #[fory(id = 0)]
-    name: String,                    // Non-nullable by default
+    name: String,                    // 默认不可空
 
     #[fory(id = 1)]
-    email: Option<String>,           // Nullable (Option<T>)
+    email: Option<String>,           // 可空（Option<T>）
 
     #[fory(id = 2, ref = true)]
-    friend: Rc<User>,                // Ref tracking (default for Rc)
+    friend: Rc<User>,                // 引用跟踪（Rc 默认启用）
 }
 ```
 
-### Default Values Summary
+### 默认值摘要 {#default-values-summary}
 
-| Type                      | Default Nullable | Default Ref Tracking |
-| ------------------------- | ---------------- | -------------------- |
-| Primitives, `String`      | `false`          | `false`              |
-| `Option<T>`               | `true`           | `false`              |
-| `Rc<T>`, `Arc<T>`         | `false`          | `true`               |
-| `RcWeak<T>`, `ArcWeak<T>` | `true`           | `true`               |
+| 类型                      | 默认可空 | 默认引用跟踪 |
+| ------------------------- | -------- | ------------ |
+| Primitives, `String`      | `false`  | `false`      |
+| `Option<T>`               | `true`   | `false`      |
+| `Rc<T>`, `Arc<T>`         | `false`  | `true`       |
+| `RcWeak<T>`, `ArcWeak<T>` | `true`   | `true`       |
 
-## Best Practices
+## 最佳实践 {#best-practices}
 
-1. **Configure field IDs**: Recommended for compatible mode to reduce serialization cost
-2. **Use `skip` for sensitive data**: Passwords, tokens, internal state
-3. **Enable ref tracking for shared objects**: When the same pointer appears multiple times
-4. **Disable ref tracking for unique fields**: Optimization when you know the field is unique
-5. **Choose appropriate encoding**: `varint` for small values, `fixed` for full-range values
-6. **Keep IDs stable**: Once assigned, don't change field IDs
+1. **配置字段 ID**：建议在兼容模式下使用，以降低序列化成本
+2. **对敏感数据使用 `skip`**：密码、令牌、内部状态
+3. **为共享对象启用引用跟踪**：当同一指针出现多次时
+4. **为唯一字段禁用引用跟踪**：当你确定字段唯一时的优化
+5. **选择合适的编码**：小值使用 `varint`，完整范围值使用 `fixed`
+6. **保持 ID 稳定**：一旦分配，就不要更改字段 ID
 
-## Options Reference
+## 选项参考 {#options-reference}
 
-| Option     | Syntax                           | Description                          | Valid For                  |
-| ---------- | -------------------------------- | ------------------------------------ | -------------------------- |
-| `id`       | `id = N`                         | Field tag ID to reduce metadata size | All fields                 |
-| `skip`     | `skip`                           | Exclude field from serialization     | All fields                 |
-| `nullable` | `nullable` or `nullable = bool`  | Control null flag writing            | All fields                 |
-| `ref`      | `ref` or `ref = bool`            | Control reference tracking           | `Rc`, `Arc`, weak types    |
-| `encoding` | `encoding = varint/fixed/tagged` | Integer encoding method              | `i32`, `u32`, `i64`, `u64` |
-| `list`     | `list(element(...))`             | Element schema metadata              | `Vec<T>`                   |
-| `map`      | `map(key(...), value(...))`      | Key/value schema metadata            | `HashMap<K, V>`            |
+| Option     | 语法                             | 描述                           | 适用于                     |
+| ---------- | -------------------------------- | ------------------------------ | -------------------------- |
+| `id`       | `id = N`                         | 用于减少元数据大小的字段 tag ID | 所有字段                   |
+| `skip`     | `skip`                           | 从序列化中排除字段             | 所有字段                   |
+| `nullable` | `nullable` 或 `nullable = bool`  | 控制 null 标志写入             | 所有字段                   |
+| `ref`      | `ref` 或 `ref = bool`            | 控制引用跟踪                   | `Rc`、`Arc`、weak 类型     |
+| `encoding` | `encoding = varint/fixed/tagged` | 整数编码方法                   | `i32`、`u32`、`i64`、`u64` |
+| `list`     | `list(element(...))`             | 元素 schema 元数据             | `Vec<T>`                   |
+| `map`      | `map(key(...), value(...))`      | key/value schema 元数据        | `HashMap<K, V>`            |
 
-## Related Topics
+## 相关主题 {#related-topics}
 
-- [Basic Serialization](basic-serialization.md) - Getting started with Fory serialization
-- [Schema Evolution](schema-evolution.md) - Compatible mode and schema evolution
-- [Cross-Language](cross-language.md) - Interoperability with Java, C++, Go, Python
+- [基本序列化](basic-serialization.md) - Fory 序列化入门
+- [Schema 演进](schema-evolution.md) - 兼容模式与 Schema 演进
+- [Xlang 序列化](xlang-serialization.md) - 与 Java、C++、Go、Python 互操作

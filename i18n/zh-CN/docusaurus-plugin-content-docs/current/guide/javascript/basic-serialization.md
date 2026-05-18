@@ -1,5 +1,5 @@
 ---
-title: Basic Serialization
+title: 基础序列化
 sidebar_position: 1
 id: basic_serialization
 license: |
@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This guide covers the core serialization APIs in Apache Fory JavaScript.
+本指南介绍 Apache Fory JavaScript 中的核心序列化 API。
 
-## Create a `Fory` Instance
+## 创建 `Fory` 实例
 
 ```ts
 import Fory from "@apache-fory/core";
@@ -29,11 +29,11 @@ import Fory from "@apache-fory/core";
 const fory = new Fory();
 ```
 
-Create one instance, register your schemas, and reuse it. Fory caches the generated serializers after the first `register` call, so recreating it on every request wastes that work.
+创建一个实例，注册你的 schema，并重复复用它。Fory 会在首次调用 `register` 后缓存生成的序列化器，因此如果每个请求都重新创建实例，就会浪费这部分工作。
 
-## Define a Schema with `Type.struct`
+## 使用 `Type.struct` 定义 Schema
 
-The most common path is to define a schema and register it.
+最常见的方式是先定义 schema，再进行注册。
 
 ```ts
 import Fory, { Type } from "@apache-fory/core";
@@ -52,7 +52,7 @@ const fory = new Fory();
 const { serialize, deserialize } = fory.register(accountType);
 ```
 
-## Serialize and Deserialize
+## 序列化与反序列化
 
 ```ts
 const bytes = serialize({
@@ -67,11 +67,11 @@ console.log(value);
 // { id: 42n, owner: 'Alice', active: true, nickname: null }
 ```
 
-The returned `bytes` value is a `Uint8Array`/platform buffer and can be sent over the network or written to storage.
+返回的 `bytes` 值是 `Uint8Array`/平台缓冲区，可以通过网络发送或写入存储。
 
-## Root-Level Dynamic Serialization
+## 根级动态序列化
 
-`Fory` can also serialize dynamic root values without first binding a schema-specific serializer.
+`Fory` 也支持在不先绑定特定 schema 序列化器的情况下，对动态根值进行序列化。
 
 ```ts
 const fory = new Fory();
@@ -86,9 +86,9 @@ const bytes = fory.serialize(
 const value = fory.deserialize(bytes);
 ```
 
-This is convenient for dynamic payloads, but explicit schemas are usually better for stable interfaces and cross-language contracts.
+这对动态载荷很方便，但对于稳定接口和跨语言契约，显式 schema 通常更合适。
 
-## Primitive Values
+## 原始值
 
 ```ts
 const fory = new Fory();
@@ -109,21 +109,21 @@ fory.deserialize(fory.serialize(new Date("2021-10-20T09:13:00Z")));
 // Date
 ```
 
-### Number and `bigint`
+### `number` 与 `bigint`
 
-JavaScript `number` is a 64-bit float, which cannot exactly represent all 64-bit integers. For cross-language contracts or anywhere exact integer sizes matter, use explicit field types in your schema:
+JavaScript 的 `number` 是 64 位浮点数，无法精确表示所有 64 位整数。对于跨语言契约，或任何需要精确整数宽度的场景，请在 schema 中使用显式字段类型：
 
-- `Type.int32()` — 32-bit integer; use JavaScript `number`
-- `Type.int64()` — 64-bit integer; use JavaScript `bigint`
-- `Type.float32()` / `Type.float64()` — floating-point
+- `Type.int32()`：32 位整数；使用 JavaScript `number`
+- `Type.int64()`：64 位整数；使用 JavaScript `bigint`
+- `Type.float32()` / `Type.float64()`：浮点数
 
-Dynamic root serialization (calling `fory.serialize(someNumber)` without a schema) will infer a type, but the inferred type is not guaranteed by the API. Use a schema for any stable contract.
+动态根序列化（即不使用 schema，直接调用 `fory.serialize(someNumber)`）会推断类型，但 API 不保证推断结果稳定。对于任何稳定契约，都应使用 schema。
 
-## Arrays, Maps, and Sets
+## 数组、Map 和 Set
 
 ```ts
 const inventoryType = Type.struct("example.inventory", {
-  tags: Type.list(Type.string()),
+  tags: Type.array(Type.string()),
   counts: Type.map(Type.string(), Type.int32()),
   labels: Type.set(Type.string()),
 });
@@ -143,7 +143,7 @@ const bytes = serialize({
 const value = deserialize(bytes);
 ```
 
-## Nested Structs
+## 嵌套 Struct
 
 ```ts
 const addressType = Type.struct("example.address", {
@@ -170,7 +170,7 @@ const bytes = serialize({
 const user = deserialize(bytes);
 ```
 
-If a nested value can be missing, mark it nullable:
+如果嵌套值可能缺失，请将其标记为可空：
 
 ```ts
 const wrapperType = Type.struct("example.wrapper", {
@@ -180,9 +180,9 @@ const wrapperType = Type.struct("example.wrapper", {
 });
 ```
 
-## Decorator-Based Registration
+## 基于 Decorator 的注册
 
-TypeScript decorators are also supported.
+TypeScript decorator 也受支持。
 
 ```ts
 import Fory, { Type } from "@apache-fory/core";
@@ -207,9 +207,9 @@ const copy = deserialize(serialize(user));
 console.log(copy instanceof User); // true
 ```
 
-## Nullability
+## 可空性
 
-Field nullability is explicit in schema-based structs.
+在基于 schema 的 struct 中，字段的可空性需要显式声明。
 
 ```ts
 const nullableType = Type.struct("example.optional_user", {
@@ -217,28 +217,3 @@ const nullableType = Type.struct("example.optional_user", {
   email: Type.string().setNullable(true),
 });
 ```
-
-If a field is not marked nullable and you try to write `null`, serialization throws.
-
-## Debugging Generated Code
-
-You can inspect generated serializer code with `hooks.afterCodeGenerated`.
-
-```ts
-const fory = new Fory({
-  hooks: {
-    afterCodeGenerated(code) {
-      console.log(code);
-      return code;
-    },
-  },
-});
-```
-
-This is useful when debugging schema behavior, field ordering, or generated fast paths.
-
-## Related Topics
-
-- [Type Registration](type-registration.md)
-- [Supported Types](supported-types.md)
-- [References](references.md)

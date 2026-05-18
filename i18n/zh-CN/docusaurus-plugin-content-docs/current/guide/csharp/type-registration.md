@@ -1,6 +1,6 @@
 ---
-title: Type Registration
-sidebar_position: 5
+title: 类型注册
+sidebar_position: 3
 id: type_registration
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-This page covers how to register user types in Apache Fory™ C#.
+本页介绍如何在 Apache Fory™ C# 中注册用户类型。
 
-## Register by Numeric Type ID
+## 按数字 type ID 注册
 
-Use explicit IDs for compact and stable cross-service mapping.
+显式 ID 可以提供紧凑且稳定的跨服务映射。
 
 ```csharp
 Fory fory = Fory.Builder().Build();
@@ -31,37 +31,37 @@ fory.Register<User>(100);
 fory.Register<Order>(101);
 ```
 
-## Register by Type Name
+## 按类型名注册
 
-Use namespace + type name registration when you prefer symbolic mappings.
+如果你更倾向于使用符号化映射，可以按命名空间和类型名注册。
 
 ```csharp
 Fory fory = Fory.Builder().Build();
 fory.Register<User>("com.example", "User");
 ```
 
-You can also use the short overload:
+也可以使用简写重载：
 
 ```csharp
 fory.Register<User>("User");
 ```
 
-## Register a Custom Serializer
+## 注册自定义序列化器
 
 ```csharp
 Fory fory = Fory.Builder().Build();
 fory.Register<MyType, MyTypeSerializer>(200);
 ```
 
-Namespace-based custom serializer registration is also supported:
+同样支持基于命名空间的自定义序列化器注册：
 
 ```csharp
 fory.Register<MyType, MyTypeSerializer>("com.example", "MyType");
 ```
 
-## Thread-Safe Registration
+## 线程安全注册
 
-`ThreadSafeFory` exposes the same registration APIs. Registrations are propagated to all per-thread runtimes.
+`ThreadSafeFory` 提供相同的注册 API。注册信息会传播到各个线程内运行时。
 
 ```csharp
 using ThreadSafeFory fory = Fory.Builder().BuildThreadSafe();
@@ -69,14 +69,14 @@ fory.Register<User>(100);
 fory.Register<Order>(101);
 ```
 
-## Registration Rules
+## 注册规则
 
-- Register user-defined types on both writer and reader sides.
-- Keep ID/name mappings consistent across services and languages.
-- Register before high-volume serialization workloads to avoid runtime misses.
+- 在写端和读端都要注册用户定义类型。
+- 在服务和语言之间保持 ID 或名称映射一致。
+- 在高频序列化负载开始前完成注册，避免运行时缺失。
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md)
-- [Custom Serializers](custom-serializers.md)
-- [Cross-Language](cross-language.md)
+- [基础序列化](basic-serialization.md)
+- [自定义序列化器](custom-serializers.md)
+- [跨语言](xlang-serialization.md)

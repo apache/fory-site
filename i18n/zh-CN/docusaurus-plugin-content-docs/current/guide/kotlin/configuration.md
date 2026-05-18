@@ -1,5 +1,5 @@
 ---
-title: Configuration
+title: 配置
 sidebar_position: 1
 id: configuration
 license: |
@@ -19,13 +19,13 @@ license: |
   limitations under the License.
 ---
 
-This page covers Kotlin-specific runtime configuration and Fory instance creation.
+本页介绍 Kotlin 专属运行时配置和 Fory 实例创建。
 
-## Xlang Setup
+## Xlang 设置
 
-Fory Kotlin follows the Java builder default: xlang mode with compatible schema
-evolution. Use this path for cross-language Kotlin payloads, schema IDL
-generated Kotlin models, and KSP-generated xlang serializers.
+Fory Kotlin 遵循 Java builder 默认值：启用 xlang 模式和兼容 Schema 演进。
+跨语言 Kotlin 载荷、Schema IDL 生成的 Kotlin 模型，以及 KSP 生成的 xlang
+序列化器都应使用这条路径。
 
 ```kotlin
 import org.apache.fory.kotlin.ForyKotlin
@@ -36,10 +36,9 @@ val fory = ForyKotlin.builder()
     .build()
 ```
 
-## Native Mode Setup
+## Native 模式设置
 
-For same-language Kotlin/JVM payloads that need native JVM object behavior, use
-native mode explicitly:
+对于需要原生 JVM 对象行为的同语言 Kotlin/JVM 载荷，请显式使用 native 模式：
 
 ```kotlin
 import org.apache.fory.kotlin.ForyKotlin
@@ -49,11 +48,11 @@ val fory = ForyKotlin.builder().withXlang(false)
     .build()
 ```
 
-## Thread Safety
+## 线程安全
 
-Fory instance creation is not cheap. Instances should be shared between multiple serializations.
+创建 Fory 实例成本不低。实例应在多次序列化之间共享。
 
-### Single-Thread Usage
+### 单线程用法
 
 ```kotlin
 import org.apache.fory.Fory
@@ -67,9 +66,9 @@ object ForyHolder {
 }
 ```
 
-### Multi-Thread Usage
+### 多线程用法
 
-For multi-threaded applications, use `ThreadSafeFory`:
+对于多线程应用，请使用 `ThreadSafeFory`：
 
 ```kotlin
 import org.apache.fory.ThreadSafeFory
@@ -83,7 +82,7 @@ object ForyHolder {
 }
 ```
 
-### Using Builder Methods
+### 使用 Builder 方法
 
 ```kotlin
 // Thread-safe Fory
@@ -93,11 +92,12 @@ val fory: ThreadSafeFory = ForyKotlin.builder()
     .buildThreadSafeFory()
 ```
 
-## Configuration
+## 配置
 
-All configuration options from Fory Java are available. See [Java Configuration](../java/configuration.md) for the complete list.
+Fory Java 的所有配置选项都可用。完整列表请参见
+[Java 配置](../java/configuration.md)。
 
-Common options for Kotlin native-mode payloads:
+Kotlin native 模式载荷的常见选项：
 
 ```kotlin
 import org.apache.fory.kotlin.ForyKotlin

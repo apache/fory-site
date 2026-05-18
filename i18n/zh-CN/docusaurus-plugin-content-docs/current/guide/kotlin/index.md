@@ -1,5 +1,5 @@
 ---
-title: Kotlin Serialization Guide
+title: Kotlin 序列化指南
 sidebar_position: 0
 id: serialization_index
 license: |
@@ -19,32 +19,30 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ Kotlin provides optimized serializers for Kotlin types, built on top of Fory Java. It supports xlang mode for cross-language payloads and native mode for Kotlin/JVM-only object serialization. Most standard Kotlin types work out of the box with the default Fory Java implementation, while Fory Kotlin adds additional support for Kotlin-specific types.
+Apache Fory™ Kotlin 基于 Fory Java 构建，为 Kotlin 类型提供优化的序列化器。大多数标准 Kotlin 类型都可以直接使用默认的 Fory Java 实现，而 Fory Kotlin 则为 Kotlin 特有类型补充了额外支持。
 
-Supported types include:
+支持的类型包括：
 
-- `data class` serialization
-- Unsigned primitives: `UByte`, `UShort`, `UInt`, `ULong`
-- Unsigned arrays: `UByteArray`, `UShortArray`, `UIntArray`, `ULongArray`
-- Stdlib types: `Pair`, `Triple`, `Result`
-- Ranges: `IntRange`, `LongRange`, `CharRange`, and progressions
-- Collections: `ArrayDeque`, empty collections (`emptyList`, `emptyMap`, `emptySet`)
-- `kotlin.time.Duration`, `kotlin.text.Regex`, `kotlin.uuid.Uuid`
+- `data class` 序列化
+- 无符号原始类型：`UByte`、`UShort`、`UInt`、`ULong`
+- 无符号数组：`UByteArray`、`UShortArray`、`UIntArray`、`ULongArray`
+- 标准库类型：`Pair`、`Triple`、`Result`
+- 范围：`IntRange`、`LongRange`、`CharRange` 以及各种 progression
+- 集合：`ArrayDeque`、空集合（`emptyList`、`emptyMap`、`emptySet`）
+- `kotlin.time.Duration`、`kotlin.text.Regex`、`kotlin.uuid.Uuid`
 
-## Features
+## 特性
 
-Fory Kotlin inherits all features from Fory Java, plus Kotlin-specific optimizations:
+Fory Kotlin 继承了 Fory Java 的全部特性，并增加了 Kotlin 特定优化：
 
-- **High Performance**: JIT code generation, zero-copy, 20-170x faster than traditional serialization
-- **Kotlin Type Support**: Optimized serializers for data classes, unsigned types, ranges, and stdlib types
-- **Default Value Support**: Automatic handling of Kotlin data class default parameters during schema evolution
-- **Static Xlang Serializers**: KSP-generated schema serializers for Kotlin/JVM and Android xlang mode
-- **Schema IDL Generation**: Fory compiler output for Kotlin models, sealed unions, and schema modules
-- **Schema Evolution**: Forward/backward compatibility for class schema changes
+- **高性能**：JIT 代码生成、零拷贝，性能可比传统序列化快 20 到 170 倍
+- **Kotlin 类型支持**：为数据类、无符号类型、范围和标准库类型提供优化序列化器
+- **默认值支持**：在 Schema 演进期间自动处理 Kotlin 数据类的默认参数
+- **Schema 演进**：支持类 Schema 变更时的前向和后向兼容
 
-See [Java Features](../java/index.md#features) for complete feature list.
+完整特性列表请参见 [Java 特性](../java/index.md#features)。
 
-## Installation
+## 安装
 
 ### Maven
 
@@ -62,23 +60,26 @@ See [Java Features](../java/index.md#features) for complete feature list.
 implementation("org.apache.fory:fory-kotlin:0.17.0")
 ```
 
-## Quick Start
+## 快速开始
 
 ```kotlin
+import org.apache.fory.Fory
 import org.apache.fory.ThreadSafeFory
-import org.apache.fory.kotlin.ForyKotlin
+import org.apache.fory.serializer.kotlin.KotlinSerializers
 
 data class Person(val name: String, val id: Long, val github: String)
 data class Point(val x: Int, val y: Int, val z: Int)
 
 fun main() {
-    // Create Fory instance (should be reused). Kotlin follows the Java default:
-    // xlang mode with compatible schema evolution.
-    val fory: ThreadSafeFory = ForyKotlin.builder()
-        .withXlang(true)
+    // 创建 Fory 实例（应复用）
+    val fory: ThreadSafeFory = Fory.builder()
         .requireClassRegistration(true)
         .buildThreadSafeFory()
 
+    // 注册 Kotlin 序列化器
+    KotlinSerializers.registerSerializers(fory)
+
+    // 注册你的类
     fory.register(Person::class.java)
     fory.register(Point::class.java)
 
@@ -88,31 +89,20 @@ fun main() {
 }
 ```
 
-## Xlang Mode And Native Mode
+## 基于 Fory Java 构建
 
-Use xlang mode for cross-language payloads and schemas shared with other Fory runtimes. Xlang mode is the default Kotlin wire mode through the JVM builder, and Kotlin examples that use it set `.withXlang(true)` explicitly so the mode choice is visible.
+Fory Kotlin 基于 Fory Java 构建。Fory Java 中的大多数配置选项、特性和概念都可直接应用于 Kotlin。可参考 Java 文档了解：
 
-Use native mode for Kotlin/JVM-only traffic. Native mode is selected with `.withXlang(false)`, uses schema-consistent payloads unless compatible mode is enabled, and inherits the JVM native-mode object serialization path from Fory Java while adding Kotlin-specific serializers for data classes, unsigned values, ranges, stdlib types, and generated serializers. It is optimized for JVM and Kotlin type systems and is the right path for same-language Kotlin/JVM framework replacement payloads.
+- [配置](../java/configuration.md) - 所有 ForyBuilder 选项
+- [基础序列化](../java/basic-serialization.md) - 序列化模式与 API
+- [类型注册](../java/type-registration.md) - 类注册与安全性
+- [Schema 演进](../java/schema-evolution.md) - 前向和后向兼容
+- [自定义序列化器](../java/custom-serializers.md) - 实现自定义序列化器
+- [压缩](../java/compression.md) - Int、long 和字符串压缩
+- [故障排查](../java/troubleshooting.md) - 常见问题与解决方案
 
-See [Configuration](configuration.md) for Kotlin builder setup and [Java Native Mode](../java/native-mode.md) for the full JVM native-mode behavior.
+## Kotlin 特定文档
 
-## Built on Fory Java
-
-Fory Kotlin is built on top of Fory Java. Most configuration options, features, and concepts from Fory Java apply directly to Kotlin. Refer to the Java documentation for:
-
-- [Configuration](../java/configuration.md) - All ForyBuilder options
-- [Basic Serialization](../java/basic-serialization.md) - Serialization patterns and APIs
-- [Type Registration](../java/type-registration.md) - Class registration and security
-- [Schema Evolution](../java/schema-evolution.md) - Forward/backward compatibility
-- [Custom Serializers](../java/custom-serializers.md) - Implement custom serializers
-- [Compression](../java/compression.md) - Int, long, and string compression
-- [Troubleshooting](../java/troubleshooting.md) - Common issues and solutions
-
-## Kotlin-Specific Documentation
-
-- [Configuration](configuration.md) - Kotlin-specific Fory setup requirements
-- [Type Serialization](type-serialization.md) - Serializing Kotlin types
-- [Schema Metadata](schema-metadata.md) - Kotlin annotations, nullability, references, and integer metadata
-- [Default Values](default-values.md) - Kotlin data class default values support
-- [Static Generated Serializers](static-generated-serializers.md) - KSP xlang/schema serializer generation
-- [Android Support](android-support.md) - Android setup, R8 behavior, and release-build validation
+- [Fory 创建](configuration.md) - Kotlin 特定的 Fory 设置要求
+- [类型序列化](type-serialization.md) - Kotlin 类型的序列化
+- [默认值](default-values.md) - Kotlin 数据类默认值支持

@@ -1,5 +1,5 @@
 ---
-title: Schema Metadata
+title: Schema 元数据
 sidebar_position: 4
 id: schema_metadata
 license: |
@@ -19,19 +19,19 @@ license: |
   limitations under the License.
 ---
 
-This page covers macro-level schema metadata in Swift.
+本页介绍 Swift 中宏级别的 schema 元数据。
 
-## Available Macro Attributes
+## 可用的宏属性 {#available-macro-attributes}
 
-- `@ForyStruct` on struct/class models
-- `@ForyEnum` on C-style enum models
-- `@ForyUnion` and `@ForyCase` on associated-value enum models
-- `@ForyField(encoding: ...)` on numeric fields
-- `@ListField`, `@ArrayField`, `@SetField`, and `@MapField` for collection field metadata
+- 结构体/类模型上的 `@ForyStruct`
+- C 风格枚举模型上的 `@ForyEnum`
+- 带关联值枚举模型上的 `@ForyUnion` 和 `@ForyCase`
+- 数值字段上的 `@ForyField(encoding: ...)`
+- 用于集合字段元数据的 `@ListField`、`@ArrayField`、`@SetField` 和 `@MapField`
 
-## `@ForyField(encoding:)`
+## `@ForyField(encoding:)` {#foryfieldencoding}
 
-Use `@ForyField` to override integer encoding strategy.
+使用 `@ForyField` 覆盖整数编码策略。
 
 ```swift
 @ForyStruct
@@ -44,24 +44,22 @@ struct Metrics: Equatable {
 }
 ```
 
-### Supported combinations
+### 支持的组合 {#supported-combinations}
 
-| Swift type | Supported encoding values      | Default encoding |
-| ---------- | ------------------------------ | ---------------- |
-| `Int32`    | `.varint`, `.fixed`            | `.varint`        |
-| `UInt32`   | `.varint`, `.fixed`            | `.varint`        |
-| `Int64`    | `.varint`, `.fixed`, `.tagged` | `.varint`        |
-| `UInt64`   | `.varint`, `.fixed`, `.tagged` | `.varint`        |
-| `Int`      | `.varint`, `.fixed`, `.tagged` | `.varint`        |
-| `UInt`     | `.varint`, `.fixed`, `.tagged` | `.varint`        |
+| Swift type | 支持的 encoding 值             | 默认 encoding |
+| ---------- | ------------------------------ | ------------- |
+| `Int32`    | `.varint`, `.fixed`            | `.varint`     |
+| `UInt32`   | `.varint`, `.fixed`            | `.varint`     |
+| `Int64`    | `.varint`, `.fixed`, `.tagged` | `.varint`     |
+| `UInt64`   | `.varint`, `.fixed`, `.tagged` | `.varint`     |
+| `Int`      | `.varint`, `.fixed`, `.tagged` | `.varint`     |
+| `UInt`     | `.varint`, `.fixed`, `.tagged` | `.varint`     |
 
-Compile-time validation rejects unsupported combinations (for example, `Int32` with `.tagged`).
+编译期校验会拒绝不支持的组合（例如 `Int32` 搭配 `.tagged`）。
 
-## Nested Collection Field Metadata
+## 嵌套集合字段元数据 {#nested-collection-field-metadata}
 
-Use `@ListField`, `@ArrayField`, `@SetField`, and `@MapField` when a collection field
-needs type-specific wire metadata, such as fixed or tagged integer encoding inside a
-container. Use `@ArrayField` for dense non-null bool, integer, and floating-point arrays.
+当集合字段需要类型特定的编码格式元数据时，例如容器内部使用定长或带 tag 的整数编码，请使用 `@ListField`、`@ArrayField`、`@SetField` 和 `@MapField`。密集的非空 bool、整数和浮点数组使用 `@ArrayField`。
 
 ```swift
 @ForyStruct
@@ -83,12 +81,9 @@ struct NestedMetrics: Equatable {
 }
 ```
 
-Non-null `List` elements with fixed-width signed or unsigned integer metadata are
-classified and encoded as the matching Fory primitive packed-array type. `Set`
-fields stay classified as Fory sets, including fixed-width integer sets.
+带有定长有符号或无符号整数元数据的非空 `List` 元素，会被分类并编码为匹配的 Fory primitive packed-array 类型。`Set` 字段仍分类为 Fory set，包括定长整数 set。
 
-When the Swift property type is an alias or otherwise needs a full hint, use
-`@ForyField(type:)`:
+当 Swift 属性类型是别名，或因其他原因需要完整提示时，请使用 `@ForyField(type:)`：
 
 ```swift
 typealias MetricsMap = [String: [Int32?]]
@@ -103,7 +98,7 @@ struct AliasMetrics: Equatable {
 }
 ```
 
-Union payloads use the same DSL through `@ForyCase(payload:)`:
+Union 载荷通过 `@ForyCase(payload:)` 使用同一套 DSL：
 
 ```swift
 @ForyUnion
@@ -116,17 +111,17 @@ enum Event: Equatable {
 }
 ```
 
-## Model Macro Requirements
+## 模型宏要求 {#model-macro-requirements}
 
-### Struct and class fields
+### 结构体和类字段 {#struct-and-class-fields}
 
-- Stored properties must declare explicit types
-- Computed properties are ignored
-- Static/class properties are ignored
+- 存储属性必须声明显式类型
+- 计算属性会被忽略
+- 静态/类属性会被忽略
 
-### Class requirement
+### 类要求 {#class-requirement}
 
-Classes annotated with `@ForyStruct` must provide a `required init()` for default construction.
+标注 `@ForyStruct` 的类必须提供 `required init()` 以进行默认构造。
 
 ```swift
 @ForyStruct
@@ -138,9 +133,9 @@ final class Node {
 }
 ```
 
-## Dynamic Any Fields in Macro Types
+## 宏类型中的动态 Any 字段 {#dynamic-any-fields-in-macro-types}
 
-Fory model macros support dynamic fields and nested containers:
+Fory 模型宏支持动态字段和嵌套容器：
 
 - `Any`, `AnyObject`, `any Serializer`
 - `AnyHashable`
@@ -149,6 +144,6 @@ Fory model macros support dynamic fields and nested containers:
 - `[Int32: Any]`
 - `[AnyHashable: Any]`
 
-Current limitations:
+当前限制：
 
-- `Dictionary<K, Any>` is only supported when `K` is `String`, `Int32`, or `AnyHashable`
+- 仅当 `K` 为 `String`、`Int32` 或 `AnyHashable` 时，才支持 `Dictionary<K, Any>`

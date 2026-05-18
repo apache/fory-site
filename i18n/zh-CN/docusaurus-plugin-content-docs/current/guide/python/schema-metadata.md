@@ -1,5 +1,5 @@
 ---
-title: Schema Metadata
+title: Schema 元信息
 sidebar_position: 7
 id: schema_metadata
 license: |
@@ -19,28 +19,28 @@ license: |
   limitations under the License.
 ---
 
-This page explains how to configure field-level metadata for serialization in Python.
+本页说明如何在 Python 中为序列化配置字段级元信息。
 
-## Overview
+## 概览
 
-Apache Fory™ provides field-level configuration through:
+Apache Fory™ 通过以下方式提供字段级配置：
 
-- **`pyfory.field()`**: Configure field metadata (id, nullable, ref, ignore, dynamic)
-- **Type annotations**: Control integer encoding (varint, fixed, tagged)
-- **`Optional[T]`**: Mark fields as nullable
+- **`pyfory.field()`**：配置字段元信息（id、nullable、ref、ignore、dynamic）
+- **类型注解**：控制整数编码（varint、fixed、tagged）
+- **`Optional[T]`**：将字段标记为可空
 
-This enables:
+这些配置支持：
 
-- **Tag IDs**: Assign compact numeric IDs to reduce struct field meta size overhead
-- **Nullability**: Control whether fields can be null
-- **Reference Tracking**: Enable reference tracking for shared objects
-- **Field Skipping**: Exclude fields from serialization
-- **Encoding Control**: Specify how integers are encoded (varint, fixed, tagged)
-- **Polymorphism**: Control whether type info is written for struct fields
+- **Tag ID**：分配紧凑的数字 ID，降低 struct 字段元信息大小开销
+- **可空性**：控制字段是否可以为 null
+- **引用跟踪**：为共享对象启用引用跟踪
+- **跳过字段**：从序列化中排除字段
+- **编码控制**：指定整数的编码方式（varint、fixed、tagged）
+- **多态**：控制是否为 struct 字段写入类型信息
 
-## Basic Syntax
+## 基本语法
 
-Use `@dataclass` decorator with type annotations and `pyfory.field()`:
+将 `@dataclass` 装饰器与类型注解和 `pyfory.field()` 配合使用：
 
 ```python
 from dataclasses import dataclass
@@ -54,9 +54,9 @@ class Person:
     nickname: Optional[str] = pyfory.field(id=2, nullable=True, default=None)
 ```
 
-## The `pyfory.field()` Function
+## `pyfory.field()` 函数
 
-Use `pyfory.field()` to configure field-level metadata:
+使用 `pyfory.field()` 配置字段级元信息：
 
 ```python
 @dataclass
@@ -68,21 +68,21 @@ class User:
     _cache: dict = pyfory.field(ignore=True, default_factory=dict)
 ```
 
-### Parameters
+### 参数
 
-| Parameter         | Type     | Default   | Description                          |
-| ----------------- | -------- | --------- | ------------------------------------ |
-| `id`              | `int`    | omitted   | Non-negative field tag ID            |
-| `nullable`        | `bool`   | `False`   | Whether the field can be null        |
-| `ref`             | `bool`   | `False`   | Enable reference tracking            |
-| `ignore`          | `bool`   | `False`   | Exclude field from serialization     |
-| `dynamic`         | `bool`   | `None`    | Control whether type info is written |
-| `default`         | Any      | `MISSING` | Default value for the field          |
-| `default_factory` | Callable | `MISSING` | Factory function for default value   |
+| 参数              | 类型     | 默认值    | 说明                 |
+| ----------------- | -------- | --------- | -------------------- |
+| `id`              | `int`    | 省略      | 非负字段 tag ID      |
+| `nullable`        | `bool`   | `False`   | 字段是否可以为 null  |
+| `ref`             | `bool`   | `False`   | 启用引用跟踪         |
+| `ignore`          | `bool`   | `False`   | 从序列化中排除字段   |
+| `dynamic`         | `bool`   | `None`    | 控制是否写入类型信息 |
+| `default`         | Any      | `MISSING` | 字段的默认值         |
+| `default_factory` | Callable | `MISSING` | 默认值的工厂函数     |
 
-## Field ID (`id`)
+## 字段 ID（`id`）
 
-Assigns a numeric ID to a field to minimize struct field meta size overhead:
+为字段分配数字 ID，以最小化 struct 字段元信息大小开销：
 
 ```python
 @dataclass
@@ -92,21 +92,21 @@ class User:
     age: pyfory.Int32 = pyfory.field(id=2, default=0)
 ```
 
-**Benefits**:
+**优点**：
 
-- Smaller serialized size (numeric IDs vs field names in metadata)
-- Reduced struct field meta overhead
-- Allows renaming fields without breaking binary compatibility
+- 序列化尺寸更小（元信息中使用数字 ID，而不是字段名）
+- 降低 struct 字段元信息开销
+- 允许重命名字段而不破坏二进制兼容性
 
-**Recommendation**: It is recommended to configure field IDs for compatible mode since it reduces serialization cost.
+**建议**：在兼容模式下建议配置字段 ID，因为它可以降低序列化成本。
 
-**Notes**:
+**注意事项**：
 
-- IDs must be unique within a class
-- IDs must be >= 0
-- If not specified, field name is used in metadata (larger overhead)
+- ID 在同一个类内必须唯一
+- ID 必须 >= 0
+- 如果未指定，元信息会使用字段名（开销更大）
 
-**Without field IDs** (field names used in metadata):
+**不使用字段 ID**（元信息中使用字段名）：
 
 ```python
 @dataclass
@@ -115,36 +115,35 @@ class User:
     name: str = ""
 ```
 
-## Nullable Fields (`nullable`)
+## 可空字段（`nullable`）
 
-Use `nullable=True` for fields that can be `None`:
+对可以为 `None` 的字段使用 `nullable=True`：
 
 ```python
 from typing import Optional
 
 @dataclass
 class Record:
-    # Nullable string field
+    # 可空字符串字段
     optional_name: Optional[str] = pyfory.field(id=0, nullable=True, default=None)
 
-    # Nullable integer field
+    # 可空整数字段
     optional_count: Optional[pyfory.Int32] = pyfory.field(id=1, nullable=True, default=None)
 ```
 
-**Notes**:
+**注意事项**：
 
-- `Optional[T]` fields must have `nullable=True`
-- Non-optional fields default to `nullable=False`
+- `Optional[T]` 字段必须设置 `nullable=True`
+- 非 optional 字段默认 `nullable=False`
 
-## Reference Tracking (`ref`)
+## 引用跟踪（`ref`）
 
-Enable reference tracking for fields that may be shared. Circular Python object
-graphs require Python native mode with global reference tracking enabled.
+为可能共享的字段启用引用跟踪。循环 Python 对象图需要启用全局引用跟踪的 Python 原生模式。
 
 ```python
 @dataclass
 class RefOuter:
-    # Both fields may point to the same inner object
+    # 两个字段都可能指向同一个内部对象
     inner1: Optional[RefInner] = pyfory.field(id=0, ref=True, nullable=True, default=None)
     inner2: Optional[RefInner] = pyfory.field(id=1, ref=True, nullable=True, default=None)
 
@@ -152,38 +151,37 @@ class RefOuter:
 @dataclass
 class CircularRef:
     name: str = pyfory.field(id=0, default="")
-    # Self-referencing field for circular references
+    # 用于循环引用的自引用字段
     self_ref: Optional["CircularRef"] = pyfory.field(id=1, ref=True, nullable=True, default=None)
 ```
 
-**Use Cases**:
+**使用场景**：
 
-- Enable for fields that may be circular or shared
-- When the same object is referenced from multiple fields
+- 为可能形成循环或共享的字段启用
+- 同一个对象被多个字段引用时启用
 
-**Notes**:
+**注意事项**：
 
-- Global `Fory(ref=True)` must be enabled.
-- Field-level `ref=True` and global `ref=True` must both be enabled for schema
-  fields.
+- 必须启用全局 `Fory(ref=True)`。
+- 对于 schema 字段，字段级 `ref=True` 和全局 `ref=True` 都必须启用。
 
-## Skipping Fields (`ignore`)
+## 跳过字段（`ignore`）
 
-Exclude fields from serialization:
+从序列化中排除字段：
 
 ```python
 @dataclass
 class User:
     id: pyfory.Int64 = pyfory.field(id=0, default=0)
     name: str = pyfory.field(id=1, default="")
-    # Not serialized
+    # 不会被序列化
     _cache: dict = pyfory.field(ignore=True, default_factory=dict)
     _internal_state: str = pyfory.field(ignore=True, default="")
 ```
 
-## Dynamic Fields (`dynamic`)
+## 动态字段（`dynamic`）
 
-Control whether type information is written for struct fields. This is essential for polymorphism support:
+控制是否为 struct 字段写入类型信息。这对多态支持至关重要：
 
 ```python
 from abc import ABC, abstractmethod
@@ -202,107 +200,106 @@ class Circle(Shape):
 
 @dataclass
 class Container:
-    # Abstract class: dynamic is always True (type info written)
+    # 抽象类：dynamic 始终为 True（写入类型信息）
     shape: Shape = pyfory.field(id=0)
 
-    # Force type info for concrete type (support runtime subtypes)
+    # 为具体类型强制写入类型信息（支持运行时子类型）
     circle: Circle = pyfory.field(id=1, dynamic=True)
 
-    # Skip type info for concrete type (use declared type directly)
+    # 对具体类型跳过类型信息（直接使用声明类型）
     fixed_circle: Circle = pyfory.field(id=2, dynamic=False)
 ```
 
-**Default Behavior**:
+**默认行为**：
 
-| Mode        | Abstract Class | Concrete Object Types | Numeric/str/time Types |
-| ----------- | -------------- | --------------------- | ---------------------- |
-| Native mode | `True`         | `True`                | `False`                |
-| Xlang mode  | `True`         | `False`               | `False`                |
+| 模式       | 抽象类 | 具体对象类型 | 数值/str/time 类型 |
+| ---------- | ------ | ------------ | ------------------ |
+| 原生模式   | `True` | `True`       | `False`            |
+| Xlang 模式 | `True` | `False`      | `False`            |
 
-**Notes**:
+**注意事项**：
 
-- **Abstract classes**: `dynamic` is always `True` (type info must be written)
-- **Native mode**: `dynamic` defaults to `True` for object types, `False` for numeric/str/time types
-- **Xlang mode**: `dynamic` defaults to `False` for concrete types
-- Use `dynamic=True` when a concrete field may hold subclass instances
-- Use `dynamic=False` for performance optimization when type is known
+- **抽象类**：`dynamic` 始终为 `True`（必须写入类型信息）
+- **原生模式**：对象类型的 `dynamic` 默认为 `True`，数值/str/time 类型默认为 `False`
+- **Xlang 模式**：具体类型的 `dynamic` 默认为 `False`
+- 当具体字段可能保存子类实例时，使用 `dynamic=True`
+- 当类型已知且需要性能优化时，使用 `dynamic=False`
 
-## Integer Type Annotations
+## 整数类型注解
 
-Fory provides type annotations to control integer encoding:
+Fory 提供类型注解来控制整数编码：
 
-### Signed Integers
+### 有符号整数
 
 ```python
 @dataclass
 class SignedIntegers:
-    byte_val: pyfory.Int8 = 0      # 8-bit signed
-    short_val: pyfory.Int16 = 0    # 16-bit signed
-    int_val: pyfory.Int32 = 0      # 32-bit signed (varint encoding)
-    long_val: pyfory.Int64 = 0     # 64-bit signed (varint encoding)
+    byte_val: pyfory.Int8 = 0      # 8 位有符号
+    short_val: pyfory.Int16 = 0    # 16 位有符号
+    int_val: pyfory.Int32 = 0      # 32 位有符号（varint 编码）
+    long_val: pyfory.Int64 = 0     # 64 位有符号（varint 编码）
 ```
 
-### Unsigned Integers
+### 无符号整数
 
 ```python
 @dataclass
 class UnsignedIntegers:
-    # Fixed-size encoding
-    u8_val: pyfory.UInt8 = 0       # 8-bit unsigned (fixed)
-    u16_val: pyfory.UInt16 = 0     # 16-bit unsigned (fixed)
+    # 定长编码
+    u8_val: pyfory.UInt8 = 0       # 8 位无符号（fixed）
+    u16_val: pyfory.UInt16 = 0     # 16 位无符号（fixed）
 
-    # Variable-length encoding (default for u32/u64)
-    u32_var: pyfory.UInt32 = 0     # 32-bit unsigned (varint)
-    u64_var: pyfory.UInt64 = 0     # 64-bit unsigned (varint)
+    # 变长编码（u32/u64 的默认值）
+    u32_var: pyfory.UInt32 = 0     # 32 位无符号（varint）
+    u64_var: pyfory.UInt64 = 0     # 64 位无符号（varint）
 
-    # Explicit fixed-size encoding
-    u32_fixed: pyfory.FixedUInt32 = 0   # 32-bit unsigned (fixed 4 bytes)
-    u64_fixed: pyfory.FixedUInt64 = 0   # 64-bit unsigned (fixed 8 bytes)
+    # 显式定长编码
+    u32_fixed: pyfory.FixedUInt32 = 0   # 32 位无符号（fixed 4 字节）
+    u64_fixed: pyfory.FixedUInt64 = 0   # 64 位无符号（fixed 8 字节）
 
-    # Tagged encoding (includes type tag)
-    u64_tagged: pyfory.TaggedUInt64 = 0  # 64-bit unsigned (tagged)
+    # Tagged 编码（包含类型 tag）
+    u64_tagged: pyfory.TaggedUInt64 = 0  # 64 位无符号（tagged）
 ```
 
-### Floating Point
+### 浮点数
 
 ```python
 @dataclass
 class FloatingPoint:
-    float_val: pyfory.Float32 = 0.0   # 32-bit float
-    double_val: pyfory.Float64 = 0.0  # 64-bit double
+    float_val: pyfory.Float32 = 0.0   # 32 位浮点数
+    double_val: pyfory.Float64 = 0.0  # 64 位双精度浮点数
 ```
 
-### Encoding Summary
+### 编码汇总
 
-| Type                  | Encoding | Size       |
-| --------------------- | -------- | ---------- |
-| `pyfory.Int8`         | fixed    | 1 byte     |
-| `pyfory.Int16`        | fixed    | 2 bytes    |
-| `pyfory.Int32`        | varint   | 1-5 bytes  |
-| `pyfory.Int64`        | varint   | 1-10 bytes |
-| `pyfory.FixedInt32`   | fixed    | 4 bytes    |
-| `pyfory.FixedInt64`   | fixed    | 8 bytes    |
-| `pyfory.TaggedInt64`  | tagged   | 1-9 bytes  |
-| `pyfory.UInt8`        | fixed    | 1 byte     |
-| `pyfory.UInt16`       | fixed    | 2 bytes    |
-| `pyfory.UInt32`       | varint   | 1-5 bytes  |
-| `pyfory.UInt64`       | varint   | 1-10 bytes |
-| `pyfory.FixedUInt32`  | fixed    | 4 bytes    |
-| `pyfory.FixedUInt64`  | fixed    | 8 bytes    |
-| `pyfory.TaggedUInt64` | tagged   | 1-9 bytes  |
-| `pyfory.Float32`      | fixed    | 4 bytes    |
-| `pyfory.Float64`      | fixed    | 8 bytes    |
+| 类型                  | 编码     | 大小      |
+| --------------------- | -------- | --------- |
+| `pyfory.Int8`         | fixed    | 1 字节    |
+| `pyfory.Int16`        | fixed    | 2 字节    |
+| `pyfory.Int32`        | varint   | 1-5 字节  |
+| `pyfory.Int64`        | varint   | 1-10 字节 |
+| `pyfory.FixedInt32`   | fixed    | 4 字节    |
+| `pyfory.FixedInt64`   | fixed    | 8 字节    |
+| `pyfory.TaggedInt64`  | tagged   | 1-9 字节  |
+| `pyfory.UInt8`        | fixed    | 1 字节    |
+| `pyfory.UInt16`       | fixed    | 2 字节    |
+| `pyfory.UInt32`       | varint   | 1-5 字节  |
+| `pyfory.UInt64`       | varint   | 1-10 字节 |
+| `pyfory.FixedUInt32`  | fixed    | 4 字节    |
+| `pyfory.FixedUInt64`  | fixed    | 8 字节    |
+| `pyfory.TaggedUInt64` | tagged   | 1-9 字节  |
+| `pyfory.Float32`      | fixed    | 4 字节    |
+| `pyfory.Float64`      | fixed    | 8 字节    |
 
-**When to Use**:
+**使用时机**：
 
-- `varint`: Best for values that are often small (default for int32/int64/uint32/uint64)
-- `fixed`: Best for values that use full range (e.g., timestamps, hashes)
-- `tagged`: When type information needs to be preserved (int64/uint64 only)
+- `varint`：最适合经常较小的值（int32/int64/uint32/uint64 的默认值）
+- `fixed`：最适合使用完整范围的值（例如时间戳、哈希）
+- `tagged`：需要保留类型信息时使用（仅 int64/uint64）
 
-## Nested Container Type Annotations
+## 嵌套容器类型注解
 
-Integer encoding aliases can be used inside declared collection schemas. Fory uses the declared
-field schema for every nested element, key, and value in both pure Python and Cython modes:
+整数编码别名可以在声明的集合 schema 内使用。无论在纯 Python 还是 Cython 模式中，Fory 都会对每个嵌套元素、键和值使用声明的字段 schema：
 
 ```python
 from dataclasses import dataclass, field
@@ -315,16 +312,11 @@ class Counters:
     values: Dict[pyfory.FixedInt32, List[pyfory.TaggedInt64]] = field(default_factory=dict)
 ```
 
-For `values`, map keys are written as fixed-width int32 values and each nested list element is
-written as tagged int64. Runtime type inference is used only for dynamic or unknown container
-schemas.
+对于 `values`，map 的键会写成定长 int32 值，每个嵌套 list 元素会写成 tagged int64。运行时类型推断仅用于动态或未知的容器 schema。
 
-In compatible mode, readers consume field bytes using the remote schema metadata. Python assigns the
-decoded value only when it can safely satisfy the local declared schema. Different integer encodings
-in the same signedness and width domain are compatible, and same-signedness narrowing is assigned
-only after range validation.
+在兼容模式下，读取端使用远端 schema 元信息消费字段字节。只有在解码值能够安全满足本地声明 schema 时，Python 才会赋值。相同符号性和宽度范围内的不同整数编码是兼容的；相同符号性的窄化转换只会在范围校验后赋值。
 
-## Complete Example
+## 完整示例
 
 ```python
 from dataclasses import dataclass
@@ -334,27 +326,27 @@ import pyfory
 
 @dataclass
 class Document:
-    # Fields with tag IDs (recommended for compatible mode)
+    # 带 tag ID 的字段（兼容模式推荐）
     title: str = pyfory.field(id=0, default="")
     version: pyfory.Int32 = pyfory.field(id=1, default=0)
 
-    # Nullable field
+    # 可空字段
     description: Optional[str] = pyfory.field(id=2, nullable=True, default=None)
 
-    # Collection fields
+    # 集合字段
     tags: List[str] = pyfory.field(id=3, default_factory=list)
     metadata: Dict[str, str] = pyfory.field(id=4, default_factory=dict)
     categories: Set[str] = pyfory.field(id=5, default_factory=set)
 
-    # Unsigned integers with different encodings
-    view_count: pyfory.UInt64 = pyfory.field(id=6, default=0)           # varint encoding
-    file_size: pyfory.FixedUInt64 = pyfory.field(id=7, default=0)       # fixed encoding
-    checksum: pyfory.TaggedUInt64 = pyfory.field(id=8, default=0)       # tagged encoding
+    # 使用不同编码的无符号整数
+    view_count: pyfory.UInt64 = pyfory.field(id=6, default=0)           # varint 编码
+    file_size: pyfory.FixedUInt64 = pyfory.field(id=7, default=0)       # fixed 编码
+    checksum: pyfory.TaggedUInt64 = pyfory.field(id=8, default=0)       # tagged 编码
 
-    # Reference-tracked field for shared/circular references
+    # 用于共享/循环引用的引用跟踪字段
     parent: Optional["Document"] = pyfory.field(id=9, ref=True, nullable=True, default=None)
 
-    # Ignored field (not serialized)
+    # 被忽略的字段（不序列化）
     _cache: dict = pyfory.field(ignore=True, default_factory=dict)
 
 
@@ -375,10 +367,10 @@ def main():
         parent=None,
     )
 
-    # Serialize
+    # 序列化
     data = fory.serialize(doc)
 
-    # Deserialize
+    # 反序列化
     decoded = fory.deserialize(data)
     assert decoded.title == doc.title
     assert decoded.version == doc.version
@@ -388,43 +380,43 @@ if __name__ == "__main__":
     main()
 ```
 
-## Cross-Language Compatibility
+## 跨语言兼容性
 
-When serializing data to be read by other languages (Java, Rust, C++, Go), use field IDs and matching type annotations:
+当序列化的数据需要被其他语言（Java、Rust、C++、Go）读取时，请使用字段 ID 和匹配的类型注解：
 
 ```python
 @dataclass
 class CrossLangData:
-    # Use field IDs for cross-language compatibility
+    # 使用字段 ID 实现跨语言兼容性
     int_var: pyfory.Int32 = pyfory.field(id=0, default=0)
     long_fixed: pyfory.FixedUInt64 = pyfory.field(id=1, default=0)
     long_tagged: pyfory.TaggedUInt64 = pyfory.field(id=2, default=0)
     optional_value: Optional[str] = pyfory.field(id=3, nullable=True, default=None)
 ```
 
-## Schema Evolution
+## Schema 演进
 
-Compatible mode supports schema evolution. It is recommended to configure field IDs to reduce serialization cost:
+兼容模式支持 Schema 演进。建议配置字段 ID 以降低序列化成本：
 
 ```python
-# Version 1
+# 版本 1
 @dataclass
 class DataV1:
     id: pyfory.Int64 = pyfory.field(id=0, default=0)
     name: str = pyfory.field(id=1, default="")
 
 
-# Version 2: Added new field
+# 版本 2：新增字段
 @dataclass
 class DataV2:
     id: pyfory.Int64 = pyfory.field(id=0, default=0)
     name: str = pyfory.field(id=1, default="")
-    email: Optional[str] = pyfory.field(id=2, nullable=True, default=None)  # New field
+    email: Optional[str] = pyfory.field(id=2, nullable=True, default=None)  # 新字段
 ```
 
-Data serialized with V1 can be deserialized with V2 (new field will be `None`).
+使用 V1 序列化的数据可以用 V2 反序列化（新字段会是 `None`）。
 
-Alternatively, field IDs can be omitted (field names will be used in metadata with larger overhead):
+也可以省略字段 ID（元信息中会使用字段名，开销更大）：
 
 ```python
 @dataclass
@@ -433,24 +425,24 @@ class Data:
     name: str = ""
 ```
 
-## Native Mode vs Xlang Mode
+## 原生模式与 Xlang 模式
 
-Field configuration behaves differently depending on the serialization mode:
+字段配置的行为取决于序列化模式：
 
-### Native Mode (Python-only)
+### 原生模式（仅 Python）
 
-Native mode has **relaxed default values** for maximum compatibility:
+原生模式使用**更宽松的默认值**以获得最大兼容性：
 
-- **Nullable**: `str` and numeric types are non-nullable by default unless `Optional` is used
-- **Ref tracking**: Enabled by default for object references (except `str` and numeric types)
+- **可空性**：`str` 和数值类型默认不可空，除非使用 `Optional`
+- **引用跟踪**：默认对对象引用启用（`str` 和数值类型除外）
 
-In native mode, you typically **don't need to configure field annotations** unless you want to:
+在原生模式中，通常**不需要配置字段注解**，除非你希望：
 
-- Reduce serialized size by using field IDs
-- Optimize performance by disabling unnecessary ref tracking
+- 通过使用字段 ID 降低序列化尺寸
+- 通过禁用不必要的引用跟踪来优化性能
 
 ```python
-# Native mode: works without schema metadata
+# 原生模式：不需要 schema 元信息也能工作
 @dataclass
 class User:
     id: int = 0
@@ -458,67 +450,67 @@ class User:
     tags: List[str] = None
 ```
 
-### Xlang Mode (Cross-language)
+### Xlang 模式（跨语言）
 
-Xlang mode has **stricter default values** due to type system differences between languages:
+由于语言之间的类型系统差异，Xlang 模式使用**更严格的默认值**：
 
-- **Nullable**: Fields are non-nullable by default (`nullable=False`)
-- **Ref tracking**: Disabled by default (`ref=False`)
+- **可空性**：字段默认不可空（`nullable=False`）
+- **引用跟踪**：默认禁用（`ref=False`）
 
-In xlang mode, you **need to configure fields** when:
+在 xlang 模式中，当出现以下情况时，你**需要配置字段**：
 
-- A field can be None (use `Optional[T]` with `nullable=True`)
-- A field needs reference tracking for shared/circular objects (use `ref=True`)
-- Integer types need specific encoding for cross-language compatibility
-- You want to reduce metadata size (use field IDs)
+- 字段可以为 None（使用带 `nullable=True` 的 `Optional[T]`）
+- 字段需要为共享/循环对象启用引用跟踪（使用 `ref=True`）
+- 整数类型需要用于跨语言兼容性的特定编码
+- 你希望降低元信息大小（使用字段 ID）
 
 ```python
-# Xlang mode: explicit configuration required for nullable/ref fields
+# Xlang 模式：可空/ref 字段需要显式配置
 @dataclass
 class User:
     id: pyfory.Int64 = pyfory.field(id=0, default=0)
     name: str = pyfory.field(id=1, default="")
-    email: Optional[str] = pyfory.field(id=2, nullable=True, default=None)  # Must declare nullable
-    friend: Optional["User"] = pyfory.field(id=3, ref=True, nullable=True, default=None)  # Must declare ref
+    email: Optional[str] = pyfory.field(id=2, nullable=True, default=None)  # 必须声明可空
+    friend: Optional["User"] = pyfory.field(id=3, ref=True, nullable=True, default=None)  # 必须声明 ref
 ```
 
-### Default Values Summary
+### 默认值汇总
 
-| Option     | Native Mode Default                                   | Xlang Mode Default |
-| ---------- | ----------------------------------------------------- | ------------------ |
-| `nullable` | `False` for `str`/numeric; others nullable by default | `False`            |
-| `ref`      | `True` (except `str` and numeric types)               | `False`            |
-| `dynamic`  | `True` (except numeric/str/time types)                | `False` (concrete) |
+| 选项       | 原生模式默认值                             | Xlang 模式默认值    |
+| ---------- | ------------------------------------------ | ------------------- |
+| `nullable` | `str`/数值类型为 `False`；其他类型默认可空 | `False`             |
+| `ref`      | `True`（`str` 和数值类型除外）             | `False`             |
+| `dynamic`  | `True`（数值/str/time 类型除外）           | `False`（具体类型） |
 
-## Best Practices
+## 最佳实践
 
-1. **Configure field IDs**: Recommended for compatible mode to reduce serialization cost
-2. **Use `Optional[T]` with `nullable=True`**: Required for nullable fields in xlang mode
-3. **Enable ref tracking for shared objects**: Use `ref=True` when objects are shared or circular
-4. **Use `ignore=True` for sensitive data**: Passwords, tokens, internal state
-5. **Choose appropriate encoding**: `varint` for small values, `fixed` for full-range values
-6. **Keep IDs stable**: Once assigned, don't change field IDs
+1. **配置字段 ID**：在兼容模式下推荐使用，可降低序列化成本
+2. **使用带 `nullable=True` 的 `Optional[T]`**：xlang 模式中可空字段必需
+3. **为共享对象启用引用跟踪**：当对象共享或形成循环时使用 `ref=True`
+4. **对敏感数据使用 `ignore=True`**：密码、令牌、内部状态
+5. **选择合适的编码**：小值使用 `varint`，完整范围值使用 `fixed`
+6. **保持 ID 稳定**：一旦分配，不要更改字段 ID
 
-## Options Reference
+## 选项参考
 
-| Configuration                              | Description                          |
-| ------------------------------------------ | ------------------------------------ |
-| `pyfory.field(id=N)`                       | Field tag ID to reduce metadata size |
-| `pyfory.field(nullable=True)`              | Mark field as nullable               |
-| `pyfory.field(ref=True)`                   | Enable reference tracking            |
-| `pyfory.field(ignore=True)`                | Exclude field from serialization     |
-| `pyfory.field(dynamic=True)`               | Force type info to be written        |
-| `pyfory.field(dynamic=False)`              | Skip type info (use declared type)   |
-| `Optional[T]`                              | Type hint for nullable fields        |
-| `pyfory.Int32`, `pyfory.Int64`             | Signed integers (varint encoding)    |
-| `pyfory.FixedInt32`, `pyfory.FixedInt64`   | Fixed-size signed                    |
-| `pyfory.TaggedInt64`                       | Tagged encoding for int64            |
-| `pyfory.UInt32`, `pyfory.UInt64`           | Unsigned integers (varint encoding)  |
-| `pyfory.FixedUInt32`, `pyfory.FixedUInt64` | Fixed-size unsigned                  |
-| `pyfory.TaggedUInt64`                      | Tagged encoding for uint64           |
+| 配置                                       | 说明                             |
+| ------------------------------------------ | -------------------------------- |
+| `pyfory.field(id=N)`                       | 用于降低元信息大小的字段 tag ID  |
+| `pyfory.field(nullable=True)`              | 将字段标记为可空                 |
+| `pyfory.field(ref=True)`                   | 启用引用跟踪                     |
+| `pyfory.field(ignore=True)`                | 从序列化中排除字段               |
+| `pyfory.field(dynamic=True)`               | 强制写入类型信息                 |
+| `pyfory.field(dynamic=False)`              | 跳过类型信息（使用声明类型）     |
+| `Optional[T]`                              | 可空字段的类型提示               |
+| `pyfory.Int32`, `pyfory.Int64`             | 有符号整数（varint 编码）        |
+| `pyfory.FixedInt32`, `pyfory.FixedInt64`   | 定长有符号整数                   |
+| `pyfory.TaggedInt64`                       | int64 的 tagged 编码             |
+| `pyfory.UInt32`, `pyfory.UInt64`           | 无符号整数（varint 编码）        |
+| `pyfory.FixedUInt32`, `pyfory.FixedUInt64` | 定长无符号整数                   |
+| `pyfory.TaggedUInt64`                      | uint64 的 tagged 编码            |
 
-## Related Topics
+## 相关主题
 
-- [Basic Serialization](basic-serialization.md) - Getting started with Fory serialization
-- [Schema Evolution](schema-evolution.md) - Compatible mode and schema evolution
-- [Cross-Language](cross-language.md) - Interoperability with Java, Rust, C++, Go
+- [基本序列化](basic-serialization.md) - Fory 序列化入门
+- [Schema 演进](schema-evolution.md) - 兼容模式和 Schema 演进
+- [Xlang 序列化](xlang-serialization.md) - 与 Java、Rust、C++、Go 互操作

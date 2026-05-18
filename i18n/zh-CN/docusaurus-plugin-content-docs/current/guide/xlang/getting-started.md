@@ -1,5 +1,5 @@
 ---
-title: Getting Started
+title: 入门指南
 sidebar_position: 10
 id: getting_started
 license: |
@@ -19,13 +19,13 @@ license: |
   limitations under the License.
 ---
 
-This guide covers installation and basic setup for cross-language serialization in all supported languages.
+本指南介绍所有受支持语言中跨语言序列化的安装与基础设置。
 
-## Installation
+## 安装
 
 ### Java
 
-**Maven:**
+**Maven：**
 
 ```xml
 <dependency>
@@ -35,7 +35,7 @@ This guide covers installation and basic setup for cross-language serialization 
 </dependency>
 ```
 
-**Gradle:**
+**Gradle：**
 
 ```gradle
 implementation 'org.apache.fory:fory-core:0.17.0'
@@ -57,24 +57,22 @@ go get github.com/apache/fory/go/fory
 
 ```toml
 [dependencies]
-fory = "0.13"
+fory = "0.17.0"
 ```
 
 ### JavaScript
 
 ```bash
-npm install @apache-fory/core
+npm install @apache-fory/fory
 ```
 
 ### C++
 
-Use Bazel or CMake to build from source. See [C++ Guide](../cpp/index.md) for details.
+使用 Bazel 或 CMake 从源码构建。详见 [C++ 指南](../cpp/index.md)。
 
-## Create an Xlang Runtime
+## 启用跨语言模式
 
-Xlang mode is the default for runtimes that expose a mode switch. Swift, C#, JavaScript/TypeScript,
-and Dart only expose the xlang wire format. The examples below keep compatible schema evolution on
-the default path and show only options that change another setting.
+每种语言都需要启用 xlang 模式，以确保跨语言之间的二进制兼容性。
 
 ### Java
 
@@ -83,8 +81,8 @@ import org.apache.fory.*;
 import org.apache.fory.config.*;
 
 Fory fory = Fory.builder()
-    .withXlang(true)
-    .withRefTracking(true)  // Optional: for circular references
+    .withLanguage(Language.XLANG)  // 启用跨语言模式
+    .withRefTracking(true)          // 可选：用于循环引用
     .build();
 ```
 
@@ -93,9 +91,10 @@ Fory fory = Fory.builder()
 ```python
 import pyfory
 
+# 必须显式启用跨语言模式
 fory = pyfory.Fory(xlang=True)
 
-# Enable reference tracking when needed
+# 需要时启用引用跟踪
 fory = pyfory.Fory(xlang=True, ref=True)
 ```
 
@@ -105,7 +104,7 @@ fory = pyfory.Fory(xlang=True, ref=True)
 import forygo "github.com/apache/fory/go/fory"
 
 fory := forygo.NewFory(forygo.WithXlang(true))
-// Or with reference tracking
+// 或启用引用跟踪
 fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
 ```
 
@@ -114,13 +113,13 @@ fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
 ```rust
 use fory::Fory;
 
-let fory = Fory::builder().xlang(true).build();
+let fory = Fory::default().xlang(true);
 ```
 
 ### JavaScript
 
 ```javascript
-import Fory, { Type } from "@apache-fory/core";
+import Fory from "@apache-fory/fory";
 
 const fory = new Fory();
 ```
@@ -132,108 +131,107 @@ const fory = new Fory();
 
 using namespace fory::serialization;
 
-auto fory = Fory::builder().xlang(true).build();
+auto fory = Fory::builder()
+    .xlang(true)
+    .build();
 ```
 
-## Type Registration
+## 类型注册
 
-Custom types must be registered with consistent names or IDs across all languages.
+自定义类型必须在所有语言中使用一致的名称或 ID 注册。
 
-### Register by Name (Recommended)
+### 按名称注册（推荐）
 
-Using string names is more flexible and less prone to conflicts:
+使用字符串名称更灵活，也更不容易发生冲突：
 
-**Java:**
+**Java：**
 
 ```java
 fory.register(Person.class, "example.Person");
 ```
 
-**Python:**
+**Python：**
 
 ```python
 fory.register_type(Person, typename="example.Person")
 ```
 
-**Go:**
+**Go：**
 
 ```go
-fory.RegisterStructByName(Person{}, "example.Person")
+fory.RegisterNamedStruct(Person{}, "example.Person")
 ```
 
-**Rust:**
+**Rust：**
 
 ```rust
-use fory::{Fory, ForyStruct};
+use fory::{Fory, ForyObject};
 
-#[derive(ForyStruct)]
+#[derive(ForyObject)]
 struct Person {
     name: String,
     age: i32,
 }
 
-let mut fory = Fory::builder().xlang(true).build();
+let mut fory = Fory::default().xlang(true);
 fory
-    .register_by_name::<Person>("example", "Person")
+    .register_by_namespace::<Person>("example", "Person")
     .expect("register Person");
 ```
 
-**JavaScript:**
+**JavaScript：**
 
 ```javascript
-const personType = Type.struct(
-  { typeName: "example.Person" },
-  {
-    name: Type.string(),
-    age: Type.int32(),
-  },
-);
-const { serialize, deserialize } = fory.register(personType);
+const description = Type.object("example.Person", {
+  name: Type.string(),
+  age: Type.int32(),
+});
+fory.registerSerializer(description);
 ```
 
-**C++:**
+**C++：**
 
 ```cpp
-fory.register_struct<Person>("example", "Person");
-// For enums, use register_enum:
-// fory.register_enum<Color>("example", "Color");
+fory.register_struct<Person>("example.Person");
+// 对于枚举，使用 register_enum：
+// fory.register_enum<Color>("example.Color");
 ```
 
-### Register by ID
+### 按 ID 注册
 
-Using numeric IDs is faster and produces smaller binary output:
+使用数字 ID 速度更快，并且生成的二进制输出更小：
 
-**Java:**
+**Java：**
 
 ```java
 fory.register(Person.class, 100);
 ```
 
-**Python:**
+**Python：**
 
 ```python
 fory.register_type(Person, type_id=100)
 ```
 
-**Go:**
+**Go：**
 
 ```go
 fory.RegisterStruct(Person{}, 100)
 ```
 
-**C++:**
+**C++：**
 
 ```cpp
 fory.register_struct<Person>(100);
-// For enums, use register_enum:
+// 对于枚举，使用 register_enum：
 // fory.register_enum<Color>(101);
 ```
 
-## Hello World Example
+## Hello World 示例
 
-A complete example showing serialization in Java and deserialization in Python:
+下面给出一个完整示例，展示如何在 Java 中序列化、在 Python 中反序列化：
 
-### Java (Serializer)
+### Java（序列化端）
 
 ```java
 import org.apache.fory.*;
@@ -247,7 +245,9 @@ public class Person {
 
 public class HelloWorld {
     public static void main(String[] args) throws Exception {
-        Fory fory = Fory.builder().withXlang(true).build();
+        Fory fory = Fory.builder()
+            .withLanguage(Language.XLANG)
+            .build();
         fory.register(Person.class, "example.Person");
 
         Person person = new Person();
@@ -261,7 +261,7 @@ public class HelloWorld {
 }
 ```
 
-### Python (Deserializer)
+### Python（反序列化端）
 
 ```python
 import pyfory
@@ -270,7 +270,7 @@ from dataclasses import dataclass
 @dataclass
 class Person:
     name: str
-    age: pyfory.Int32
+    age: pyfory.Int32Type
 
 fory = pyfory.Fory(xlang=True)
 fory.register_type(Person, typename="example.Person")
@@ -283,16 +283,16 @@ print(f"Name: {person.name}, Age: {person.age}")
 # Output: Name: Alice, Age: 30
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Use consistent type names**: Ensure all languages use the same type name or ID
-2. **Enable reference tracking**: If your data has circular or shared references
-3. **Reuse Fory instances**: Creating Fory is expensive; reuse instances
-4. **Use type annotations**: In Python, use markers such as `pyfory.Int32` for precise type mapping
-5. **Test cross-language**: Verify serialization works across all target languages
+1. **使用一致的类型名**：确保所有语言使用相同的类型名或 ID。
+2. **启用引用跟踪**：如果你的数据包含循环引用或共享引用。
+3. **复用 Fory 实例**：创建 Fory 的成本较高，应尽量复用实例。
+4. **使用类型注解**：在 Python 中使用 `pyfory.Int32Type` 等精确类型映射。
+5. **测试跨语言链路**：验证序列化结果在所有目标语言之间都能正确工作。
 
-## Next Steps
+## 后续步骤
 
-- [Type Mapping](../../specification/xlang_type_mapping.md) - Cross-language type mapping reference
-- [Serialization](serialization.md) - Detailed serialization examples
-- [Troubleshooting](troubleshooting.md) - Common issues and solutions
+- [类型映射](../../specification/xlang_type_mapping.md) - 跨语言类型映射参考
+- [序列化](serialization.md) - 更详细的序列化示例
+- [故障排查](troubleshooting.md) - 常见问题与解决方案

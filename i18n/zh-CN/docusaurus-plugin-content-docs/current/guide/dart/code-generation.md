@@ -1,7 +1,7 @@
 ---
-title: Code Generation
+title: 代码生成
 sidebar_position: 3
-id: code_generation
+id: dart_code_generation
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -19,11 +19,11 @@ license: |
   limitations under the License.
 ---
 
-Fory generates fast serializer code for your Dart classes at build time. You annotate your models, run `build_runner`, and Fory takes care of the rest.
+Fory 会在构建阶段为你的 Dart 类生成高性能序列化代码。你只需要给模型加注解、运行 `build_runner`，剩下的由 Fory 处理。
 
-## Step 1 — Annotate Your Models
+## 第一步：给模型加注解
 
-Add `@ForyStruct()` to each class you want to serialize. Include the generated part directive at the top of the file.
+为每个需要序列化的类添加 `@ForyStruct()`。同时在文件顶部加入生成的 `part` 指令。
 
 ```dart
 import 'package:fory/fory.dart';
@@ -43,28 +43,26 @@ class User {
   User();
 
   String name = '';
-
-  @ForyField(type: Int32Type())
-  int age = 0;
+  Int32 age = Int32(0);
   Address address = Address();
 }
 ```
 
-Enums defined in the same file are automatically included in the generated registration.
+定义在同一文件中的枚举会自动包含到生成的注册代码里。
 
-## Step 2 — Run the Generator
+## 第二步：运行生成器
 
-From the directory that contains your `pubspec.yaml`:
+在包含 `pubspec.yaml` 的目录下运行：
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-This emits a `.fory.dart` file next to your source file. Re-run this command any time you add or rename annotated types.
+这会在源文件旁边生成一个 `.fory.dart` 文件。每当你新增或重命名带注解的类型时，都需要重新运行这个命令。
 
-## Step 3 — Register and Use
+## 第三步：注册并使用
 
-The generator creates a namespace (named after your file) with a `register` function. Call it before serializing:
+生成器会创建一个以源文件命名的命名空间，并提供 `register` 函数。请在序列化前调用它：
 
 ```dart
 final fory = Fory();
@@ -72,7 +70,7 @@ ModelsFory.register(fory, Address, id: 1);
 ModelsFory.register(fory, User, id: 2);
 ```
 
-Or use a stable name instead of a numeric ID (useful for cross-language scenarios):
+也可以用稳定名称代替数字 ID，这在跨语言场景中更有用：
 
 ```dart
 ModelsFory.register(
@@ -83,17 +81,17 @@ ModelsFory.register(
 );
 ```
 
-See [Type Registration](type-registration.md) for guidance on choosing between IDs and names.
+关于如何在 ID 和名称之间做选择，见 [类型注册](type-registration.md)。
 
-## Schema Evolution: `evolving`
+## Schema 演进：`evolving`
 
-`@ForyStruct()` defaults to `evolving: true`, which is the right choice for most applications.
+`@ForyStruct()` 默认使用 `evolving: true`，这对大多数应用都是正确选择。
 
-- `evolving: true` — Fory stores enough metadata so that if you add or remove fields later, old and new code can still exchange messages. Enable this whenever different versions of your app or service may be running at the same time.
-- `evolving: false` — No extra metadata; marginally smaller payloads. Safe only when both writer and reader are always updated together.
+- `evolving: true`：Fory 会保存足够的元信息，因此当你之后新增或删除字段时，旧代码与新代码仍然可以交换消息。只要你的应用或服务可能存在多个版本同时运行，就应该启用它。
+- `evolving: false`：不写入额外元信息，载荷会略小一些。只有在写端和读端总是一起升级时才安全。
 
 ```dart
-// evolving: true is the default, you can omit it
+// evolving: true 是默认值，可以省略
 @ForyStruct(evolving: true)
 class Event {
   Event();
@@ -102,14 +100,14 @@ class Event {
 }
 ```
 
-When using evolving structs, also assign stable field IDs with `@ForyField(id: ...)` before you ship your first payload — those IDs are how Fory matches fields after a schema change.
+使用 evolving 结构体时，也要在首次对外发送载荷之前通过 `@ForyField(id: ...)` 为字段分配稳定 ID，因为 Fory 会依赖这些 ID 在 Schema 变化后匹配字段。
 
-## When Not to Use Code Generation
+## 什么时候不要使用代码生成
 
-If you cannot annotate a type (e.g., it comes from a package you do not own), write a [Custom Serializer](custom-serializers.md) instead.
+如果你无法给某个类型加注解，例如它来自一个你无法修改的第三方包，那就改用 [自定义序列化器](custom-serializers.md)。
 
-## Related Topics
+## 相关主题
 
-- [Type Registration](type-registration.md)
-- [Schema Metadata](schema-metadata.md)
-- [Schema Evolution](schema-evolution.md)
+- [类型注册](type-registration.md)
+- [字段配置](schema-metadata.md)
+- [Schema 演进](schema-evolution.md)
