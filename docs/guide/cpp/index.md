@@ -42,6 +42,9 @@ The C++ implementation supports both CMake and Bazel build systems.
 - CMake 3.16+ (for CMake build) or Bazel 8+ (for Bazel build)
 - C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
 
+When building with MSVC, configure your build system to pass
+`/Zc:preprocessor`.
+
 ### Using CMake (Recommended)
 
 The easiest way to use Fory is with CMake's `FetchContent` module:
@@ -105,6 +108,14 @@ cc_binary(
     srcs = ["main.cc"],
     deps = ["@fory//cpp/fory/serialization:fory_serialization"],
 )
+```
+
+When building with MSVC, add the conforming preprocessor option to your Bazel
+configuration:
+
+```bazel
+# .bazelrc
+build --cxxopt=/Zc:preprocessor
 ```
 
 Then build and run:
