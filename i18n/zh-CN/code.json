@@ -279,7 +279,7 @@
     "description": "The title displayed in the homepage hero section"
   },
   "homepage.hero.subtitle": {
-    "message": "Apache Fory™ 一个基于动态代码生成和零拷贝技术的多语言序列化框架，实现了无需IDL编译的原生多语言编程范式，并提供最高170倍的性能和极致的易用性。大幅提升大规模数据传输、高并发RPC、分布式系统、云原生中间件等场景的性能，显著降低多语言系统的研发成本。",
+    "message": "面向惯用领域对象、Schema IDL 和跨语言数据交换的极速多语言序列化框架。",
     "description": "The subtitle displayed in the homepage hero section"
   },
   "homepage.githubButton": {
@@ -287,31 +287,63 @@
     "description": "The GitHub button label on the homepage"
   },
   "homepage.getStartedButton": {
-    "message": "Get Started",
+    "message": "开始使用",
     "description": "The Get Started button label on the homepage"
   },
-  "feature.highPerformance.title": {
-    "message": "高性能",
-    "description": "The title for the high performance feature"
+  "homepage.quickStart.title": {
+    "message": "快速开始",
+    "description": "The title for the homepage quick start language picker"
   },
-  "feature.highPerformance.description": {
-    "message": "相比其他序列化框架，性能最高提升20~170倍",
-    "description": "Description for the high performance feature"
+  "homepage.quickStart.description": {
+    "message": "选择运行时并打开对应的快速开始指南。",
+    "description": "The description for the homepage quick start language picker"
   },
-  "feature.easyToUse.title": {
-    "message": "易于使用",
-    "description": "The title for the easy to use feature"
+  "feature.crossLanguageEncoding.title": {
+    "message": "跨语言编码",
+    "description": "The title for the cross-language encoding feature"
   },
-  "feature.easyToUse.description": {
-    "message": "无需编写IDL定义Schema，您可以使用Fory自动序列化自定义类型对象",
-    "description": "Description for the easy to use feature"
+  "feature.crossLanguageEncoding.description": {
+    "message": "用紧凑二进制载荷跨运行时交换数据，并支持 Schema 演进、共享引用、循环引用和多态运行时类型。",
+    "description": "Description for the cross-language encoding feature"
   },
-  "feature.multiLanguages.title": {
-    "message": "多语言",
-    "description": "The title for the multi-languages feature"
+  "feature.domainObjects.title": {
+    "message": "领域对象优先",
+    "description": "The title for the domain objects feature"
   },
-  "feature.multiLanguages.description": {
-    "message": "支持Java、Scala、Python、C++、Golang、Javascript、Rust等编程语言",
-    "description": "Description for the multi-languages feature"
+  "feature.domainObjects.description": {
+    "message": "直接序列化 Java 类、Python dataclass、Go struct、Rust/C++ struct，以及生成或注解过的模型类型。",
+    "description": "Description for the domain objects feature"
+  },
+  "feature.schemaIdl.title": {
+    "message": "感知引用的 Schema IDL",
+    "description": "The title for the schema IDL feature"
+  },
+  "feature.schemaIdl.description": {
+    "message": "一次定义 Schema，并在其中表达共享引用和循环引用，再为各语言生成原生领域对象，无需包装类型。",
+    "description": "Description for the schema IDL feature"
+  },
+  "feature.rowFormat.title": {
+    "message": "行格式随机访问",
+    "description": "The title for the row format feature"
+  },
+  "feature.rowFormat.description": {
+    "message": "无需重建完整对象即可读取字段、数组和嵌套值，支持零拷贝访问、部分读取和 Arrow 集成。",
+    "description": "Description for the row format feature"
+  },
+  "feature.optimizedRuntimes.title": {
+    "message": "优化运行时",
+    "description": "The title for the optimized runtimes feature"
+  },
+  "feature.optimizedRuntimes.description": {
+    "message": "Java JIT 序列化器，以及其他运行时的生成式或静态序列化器，让热点路径保持高速并压缩序列化数据。",
+    "description": "Description for the optimized runtimes feature"
+  },
+  "feature.platformSupport.title": {
+    "message": "广泛平台支持",
+    "description": "The title for the platform support feature"
+  },
+  "feature.platformSupport.description": {
+    "message": "支持 Java、Python、C++、Go、Rust、JavaScript/TypeScript、C#、Swift、Dart、Scala、Kotlin、GraalVM、Flutter、Node.js 和浏览器。",
+    "description": "Description for the platform support feature"
   }
 }
