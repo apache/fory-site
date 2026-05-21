@@ -30,16 +30,27 @@
 }
 
 .navbar__logo {
-  height: 2.5rem;
+  height: 2.25rem;
+}
+
+@media (min-width: 997px) {
+  .navbar {
+    padding-left: calc(
+      var(--fory-doc-sidebar-inset) +
+      var(--ifm-menu-link-padding-horizontal)
+    );
+  }
 }
 
 .navbar__item {
-  font-size: 1rem; 
-  margin-right: -10px; 
+  font-size: .95rem;
+  margin-right: 0;
 }
 
 .navbar__link {
-  font-size: 1rem; 
+  font-size: .95rem;
+  padding-left: .55rem;
+  padding-right: .55rem;
 }
 
 
@@ -82,4 +93,166 @@
 
 [data-theme='dark'] .themed-logo-dark {
   display: block;
+}
+
+/* Docs reading surface */
+:root {
+  --fory-doc-content-width: 860px;
+  --fory-doc-shell-width: 908px;
+  --fory-doc-wide-width: 860px;
+  --fory-doc-gutter-width: 24px;
+  --fory-doc-sidebar-inset: 2.75rem;
+  --fory-doc-toc-right-inset: 5.5rem;
+}
+
+.theme-doc-breadcrumbs,
+.theme-doc-footer,
+.pagination-nav {
+  max-width: var(--fory-doc-content-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.theme-doc-version-badge {
+  display: inline-block;
+  margin-left: max(0px, calc((100% - var(--fory-doc-shell-width)) / 2 + var(--fory-doc-gutter-width)));
+}
+
+.theme-doc-markdown {
+  max-width: var(--fory-doc-shell-width);
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.03rem;
+  line-height: 1.72;
+}
+
+.theme-doc-markdown > * {
+  max-width: var(--fory-doc-content-width);
+}
+
+.theme-doc-markdown > h1,
+.theme-doc-markdown > h2,
+.theme-doc-markdown > h3,
+.theme-doc-markdown > h4,
+.theme-doc-markdown > h5,
+.theme-doc-markdown > h6,
+.theme-doc-markdown > p,
+.theme-doc-markdown > header,
+.theme-doc-markdown > ul,
+.theme-doc-markdown > ol,
+.theme-doc-markdown > blockquote,
+.theme-doc-markdown > table,
+.theme-doc-markdown > div,
+.theme-doc-markdown > pre,
+.theme-doc-markdown > .tabs-container,
+.theme-doc-markdown > .theme-code-block,
+.theme-doc-markdown > .admonition {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.theme-doc-markdown > table {
+  display: table;
+}
+
+.theme-doc-markdown > pre,
+.theme-doc-markdown > table,
+.theme-doc-markdown > .tabs-container,
+.theme-doc-markdown > .theme-code-block {
+  max-width: var(--fory-doc-wide-width);
+}
+
+@media (min-width: 997px) {
+  .theme-doc-breadcrumbs,
+  .theme-doc-footer,
+  .pagination-nav,
+  .theme-doc-markdown {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .theme-doc-toc-desktop {
+    padding-right: var(--fory-doc-toc-right-inset);
+  }
+}
+
+.theme-doc-markdown h1 {
+  font-size: 2.6rem;
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+}
+
+.theme-doc-markdown h2 {
+  font-size: 1.8rem;
+  margin-top: 3rem;
+}
+
+.theme-doc-markdown h3 {
+  font-size: 1.35rem;
+  margin-top: 2.25rem;
+}
+
+.theme-doc-markdown p,
+.theme-doc-markdown li {
+  color: var(--ifm-color-emphasis-800);
+}
+
+.theme-doc-markdown table {
+  font-size: .95rem;
+}
+
+.theme-doc-markdown th {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.theme-doc-markdown .theme-code-block,
+.theme-doc-markdown pre {
+  margin-top: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.table-of-contents {
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.table-of-contents__link {
+  color: var(--ifm-color-emphasis-700);
+}
+
+.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+.theme-doc-sidebar-container {
+  background: var(--ifm-background-surface-color);
+}
+
+.theme-doc-sidebar-menu {
+  padding: .75rem .75rem .75rem var(--fory-doc-sidebar-inset);
+}
+
+.menu__link {
+  border-radius: 6px;
+  font-size: .96rem;
+}
+
+.menu__link--active {
+  font-weight: 600;
+}
+
+.theme-doc-sidebar-menu .menu__caret::before,
+.theme-doc-sidebar-menu .menu__link--sublist-caret::after {
+  background: var(--ifm-menu-link-sublist-icon) 50% / 1rem 1rem no-repeat;
+  height: .9rem;
+  min-width: .9rem;
+  opacity: .72;
+  width: .9rem;
+}
+
+@media (max-width: 996px) {
+  .theme-doc-markdown h1 {
+    font-size: 2.15rem;
+  }
 }
