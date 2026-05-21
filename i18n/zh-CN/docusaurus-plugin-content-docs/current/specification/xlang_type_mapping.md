@@ -21,7 +21,7 @@ license: |
 
 说明：
 
-- 类型定义请参见 [规范中的类型系统](xlang_serialization_spec.md#type-systems)
+- 类型定义请参见 [规范中的类型系统](xlang_serialization_spec.md#类型系统)
 - `int16_t[n]/vector<T>` 表示 `int16_t[n]/vector<int16_t>` 这一类数组/向量形式
 - 跨语言序列化协议仍在演进，生产环境请先做严格兼容验证
 

@@ -1,10 +1,17 @@
 /** @type {import('tailwindcss').Config} */
+const contentPaths = [
+  "./src/**/*.{js,jsx,ts,tsx}",
+  "./blog/**/*.{md,mdx}",
+  "./docs/**/*.{md,mdx}",
+  "./versioned_docs/**/*.{md,mdx}",
+  "./i18n/**/*.{js,jsx,ts,tsx,md,mdx}",
+  "./node_modules/@docusaurus/theme-classic/**/*.{js,jsx,ts,tsx}",
+  "./node_modules/@docusaurus/theme-search-algolia/**/*.{js,jsx,ts,tsx}",
+];
+
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "./node_modules/@docusaurus/theme-classic/**/*.{js,jsx,ts,tsx}",
-    "./node_modules/@docusaurus/theme-search-algolia/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: contentPaths,
+  purge: contentPaths,
   theme: {
     screens: {
       xs: "480px",

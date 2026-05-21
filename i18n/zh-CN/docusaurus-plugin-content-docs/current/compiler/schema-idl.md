@@ -531,7 +531,7 @@ Rust 对启用 ref 跟踪的字段默认使用 `Rc` 和 `RcWeak`。当生成的 
 `Arc` 或 `ArcWeak` 进行跨线程共享所有权时，可以使用 `ref(thread_safe=true)`。这个
 设置只是 Rust 代码生成中的承载类型选择；它不会改变编码格式，也不会让被引用值本身
 变成线程安全。protobuf 选项语法见
-[Protocol Buffers IDL Support](protobuf-idl.md#field-level-options)。
+[Protocol Buffers IDL Support](protobuf-idl.md#字段级选项)。
 
 Rust 指针承载类型映射：
 

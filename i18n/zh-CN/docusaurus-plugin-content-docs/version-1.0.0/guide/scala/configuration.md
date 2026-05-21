@@ -167,4 +167,4 @@ val fory = ForyScala.builder()
 
 - 保持 `requireClassRegistration(true)`，并注册应用类或生成的 modules。
 - 使用 `withMaxDepth(...)` 拒绝异常深的对象图。
-- Allow-listing 和 unknown-class 控制请遵循 [Java 配置](../java/configuration.md#security)。
+- Allow-listing 和 unknown-class 控制请遵循 [Java 配置](../java/configuration.md#forybuilder-选项)。
