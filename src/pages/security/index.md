@@ -9,6 +9,18 @@ Apache Fory™ uses the standard process outlined by the [Apache Security Team](
 
 To report a possible security vulnerability, please email private@fory.apache.org.
 
+### [CVE-2026-48207](https://www.cve.org/CVERecord?id=CVE-2026-48207): PyFory ReduceSerializer DeserializationPolicy bypass
+
+Severity: Important
+
+Vendor: The Apache Software Foundation
+
+Versions affected: 0.13.0 through 0.17.0 for pyfory
+
+Description: Deserialization of untrusted data in pyfory versions 0.13.0 through 0.17.0 can bypass documented DeserializationPolicy validation in Python-native mode with `strict=False`. Applications are vulnerable when they deserialize attacker-controlled data and rely on a custom DeserializationPolicy to restrict unsafe classes, functions, or module attributes.
+
+Mitigation: Upgrade to pyfory version 1.0.0 or later, which consistently enforces DeserializationPolicy validation for this issue. Libraries and applications that depend on Apache Fory should update their dependency requirements and release patched versions.
+
 ### [CVE-2025-61622](https://www.cve.org/CVERecord?id=CVE-2025-61622): Python RCE via unguarded pickle fallback serializer in pyfory
 
 Severity: Critical
