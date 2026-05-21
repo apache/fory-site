@@ -18,12 +18,13 @@ id: how_to_release
 
 此发布过程在 Ubuntu 系统中运行，需要以下几个环境依赖：
 
-- JDK 1.8+
-- Apache Maven 3.x+
-- Python 3.8
+- OpenJDK 25+
+- Apache Maven 3.6.3+
+- Python 3.8+
 - GnuPG 2.x
 - Git
 - SVN（Apache 基金会使用 svn 来托管项目发布）
+- 可选的包发布和验证工具：Node.js LTS 和 npm、Rust via rustup、Go 1.24+、Dart、.NET SDK 8.0+、sbt
 - **设置环境变量**：如果您在不同的目录下配置了 gpg 密钥，请执行 `export GNUPGHOME=$(xxx)` 导出环境变量。
 
 ### 准备 GPG 密钥
@@ -185,9 +186,9 @@ Hello, Apache Fory Community,
 
 This is a call for a discussion to release Apache Fory version ${release_version}.
 
-The change lists about this release:
+The planned change list for this release:
 
-https://github.com/apache/fory/compare/v0.11.2...v0.12.0
+https://github.com/apache/fory/compare/v${previous_release_version}...main
 
 Please leave your comments here about this release plan. We will bump the version in repo and start the release process after the discussion.
 
@@ -200,22 +201,22 @@ ${name}
 
 如果讨论结果中没有出现反对声音，您需要做一些发布版本的准备工作。
 
-### Github 分支和标签
+### GitHub 分支和标签
 
-- 创建一个名为 `releases-0.16.0`
-- 通过执行命令将版本 `$version` 升级到 `python ci/release.py bump_version -l all -version $version`
+- 创建一个名为 `releases-${release_version}` 的分支。也可以运行 `python ci/release.py prepare -v ${release_version}`，让脚本创建分支、更新所有版本并创建准备提交。
+- 如果没有使用 `prepare`，通过执行命令 `python ci/release.py bump_version -l all -version ${release_version}` 将版本升级到 `${release_version}`
 - 执行 git commit 并将分支推送到 `git@github.com:apache/fory.git`
-- 通过 `git tag v0.16.0-rc1` 创建一个 release 标签，然后将其推送到 `git@github.com:apache/fory.git`
-- 如果本次发布包含 `go/fory` 这个 Go 子模块，还需要额外创建并推送 Go 子模块标签。例如，对于最终版 `0.16.0`，执行：
+- 通过 `git tag v${release_version}-${rc_version}` 创建一个 release candidate 标签，然后将其推送到 `git@github.com:apache/fory.git`
+- 如果本次发布包含 `go/fory` 这个 Go 子模块，请在投票通过后额外创建并推送 Go 子模块标签。例如，对于最终版 `${release_version}`，执行：
 
 ```bash
-git tag go/fory/v0.16.0
-git push apache go/fory/v0.16.0
+git tag go/fory/v${release_version}
+git push apache go/fory/v${release_version}
 ```
 
 ### 构建 artifacts 并上传到 SVN dist/dev 仓库
 
-首先，您需要通过 `python ci/release.py build -v $version` 构建预发布 artifacts。
+首先，您需要通过 `python ci/release.py build -v ${release_version}` 构建预发布 artifacts。
 
 然后您需要把它上传到 svn dist repo。dev 分支的 dist 仓库地址是：https://dist.apache.org/repos/dist/dev/fory
 
@@ -252,8 +253,8 @@ svn commit -m "Prepare for fory ${release_version}-${rc_version}"
 
 新版本发布需要 Apache Fory 社区的投票。
 
-- release_version：Fory 的版本，如 0.12.0。
-- release_candidate_version：投票的版本，如 0.12.0-rc1。
+- release_version：Fory 的版本，如 1.0.0。
+- release_candidate_version：投票的版本，如 1.0.0-rc1。
 - maven_artifact_number：Maven 暂存 artifacts 的数量。如 1001. 具体来说，可以通过搜索 “fory” 来找到 maven_artifact_number https://repository.apache.org/#stagingRepositories.
 
 ### Fory 社区投票
@@ -272,32 +273,33 @@ svn commit -m "Prepare for fory ${release_version}-${rc_version}"
 Hello, Apache Fory Community:
 
 This is a call for vote to release Apache Fory
-version release-0.12.0-rc1.
+v${release_version}-${rc_version}.
 
-Apache Fory - A blazingly fast multi-language serialization
-framework powered by JIT and zero-copy.
+Apache Fory is a blazingly fast multi-language serialization framework
+for idiomatic domain objects, schema IDL, and cross-language data
+exchange.
 
 The change lists about this release:
 
-https://github.com/apache/fory/compare/v0.12.0...v0.12.0-rc1
+https://github.com/apache/fory/compare/v${previous_release_version}...v${release_version}-${rc_version}
 
 The release candidates:
-https://dist.apache.org/repos/dist/dev/fory/0.12.0-rc1/
+https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_version}/
 
 The maven staging for this release:
-https://repository.apache.org/content/repositories/orgapachefory-1003
+https://repository.apache.org/content/repositories/orgapachefory-${maven_artifact_number}
 
 Git tag for the release:
-https://github.com/apache/fory/releases/tag/v0.12.0-rc1
+https://github.com/apache/fory/releases/tag/v${release_version}-${rc_version}
 
 如果本次发布还包含 Go 模块，请同时附上 Go 子模块标签：
-https://github.com/apache/fory/releases/tag/go/fory/v0.16.0
+https://github.com/apache/fory/releases/tag/go/fory/v${release_version}
 
 Git commit for the release:
-https://github.com/apache/fory/commit/fae06330edd049bb960536e978a45b97bca66faf
+https://github.com/apache/fory/commit/${release_commit}
 
-The artifacts signed with PGP key [5E580BA4], corresponding to
-[chaokunyang@apache.org], that can be found in keys file:
+The artifacts signed with PGP key [${gpg_key_id}], corresponding to
+[${apache_email}], that can be found in keys file:
 https://downloads.apache.org/fory/KEYS
 
 The vote will be open for at least 72 hours until the necessary number of votes are reached.
@@ -326,7 +328,7 @@ Thanks,
 Chaokun Yang
 ```
 
-在至少获得 3 + 1 且具有约束力的投票（来自 Fory Podling PMC 成员和提交者）并没有收到否决票之后，发布投票结果：
+在至少获得 3 个来自 Apache Fory PMC member 的 binding +1，并且没有收到否决票之后，发布投票结果：
 
 标题：
 
@@ -341,7 +343,7 @@ Hello, Apache Fory Community,
 
 The vote to release Apache Fory v${release_version}-${rc_version} has passed.
 
-The vote PASSED with 3 binding +1 and 0 -1 vote:
+The vote PASSED with 3 binding +1 votes and 0 -1 votes:
 
 Binding votes:
 
@@ -366,8 +368,8 @@ ${name}
 
 ### 将 artifacts 发布到 SVN 发布目录
 
-- release_version：Fory 的发布版本，如 0.12.0
-- release_candidate_version：投票版本，如 0.12.0-rc1
+- release_version：Fory 的发布版本，如 1.0.0
+- release_candidate_version：投票版本，如 1.0.0-rc1
 
 ```bash
 svn mv https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_version} https://dist.apache.org/repos/dist/release/fory/${release_version} -m "Release fory ${release_version}"
@@ -376,6 +378,12 @@ svn mv https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_versi
 ### 更改 Fory 网站下载链接
 
 提交 PR 到 https://github.com/apache/fory-site 仓库更新 Fory 版本，[下载页面](https://fory.apache.org/download)
+
+同时更新 release blog、download page、checksum/signature 示例、release notes 链接、current docs、zh-CN 翻译、`${release_version}` 的 versioned docs snapshot、`versions.json` 以及 `docusaurus.config.ts` 默认 docs 版本。
+
+### GitHub 正式发布
+
+投票通过后，从通过投票的 commit 创建并推送最终 tag `v${release_version}`。该 tag 会触发 Python、compiler、JavaScript、Rust、Dart 和 C# 的最终包发布 workflows。发送公告前，请监控所有 workflows 直到完成。
 
 ### 发布 Maven artifacts
 
@@ -399,16 +407,26 @@ svn mv https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_versi
 Hi all,
 
 The Apache Fory community is pleased to announce
-that Apache Fory {release_version} has been released!
+that Apache Fory ${release_version} is now available.
 
-Apache Fory - A blazingly fast multi-language serialization
-framework powered by JIT and zero-copy.
+Apache Fory is a blazingly fast multi-language serialization framework
+for idiomatic domain objects, schema IDL, and cross-language data
+exchange.
+
+This release includes ${pr_count} PRs from ${contributor_count} contributors.
+
+Highlights in ${release_version} include:
+
+- ...
+
+Release blog, with details and examples:
+https://fory.apache.org/blog/fory_${release_version_with_underscores}_release
 
 The release notes are available here:
 https://github.com/apache/fory/releases/tag/v${release_version}
 
 For the complete list of changes:
-https://github.com/apache/fory/compare/v0.12.0...v${release_version}
+https://github.com/apache/fory/compare/v${previous_release_version}...v${release_version}
 
 Apache Fory website: https://fory.apache.org/
 

@@ -19,12 +19,13 @@ Publishing software is a serious thing and has legal consequences.
 
 This release process is operated in the Ubuntu OS, and the following tools are required:
 
-- JDK 1.8
-- Apache Maven 3.x
-- Python 3.8
+- OpenJDK 25+
+- Apache Maven 3.6.3+
+- Python 3.8+
 - GnuPG 2.x
 - Git
 - SVN (apache uses svn to host project releases)
+- Optional package release and verification tools: Node.js LTS and npm, Rust via rustup, Go 1.24+, Dart, .NET SDK 8.0+, and sbt
 - Pay attention to setting environment variables: if you configure gpg keys under a different directory,
   please `export GNUPGHOME=$(xxx)`
 
@@ -191,9 +192,9 @@ Hello, Apache Fory Community,
 
 This is a call for a discussion to release Apache Fory version ${release_version}.
 
-The change lists about this release:
+The planned change list for this release:
 
-https://github.com/apache/fory/compare/v0.12.0...v0.12.1-rc1
+https://github.com/apache/fory/compare/v${previous_release_version}...main
 
 Please leave your comments here about this release plan. We will bump the version in repo and start the release process after the discussion.
 
@@ -204,25 +205,25 @@ ${name}
 
 ## Preparing for release
 
-If the discussion goes positive, you will need to prepare the release artifiacts.
+If the discussion goes positive, you will need to prepare the release artifacts.
 
-### Github branch and tag
+### GitHub branch and tag
 
-- Create a new branch named `releases-0.16.0`
-- Bump version to `$version` by executing command `python ci/release.py bump_version -l all -version $version`
+- Create a new branch named `releases-${release_version}`. You can also run `python ci/release.py prepare -v ${release_version}` to create the branch, bump all versions, and create the preparation commit.
+- Bump version to `${release_version}` by executing command `python ci/release.py bump_version -l all -version ${release_version}` if you do not use `prepare`
 - Make a git commit and push the branch to `git@github.com:apache/fory.git`
-- Create a new release tag by `git tag v0.16.0-rc1`, then push it to `git@github.com:apache/fory.git`
-- If the Go module under `go/fory` is part of this release, create and push the Go submodule tag as well. For example, for the final `0.16.0` release:
+- Create a new release-candidate tag by `git tag v${release_version}-${rc_version}`, then push it to `git@github.com:apache/fory.git`
+- If the Go module under `go/fory` is part of this release, create and push the Go submodule tag after the vote passes. For example, for the final `${release_version}` release:
 
 ```bash
 git remote add apache git@github.com:apache/fory.git
-git tag go/fory/v0.16.0
-git push apache go/fory/v0.16.0
+git tag go/fory/v${release_version}
+git push apache go/fory/v${release_version}
 ```
 
 ### Build and upload artifacts to SVN dist/dev repo
 
-First you need to build source release artifacts by `python ci/release.py build -v $version`.
+First you need to build source release artifacts by `python ci/release.py build -v ${release_version}`.
 
 Then you need to upload it to svn dist repo. The dist repo of the dev branch
 is: https://dist.apache.org/repos/dist/dev/fory
@@ -262,8 +263,8 @@ If some files are unexpected, you need to remove by `svn delete` and repeat the 
 
 Fory requires votes from the Fory Community.
 
-- release_version: the version for fory, like 0.12.0.
-- release_candidate_version: the version for voting, like 0.12.0-rc1.
+- release_version: the version for fory, like 1.0.0.
+- release_candidate_version: the version for voting, like 1.0.0-rc1.
 - maven_artifact_number: the number for Maven staging artifacts, like 1001. Specifically, the maven_artifact_number can
   be found by searching "fory" on https://repository.apache.org/#stagingRepositories.
 
@@ -343,10 +344,9 @@ cd java
 # -T10: Use 10 threads for parallel build, improving speed
 # clean: Clean the project
 # deploy: Deploy to remote repository
-# -Papache-release: Activate apache-release profile
+# -Prelease: Activate the release profile
 # -DskipTests: Skip tests
-# -Dgpg.skip=false: Enable GPG signing (required for release verification)
-mvn -T10 clean deploy -Papache-release -DskipTests -Dgpg.skip=false
+mvn -T10 clean deploy --no-transfer-progress -DskipTests -Prelease
 
 ```
 
@@ -359,7 +359,7 @@ cd ../kotlin
 
 # Execute the same Maven command as Java module
 # Configuration parameters are identical to Java module
-mvn -T10 clean deploy -Papache-release -DskipTests -Dgpg.skip=false
+mvn -T10 clean deploy --no-transfer-progress -DskipTests -Prelease
 
 ```
 
@@ -389,22 +389,28 @@ echo "Scala JAR deployment succeeded!"
 
 ```
 
-#### Lock the Release in Nexus
+#### Close the Maven staging repository in Nexus
 
 After completing the publication of all modules, perform the following steps in Nexus:
 
 1. Log in to the Apache Nexus repository management interface
-2. Navigate to the "Snapshots" or "Releases" repository (depending on your release type)
-3. Locate the latest Fory project version
+2. Navigate to the staging repositories page
+3. Locate the latest Fory staging repository, such as `orgapachefory-1001`
 4. Execute the "Close" operation to validate all uploaded artifacts
-5. After successful validation, execute the "Release" operation to finalize the deployment
+5. Record the staging repository ID for the vote email
+6. Do not execute the "Release" operation until the vote passes
 
-These steps ensure all published artifacts are verified and correctly deployed to the public repository.
+These steps ensure all staged artifacts are verified before the community vote.
 
-### build a Pre-release
+### Build a pre-release
 
 You need to build a Pre-release before voting, such as:
-https://github.com/apache/fory/releases/tag/v0.12.0-rc1
+https://github.com/apache/fory/releases/tag/v${release_version}-${rc_version}
+
+Pushing a `v*` tag triggers the tag-based package release workflows for Python, compiler, JavaScript, Rust, Dart, and C#.
+For release-candidate tags that contain `-`, workflows publish prerelease or staging artifacts where the ecosystem supports
+it, such as TestPyPI for Python packages and the `next` tag for npm packages. Monitor all triggered workflows before
+starting the vote.
 
 ### Fory Community Vote
 
@@ -422,34 +428,35 @@ Content:
 Hello, Apache Fory Community:
 
 This is a call for vote to release Apache Fory
-version release-${release_version}-${rc_version}.
+v${release_version}-${rc_version}.
 
-Apache Fory - A blazingly fast multi-language serialization
-framework powered by JIT and zero-copy.
+Apache Fory is a blazingly fast multi-language serialization framework
+for idiomatic domain objects, schema IDL, and cross-language data
+exchange.
 
 The discussion thread:
 https://lists.apache.org/thread/xxr3od301g6v3ndj14zqc05byp9qvclh
 
 The change lists about this release:
-https://github.com/apache/fory/compare/v0.12.0...v0.12.1-rc1
+https://github.com/apache/fory/compare/v${previous_release_version}...v${release_version}-${rc_version}
 
 The release candidates:
-https://dist.apache.org/repos/dist/dev/fory/0.5.0-rc3/
+https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_version}/
 
 The maven staging for this release:
-https://repository.apache.org/content/repositories/orgapachefory-1003
+https://repository.apache.org/content/repositories/orgapachefory-${maven_artifact_number}
 
 Git tag for the release:
-https://github.com/apache/fory/releases/tag/v0.12.0-rc1
+https://github.com/apache/fory/releases/tag/v${release_version}-${rc_version}
 
 If this release also publishes the Go module, include the Go submodule tag too:
-https://github.com/apache/fory/releases/tag/go/fory/v0.16.0
+https://github.com/apache/fory/releases/tag/go/fory/v${release_version}
 
 Git commit for the release:
-https://github.com/apache/fory/commit/fae06330edd049bb960536e978a45b97bca66faf
+https://github.com/apache/fory/commit/${release_commit}
 
-The artifacts signed with PGP key [5E580BA4], corresponding to
-[chaokunyang@apache.org], that can be found in keys file:
+The artifacts signed with PGP key [${gpg_key_id}], corresponding to
+[${apache_email}], that can be found in keys file:
 https://downloads.apache.org/fory/KEYS
 
 The vote will be open for at least 72 hours until the necessary number of votes are reached.
@@ -479,7 +486,7 @@ Thanks,
 ${name}
 ```
 
-After at least 3 +1 binding vote (from Fory Podling PMC member and committers) and no veto,
+After at least 3 +1 binding votes from Apache Fory PMC members and no veto,
 first, reply to the above voting thread to notify that the voting has ended.
 
 ```
@@ -510,7 +517,7 @@ Hello, Apache Fory Community,
 
 The vote to release Apache Fory v${release_version}-${rc_version} has passed.
 
-The vote PASSED with 3 binding +1 and 0 -1 vote:
+The vote PASSED with 3 binding +1 votes and 0 -1 votes:
 
 Binding votes:
 
@@ -525,7 +532,7 @@ Thanks,
 ${name}
 ```
 
-### What if vote fail
+### What if vote fails
 
 If the vote failed, click "Drop" to drop the staging Maven artifacts.
 
@@ -535,8 +542,8 @@ Address the raised issues, then bump `rc_version` and file a new vote again.
 
 ### Publish artifacts to SVN Release Directory
 
-- release_version: the release version for fory, like 0.5.0
-- release_candidate_version: the version for voting, like 0.5.0-rc1
+- release_version: the release version for fory, like 1.0.0
+- release_candidate_version: the version for voting, like 1.0.0-rc1
 
 ```bash
 svn mv https://dist.apache.org/repos/dist/dev/fory/${release_version}-${rc_version} https://dist.apache.org/repos/dist/release/fory/${release_version} -m "Release fory ${release_version}"
@@ -546,7 +553,7 @@ In the repository at https://dist.apache.org/repos/dist/dev/fory/, if any
 outdated release_candidate_version are left behind when releasing the release_version,
 please clear them to keep the dev repository tidy.
 
-When `https://archive.apache.org/dist/fory/0.12.0/${release_version}` is
+When `https://archive.apache.org/dist/fory/${release_version}/` is
 accessible (confirming that the release_version has been successfully released
 and archived), we may clean up the previous release version in the release repository,
 leaving only the current version.
@@ -559,7 +566,7 @@ and [#285](https://github.com/apache/fory-site/pull/285).
 
 #### Update Fory-Site
 
-In general, the following two key areas need to be modified:
+In general, the following key areas need to be modified:
 
 1. Write a new announcement, for example:
    Add a new markdown file under the blog folder:
@@ -579,15 +586,22 @@ The Apache Fory team is pleased to announce the [?] release. This is a major rel
 </dependency>
 ```
 
+3. Update the download page, checksum and signature examples, release notes link, current docs, zh-CN translations, versioned docs snapshot, `versions.json`, and `docusaurus.config.ts` default docs version.
+
 #### Update Fory
 
-Submit a PR to https://github.com/apache/fury to update [README](https://github.com/apache/fury/blob/main/README.md),
-like [#2207](https://github.com/apache/fury/pull/2207).
+Submit a PR to https://github.com/apache/fory to update [README](https://github.com/apache/fory/blob/main/README.md),
+package metadata for the next development version, and user-facing install snippets that should point at the latest
+released version.
 
-### Github officially released
+### GitHub officially released
 
 You need to officially release this version in the Fory project
-Reference implementation: https://github.com/apache/fory/releases/tag/v0.12.0
+Reference implementation: https://github.com/apache/fory/releases/tag/v${release_version}
+
+Create and push the final `v${release_version}` tag from the voted commit after the vote passes. This tag triggers the
+final package publishing workflows for Python, compiler, JavaScript, Rust, Dart, and C#. Monitor every workflow to
+completion before sending the announcement.
 
 ### Release Maven artifacts
 
@@ -611,16 +625,26 @@ Content:
 Hi all,
 
 The Apache Fory community is pleased to announce
-that Apache Fory {release_version} has been released!
+that Apache Fory ${release_version} is now available.
 
-Apache Fory - A blazingly fast multi-language serialization
-framework powered by JIT and zero-copy.
+Apache Fory is a blazingly fast multi-language serialization framework
+for idiomatic domain objects, schema IDL, and cross-language data
+exchange.
+
+This release includes ${pr_count} PRs from ${contributor_count} contributors.
+
+Highlights in ${release_version} include:
+
+- ...
+
+Release blog, with details and examples:
+https://fory.apache.org/blog/fory_${release_version_with_underscores}_release
 
 The release notes are available here:
 https://github.com/apache/fory/releases/tag/v${release_version}
 
 For the complete list of changes:
-https://github.com/apache/fory/compare/v0.12.0...v${release_version}
+https://github.com/apache/fory/compare/v${previous_release_version}...v${release_version}
 
 Apache Fory website: https://fory.apache.org/
 
