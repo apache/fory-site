@@ -21,7 +21,7 @@ license: |
 
 注意：
 
-- 类型定义请参见 [规范中的类型系统](/specification/xlang_serialization_spec.md#type-systems)
+- 类型定义请参见 [规范中的类型系统](/specification/xlang_serialization_spec.md#类型系统)
 - `int16_t[n]/vector<T>` 表示 `int16_t[n]/vector<int16_t>`
 - 跨语言序列化功能尚不稳定，请勿在生产环境中使用。
 

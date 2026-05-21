@@ -142,7 +142,7 @@ Apache Fory™ 实现了针对不同场景优化的多个二进制协议：
 | **Go**           | Go 实现和用法           | [Go 指南](https://github.com/apache/fory/blob/main/docs/guide/go/)                    | [查看](../guide/go)                 |
 | **Scala**        | Scala 集成和最佳实践    | [Scala 指南](https://github.com/apache/fory/blob/main/docs/guide/scala/)              | [查看](../guide/scala)              |
 | **GraalVM**      | 原生镜像支持和 AOT 编译 | [GraalVM 支持](https://github.com/apache/fory/blob/main/docs/guide/java/graalvm-support.md) | [查看](../guide/java/graalvm_support) |
-| **开发**         | 构建和贡献 Fory         | [开发指南](https://github.com/apache/fory/blob/main/docs/DEVELOPMENT.md)              | [查看](../community/DEVELOPMENT)    |
+| **开发**         | 构建和贡献 Fory         | [开发指南](https://github.com/apache/fory/blob/main/docs/DEVELOPMENT.md)              | [查看](../community/DEVELOPMENT.md) |
 
 ### 协议规范
 

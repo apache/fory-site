@@ -14,7 +14,17 @@ const config: Config = {
   baseUrl: '/',
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
+  future: {
+    v4: {
+      removeLegacyPostBuildHeadAttribute: true,
+    },
+    faster: true,
+  },
   i18n: {
     defaultLocale: 'en-US',
     locales: ['en-US', 'zh-CN'],
@@ -73,6 +83,7 @@ const config: Config = {
         blog: {
           blogSidebarCount: 'ALL',
           blogSidebarTitle: 'All our posts',
+          onUntruncatedBlogPosts: 'ignore',
           showReadingTime: true,
           editUrl: ({ blogPath, locale }) => {
             var editUrl = "";

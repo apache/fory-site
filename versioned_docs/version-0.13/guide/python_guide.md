@@ -1,7 +1,7 @@
 ---
 title: Python Serialization
 sidebar_position: 1
-id: serialization
+id: python_serialization
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -460,7 +460,7 @@ import pyfory
 fory = pyfory.Fory(xlang=True, ref=False, strict=True)
 ```
 
-### Cross-Language Sserialization
+### Cross-Language Serialization
 
 Serialize data in Python and deserialize it in Java, Go, Rust, or other supported languages. Both sides must register the same type with matching names:
 

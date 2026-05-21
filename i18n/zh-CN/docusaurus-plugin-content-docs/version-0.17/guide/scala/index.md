@@ -41,7 +41,7 @@ Fory Scala 继承了 Fory Java 的全部特性，并增加了 Scala 特定优化
 - **单例保持**：`object` 单例在反序列化后仍保持引用相等性
 - **Schema 演进**：支持类 Schema 变更时的前向和后向兼容
 
-完整特性列表请参见 [Java 特性](../java/index.md#features)。
+完整特性列表请参见 [Java 特性](../java/index.md#特性)。
 
 ## 安装
 
