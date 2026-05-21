@@ -153,6 +153,8 @@
 
 .theme-doc-markdown > table {
   display: table;
+  margin-left: 0;
+  margin-right: auto;
 }
 
 .theme-doc-markdown > pre,
@@ -199,6 +201,8 @@
 
 .theme-doc-markdown table {
   font-size: .95rem;
+  margin-left: 0;
+  margin-right: auto;
 }
 
 .theme-doc-markdown th {
