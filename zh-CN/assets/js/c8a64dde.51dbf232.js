@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[30214],{88330:s=>{s.exports=JSON.parse('{"label":"dart","permalink":"/zh-CN/blog/tags/dart","allTagsPath":"/zh-CN/blog/tags","count":1,"unlisted":false}')}}]);
