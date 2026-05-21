@@ -31,6 +31,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - uses: actions/setup-python@v3
         with:
@@ -44,7 +46,7 @@ jobs:
           ls -lR ../../i18n/zh-CN/ ../../i18n/eu-US/
 
       - name: NPM Install
-        run: npm install
+        run: npm ci --prefer-offline --fund=false
 
       - name: Restore Docusaurus cache
         uses: actions/cache@v4
