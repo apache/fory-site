@@ -4,7 +4,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Apache Fory™',
-  tagline: 'A blazing-fast cross-language serialization framework powered by just-in-time compilation and zero-copy',
+  tagline: 'A blazingly-fast multi-language serialization framework for idiomatic domain objects, schema IDL, and cross-language data exchange',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here

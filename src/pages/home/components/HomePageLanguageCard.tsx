@@ -3,6 +3,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import "../css/tailwind.css";
 import { imageUrls } from "../../../constants";
 import styles from "../css/HomePageLanguageCard.module.css";
+import Translate from "@docusaurus/Translate";
 
 export default function HomePageLanguageCard() {
   const [locale, setLocale] = useState("en-US");
@@ -30,9 +31,21 @@ export default function HomePageLanguageCard() {
 
   return (
     <div className="text-center p-8">
-      <h2 className="text-3xl font-bold mb-4 dark:text-white">Quick Start!</h2>
+      <h2 className="text-3xl font-bold mb-4 dark:text-white">
+        <Translate
+          id="homepage.quickStart.title"
+          description="The title for the homepage quick start language picker"
+        >
+          Quick Start
+        </Translate>
+      </h2>
       <p className="text-lg mb-8 text-gray-600 dark:text-gray-400">
-        Choose a language to get started.
+        <Translate
+          id="homepage.quickStart.description"
+          description="The description for the homepage quick start language picker"
+        >
+          Choose a runtime to open the matching quick start guide.
+        </Translate>
       </p>
       <div className="max-w-4xl mx-auto">
         <div className="grid md:grid-cols-3 sm:grid-cols-1 gap-6">

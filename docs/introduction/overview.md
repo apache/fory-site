@@ -9,7 +9,13 @@ sidebar_position: 1
     <img width="65%" alt="Apache Fory logo" src="/img/fory-logo-light.png" class="themed-logo-light"/>
 </div>
 
-**Apache Fory™** is a blazingly-fast multi-language serialization framework powered by **JIT compilation**, **zero-copy** techniques, and **advanced code generation**, achieving up to **170x performance improvement** while maintaining simplicity and ease of use.
+**Apache Fory™** is a blazingly-fast multi-language serialization framework for
+idiomatic domain objects, schema IDL, and cross-language data exchange.
+
+Fory is built for compact, high-throughput serialization across languages and
+runtimes. It works directly with application objects, supports shared schemas
+when you need a stable contract, and preserves object graph features such as
+shared references, circular references, and polymorphic runtime types.
 
 ## Quick Example
 
@@ -59,34 +65,54 @@ print(decoded)  # User(name='Alice', age=30)
 
 ## Key Features
 
-### High-Performance Serialization
+### Efficient Cross-Language Encoding
 
-Apache Fory™ delivers exceptional performance through advanced optimization techniques:
+The **[xlang serialization format](../specification/xlang_serialization_spec.md)**
+exchanges compact binary payloads across supported languages:
 
-- **JIT Compilation**: Runtime code generation for Java eliminates virtual method calls and inlines hot paths
-- **Static Code Generation**: Compile-time code generation for Rust, C++, and Go delivers peak performance without runtime overhead
-- **Zero-Copy Operations**: Direct memory access without intermediate buffer copies; row format enables random access and partial serialization
-- **Intelligent Encoding**: Variable-length compression for integers and strings; SIMD acceleration for arrays (Java 16+)
-- **Meta Sharing**: Class metadata packing reduces redundant type information across serializations
+- **Compact metadata**: Type metadata and field information are packed to keep payloads small.
+- **Schema evolution**: Compatible mode supports forward and backward evolution for application schemas.
+- **Object graph semantics**: Shared references, circular references, and polymorphic runtime types are preserved across runtimes.
+- **Type mapping**: Language-specific values are mapped through the shared [type mapping](../specification/xlang_type_mapping.md).
 
-### Cross-Language Serialization
+### Domain Objects First
 
-The **[xlang serialization format](../specification/xlang_serialization_spec.md)** enables seamless data exchange across programming languages:
+Fory serializes host-language models directly instead of forcing applications
+through wrapper types:
 
-- **Automatic Type Mapping**: Intelligent conversion between language-specific types ([type mapping](../specification/xlang_type_mapping.md))
-- **Reference Preservation**: Shared and circular references work correctly across languages
-- **Polymorphism**: Objects serialize/deserialize with their actual runtime types
-- **Schema Evolution**: Optional forward/backward compatibility for evolving schemas
-- **Automatic Serialization**: No IDL or schema definitions required; serialize any object directly without code generation
+- Java classes, Scala/Kotlin types, and GraalVM native image workloads.
+- Python dataclasses and Python-native object graphs.
+- Go structs, Rust structs, C++ structs, C# models, Swift types, Dart models, and JavaScript/TypeScript values.
+- Generated or annotated model types when a shared contract is preferred.
 
-### Row Format
+### Reference-Aware Schema IDL
 
-A cache-friendly **[row format](../specification/row_format_spec.md)** optimized for analytics workloads:
+**[Fory IDL and the compiler](../compiler/index.md)** let teams define schemas
+once and generate native domain objects for each target language:
 
-- **Zero-Copy Random Access**: Read individual fields without deserializing entire objects
-- **Partial Operations**: Selective field serialization and deserialization for efficiency
-- **Apache Arrow Integration**: Seamless conversion to columnar format for analytics pipelines
-- **Multi-Language**: Available in Java, Python, Rust and C++
+- Model numbers, strings, lists, maps, arrays, enums, structs, and unions.
+- Express shared and circular references directly in the schema.
+- Generate idiomatic host-language code without introducing transport-specific wrapper types into user code.
+- Use schema IDL when services need a stable contract across independently maintained runtimes.
+
+### Row-Format Random Access
+
+A cache-friendly **[row format](../specification/row_format_spec.md)** is
+optimized for analytics and partial-read workloads:
+
+- **Zero-copy random access**: Read fields, arrays, and nested values without rebuilding whole objects.
+- **Partial operations**: Read only the values needed for a query or pipeline stage.
+- **Apache Arrow integration**: Convert to columnar data for analytics pipelines.
+- **Multi-language support**: Use row format from Java, Python, Rust, and C++.
+
+### Optimized Runtimes
+
+Fory keeps hot paths fast without making every runtime use the same implementation strategy:
+
+- **Java JIT serializers**: Runtime code generation eliminates reflection overhead and inlines hot paths.
+- **Generated and static serializers**: Other runtimes use generated or static serializers where appropriate.
+- **Zero-copy paths**: Row format and out-of-band buffers avoid unnecessary copies for large values.
+- **Metadata sharing**: Repeated type information is shared or packed to reduce serialization overhead.
 
 ### Security & Production-Readiness
 
@@ -104,7 +130,7 @@ Apache Fory™ implements multiple binary protocols optimized for different scen
 | Protocol                                                                | Use Case                       | Key Features                                           |
 | ----------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
 | **[Xlang Serialization](../specification/xlang_serialization_spec.md)** | Cross-language object exchange | Automatic serialization, references, polymorphism      |
-| **[Java Serialization](../specification/java_serialization_spec.md)**   | High-performance Java-only     | Drop-in JDK serialization replacement, 100x faster     |
+| **[Java Serialization](../specification/java_serialization_spec.md)**   | High-performance Java-only     | Java-native object graphs, JDK hooks, optimized runtime |
 | **[Row Format](../specification/row_format_spec.md)**                   | Analytics and data processing  | Zero-copy random access, Arrow compatibility           |
 | **Python Native**                                                       | Python-specific serialization  | Pickle/cloudpickle replacement with better performance |
 
@@ -147,7 +173,9 @@ Apache Fory™ supports class schema forward/backward compatibility across **Jav
 
 ### Binary Compatibility
 
-**Current Status**: Binary compatibility is **not guaranteed** between Fory major releases as the protocol continues to evolve. However, compatibility **is guaranteed** between minor versions (e.g., 0.13.x).
+**Current Status**: Fory 1.0 is the first stable major line. Treat the major
+version as the compatibility boundary and keep producers and consumers on
+compatible protocol versions.
 
 **Recommendations**:
 

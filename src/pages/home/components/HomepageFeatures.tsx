@@ -13,58 +13,120 @@ const FeatureList: FeatureItem[] = [
   {
     title: (
       <Translate
-        id="feature.highPerformance.title"
-        description="The title for the high performance feature"
+        id="feature.crossLanguageEncoding.title"
+        description="The title for the cross-language encoding feature"
       >
-        High performance
+        Cross-language encoding
       </Translate>
     ),
     Svg: require("@site/static/img/performance.svg").default,
     description: (
       <Translate
-        id="feature.highPerformance.description"
-        description="Description for the high performance feature"
+        id="feature.crossLanguageEncoding.description"
+        description="Description for the cross-language encoding feature"
       >
-        Compared to other serialization frameworks, there is a 20~170x speed up.
+        Exchange compact binary payloads across runtimes with schema evolution,
+        shared and circular references, and polymorphic runtime types.
       </Translate>
     ),
   },
   {
     title: (
       <Translate
-        id="feature.easyToUse.title"
-        description="The title for the easy to use feature"
+        id="feature.domainObjects.title"
+        description="The title for the domain objects feature"
       >
-        Easy to use
+        Domain objects first
       </Translate>
     ),
     Svg: require("@site/static/img/happy.svg").default,
     description: (
       <Translate
-        id="feature.easyToUse.description"
-        description="Description for the easy to use feature"
+        id="feature.domainObjects.description"
+        description="Description for the domain objects feature"
       >
-        No need for DSL, you can use Fory effectively with your intuition.
+        Serialize Java classes, Python dataclasses, Go structs, Rust and C++
+        structs, and generated model types directly in application code.
       </Translate>
     ),
   },
   {
     title: (
       <Translate
-        id="feature.multiLanguages.title"
-        description="The title for the multi-languages feature"
+        id="feature.schemaIdl.title"
+        description="The title for the schema IDL feature"
       >
-        Multi-languages
+        Reference-aware Schema IDL
       </Translate>
     ),
     Svg: require("@site/static/img/multi.svg").default,
     description: (
       <Translate
-        id="feature.multiLanguages.description"
-        description="Description for the multi-languages feature"
+        id="feature.schemaIdl.description"
+        description="Description for the schema IDL feature"
       >
-        Supports popular programming languages such as Java, Python, C++,
-        Golang, Javascript, Rust, and more will be added in the future.
+        Define schemas once, including shared and circular references, then
+        generate native domain objects without wrapper types.
+      </Translate>
+    ),
+  },
+  {
+    title: (
+      <Translate
+        id="feature.rowFormat.title"
+        description="The title for the row format feature"
+      >
+        Row-format random access
+      </Translate>
+    ),
+    Svg: require("@site/static/img/rocket.svg").default,
+    description: (
+      <Translate
+        id="feature.rowFormat.description"
+        description="Description for the row format feature"
+      >
+        Read fields, arrays, and nested values without rebuilding whole
+        objects, with zero-copy access, partial reads, and Arrow integration.
+      </Translate>
+    ),
+  },
+  {
+    title: (
+      <Translate
+        id="feature.optimizedRuntimes.title"
+        description="The title for the optimized runtimes feature"
+      >
+        Optimized runtimes
+      </Translate>
+    ),
+    Svg: require("@site/static/img/performance.svg").default,
+    description: (
+      <Translate
+        id="feature.optimizedRuntimes.description"
+        description="Description for the optimized runtimes feature"
+      >
+        Java JIT serializers and generated or static serializers in other
+        runtimes keep hot paths fast and serialized data compact.
+      </Translate>
+    ),
+  },
+  {
+    title: (
+      <Translate
+        id="feature.platformSupport.title"
+        description="The title for the platform support feature"
+      >
+        Broad platform support
+      </Translate>
+    ),
+    Svg: require("@site/static/img/multi.svg").default,
+    description: (
+      <Translate
+        id="feature.platformSupport.description"
+        description="Description for the platform support feature"
+      >
+        Use Fory from Java, Python, C++, Go, Rust, JavaScript/TypeScript, C#,
+        Swift, Dart, Scala, Kotlin, GraalVM, Flutter, Node.js, and browsers.
       </Translate>
     ),
   },
