@@ -116,10 +116,35 @@ assert_eq!(person, decoded);
 
 ### 日期和时间
 
-| Rust 类型               | 描述             |
-| ----------------------- | ---------------- |
-| `chrono::NaiveDate`     | 不带时区的日期   |
-| `chrono::NaiveDateTime` | 不带时区的时间戳 |
+| Rust 类型   | 描述                             |
+| ----------- | -------------------------------- |
+| `Date`      | 不带时区的日期，存储为 epoch 天数 |
+| `Timestamp` | 时间点，存储为 epoch 秒和纳秒     |
+| `Duration`  | 有符号时长，存储为秒和规范化纳秒 |
+
+内置承载类型提供无额外依赖的构造器、访问器、转换和 checked 算术：
+
+```rust
+use fory::{Date, Duration, Timestamp};
+
+let date = Date::from_epoch_days(19_782);
+assert_eq!(date.checked_add_days(1)?.epoch_days(), 19_783);
+
+let timestamp = Timestamp::from_epoch_millis(-1);
+assert_eq!(timestamp.to_epoch_millis()?, -1);
+
+let duration = Duration::from_parts(1, 1_500_000_000)?;
+assert_eq!(duration.to_millis()?, 2_500);
+let later = timestamp.checked_add_duration(duration)?;
+```
+
+启用 Rust `chrono` feature 后，也支持 `chrono::NaiveDate`、`chrono::NaiveDateTime` 和
+`chrono::Duration`：
+
+```toml
+[dependencies]
+fory = { version = "1.0.0", features = ["chrono"] }
+```
 
 ### 自定义类型
 

@@ -522,10 +522,25 @@ message Node {
 | Java       | `Node parent`    | `Node parent` 配合 `@ForyField(ref=true)`  |
 | Python     | `parent: Node`   | `parent: Node = pyfory.field(ref=True)`    |
 | Go         | `Parent Node`    | `Parent *Node` 配合 `fory:"ref"`           |
-| Rust       | `parent: Node`   | `parent: Arc<Node>`                        |
+| Rust       | `parent: Node`   | `parent: Rc<Node>`                         |
 | C++        | `Node parent`    | `std::shared_ptr<Node> parent`             |
 | JavaScript | `parent: Node`   | `parent: Node`（无额外 `ref` 区分）        |
 | Dart       | `Node parent`    | `Node parent` 配合 `@ForyField(ref: true)` |
+
+Rust 对启用 ref 跟踪的字段默认使用 `Rc` 和 `RcWeak`。当生成的 Rust 类型需要使用
+`Arc` 或 `ArcWeak` 进行跨线程共享所有权时，可以使用 `ref(thread_safe=true)`。这个
+设置只是 Rust 代码生成中的承载类型选择；它不会改变编码格式，也不会让被引用值本身
+变成线程安全。protobuf 选项语法见
+[Protocol Buffers IDL Support](protobuf-idl.md#field-level-options)。
+
+Rust 指针承载类型映射：
+
+| Fory IDL                                       | Rust type       |
+| ---------------------------------------------- | --------------- |
+| `ref Node parent`                              | `Rc<Node>`      |
+| `ref(thread_safe=true) Node parent`            | `Arc<Node>`     |
+| `ref(weak=true) Node parent`                   | `RcWeak<Node>`  |
+| `ref(weak=true, thread_safe=true) Node parent` | `ArcWeak<Node>` |
 
 #### `list`
 

@@ -221,14 +221,14 @@ message TreeNode {
 
 ### 字段级选项
 
-| 选项                         | 类型   | 说明                                                  |
-| ---------------------------- | ------ | ----------------------------------------------------- |
-| `(fory).ref`                 | bool   | 为该字段启用引用跟踪                                  |
-| `(fory).nullable`            | bool   | 将字段视为可空（`optional`）                          |
-| `(fory).weak_ref`            | bool   | 生成弱指针语义（C++/Rust 代码生成）                   |
-| `(fory).thread_safe_pointer` | bool   | ref 字段在 Rust 中的指针类型（`Arc` vs `Rc`）         |
-| `(fory).deprecated`          | bool   | 标记字段为弃用                                        |
-| `(fory).type`                | string | 基础类型覆盖，目前支持 `tagged_int64`/`tagged_uint64` |
+| 选项                         | 类型   | 说明                                                                  |
+| ---------------------------- | ------ | --------------------------------------------------------------------- |
+| `(fory).ref`                 | bool   | 为该字段启用引用跟踪                                                  |
+| `(fory).nullable`            | bool   | 将字段视为可空（`optional`）                                          |
+| `(fory).weak_ref`            | bool   | 生成弱指针语义（C++/Rust 代码生成）                                   |
+| `(fory).thread_safe_pointer` | bool   | 对 ref 字段使用 Rust `Arc`/`ArcWeak`；默认 `false` 使用 `Rc`/`RcWeak` |
+| `(fory).deprecated`          | bool   | 标记字段为弃用                                                        |
+| `(fory).type`                | string | 基础类型覆盖，目前支持 `tagged_int64`/`tagged_uint64`                 |
 
 引用相关行为：
 
@@ -236,12 +236,15 @@ message TreeNode {
 - 对 `repeated` 字段，`(fory).ref = true` 作用于列表元素。
 - 对 `map<K, V>` 字段，`(fory).ref = true` 作用于 map value。
 - `weak_ref` 与 `thread_safe_pointer` 是 C++/Rust 代码生成提示。
+- `thread_safe_pointer` 默认为 `false`；它只改变生成的 Rust 指针承载类型，不改变编码格式。
+- 在 Rust 代码生成中，`(fory).weak_ref = true` 默认使用 `RcWeak`；只有同时设置
+  `(fory).thread_safe_pointer = true` 时才会切换为 `ArcWeak`。
 
 ### 典型选项组合示例
 
 ```protobuf
 message Graph {
-  Node root = 1 [(fory).ref = true, (fory).thread_safe_pointer = false];
+  Node root = 1 [(fory).ref = true, (fory).thread_safe_pointer = true];
   repeated Node nodes = 2 [(fory).ref = true];
   map<string, Node> cache = 3 [(fory).ref = true];
   Node parent = 4 [(fory).weak_ref = true];

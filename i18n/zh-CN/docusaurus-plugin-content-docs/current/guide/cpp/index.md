@@ -42,6 +42,8 @@ C++ 实现同时支持 CMake 和 Bazel 构建系统。
 - CMake 3.16+（用于 CMake 构建）或 Bazel 8+（用于 Bazel 构建）
 - 支持 C++17 的编译器（GCC 7+、Clang 5+、MSVC 2017+）
 
+使用 MSVC 构建时，需要配置构建系统传入 `/Zc:preprocessor`。
+
 ### 使用 CMake（推荐）
 
 最简单的集成方式是使用 CMake 的 `FetchContent` 模块：
@@ -59,7 +61,7 @@ include(FetchContent)
 FetchContent_Declare(
     fory
     GIT_REPOSITORY https://github.com/apache/fory.git
-    GIT_TAG        v0.17.0
+    GIT_TAG        v1.0.0
     SOURCE_SUBDIR  cpp
 )
 FetchContent_MakeAvailable(fory)
@@ -89,11 +91,11 @@ module(
 
 bazel_dep(name = "rules_cc", version = "0.1.1")
 
-bazel_dep(name = "fory", version = "0.17.0")
+bazel_dep(name = "fory", version = "1.0.0")
 git_override(
     module_name = "fory",
     remote = "https://github.com/apache/fory.git",
-    commit = "v0.17.0",  # 或使用特定 commit hash 以确保可复现性
+    commit = "v1.0.0",  # 或使用特定 commit hash 以确保可复现性
 )
 ```
 
@@ -107,6 +109,13 @@ cc_binary(
 )
 ```
 
+使用 MSVC 构建时，在 Bazel 配置中加入符合标准的预处理器选项：
+
+```bazel
+# .bazelrc
+build --cxxopt=/Zc:preprocessor
+```
+
 然后构建并运行：
 
 ```bash
@@ -117,7 +126,7 @@ bazel run //:my_app
 对于本地开发，也可以改用 `local_path_override`：
 
 ```bazel
-bazel_dep(name = "fory", version = "0.17.0")
+bazel_dep(name = "fory", version = "1.0.0")
 local_path_override(
     module_name = "fory",
     path = "/path/to/fory",
