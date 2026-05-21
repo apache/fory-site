@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[27064],{17219:s=>{s.exports=JSON.parse('{"label":"scala","permalink":"/blog/tags/scala","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

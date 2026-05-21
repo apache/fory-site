@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[65320],{9544:s=>{s.exports=JSON.parse('{"label":"kotlin","permalink":"/blog/tags/kotlin","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

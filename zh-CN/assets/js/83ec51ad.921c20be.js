@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([["39222"],{76871(e,u,s){function t(){return null}s.r(u),s.d(u,{default:()=>t}),s(96540)}}]);

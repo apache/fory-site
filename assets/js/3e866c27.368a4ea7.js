@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[70290],{99348:s=>{s.exports=JSON.parse('{"label":"protobuf","permalink":"/blog/tags/protobuf","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

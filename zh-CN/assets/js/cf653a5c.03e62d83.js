@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([["15176"],{17119(e){e.exports=JSON.parse('{"metadata":{"permalink":"/zh-CN/blog/page/3","page":3,"postsPerPage":10,"totalPages":5,"totalCount":44,"previousPage":"/zh-CN/blog/page/2","nextPage":"/zh-CN/blog/page/4","blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

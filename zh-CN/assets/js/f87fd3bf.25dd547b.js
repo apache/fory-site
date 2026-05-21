@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([[92800],{49430:s=>{s.exports=JSON.parse('{"label":"schema","permalink":"/zh-CN/blog/tags/schema","allTagsPath":"/zh-CN/blog/tags","count":1,"unlisted":false}')}}]);
