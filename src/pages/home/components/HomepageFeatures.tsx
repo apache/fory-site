@@ -45,8 +45,9 @@ const FeatureList: FeatureItem[] = [
         id="feature.domainObjects.description"
         description="Description for the domain objects feature"
       >
-        Serialize Java classes, Python dataclasses, Go structs, Rust and C++
-        structs, and generated model types directly in application code.
+        Serialize native domain objects directly, including Java classes,
+        Python dataclasses, Go structs, Rust and C++ structs, and generated or
+        annotated types.
       </Translate>
     ),
   },

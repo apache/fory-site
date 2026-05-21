@@ -279,7 +279,7 @@
     "description": "The title displayed in the homepage hero section"
   },
   "homepage.hero.subtitle": {
-    "message": "面向惯用领域对象、Schema IDL 和跨语言数据交换的极速多语言序列化框架。",
+    "message": "Apache Fory 是一个高性能多语言序列化框架，面向原生对象序列化和跨语言二进制编解码，支持 Schema IDL、对象引用、Schema 演进、Row Format 随机访问与零拷贝读取。",
     "description": "The subtitle displayed in the homepage hero section"
   },
   "homepage.githubButton": {
@@ -311,11 +311,11 @@
     "description": "The title for the domain objects feature"
   },
   "feature.domainObjects.description": {
-    "message": "直接序列化 Java 类、Python dataclass、Go struct、Rust/C++ struct，以及生成或注解过的模型类型。",
+    "message": "直接序列化原生领域对象，包括 Java 类、Python dataclass、Go struct、Rust/C++ struct，以及生成或注解过的类型。",
     "description": "Description for the domain objects feature"
   },
   "feature.schemaIdl.title": {
-    "message": "感知引用的 Schema IDL",
+    "message": "原生支持引用的 Schema IDL",
     "description": "The title for the schema IDL feature"
   },
   "feature.schemaIdl.description": {
