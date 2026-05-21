@@ -114,7 +114,7 @@ Fory keeps hot paths fast without making every runtime use the same implementati
 - **Zero-copy paths**: Row format and out-of-band buffers avoid unnecessary copies for large values.
 - **Metadata sharing**: Repeated type information is shared or packed to reduce serialization overhead.
 
-### Security & Production-Readiness
+### Production-Readiness
 
 Enterprise-grade security and compatibility:
 
@@ -170,36 +170,6 @@ Apache Fory™ supports class schema forward/backward compatibility across **Jav
 1. **Schema Consistent Mode (Default)**: Assumes identical class schemas between serialization and deserialization peers. This mode offers minimal serialization overhead, smallest data size, and fastest performance: ideal for stable schemas or controlled environments.
 
 2. **Compatible Mode**: Supports independent schema evolution with forward and backward compatibility. This mode enables field addition/deletion, limited type evolution, and graceful handling of schema mismatches. Enable using `withCompatibleMode(CompatibleMode.COMPATIBLE)` in Java, `compatible=True` in Python, `compatible_mode(true)` in Rust, or `NewFory(true)` in Go.
-
-### Binary Compatibility
-
-**Current Status**: Fory 1.0 is the first stable major line. Treat the major
-version as the compatibility boundary and keep producers and consumers on
-compatible protocol versions.
-
-**Recommendations**:
-
-- Use xlang mode for cross-language payloads and schemas shared across runtimes
-- Use native mode for same-language traffic when the runtime supports it
-- Use [schema evolution](../guide/java/schema-evolution.md) when Java schemas change independently
-
-## Security
-
-### Overview
-
-Serialization security varies by protocol:
-
-- **Row Format**: Secure with predefined schemas
-- **Object Graph Serialization** (Java/Python native): More flexible but requires careful security configuration
-
-Dynamic serialization can deserialize arbitrary types, which may introduces risks. For example, the deserialization may invoke `init` constructor or `equals/hashCode` method, if the method body contains malicious code, the system will be at risk.
-
-Fory enables class registration **by default** for dynamic protocols, allowing only trusted registered types.
-**Do not disable class registration unless you can ensure your environment is secure**.
-
-If this option is disabled, you are responsible for serialization security. You should implement and configure a customized `ClassChecker` or `DeserializationPolicy` for fine-grained security control
-
-To report security vulnerabilities in Apache Fory™, please follow the [ASF vulnerability reporting process](https://apache.org/security/#reporting-a-vulnerability).
 
 ## Community and Support
 
