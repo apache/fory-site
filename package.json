@@ -5,7 +5,8 @@
   "scripts": {
     "download-avatars": "node ./scripts/download_avatars/script.js",
     "docusaurus": "bash ./scripts/docusaurus-with-i18n.sh",
-    "start": "docusaurus start --host 0.0.0.0",
+    "start": "npm run build && docusaurus serve --host 0.0.0.0",
+    "start-dev": "docusaurus start --host 0.0.0.0",
     "start-en": "docusaurus start --locale en-US --host 0.0.0.0",
     "start-zh": "docusaurus start --locale zh-CN --host 0.0.0.0",
     "copy-i18n-fallback": "bash ./scripts/copy-i18n-fallback.sh",
@@ -60,6 +61,6 @@
     ]
   },
   "engines": {
-    "node": ">=24.0"
+    "node": ">=22.0.0"
   }
 }
