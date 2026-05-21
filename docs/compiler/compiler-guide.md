@@ -639,7 +639,7 @@ Add the Fory dependency to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fory: ^0.1.0
+  fory: ^1.0.0
 
 dev_dependencies:
   build_runner: ^2.4.0
@@ -831,5 +831,5 @@ fory = "x.y.z"
 
 ```yaml
 dependencies:
-  fory: ^0.1.0
+  fory: ^1.0.0
 ```
