@@ -31,7 +31,7 @@ Fory 为下载站点上的所有文件提供 SHA 摘要和 PGP 签名文件。
 要验证 SHA 摘要，你需要 `.tar.gz` 文件及其对应的 `.tar.gz.sha512` 文件。示例命令如下：
 
 ```bash
-sha512sum --check apache-fory-1.0.0-src.tar.gz
+sha512sum --check apache-fory-1.0.0-src.tar.gz.sha512
 ```
 
 输出类似下面这样即表示校验通过：

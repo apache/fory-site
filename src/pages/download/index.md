@@ -31,7 +31,7 @@ These files are named after the files they relate to but have `.sha512/.asc` ext
 To verify the SHA digests, you need the `.tar.gz` file and its associated `.tar.gz.sha512` file. An example command:
 
 ```bash
-sha512sum --check apache-fory-1.0.0-src.tar.gz
+sha512sum --check apache-fory-1.0.0-src.tar.gz.sha512
 ```
 
 It should output something like:
