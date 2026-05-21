@@ -43,7 +43,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fory: ^0.17.0
+  fory: ^1.0.0
 
 dev_dependencies:
   build_runner: ^2.4.0

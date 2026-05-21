@@ -31,14 +31,14 @@ This guide covers installation and basic setup for cross-language serialization 
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>0.17.0</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 **Gradle:**
 
 ```gradle
-implementation 'org.apache.fory:fory-core:0.17.0'
+implementation 'org.apache.fory:fory-core:1.0.0'
 ```
 
 ### Python
@@ -57,7 +57,7 @@ go get github.com/apache/fory/go/fory
 
 ```toml
 [dependencies]
-fory = "0.13"
+fory = "1.0.0"
 ```
 
 ### JavaScript

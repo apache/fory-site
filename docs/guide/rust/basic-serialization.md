@@ -147,7 +147,7 @@ let later = timestamp.checked_add_duration(duration)?;
 
 ```toml
 [dependencies]
-fory = { version = "0.13", features = ["chrono"] }
+fory = { version = "1.0.0", features = ["chrono"] }
 ```
 
 ### Custom Types
