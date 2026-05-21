@@ -77,13 +77,13 @@ exchanges compact binary payloads across supported languages:
 
 ### Domain Objects First
 
-Fory serializes host-language models directly instead of forcing applications
+Fory serializes native domain objects directly instead of forcing applications
 through wrapper types:
 
 - Java classes, Scala/Kotlin types, and GraalVM native image workloads.
 - Python dataclasses and Python-native object graphs.
 - Go structs, Rust structs, C++ structs, C# models, Swift types, Dart models, and JavaScript/TypeScript values.
-- Generated or annotated model types when a shared contract is preferred.
+- Generated or annotated types when a shared contract is preferred.
 
 ### Reference-Aware Schema IDL
 

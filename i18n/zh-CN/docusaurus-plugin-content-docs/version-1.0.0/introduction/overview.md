@@ -9,7 +9,7 @@ sidebar_position: 1
     <img width="65%" alt="Apache Fory logo" src="/img/fory-logo-light.png" class="themed-logo-light"/>
 </div>
 
-**Apache Fory™** 是一个面向惯用领域对象、Schema IDL 和跨语言数据交换的极速多语言序列化框架。
+**Apache Fory™** 是一个高性能多语言序列化框架，面向原生对象序列化和跨语言二进制编解码，支持 Schema IDL、对象引用、Schema 演进、Row Format 随机访问与零拷贝读取。
 
 Fory 面向跨语言、跨运行时的紧凑高吞吐序列化而构建。它可以直接处理应用中的对象；当需要稳定契约时，也可以使用共享 Schema；同时保留对象图中的共享引用、循环引用和多态运行时类型等语义。
 
@@ -72,14 +72,14 @@ print(decoded)  # User(name='Alice', age=30)
 
 ### 领域对象优先
 
-Fory 直接序列化宿主语言模型，而不是要求应用引入包装类型：
+Fory 直接序列化原生领域对象，而不是要求应用引入包装类型：
 
 - Java 类、Scala/Kotlin 类型，以及 GraalVM native image 工作负载。
 - Python dataclass 和 Python 原生对象图。
 - Go struct、Rust struct、C++ struct、C# 模型、Swift 类型、Dart 模型，以及 JavaScript/TypeScript 值。
-- 当需要共享契约时，也支持生成或注解过的模型类型。
+- 当需要共享契约时，也支持生成或注解过的类型。
 
-### 感知引用的 Schema IDL
+### 原生支持引用的 Schema IDL
 
 **[Fory IDL 和编译器](../compiler/index.md)** 允许团队一次定义 Schema，并为每种目标语言生成原生领域对象：
 
