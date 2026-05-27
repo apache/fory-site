@@ -112,7 +112,7 @@ final bytes = fory.serialize(Person()
 ### CSharp
 
 ```csharp
-[ForyObject]
+[ForyStruct]
 public sealed class Person
 {
     public string Name { get; set; } = string.Empty;

@@ -21,15 +21,15 @@ license: |
 
 This page covers field-level serializer configuration for C# generated serializers.
 
-## `[ForyObject]` and `[ForyField]`
+## `[ForyStruct]` and `[ForyField]`
 
-Use `[ForyObject]` to enable source-generated serializers. Use `[ForyField]` to assign an optional stable non-negative field id or to override the Fory schema type used for a field.
+Use `[ForyStruct]` to enable source-generated serializers. Use `[ForyField]` to assign an optional stable non-negative field id or to override the Fory schema type used for a field.
 
 ```csharp
 using Apache.Fory;
 using S = Apache.Fory.Schema.Types;
 
-[ForyObject]
+[ForyStruct]
 public sealed class Metrics
 {
     [ForyField(Type = typeof(S.UInt32))]
@@ -48,7 +48,7 @@ public sealed class Metrics
 using Apache.Fory;
 using S = Apache.Fory.Schema.Types;
 
-[ForyObject]
+[ForyStruct]
 public sealed class NestedMetrics
 {
     [ForyField(Type = typeof(S.Map<S.Fixed<S.UInt32>, S.List<S.Tagged<S.UInt64>>>))]
