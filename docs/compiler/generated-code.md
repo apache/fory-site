@@ -787,16 +787,26 @@ public sealed partial class Person
 }
 ```
 
-Unions generate `[ForyUnion]` `Union` subclasses with typed case helpers:
+Unions generate `[ForyUnion]` ADTs. Case ID `0` is the unknown-case
+carrier; schema-defined cases use positive `[ForyCase]` IDs. If a case needs
+non-default schema encoding, the generated `[ForyCase]` carries `Type`. Known
+case record names are PascalCase FDL case names; payload types are emitted as
+qualified references when needed to avoid name conflicts.
 
 ```csharp
 [ForyUnion]
-public sealed class Animal : Union
+public abstract partial record Animal
 {
-    public static Animal Dog(Dog value) { ... }
-    public static Animal Cat(Cat value) { ... }
-    public bool IsDog => ...;
-    public Dog DogValue() { ... }
+    private Animal() {}
+
+    [ForyCase(0)]
+    public sealed partial record UnknownCase(int CaseId, object? Value) : Animal;
+
+    [ForyCase(1)]
+    public sealed partial record Dog(global::addressbook.Dog Value) : Animal;
+
+    [ForyCase(2)]
+    public sealed partial record Cat(global::addressbook.Cat Value) : Animal;
 }
 ```
 
