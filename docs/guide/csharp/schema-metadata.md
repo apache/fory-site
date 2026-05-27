@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-This page covers field-level serializer configuration for C# generated serializers.
+This page covers schema metadata for C# generated serializers.
 
 ## `[ForyStruct]` and `[ForyField]`
 
@@ -80,6 +80,33 @@ Container descriptors are composable:
 Dense array fields use `S.Array<TElement>`, for example `S.Array<S.Int32>` or `S.Array<S.BFloat16>`.
 
 Nullability comes from the C# carrier type. Use `List<ulong?>` for nullable list elements and `NullableKeyDictionary<TKey, TValue>` when a map needs nullable keys.
+
+## `[ForyUnion]` and `[ForyCase]`
+
+Generated union cases use `[ForyCase]` for both the stable case ID and optional
+case payload schema type. Do not put `[ForyField]` on union case payload
+members. Known case record names use PascalCase FDL case names; payload types
+use qualified references when needed to avoid name conflicts.
+
+```csharp
+using Apache.Fory;
+using S = Apache.Fory.Schema.Types;
+
+[ForyUnion]
+public abstract partial record Shape
+{
+    private Shape() {}
+
+    [ForyCase(0)]
+    public sealed partial record UnknownCase(int CaseId, object? Value) : Shape;
+
+    [ForyCase(1)]
+    public sealed partial record Circle(global::example.Circle Value) : Shape;
+
+    [ForyCase(2, Type = typeof(S.Fixed<S.Int32>))]
+    public sealed partial record Code(int Value) : Shape;
+}
+```
 
 ## Nullability and Reference Tracking
 

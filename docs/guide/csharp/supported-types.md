@@ -76,7 +76,7 @@ This page summarizes built-in and generated type support in Apache Fory™ C#.
 
 ## User Types
 
-- `[ForyStruct]` classes/structs via source-generated serializers, plus `[ForyEnum]` enums and `[ForyUnion]` union subclasses
+- `[ForyStruct]` classes/structs via source-generated serializers, plus `[ForyEnum]` enums and `[ForyUnion]` ADT records
 - Custom serializer types registered through `Register<T, TSerializer>(...)`
 - `Union` / `Union2<...>` typed union support
 
