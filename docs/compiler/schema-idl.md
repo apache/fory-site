@@ -714,9 +714,9 @@ message Person {  // Auto-generated when enable_auto_type_id = true
 | Java                  | POJO class with getters/setters     |
 | Python                | `@dataclass` class                  |
 | Go                    | Struct with exported fields         |
-| Rust                  | Struct with `#[derive(ForyObject)]` |
+| Rust                  | Struct with `#[derive(ForyStruct)]` |
 | C++                   | Struct with `FORY_STRUCT` macro     |
-| C#                    | `[ForyObject]` class                |
+| C#                    | `[ForyStruct]` class                |
 | JavaScript/TypeScript | `export interface` declaration      |
 | Swift                 | `@ForyStruct` struct or class       |
 | Dart                  | `@ForyStruct` `final class`         |

@@ -771,10 +771,10 @@ C# output is one `.cs` file per schema, for example:
 
 ### Type Generation
 
-Messages generate `[ForyObject]` classes with C# properties and byte helpers:
+Messages generate `[ForyStruct]` classes with C# properties and byte helpers:
 
 ```csharp
-[ForyObject]
+[ForyStruct]
 public sealed partial class Person
 {
     public string Name { get; set; } = string.Empty;
@@ -787,9 +787,10 @@ public sealed partial class Person
 }
 ```
 
-Unions generate `Union` subclasses with typed case helpers:
+Unions generate `[ForyUnion]` `Union` subclasses with typed case helpers:
 
 ```csharp
+[ForyUnion]
 public sealed class Animal : Union
 {
     public static Animal Dog(Dog value) { ... }
