@@ -21,7 +21,9 @@ license: |
 
 This document explains generated code for each target language.
 
-Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and registration helpers or modules.
+Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and schema modules or registration helpers, depending on the target language.
+
+Generated schema modules are schema-file owners, not package or namespace owners. In targets that expose the owner directly in a language package or namespace, the owner name includes a source-file-derived prefix such as `AddressbookForyModule` or `ComplexPbForyModule` so multiple IDL files can target the same package or namespace without producing colliding `ForyModule` types.
 
 ## Reference Schemas
 
@@ -827,14 +829,15 @@ public abstract partial record Animal
 }
 ```
 
-### Registration
+### Module Installation
 
-Each schema generates a registration helper:
+Each schema generates a module owner that installs imported modules first and
+then registers the local schema types:
 
 ```csharp
-public static class AddressbookForyRegistration
+public static class AddressbookForyModule
 {
-    public static void Register(Fory fory)
+    public static void Install(Fory fory)
     {
         fory.Register<addressbook.Animal>((uint)106);
         fory.Register<addressbook.Person>((uint)100);
@@ -843,7 +846,10 @@ public static class AddressbookForyRegistration
 }
 ```
 
-When explicit type IDs are not provided, generated registration uses computed
+The C# module owner keeps the schema-file prefix even when several schemas share
+the same C# namespace.
+
+When explicit type IDs are not provided, generated installation uses computed
 numeric IDs (same behavior as other targets).
 
 ## JavaScript/TypeScript
@@ -955,30 +961,30 @@ For non-null fixed-width integer list elements, Swift classifies the field as
 the corresponding Fory primitive packed-array type; fixed-width integer sets
 remain Fory sets.
 
-### Registration
+### Module Installation
 
-Each schema includes a registration helper with transitive import registration:
+Each schema includes a `ForyModule` owner with transitive import installation:
 
 ```swift
-public enum ForyRegistration {
-    public static func register(_ fory: Fory) throws {
-        try ComplexPb.ForyRegistration.register(fory)
+public enum ForyModule {
+    public static func install(_ fory: Fory) throws {
+        try ComplexPb.ForyModule.install(fory)
         fory.register(Addressbook.Person.self, id: 100)
         fory.register(Addressbook.Animal.self, id: 106)
     }
 }
 ```
 
-With non-empty package and `flatten` style, the helper is prefixed too (for example `Addressbook_ForyRegistration`).
+With non-empty package and `flatten` style, the helper is prefixed too (for example `Addressbook_ForyModule`).
 
-For schemas without explicit `[id=...]`, registration uses computed numeric IDs.
+For schemas without explicit `[id=...]`, installation uses computed numeric IDs.
 If `option enable_auto_type_id = false;` is set, generated code uses name-based registration APIs.
 
 ## Dart
 
 ### Output Layout
 
-Dart output is two files per schema: a main `.dart` file with annotated types, and a `.fory.dart` part file with generated serializers and registration helpers.
+Dart output is two files per schema: a main `.dart` file with annotated types and the IDL module owner, and a `.fory.dart` part file with generated serializers and metadata.
 
 - `<dart_out>/package/package.dart`
 - `<dart_out>/package/package.fory.dart`
@@ -1100,24 +1106,26 @@ List<Node> children = <Node>[];
 Map<String, Node> byName = <String, Node>{};
 ```
 
-### Registration
+### Module Installation
 
-Each generated Dart library includes a registration helper named after the input
-file, such as `AddressbookFory` for `addressbook.dart`. The helper handles all
-generated types in that file and transitively registers imported generated
-types:
+Each generated Dart IDL library includes a module owner named after the input
+file, such as `AddressbookForyModule` for `addressbook.dart`. The module
+installs imported modules first and then registers every local schema type with
+its default IDL identity:
 
 ```dart
-abstract final class AddressbookFory {
-  static void register(
-    Fory fory,
-    Type type, {
-    int? id,
-    String? namespace,
-    String? typeName,
-  }) {
+abstract final class AddressbookForyModule {
+  static void install(Fory fory) {
+    complex_pb.ComplexPbForyModule.install(fory);
+    _registerType(fory, Person);
+    _registerType(fory, Dog);
+  }
+
+  static Fory getFory() { ... }
+
+  static void _registerType(Fory fory, Type type) {
     if (type == Person) {
-      registerGeneratedStruct(fory, _personForyRegistration, id: id, namespace: namespace, typeName: typeName);
+      registerGeneratedStruct(fory, _personForySchema, id: 100, namespace: null, typeName: null);
       return;
     }
     // ... other types
@@ -1133,9 +1141,7 @@ import 'generated/addressbook/addressbook.dart';
 
 void main() {
   final fory = Fory();
-  AddressbookFory.register(fory, Person, id: 100);
-  AddressbookFory.register(fory, Dog, id: 104);
-  // ...
+  AddressbookForyModule.install(fory);
 
   final person = Person()
     ..name = 'Alice'
@@ -1431,9 +1437,9 @@ object AddressbookForyModule extends org.apache.fory.ForyModule {
 
 ### Type ID Behavior
 
-- Explicit `[id=...]` values are used directly in generated registration.
+- Explicit `[id=...]` values are used directly by generated module installation or registration helpers.
 - When type IDs are omitted, generated code uses computed numeric IDs (see `auto_id.*` outputs).
-- If `option enable_auto_type_id = false;` is set, generated registration uses name-based APIs instead of numeric IDs.
+- If `option enable_auto_type_id = false;` is set, generated module installation or registration helpers use name-based APIs instead of numeric IDs.
 
 ### Nested Type Shape
 
