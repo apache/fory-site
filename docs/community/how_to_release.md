@@ -344,9 +344,9 @@ cd java
 # -T10: Use 10 threads for parallel build, improving speed
 # clean: Clean the project
 # deploy: Deploy to remote repository
-# -Prelease: Activate the release profile
+# -Papache-release: Activate the release profile
 # -DskipTests: Skip tests
-mvn -T10 clean deploy --no-transfer-progress -DskipTests -Prelease
+mvn -T10 clean deploy --no-transfer-progress -DskipTests -Papache-release
 
 ```
 
@@ -359,7 +359,7 @@ cd ../kotlin
 
 # Execute the same Maven command as Java module
 # Configuration parameters are identical to Java module
-mvn -T10 clean deploy --no-transfer-progress -DskipTests -Prelease
+mvn -T10 clean deploy --no-transfer-progress -DskipTests -Papache-release
 
 ```
 
