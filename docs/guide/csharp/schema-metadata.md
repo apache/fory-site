@@ -86,7 +86,10 @@ Nullability comes from the C# carrier type. Use `List<ulong?>` for nullable list
 Generated union cases use `[ForyCase]` for both the stable case ID and optional
 case payload schema type. Do not put `[ForyField]` on union case payload
 members. Known case record names use PascalCase FDL case names; payload types
-use qualified references when needed to avoid name conflicts.
+use qualified references when needed to avoid name conflicts. A typed union must
+declare at least one non-`Unknown` case; `Unknown(UnknownCase)` is only the
+runtime forward-compatibility carrier. The marker only selects the carrier and
+does not add an entry to the schema case table.
 
 ```csharp
 using Apache.Fory;
@@ -97,13 +100,13 @@ public abstract partial record Shape
 {
     private Shape() {}
 
-    [ForyCase(0)]
-    public sealed partial record UnknownCase(int CaseId, object? Value) : Shape;
+    [ForyUnknownCase]
+    public sealed partial record Unknown(UnknownCase Value) : Shape;
 
-    [ForyCase(1)]
+    [ForyCase(0)]
     public sealed partial record Circle(global::example.Circle Value) : Shape;
 
-    [ForyCase(2, Type = typeof(S.Fixed<S.Int32>))]
+    [ForyCase(1, Type = typeof(S.Fixed<S.Int32>))]
     public sealed partial record Code(int Value) : Shape;
 }
 ```
