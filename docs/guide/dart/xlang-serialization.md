@@ -41,7 +41,7 @@ Simpler for small, tightly-coordinated teams:
 
 ```dart
 // Dart
-ModelsFory.register(fory, Person, id: 100);
+ModelsForyModule.register(fory, Person, id: 100);
 ```
 
 ### Namespace + Type Name
@@ -50,7 +50,7 @@ Better when multiple teams define types independently:
 
 ```dart
 // Dart
-ModelsFory.register(
+ModelsForyModule.register(
   fory,
   Person,
   namespace: 'example',
@@ -80,7 +80,7 @@ class Person {
 }
 
 final fory = Fory();
-PersonFory.register(fory, Person, id: 100);
+PersonForyModule.register(fory, Person, id: 100);
 final bytes = fory.serialize(Person()
   ..name = 'Alice'
   ..age = 30);
@@ -103,7 +103,7 @@ Person value = (Person) fory.deserialize(bytesFromDart);
 
 ```dart
 final fory = Fory();
-PersonFory.register(fory, Person, id: 100);
+PersonForyModule.register(fory, Person, id: 100);
 final bytes = fory.serialize(Person()
   ..name = 'Alice'
   ..age = 30);
@@ -133,7 +133,7 @@ Person person = fory.Deserialize<Person>(payloadFromDart);
 
 ```dart
 final fory = Fory();
-PersonFory.register(fory, Person, id: 100);
+PersonForyModule.register(fory, Person, id: 100);
 final bytes = fory.serialize(Person()
   ..name = 'Alice'
   ..age = 30);
