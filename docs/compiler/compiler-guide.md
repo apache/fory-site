@@ -419,7 +419,7 @@ generated/
 - Messages derive `org.apache.fory.scala.ForySerializer`
 - `optional T` fields use `Option[T]`
 - Enums use Scala 3 `enum`
-- Unions use Scala 3 ADT `enum` with `@ForyUnion`, `@ForyCase`, and an `UnknownCase`
+- Unions use Scala 3 ADT `enum` with `@ForyUnion`, `@ForyCase`, and an `Unknown`
 - Schema module object included
 
 ### Kotlin
