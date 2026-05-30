@@ -135,32 +135,32 @@ const config: Config = {
         {
           type: 'docSidebar',
           sidebarId: 'docsSidebar',
-          position: 'right',
+          position: 'left',
           label: 'Docs',
         },
         {
           type: 'docSidebar',
           sidebarId: 'specificationSidebar',
-          position: 'right',
+          position: 'left',
           label: 'Specification',
         },
         {
           type: 'docSidebar',
           sidebarId: 'communitySidebar',
-          position: 'right',
+          position: 'left',
           label: 'Community',
         },
         {
           to: '/user',
           label: 'Users',
-          position: "right",
+          position: "left",
         },
         {
-          position: 'right',
+          position: 'left',
           to: '/download',
           label: 'Download',
         },
-        { to: '/blog', label: 'Blog', position: 'right' },
+        { to: '/blog', label: 'Blog', position: 'left' },
         {
           type: 'dropdown',
           label: 'ASF',
