@@ -234,9 +234,10 @@ docs: {
 
 Minimum validation:
 
-1. `npm run typecheck`
-2. `npm run build`
-3. Review the output and separate:
+1. `npx markdownlint-cli@0.25.0 '**/*.md' --ignore node_modules`
+2. `npm run typecheck`
+3. `npm run build`
+4. Review the output and separate:
    - new failures caused by your changes
    - pre-existing failures, especially zh-CN broken links
 
