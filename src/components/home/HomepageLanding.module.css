@@ -445,7 +445,7 @@
 }
 
 .schemaLayout {
-  align-items: stretch;
+  align-items: center;
   display: grid;
   gap: 1.4rem;
   grid-template-columns: minmax(0, 0.84fr) minmax(480px, 1fr);
@@ -547,7 +547,7 @@
 }
 
 .schemaPreview {
-  align-self: stretch;
+  align-self: center;
   background: var(--ifm-background-surface-color);
   border: 1px solid var(--ifm-color-emphasis-200);
   border-radius: 8px;
@@ -583,18 +583,21 @@
   background: var(--fory-code-bg);
   border-radius: 0;
   box-shadow: none;
-  flex: 1;
   margin: 0;
 }
 
 .schemaPreview :global(pre.prism-code) {
   background: var(--fory-code-bg) !important;
-  height: 100%;
   font-size: 0.86rem;
-  line-height: 1.6;
+  line-height: 1.55;
   margin: 0;
-  min-height: 430px;
-  padding: 1.2rem;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.schemaPreview :global(pre.prism-code > code) {
+  padding: 1.2rem !important;
 }
 
 .performance {
@@ -616,7 +619,7 @@
 .performanceCards {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .performanceCard {
@@ -633,18 +636,11 @@
   line-height: 1.15;
 }
 
-.performanceCard span {
-  color: var(--ifm-font-color-base);
-  display: block;
-  font-weight: 900;
-  margin-top: 0.5rem;
-}
-
 .performanceCard p {
   color: var(--ifm-color-emphasis-800);
   font-size: 0.9rem;
   line-height: 1.55;
-  margin: 0.65rem 0 0;
+  margin: 0.75rem 0 0;
 }
 
 .useCaseGrid {

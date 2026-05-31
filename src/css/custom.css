@@ -6,6 +6,7 @@
 
 /* You can override the default Infima variables here. */
 :root {
+  --fory-layout-width: 1180px;
   --ifm-navbar-height: 4rem;
   --ifm-color-primary: #ff6f01d2;
   --ifm-color-primary-dark: #FF7001;
@@ -39,7 +40,7 @@
   .navbar__inner {
     margin-left: auto;
     margin-right: auto;
-    max-width: 1180px;
+    max-width: var(--fory-layout-width);
   }
 
 .navbar__brand {
@@ -241,6 +242,13 @@
 }
 
 @media (min-width: 997px) {
+  [class*="docRoot_"] {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: none;
+    width: calc(100% - 4rem);
+  }
+
   .theme-doc-breadcrumbs,
   .theme-doc-footer,
   .pagination-nav,
@@ -314,6 +322,12 @@
 
 .theme-doc-sidebar-menu {
   padding: .75rem .75rem .75rem var(--fory-doc-sidebar-inset);
+}
+
+@media (min-width: 997px) {
+  .theme-doc-sidebar-menu {
+    padding-left: max(.75rem, calc((100vw - var(--fory-layout-width)) / 2 - .5rem));
+  }
 }
 
 .menu__link {

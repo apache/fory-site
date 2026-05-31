@@ -83,9 +83,9 @@ const copies: Record<"en" | "zh", Copy> = {
     schemaSubtitle:
       "Fory IDL starts with familiar message definitions, then adds unions and reference-aware fields for data models that ordinary IDLs tend to flatten.",
     performanceEyebrow: "Performance",
-    performanceTitle: "Measure the runtime you plan to ship.",
+    performanceTitle: "Designed for high-throughput serialization paths.",
     performanceSubtitle:
-      "Compare language-specific benchmark results with the same workloads, chart notes, and reproduction details.",
+      "Fory combines efficient binary encoding with highly optimized serializers, from JIT compilation to statically generated code.",
     benchmarkCta: "View full benchmark charts",
     useCasesEyebrow: "Data boundaries",
     useCasesTitle: "Match Fory to each data boundary.",
@@ -119,9 +119,9 @@ const copies: Record<"en" | "zh", Copy> = {
     schemaSubtitle:
       "Fory IDL 从熟悉的 message 定义开始，并提供 union 与引用感知字段，表达普通 IDL 容易压平的对象模型。",
     performanceEyebrow: "性能",
-    performanceTitle: "测量你真正要上线的运行时。",
+    performanceTitle: "面向高吞吐序列化路径而设计。",
     performanceSubtitle:
-      "按语言对比相同工作负载下的 Benchmark 结果、图表说明和复现细节。",
+      "Fory 结合高效二进制编码和高度优化的 serializer，从 JIT 编译到静态生成代码。",
     benchmarkCta: "查看完整性能图表",
     useCasesEyebrow: "数据边界",
     useCasesTitle: "让 Fory 匹配每一种数据边界。",
@@ -504,11 +504,6 @@ const schemaExamples = [
     zhTitle: "Message 类型",
     text: "Define structured data types with typed fields, field IDs, and explicit optional fields.",
     zhText: "用 typed fields、字段 ID 和明确的 optional 字段定义结构化数据类型。",
-    code: `message Person {
-    string name = 1;
-    int32 age = 2;
-    optional string email = 3;
-}`,
   },
   {
     title: "Union Type",
@@ -544,7 +539,7 @@ union Animal [id=106] {
 ];
 
 const schemaPreviewCode = `package example;\n\n${schemaExamples
-  .map((item) => item.code)
+  .flatMap((item) => item.code ? [item.code] : [])
   .join("\n\n")}`;
 
 const schemaLinks = [
@@ -567,28 +562,16 @@ const schemaLinks = [
 
 const performanceCards = [
   {
-    value: "Per language",
-    zhValue: "按语言",
-    label: "runtime benchmarks",
-    zhLabel: "运行时性能",
-    text: "Compare Fory with the serializers a team would realistically choose for that language.",
-    zhText: "把 Fory 与该语言中团队实际会选择的序列化方案进行对比。",
+    value: "Optimized Serializers",
+    zhValue: "优化 Serializer",
+    text: "Use JIT serializers, source generators, macros, KSP, and build_runner where each runtime supports them.",
+    zhText: "在各运行时使用 JIT serializer、source generator、macro、KSP 和 build_runner。",
   },
   {
-    value: "Same workloads",
-    zhValue: "同工作负载",
-    label: "reproducible setup",
-    zhLabel: "可复现设置",
-    text: "Use the benchmark notes to understand payload shape, environment, and methodology.",
-    zhText: "通过 Benchmark 说明理解载荷形态、环境和测试方法。",
-  },
-  {
-    value: "By boundary",
-    zhValue: "按边界",
-    label: "mode selection",
-    zhLabel: "模式选择",
-    text: "Measure the path you intend to ship: xlang payloads, native mode, or row format.",
-    zhText: "测量你真正要上线的路径：xlang payload、native mode 或 row format。",
+    value: "Efficient Encoding",
+    zhValue: "高效编码",
+    text: "Encode typed objects into an efficient binary format for fast serialization and deserialization.",
+    zhText: "将类型化对象编码为面向快速序列化和反序列化的高效二进制格式。",
   },
 ];
 
@@ -813,9 +796,8 @@ function HomepageLanding(): JSX.Element {
         </div>
         <div className={styles.performanceCards}>
           {performanceCards.map((item) => (
-            <div className={styles.performanceCard} key={item.label}>
+            <div className={styles.performanceCard} key={item.value}>
               <strong>{isZh ? item.zhValue : item.value}</strong>
-              <span>{isZh ? item.zhLabel : item.label}</span>
               <p>{isZh ? item.zhText : item.text}</p>
             </div>
           ))}
