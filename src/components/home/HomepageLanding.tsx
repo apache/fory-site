@@ -475,7 +475,7 @@ const heroSurfaces = [
     zhLabel: "原生",
     title: "Idiomatic Objects",
     zhTitle: "原生对象",
-    text: "Serialize existing domain objects directly in the target language, without extra conversion code.",
+    text: "Serialize existing domain objects directly in the target language.",
     zhText: "在目标语言内直接序列化已有领域对象，无需额外手动转换代码。",
     link: "/docs/start/usage",
   },
