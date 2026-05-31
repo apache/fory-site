@@ -20,7 +20,7 @@ This skill is for the website/docs repository workflow, not the ASF source relea
 This workflow covers:
 
 1. Write the release blog post
-2. Update the English release-facing pages, including the download page and pinned latest-version references
+2. Update the English release-facing pages, including the homepage, download page, and pinned latest-version references
 3. Git commit the English content checkpoint
 4. Translate the zh-CN release blog and zh-CN docs
 5. Git commit the translation checkpoint
@@ -38,6 +38,7 @@ This workflow covers:
 - Chinese blog posts live in `i18n/zh-CN/docusaurus-plugin-content-blog/`
 - Docs version history is recorded in `versions.json`
 - The default released docs version is controlled by `docs.lastVersion` in `docusaurus.config.ts`
+- Homepage runtime examples live in `src/components/home/HomepageLanding.tsx`
 - The latest-release download page lives at `src/pages/download/index.md`
 - Localized page translations live under `i18n/zh-CN/docusaurus-plugin-content-pages/`
 - The wrapped versioning command is `yarn docusaurus docs:version <ver>`, which calls `scripts/docusaurus-with-i18n.sh`
@@ -104,7 +105,7 @@ This workflow covers:
 7. If you add benchmark images, ensure the referenced static paths and copied files match exactly.
 8. Validate the post for obvious copy/paste errors from the previous release.
 
-## Step 1A: Bump Versioned References in Current Docs and the Download Page
+## Step 1A: Bump Versioned References in Current Docs, Homepage, and the Download Page
 
 Before translating the zh-CN blog/docs or freezing the docs version, update all pinned current-doc references and release-facing site pages to the new release version.
 
@@ -113,29 +114,32 @@ Required targets:
 1. `docs/start/install.md`
 2. `docs/guide/**/index.md` for each language/runtime that includes versioned install or dependency examples
 3. other current guide pages with pinned version examples, dependency strings, or install snippets
-4. `src/pages/download/index.md`
-5. any other current docs page that still advertises the previous release as the recommended install version
+4. `src/components/home/HomepageLanding.tsx`
+5. `src/pages/download/index.md`
+6. any other current docs page that still advertises the previous release as the recommended install version
 
 Minimum workflow:
 
 1. Replace the previous release version with the new release version in `docs/start/install.md`
 2. Scan all current docs for pinned release strings and update them where they describe the latest recommended version
 3. Explicitly inspect `docs/guide/**/index.md` because these pages often carry language-specific install snippets and versioned dependency examples
-4. Update `src/pages/download/index.md` so the page advertises the new release correctly:
+4. Update `src/components/home/HomepageLanding.tsx` so homepage runtime install examples advertise the new release correctly, especially Java/Maven, Rust/Cargo, C++ `GIT_TAG`, .NET, Swift, Dart, Scala, and Kotlin/KSP snippets
+5. Update `src/pages/download/index.md` so the page advertises the new release correctly:
    - update the "latest release" version and release date
    - update source, `.asc`, and `.sha512` URLs to the new artifact path
    - update the release-notes link
    - update checksum/signature example filenames and commands if they still reference the previous release
-5. Update every latest-version reference before `yarn docusaurus docs:version <version>` so the frozen snapshot inherits the correct release version
-6. Be especially suspicious of:
+6. Update every latest-version reference before `yarn docusaurus docs:version <version>` so the frozen snapshot inherits the correct release version
+7. Be especially suspicious of:
    - Maven/Gradle coordinates
    - `pip install`, `go get`, `cargo add`, `dotnet add package`
    - Bazel dependency examples
    - language-guide install snippets under `docs/guide/**`
    - language `index.md` pages under `docs/guide/**/index.md`
+   - homepage runtime examples under `src/components/home/**`
    - `src/pages/download/index.md` release tables, artifact filenames, and verification examples
-7. Finish all of these English/current-doc version updates before starting zh-CN translation, so the Chinese docs/blog are translated once from the final English source rather than patched twice
-8. Do this before `yarn docusaurus docs:version <version>` so the released snapshot freezes the correct install guidance and the site advertises the correct latest release
+8. Finish all of these English/current-doc version updates before starting zh-CN translation, so the Chinese docs/blog are translated once from the final English source rather than patched twice
+9. Do this before `yarn docusaurus docs:version <version>` so the released snapshot freezes the correct install guidance and the site advertises the correct latest release
 
 ## Step 2: Git Commit the English Release Checkpoint
 
@@ -230,9 +234,10 @@ docs: {
 
 Minimum validation:
 
-1. `npm run typecheck`
-2. `npm run build`
-3. Review the output and separate:
+1. `npx markdownlint-cli@0.25.0 '**/*.md' --ignore node_modules`
+2. `npm run typecheck`
+3. `npm run build`
+4. Review the output and separate:
    - new failures caused by your changes
    - pre-existing failures, especially zh-CN broken links
 
@@ -251,9 +256,10 @@ Recommended route checks when the build is usable:
 Also run targeted checks:
 
 - parameterize stale-version scans using the actual old/new versions instead of hard-coded values
-- scan at least: `blog`, `docs`, `src/pages/download/index.md`, `i18n/zh-CN/docusaurus-plugin-content-pages/download/index.md`, `versioned_docs/version-<version>`, and `i18n/zh-CN/docusaurus-plugin-content-docs`
+- scan at least: `blog`, `docs`, `src/components/home`, `src/pages/download/index.md`, `i18n/zh-CN/docusaurus-plugin-content-pages/download/index.md`, `versioned_docs/version-<version>`, and `i18n/zh-CN/docusaurus-plugin-content-docs`
 - for example, search for the previous release string, older release strings likely to be copy/paste remnants, and placeholders such as `TODO` / `TBD`
 - treat stale latest-version references in current install/docs pages as blocking, especially in `docs/start/install.md`, `docs/guide/**/index.md`, and other `docs/guide/**` pages
+- treat stale latest-version references in homepage runtime examples as blocking, especially in `src/components/home/HomepageLanding.tsx`
 - treat stale release numbers, dates, artifact URLs, or verification examples in `src/pages/download/index.md` as blocking
 - treat stale release numbers, dates, artifact URLs, or verification examples in `i18n/zh-CN/docusaurus-plugin-content-pages/download/index.md` as blocking whenever the zh download page exists or should exist
 - confirm release blog asset paths exist under `static/img/blog/fory_<version>_release/`
@@ -275,11 +281,12 @@ The review should check at least:
 4. Are the zh-CN release blog and English release blog both present and consistent with the intended release state?
 5. Are blog asset paths and benchmark links valid?
 6. Are there any obvious missing follow-up edits, such as `docs/start/install.md` or guide pages with pinned version references that should move to the new release?
-7. Does `src/pages/download/index.md` advertise the new release correctly, including version, date, artifact URLs, release-notes link, and verification examples?
-8. If `/zh-CN/download` is expected, is `i18n/zh-CN/docusaurus-plugin-content-pages/download/index.md` present and aligned with the English download page?
-9. Did the workflow accidentally snapshot stale site docs because upstream `apache/fory` doc changes were not synced first?
-10. Did any changed English current doc outside `guide/` fail to get translated or reviewed in zh-CN before versioning, for example under `compiler/`, `benchmarks/`, `specification/`, `start/`, or `introduction/`?
-11. Does every changed zh current doc in the release-doc scope match the intended `version-<version>` snapshot, or did the workflow freeze an older zh current state?
+7. Does `src/components/home/HomepageLanding.tsx` advertise the new release correctly in every pinned runtime install example?
+8. Does `src/pages/download/index.md` advertise the new release correctly, including version, date, artifact URLs, release-notes link, and verification examples?
+9. If `/zh-CN/download` is expected, is `i18n/zh-CN/docusaurus-plugin-content-pages/download/index.md` present and aligned with the English download page?
+10. Did the workflow accidentally snapshot stale site docs because upstream `apache/fory` doc changes were not synced first?
+11. Did any changed English current doc outside `guide/` fail to get translated or reviewed in zh-CN before versioning, for example under `compiler/`, `benchmarks/`, `specification/`, `start/`, or `introduction/`?
+12. Does every changed zh current doc in the release-doc scope match the intended `version-<version>` snapshot, or did the workflow freeze an older zh current state?
 
 Treat review findings as blocking until resolved or explicitly documented.
 
