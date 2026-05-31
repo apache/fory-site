@@ -181,6 +181,10 @@
   --fory-doc-toc-right-inset: 5.5rem;
 }
 
+html:root {
+  --doc-sidebar-width: 310px;
+}
+
 .theme-doc-breadcrumbs,
 .theme-doc-footer,
 .pagination-nav {
@@ -333,6 +337,8 @@
 .menu__link {
   border-radius: 6px;
   font-size: .96rem;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .menu__link--active {
