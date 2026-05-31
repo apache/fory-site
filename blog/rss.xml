@@ -4,10 +4,69 @@
         <title>Apache Fory™ Blog</title>
         <link>https://fory.apache.org/blog</link>
         <description>Apache Fory™ Blog</description>
-        <lastBuildDate>Thu, 21 May 2026 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 31 May 2026 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en-US</language>
+        <item>
+            <title><![CDATA[Fory v1.1.0 Released]]></title>
+            <link>https://fory.apache.org/blog/fory_1_1_0_release</link>
+            <guid>https://fory.apache.org/blog/fory_1_1_0_release</guid>
+            <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[The Apache Fory team is pleased to announce the 1.1.0 release. This release includes 18 PRs from 4 distinct contributors and continues to improve the cross-language runtime across supported languages. See the Install page to get the libraries for your platform.]]></description>
+            <content:encoded><![CDATA[<p>The Apache Fory team is pleased to announce the 1.1.0 release. This release includes <a href="https://github.com/apache/fory/compare/v1.0.0...v1.1.0" target="_blank" rel="noopener noreferrer" class="">18 PRs</a> from 4 distinct contributors and continues to improve the cross-language runtime across supported languages. See the <a href="https://fory.apache.org/docs/start/install" target="_blank" rel="noopener noreferrer" class="">Install</a> page to get the libraries for your platform.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="highlights">Highlights<a href="https://fory.apache.org/blog/fory_1_1_0_release#highlights" class="hash-link" aria-label="Direct link to Highlights" title="Direct link to Highlights" translate="no">​</a></h2>
+<ul>
+<li class="">Added Java/Python gRPC support in the compiler.</li>
+<li class="">Improved xlang union handling with unknown union case support and sealed record generation for C# unions.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="features">Features<a href="https://fory.apache.org/blog/fory_1_1_0_release#features" class="hash-link" aria-label="Direct link to Features" title="Direct link to Features" translate="no">​</a></h2>
+<ul>
+<li class="">feat(compiler): add java/python gRPC support by @chaokunyang in <a href="https://github.com/apache/fory/pull/3692" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3692</a></li>
+<li class="">refactor(csharp): split Fory object attributes by @chaokunyang in <a href="https://github.com/apache/fory/pull/3709" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3709</a></li>
+<li class="">feat(c#): use sealed record for c# union by @chaokunyang in <a href="https://github.com/apache/fory/pull/3710" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3710</a></li>
+<li class="">feat(xlang): support unknown union case in union type by @chaokunyang in <a href="https://github.com/apache/fory/pull/3711" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3711</a></li>
+<li class="">refactor(compiler): rename generated schema owners to modules by @chaokunyang in <a href="https://github.com/apache/fory/pull/3713" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3713</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="bug-fixes">Bug Fixes<a href="https://fory.apache.org/blog/fory_1_1_0_release#bug-fixes" class="hash-link" aria-label="Direct link to Bug Fixes" title="Direct link to Bug Fixes" translate="no">​</a></h2>
+<ul>
+<li class="">fix(c++): propagate /Zc<!-- -->:preprocessor<!-- --> on MSVC for FORY_STRUCT consumers by @truffle-dev in <a href="https://github.com/apache/fory/pull/3694" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3694</a></li>
+<li class="">fix(cpp): repair CMake tests and examples by @chaokunyang in <a href="https://github.com/apache/fory/pull/3699" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3699</a></li>
+<li class="">fix(java): guard replace-resolve class reads by @chaokunyang in <a href="https://github.com/apache/fory/pull/3706" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3706</a></li>
+<li class="">fix(python): make policy validators validation-only by @chaokunyang in <a href="https://github.com/apache/fory/pull/3708" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3708</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="other-improvements">Other Improvements<a href="https://fory.apache.org/blog/fory_1_1_0_release#other-improvements" class="hash-link" aria-label="Direct link to Other Improvements" title="Direct link to Other Improvements" translate="no">​</a></h2>
+<ul>
+<li class="">docs(cpp): clarify MSVC preprocessor requirement by @chaokunyang in <a href="https://github.com/apache/fory/pull/3695" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3695</a></li>
+<li class="">chore: bump release version to 1.0 by @chaokunyang in <a href="https://github.com/apache/fory/pull/3696" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3696</a></li>
+<li class="">chore(deps): bump io.grpc<!-- -->:grpc-netty-shaded<!-- --> from 1.62.2 to 1.75.0 in /integration_tests/grpc_tests/java by @dependabot[bot] in <a href="https://github.com/apache/fory/pull/3697" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3697</a></li>
+<li class="">docs(xlang): update language support docs by @chaokunyang in <a href="https://github.com/apache/fory/pull/3700" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3700</a></li>
+<li class="">docs: fix xlang type mapping MDX by @chaokunyang in <a href="https://github.com/apache/fory/pull/3701" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3701</a></li>
+<li class="">chore(js): upgrade test dependencies by @chaokunyang in <a href="https://github.com/apache/fory/pull/3703" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3703</a></li>
+<li class="">ci: declare workflow-level <code>contents: read</code> on ci and lint by @arpitjain099 in <a href="https://github.com/apache/fory/pull/3704" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3704</a></li>
+<li class="">docs: update readme to add android support by @chaokunyang in <a href="https://github.com/apache/fory/pull/3705" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3705</a></li>
+<li class="">chore: update java checks docs by @chaokunyang in <a href="https://github.com/apache/fory/pull/3707" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3707</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-contributors">New Contributors<a href="https://fory.apache.org/blog/fory_1_1_0_release#new-contributors" class="hash-link" aria-label="Direct link to New Contributors" title="Direct link to New Contributors" translate="no">​</a></h2>
+<ul>
+<li class="">@truffle-dev made their first contribution in <a href="https://github.com/apache/fory/pull/3694" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3694</a></li>
+<li class="">@arpitjain099 made their first contribution in <a href="https://github.com/apache/fory/pull/3704" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3704</a></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a href="https://github.com/apache/fory/compare/v1.0.0...v1.1.0" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/compare/v1.0.0...v1.1.0</a></p>]]></content:encoded>
+            <category>fory</category>
+            <category>java</category>
+            <category>kotlin</category>
+            <category>scala</category>
+            <category>android</category>
+            <category>python</category>
+            <category>rust</category>
+            <category>c++</category>
+            <category>go</category>
+            <category>c#</category>
+            <category>swift</category>
+            <category>dart</category>
+            <category>compiler</category>
+        </item>
         <item>
             <title><![CDATA[Fory v1.0.0 Released]]></title>
             <link>https://fory.apache.org/blog/fory_1_0_0_release</link>
@@ -2416,61 +2475,6 @@ schema above, generated code looks like:</p>
 <li class="">chore: bump version 0.11.1 by @LiangliangSui in <a href="https://github.com/apache/fory/pull/2369" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2369</a></li>
 </ul>
 <p><strong>Full Changelog</strong>: <a href="https://github.com/apache/fory/compare/v0.11.1...v0.11.2" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/compare/v0.11.1...v0.11.2</a></p>]]></content:encoded>
-            <category>fory</category>
-        </item>
-        <item>
-            <title><![CDATA[Fory v0.11.1 Released]]></title>
-            <link>https://fory.apache.org/blog/fory_0_11_1_release</link>
-            <guid>https://fory.apache.org/blog/fory_0_11_1_release</guid>
-            <pubDate>Fri, 27 Jun 2025 00:00:00 GMT</pubDate>
-            <description><![CDATA[The Apache Fory team is pleased to announce the 0.11.1 release. This is a major release that includes 32 PR from 13 distinct contributors. See the Install Page to learn how to get the libraries for your platform.]]></description>
-            <content:encoded><![CDATA[<p>The Apache Fory team is pleased to announce the 0.11.1 release. This is a major release that includes <a href="https://github.com/apache/fory/compare/v0.11.0...v0.11.1-rc1" target="_blank" rel="noopener noreferrer" class="">32 PR</a> from 13 distinct contributors. See the <a href="https://fury.apache.org/docs/docs/start/install" target="_blank" rel="noopener noreferrer" class="">Install</a> Page to learn how to get the libraries for your platform.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="features">Features<a href="https://fory.apache.org/blog/fory_0_11_1_release#features" class="hash-link" aria-label="Direct link to Features" title="Direct link to Features" translate="no">​</a></h2>
-<ul>
-<li class="">feat(java): row encoder supports synthesizing interfaces nested inside of records by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2304" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2304</a></li>
-<li class="">feat(java): Support customized serializer for abstract or interface. by @CherishCai in <a href="https://github.com/apache/fory/pull/2311" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2311</a></li>
-<li class="">feat(java): row encoder supports custom rewriting values without changing their type by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2305" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2305</a></li>
-<li class="">feat(java): support multi-dimensional array field serialization in xlang meta shared mode by @OmCheeLin in <a href="https://github.com/apache/fory/pull/2314" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2314</a></li>
-<li class="">feat(python): bump cython to 3.1.1 by @penguin-wwy in <a href="https://github.com/apache/fory/pull/2318" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2318</a></li>
-<li class="">feat(java): array row encoder supports set of interface type by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2333" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2333</a></li>
-<li class="">feat(java): support maven shade for disallowed.txt by @chaokunyang in <a href="https://github.com/apache/fory/pull/2327" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2327</a></li>
-<li class="">feat(java): store OptionalInt, OptionalLong, OptionalDouble same as nullable values by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2338" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2338</a></li>
-</ul>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="bug-fix">Bug Fix<a href="https://fory.apache.org/blog/fory_0_11_1_release#bug-fix" class="hash-link" aria-label="Direct link to Bug Fix" title="Direct link to Bug Fix" translate="no">​</a></h2>
-<ul>
-<li class="">fix(java): row encoder interface synthesis handle (Optional) null correctly by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2306" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2306</a></li>
-<li class="">fix(java): Use (long, long, byte) key for MetaStringBytes cache to prevent collisions by @LouisLou2 in <a href="https://github.com/apache/fory/pull/2308" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2308</a></li>
-<li class="">fix(python): update python benchmark script by @penguin-wwy in <a href="https://github.com/apache/fory/pull/2315" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2315</a></li>
-<li class="">fix(java): fix row encoder synthesized interface lazy-decoding of Optional by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2320" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2320</a></li>
-<li class="">fix(java): fix row format handling Optional of type with custom codec by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2321" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2321</a></li>
-<li class="">fix(java): row encoder array element serializer created too late by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2323" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2323</a></li>
-<li class="">fix(python): fix py3.13 ci on windows by @chaokunyang in <a href="https://github.com/apache/fory/pull/2334" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2334</a></li>
-<li class="">fix(python): correct compute_string_hash usage in StructHashVisitor.visit_customized by @lzaeh in <a href="https://github.com/apache/fory/pull/2335" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2335</a></li>
-<li class="">fix(java): fix register serializer for abstract class by @chaokunyang in <a href="https://github.com/apache/fory/pull/2347" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2347</a></li>
-<li class="">fix(java): fix map nested array type serialization codegen by @chaokunyang in <a href="https://github.com/apache/fory/pull/2352" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2352</a></li>
-</ul>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="other-improvements">Other Improvements<a href="https://fory.apache.org/blog/fory_0_11_1_release#other-improvements" class="hash-link" aria-label="Direct link to Other Improvements" title="Direct link to Other Improvements" translate="no">​</a></h2>
-<ul>
-<li class="">chore(java): skip find customized serializer when absClassInfo is empty by @CherishCai in <a href="https://github.com/apache/fory/pull/2316" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2316</a></li>
-<li class="">chore: add release note generate tool by @chaokunyang in <a href="https://github.com/apache/fory/pull/2322" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2322</a></li>
-<li class="">chore: Update README.md for fory rename by @chaokunyang in <a href="https://github.com/apache/fory/pull/2324" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2324</a></li>
-<li class="">chore: update slack invite link to fory by @chaokunyang in <a href="https://github.com/apache/fory/pull/2325" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2325</a></li>
-<li class="">perf(java): Improve zone offset deserialization performance by overriding JDK caching by @Cybermaxke in <a href="https://github.com/apache/fory/pull/2336" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2336</a></li>
-<li class="">chore: bump release version to 0.11.0 by @chaokunyang in <a href="https://github.com/apache/fory/pull/2340" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2340</a></li>
-<li class="">perf(java): update benchmark plot by @chaokunyang in <a href="https://github.com/apache/fory/pull/2342" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2342</a></li>
-<li class="">chore: update plots fro compatible by @chaokunyang in <a href="https://github.com/apache/fory/pull/2344" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2344</a></li>
-<li class="">docs: add document for customized map collection serializers by @chaokunyang in <a href="https://github.com/apache/fory/pull/2351" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2351</a></li>
-<li class="">docs: add row format guide for ext and interface types by @nabilshafi in <a href="https://github.com/apache/fory/pull/2346" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2346</a></li>
-<li class="">chore(java): ProtobufDispatcher should trigger log warning at most once by @ClaudioConsolmagno in <a href="https://github.com/apache/fory/pull/2353" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2353</a></li>
-<li class="">docs: format markdown docs by @chaokunyang in <a href="https://github.com/apache/fory/pull/2354" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2354</a></li>
-<li class="">chore: refine validate serializers message for map/collection by @chaokunyang in <a href="https://github.com/apache/fory/pull/2355" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2355</a></li>
-</ul>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-contributors">New Contributors<a href="https://fory.apache.org/blog/fory_0_11_1_release#new-contributors" class="hash-link" aria-label="Direct link to New Contributors" title="Direct link to New Contributors" translate="no">​</a></h2>
-<ul>
-<li class="">@nabilshafi made their first contribution in <a href="https://github.com/apache/fory/pull/2346" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2346</a></li>
-<li class="">@ClaudioConsolmagno made their first contribution in <a href="https://github.com/apache/fory/pull/2353" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2353</a></li>
-</ul>
-<p><strong>Full Changelog</strong>: <a href="https://github.com/apache/fory/compare/v0.11.0...v0.11.1-rc1" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/compare/v0.11.0...v0.11.1-rc1</a></p>]]></content:encoded>
             <category>fory</category>
         </item>
     </channel>

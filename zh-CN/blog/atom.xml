@@ -2,11 +2,74 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fory.apache.org/zh-CN/blog</id>
     <title>Apache Fory™ Blog</title>
-    <updated>2026-05-21T00:00:00.000Z</updated>
+    <updated>2026-05-31T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fory.apache.org/zh-CN/blog"/>
     <subtitle>Apache Fory™ Blog</subtitle>
     <icon>https://fory.apache.org/zh-CN/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Fory v1.1.0 发布]]></title>
+        <id>https://fory.apache.org/zh-CN/blog/fory_1_1_0_release</id>
+        <link href="https://fory.apache.org/zh-CN/blog/fory_1_1_0_release"/>
+        <updated>2026-05-31T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Apache Fory 团队很高兴宣布 1.1.0 版本正式发布。本版本包含来自 4 位贡献者的 18 个 PR，并继续改进各支持语言的跨语言运行时。请访问 Install 页面 获取各平台安装方式。]]></summary>
+        <content type="html"><![CDATA[<p>Apache Fory 团队很高兴宣布 1.1.0 版本正式发布。本版本包含来自 4 位贡献者的 <a href="https://github.com/apache/fory/compare/v1.0.0...v1.1.0" target="_blank" rel="noopener noreferrer" class="">18 个 PR</a>，并继续改进各支持语言的跨语言运行时。请访问 <a href="https://fory.apache.org/docs/start/install" target="_blank" rel="noopener noreferrer" class="">Install 页面</a> 获取各平台安装方式。</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="发布亮点">发布亮点<a href="https://fory.apache.org/zh-CN/blog/fory_1_1_0_release#%E5%8F%91%E5%B8%83%E4%BA%AE%E7%82%B9" class="hash-link" aria-label="发布亮点的直接链接" title="发布亮点的直接链接" translate="no">​</a></h2>
+<ul>
+<li class="">Compiler 增加 Java/Python gRPC 支持。</li>
+<li class="">改进 xlang union 处理，支持未知 union case，并为 C# union 生成 sealed record。</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="功能特性">功能特性<a href="https://fory.apache.org/zh-CN/blog/fory_1_1_0_release#%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7" class="hash-link" aria-label="功能特性的直接链接" title="功能特性的直接链接" translate="no">​</a></h2>
+<ul>
+<li class="">feat(compiler): 增加 Java/Python gRPC 支持，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3692" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3692</a></li>
+<li class="">refactor(csharp): 拆分 Fory object attribute，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3709" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3709</a></li>
+<li class="">feat(c#): 为 C# union 使用 sealed record，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3710" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3710</a></li>
+<li class="">feat(xlang): 在 union 类型中支持未知 union case，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3711" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3711</a></li>
+<li class="">refactor(compiler): 将生成的 schema owner 重命名为 module，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3713" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3713</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="bug-修复">Bug 修复<a href="https://fory.apache.org/zh-CN/blog/fory_1_1_0_release#bug-%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Bug 修复的直接链接" title="Bug 修复的直接链接" translate="no">​</a></h2>
+<ul>
+<li class="">fix(c++): 为 FORY_STRUCT 使用方在 MSVC 下传递 <code>/Zc:preprocessor</code>，作者 @truffle-dev，见 <a href="https://github.com/apache/fory/pull/3694" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3694</a></li>
+<li class="">fix(cpp): 修复 CMake 测试和示例，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3699" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3699</a></li>
+<li class="">fix(java): 保护 replace-resolve 类读取，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3706" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3706</a></li>
+<li class="">fix(python): 让 policy validator 只执行校验，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3708" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3708</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="其他改进">其他改进<a href="https://fory.apache.org/zh-CN/blog/fory_1_1_0_release#%E5%85%B6%EF%BF%BD%E4%BB%96%E6%94%B9%E8%BF%9B" class="hash-link" aria-label="其他改进的直接链接" title="其他改进的直接链接" translate="no">​</a></h2>
+<ul>
+<li class="">docs(cpp): 说明 MSVC preprocessor 要求，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3695" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3695</a></li>
+<li class="">chore: 将发布版本提升到 1.0，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3696" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3696</a></li>
+<li class="">chore(deps): 在 <code>/integration_tests/grpc_tests/java</code> 中将 <code>io.grpc:grpc-netty-shaded</code> 从 1.62.2 升级到 1.75.0，作者 @dependabot[bot]，见 <a href="https://github.com/apache/fory/pull/3697" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3697</a></li>
+<li class="">docs(xlang): 更新语言支持文档，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3700" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3700</a></li>
+<li class="">docs: 修复 xlang type mapping MDX，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3701" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3701</a></li>
+<li class="">chore(js): 升级测试依赖，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3703" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3703</a></li>
+<li class="">ci: 在 ci 和 lint 中声明 workflow-level <code>contents: read</code> 权限，作者 @arpitjain099，见 <a href="https://github.com/apache/fory/pull/3704" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3704</a></li>
+<li class="">docs: 更新 README 并增加 Android 支持说明，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3705" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3705</a></li>
+<li class="">chore: 更新 Java 检查文档，作者 @chaokunyang，见 <a href="https://github.com/apache/fory/pull/3707" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3707</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="新贡献者">新贡献者<a href="https://fory.apache.org/zh-CN/blog/fory_1_1_0_release#%E6%96%B0%E8%B4%A1%E7%8C%AE%E8%80%85" class="hash-link" aria-label="新贡献者的直接链接" title="新贡献者的直接链接" translate="no">​</a></h2>
+<ul>
+<li class="">@truffle-dev 在 <a href="https://github.com/apache/fory/pull/3694" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3694</a> 中完成了首次贡献</li>
+<li class="">@arpitjain099 在 <a href="https://github.com/apache/fory/pull/3704" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/3704</a> 中完成了首次贡献</li>
+</ul>
+<p><strong>完整变更日志</strong>： <a href="https://github.com/apache/fory/compare/v1.0.0...v1.1.0" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/compare/v1.0.0...v1.1.0</a></p>]]></content>
+        <author>
+            <name>杨朝坤</name>
+            <uri>https://github.com/chaokunyang</uri>
+        </author>
+        <category label="fory" term="fory"/>
+        <category label="java" term="java"/>
+        <category label="kotlin" term="kotlin"/>
+        <category label="scala" term="scala"/>
+        <category label="android" term="android"/>
+        <category label="python" term="python"/>
+        <category label="rust" term="rust"/>
+        <category label="c++" term="c++"/>
+        <category label="go" term="go"/>
+        <category label="c#" term="c#"/>
+        <category label="swift" term="swift"/>
+        <category label="dart" term="dart"/>
+        <category label="compiler" term="compiler"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Fory v1.0.0 发布]]></title>
         <id>https://fory.apache.org/zh-CN/blog/fory_1_0_0_release</id>
@@ -2481,65 +2544,6 @@ Protobuf 会保留 unknown fields；Fory 不会保留 protobuf unknown-field 载
         <author>
             <name>Pan Li</name>
             <uri>https://github.com/pandalee99</uri>
-        </author>
-        <category label="fory" term="fory"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Fory v0.11.1 发布]]></title>
-        <id>https://fory.apache.org/zh-CN/blog/fory_0_11_1_release</id>
-        <link href="https://fory.apache.org/zh-CN/blog/fory_0_11_1_release"/>
-        <updated>2025-06-27T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Apache Fory 团队很高兴宣布 0.11.1 版本发布。 这是一个重要版本，包含来自 13 位贡献者的32 PR。 请参阅Install页面了解如何获取适用于你平台的库。]]></summary>
-        <content type="html"><![CDATA[<p>Apache Fory 团队很高兴宣布 0.11.1 版本发布。 这是一个重要版本，包含来自 13 位贡献者的<a href="https://github.com/apache/fory/compare/v0.11.0...v0.11.1-rc1" target="_blank" rel="noopener noreferrer" class="">32 PR</a>。 请参阅<a href="https://fury.apache.org/docs/docs/start/install" target="_blank" rel="noopener noreferrer" class="">Install</a>页面了解如何获取适用于你平台的库。</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="功能特性">功能特性<a href="https://fory.apache.org/zh-CN/blog/fory_0_11_1_release#%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7" class="hash-link" aria-label="功能特性的直接链接" title="功能特性的直接链接" translate="no">​</a></h2>
-<ul>
-<li class="">feat(java): row encoder supports synthesizing interfaces nested inside of records by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2304" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2304</a></li>
-<li class="">feat(java): Support customized serializer for abstract or interface. by @CherishCai in <a href="https://github.com/apache/fory/pull/2311" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2311</a></li>
-<li class="">feat(java): row encoder supports custom rewriting values without changing their type by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2305" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2305</a></li>
-<li class="">feat(java): support multi-dimensional array field serialization in xlang meta shared mode by @OmCheeLin in <a href="https://github.com/apache/fory/pull/2314" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2314</a></li>
-<li class="">feat(python): bump cython to 3.1.1 by @penguin-wwy in <a href="https://github.com/apache/fory/pull/2318" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2318</a></li>
-<li class="">feat(java): array row encoder supports set of interface type by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2333" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2333</a></li>
-<li class="">feat(java): support maven shade for disallowed.txt by @chaokunyang in <a href="https://github.com/apache/fory/pull/2327" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2327</a></li>
-<li class="">feat(java): store OptionalInt, OptionalLong, OptionalDouble same as nullable values by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2338" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2338</a></li>
-</ul>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="缺陷修复">缺陷修复<a href="https://fory.apache.org/zh-CN/blog/fory_0_11_1_release#%E7%BC%BA%E9%99%B7%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="缺陷修复的直接链接" title="缺陷修复的直接链接" translate="no">​</a></h2>
-<ul>
-<li class="">fix(java): row encoder interface synthesis handle (Optional) null correctly by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2306" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2306</a></li>
-<li class="">fix(java): Use (long, long, byte) key for MetaStringBytes cache to prevent collisions by @LouisLou2 in <a href="https://github.com/apache/fory/pull/2308" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2308</a></li>
-<li class="">fix(python): update python benchmark script by @penguin-wwy in <a href="https://github.com/apache/fory/pull/2315" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2315</a></li>
-<li class="">fix(java): fix row encoder synthesized interface lazy-decoding of Optional by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2320" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2320</a></li>
-<li class="">fix(java): fix row format handling Optional of type with custom codec by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2321" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2321</a></li>
-<li class="">fix(java): row encoder array element serializer created too late by @stevenschlansker in <a href="https://github.com/apache/fory/pull/2323" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2323</a></li>
-<li class="">fix(python): fix py3.13 ci on windows by @chaokunyang in <a href="https://github.com/apache/fory/pull/2334" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2334</a></li>
-<li class="">fix(python): correct compute_string_hash usage in StructHashVisitor.visit_customized by @lzaeh in <a href="https://github.com/apache/fory/pull/2335" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2335</a></li>
-<li class="">fix(java): fix register serializer for abstract class by @chaokunyang in <a href="https://github.com/apache/fory/pull/2347" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2347</a></li>
-<li class="">fix(java): fix map nested array type serialization codegen by @chaokunyang in <a href="https://github.com/apache/fory/pull/2352" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2352</a></li>
-</ul>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="其他改进">其他改进<a href="https://fory.apache.org/zh-CN/blog/fory_0_11_1_release#%E5%85%B6%E4%BB%96%E6%94%B9%E8%BF%9B" class="hash-link" aria-label="其他改进的直接链接" title="其他改进的直接链接" translate="no">​</a></h2>
-<ul>
-<li class="">chore(java): skip find customized serializer when absClassInfo is empty by @CherishCai in <a href="https://github.com/apache/fory/pull/2316" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2316</a></li>
-<li class="">chore: add release note generate tool by @chaokunyang in <a href="https://github.com/apache/fory/pull/2322" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2322</a></li>
-<li class="">chore: Update README.md for fory rename by @chaokunyang in <a href="https://github.com/apache/fory/pull/2324" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2324</a></li>
-<li class="">chore: update slack invite link to fory by @chaokunyang in <a href="https://github.com/apache/fory/pull/2325" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2325</a></li>
-<li class="">perf(java): Improve zone offset deserialization performance by overriding JDK caching by @Cybermaxke in <a href="https://github.com/apache/fory/pull/2336" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2336</a></li>
-<li class="">chore: bump release version to 0.11.0 by @chaokunyang in <a href="https://github.com/apache/fory/pull/2340" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2340</a></li>
-<li class="">perf(java): update benchmark plot by @chaokunyang in <a href="https://github.com/apache/fory/pull/2342" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2342</a></li>
-<li class="">chore: update plots fro compatible by @chaokunyang in <a href="https://github.com/apache/fory/pull/2344" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2344</a></li>
-<li class="">docs: add document for customized map collection serializers by @chaokunyang in <a href="https://github.com/apache/fory/pull/2351" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2351</a></li>
-<li class="">docs: add row format guide for ext and interface types by @nabilshafi in <a href="https://github.com/apache/fory/pull/2346" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2346</a></li>
-<li class="">chore(java): ProtobufDispatcher should trigger log warning at most once by @ClaudioConsolmagno in <a href="https://github.com/apache/fory/pull/2353" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2353</a></li>
-<li class="">docs: format markdown docs by @chaokunyang in <a href="https://github.com/apache/fory/pull/2354" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2354</a></li>
-<li class="">chore: refine validate serializers message for map/collection by @chaokunyang in <a href="https://github.com/apache/fory/pull/2355" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2355</a></li>
-</ul>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="新贡献者">新贡献者<a href="https://fory.apache.org/zh-CN/blog/fory_0_11_1_release#%E6%96%B0%E8%B4%A1%E7%8C%AE%E8%80%85" class="hash-link" aria-label="新贡献者的直接链接" title="新贡献者的直接链接" translate="no">​</a></h2>
-<ul>
-<li class="">@nabilshafi made their first contribution in <a href="https://github.com/apache/fory/pull/2346" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2346</a></li>
-<li class="">@ClaudioConsolmagno made their first contribution in <a href="https://github.com/apache/fory/pull/2353" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/pull/2353</a></li>
-</ul>
-<p><strong>完整更新日志</strong>：<a href="https://github.com/apache/fory/compare/v0.11.0...v0.11.1-rc1" target="_blank" rel="noopener noreferrer" class="">https://github.com/apache/fory/compare/v0.11.0...v0.11.1-rc1</a></p>]]></content>
-        <author>
-            <name>Liangliang Sui</name>
-            <uri>https://github.com/LiangliangSui</uri>
         </author>
         <category label="fory" term="fory"/>
     </entry>
