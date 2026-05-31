@@ -4,7 +4,7 @@
     "description": "The label for version current"
   },
   "sidebar.docsSidebar.category.Introduction": {
-    "message": "Apache Fory 介绍",
+    "message": "介绍",
     "description": "The label for category Introduction in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Start": {
