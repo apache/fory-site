@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-本指南介绍 Fory IDL 编译器的安装、命令行使用方式以及构建系统集成方案。
+本指南介绍 Fory IDL 编译器的安装、使用方式和集成方法。
 
 ## 安装
 
@@ -52,52 +52,64 @@ foryc --scan-generated [OPTIONS]
 
 编译选项：
 
-| 选项                                  | 说明                                             | 默认值        |
-| ------------------------------------- | ------------------------------------------------ | ------------- |
-| `--lang`                              | 目标语言列表（逗号分隔）                         | `all`         |
-| `--output`, `-o`                      | 输出目录                                         | `./generated` |
-| `--package`                           | 覆盖 Fory IDL 文件中的 package                   | （来自文件）  |
-| `-I`, `--proto_path`, `--import_path` | 添加 import 搜索路径（可重复）                   | （无）        |
-| `--java_out=DST_DIR`                  | 将 Java 代码输出到 `DST_DIR`                     | （无）        |
-| `--python_out=DST_DIR`                | 将 Python 代码输出到 `DST_DIR`                   | （无）        |
-| `--cpp_out=DST_DIR`                   | 将 C++ 代码输出到 `DST_DIR`                      | （无）        |
-| `--go_out=DST_DIR`                    | 将 Go 代码输出到 `DST_DIR`                       | （无）        |
-| `--rust_out=DST_DIR`                  | 将 Rust 代码输出到 `DST_DIR`                     | （无）        |
-| `--javascript_out=DST_DIR`            | 将 JavaScript 代码输出到 `DST_DIR`               | （无）        |
-| `--swift_out=DST_DIR`                 | 将 Swift 代码输出到 `DST_DIR`                    | （无）        |
-| `--dart_out=DST_DIR`                  | 将 Dart 代码输出到 `DST_DIR`                     | （无）        |
-| `--go_nested_type_style`              | Go 嵌套类型命名风格：`camelcase` 或 `underscore` | schema/默认值 |
-| `--swift_namespace_style`             | Swift 命名空间风格：`enum` 或 `flatten`          | `enum`        |
-| `--emit-fdl`                          | 对非 `.fdl` 输入打印转换后的 Fory IDL            | `false`       |
-| `--emit-fdl-path`                     | 将转换后的 Fory IDL 写入文件或目录               | （stdout）    |
+| 选项                                  | 说明                                               | 默认值        |
+| ------------------------------------- | -------------------------------------------------- | ------------- |
+| `--lang`                              | 目标语言列表，使用逗号分隔                         | `all`         |
+| `--output`, `-o`                      | 输出目录                                           | `./generated` |
+| `-I`, `--proto_path`, `--import_path` | 添加 import 搜索路径（可重复指定）                 | （无）        |
+| `--java_out=DST_DIR`                  | 在 DST_DIR 中生成 Java 代码                        | （无）        |
+| `--python_out=DST_DIR`                | 在 DST_DIR 中生成 Python 代码                      | （无）        |
+| `--cpp_out=DST_DIR`                   | 在 DST_DIR 中生成 C++ 代码                         | （无）        |
+| `--go_out=DST_DIR`                    | 在 DST_DIR 中生成 Go 代码                          | （无）        |
+| `--rust_out=DST_DIR`                  | 在 DST_DIR 中生成 Rust 代码                        | （无）        |
+| `--csharp_out=DST_DIR`                | 在 DST_DIR 中生成 C# 代码                          | （无）        |
+| `--javascript_out=DST_DIR`            | 在 DST_DIR 中生成 JavaScript/TypeScript 代码       | （无）        |
+| `--swift_out=DST_DIR`                 | 在 DST_DIR 中生成 Swift 代码                       | （无）        |
+| `--dart_out=DST_DIR`                  | 在 DST_DIR 中生成 Dart 代码                        | （无）        |
+| `--scala_out=DST_DIR`                 | 在 DST_DIR 中生成 Scala 3 代码                     | （无）        |
+| `--kotlin_out=DST_DIR`                | 在 DST_DIR 中生成 Kotlin 代码                      | （无）        |
+| `--go_nested_type_style`              | Go 嵌套类型命名方式：`camelcase` 或 `underscore`   | `underscore`  |
+| `--swift_namespace_style`             | Swift 命名空间方式：`enum` 或 `flatten`            | `enum`        |
+| `--emit-fdl`                          | 输出转换后的 FDL（用于非 FDL 输入）                | `false`       |
+| `--emit-fdl-path`                     | 将转换后的 FDL 写入此路径（文件或目录）            | （stdout）    |
+| `--grpc`                              | 为 Java 和 Python 生成 gRPC service companion 代码 | `false`       |
+
+支持 schema 级文件选项，用于控制特定语言的生成行为。
+对于 `go_nested_type_style` 和 `swift_namespace_style`，当 CLI 标志和
+schema 选项同时存在时，CLI 标志优先生效。Rust temporal 代码生成没有 CLI 标志：
+需要在 schema 中设置 `option rust_use_chrono_temporal_types = true;`，以生成
+`chrono::NaiveDate`、`chrono::NaiveDateTime` 和 `chrono::Duration`，而不是默认的
+`fory::Date`、`fory::Timestamp` 和 `fory::Duration`。编译基于 chrono 的 Rust
+生成代码的 crate 必须依赖 `chrono`，并启用 Fory 的 `chrono` feature。
 
 扫描选项（配合 `--scan-generated`）：
 
 | 选项         | 说明                   | 默认值  |
 | ------------ | ---------------------- | ------- |
-| `--root`     | 扫描根目录             | `.`     |
-| `--relative` | 以相对路径输出         | `false` |
-| `--delete`   | 删除匹配到的生成文件   | `false` |
-| `--dry-run`  | 仅扫描输出，不执行删除 | `false` |
+| `--root`     | 要扫描的根目录         | `.`     |
+| `--relative` | 输出相对于根目录的路径 | `false` |
+| `--delete`   | 删除匹配的生成文件     | `false` |
+| `--dry-run`  | 仅扫描/打印，不删除    | `false` |
 
 ### 扫描生成文件
 
-使用 `--scan-generated` 可以定位 `foryc` 生成的文件。扫描器会递归遍历目录树，跳过 `build/`、`target/` 和隐藏目录，并输出找到的每个生成文件。
+使用 `--scan-generated` 查找 `foryc` 生成的文件。扫描器会递归遍历目录树，跳过
+`build/`、`target/` 和隐藏目录，并在发现每个生成文件时打印出来。
 
 ```bash
-# 扫描当前目录
+# Scan current directory
 foryc --scan-generated
 
-# 扫描指定根目录
+# Scan a specific root
 foryc --scan-generated --root ./src
 
-# 输出相对路径
+# Print paths relative to the scan root
 foryc --scan-generated --root ./src --relative
 
-# 删除扫描到的生成文件
+# Delete scanned generated files
 foryc --scan-generated --root ./src --delete
 
-# Dry-run（仅扫描与输出）
+# Dry-run (scan and print only)
 foryc --scan-generated --root ./src --dry-run
 ```
 
@@ -109,10 +121,10 @@ foryc --scan-generated --root ./src --dry-run
 foryc schema.fdl
 ```
 
-**为指定语言编译：**
+**为选定的一组语言编译：**
 
 ```bash
-foryc schema.fdl --lang java,python,csharp,javascript,swift,dart
+foryc schema.fdl --lang java,python,csharp,javascript,swift,dart,kotlin
 ```
 
 **指定输出目录：**
@@ -121,92 +133,103 @@ foryc schema.fdl --lang java,python,csharp,javascript,swift,dart
 foryc schema.fdl --output ./src/generated
 ```
 
-**覆盖 package：**
-
-```bash
-foryc schema.fdl --package com.myapp.models
-```
-
 **编译多个文件：**
 
 ```bash
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**编译包含 service 定义的简单 schema（生成 Java + Python 模型）：**
+**编译包含 service 定义的简单 schema（Java + Python 模型）：**
 
 ```bash
 foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python
 ```
 
+**生成 Java 和 Python gRPC service companion 代码：**
+
+```bash
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --grpc
+```
+
+生成的 gRPC service 代码使用 Fory 序列化请求和响应载荷。Java 输出会导入
+grpc-java API，Python 输出会导入 `grpc`；编译或运行这些生成 service 文件的
+应用需要自行提供 gRPC 依赖。Fory 的 Java 和 Python 运行时包不会为此功能加入
+强制 gRPC 依赖。
+
 **使用 import 搜索路径：**
 
 ```bash
-# 单个路径
+# Add a single import path
 foryc src/main.fdl -I libs/common
 
-# 多个路径（重复参数）
+# Add multiple import paths (repeated option)
 foryc src/main.fdl -I libs/common -I libs/types
 
-# 多个路径（逗号分隔）
+# Add multiple import paths (comma-separated)
 foryc src/main.fdl -I libs/common,libs/types,third_party/
 
-# --proto_path（protoc 兼容别名）
+# Using --proto_path (protoc-compatible alias)
 foryc src/main.fdl --proto_path=libs/common
 
-# 混合写法
+# Mix all styles
 foryc src/main.fdl -I libs/common,libs/types --proto_path third_party/
 ```
 
-**语言定向输出目录（protoc 风格）：**
+**语言专属输出目录（protoc 风格）：**
 
 ```bash
-# 仅生成 Java
+# Generate only Java code to a specific directory
 foryc schema.fdl --java_out=./src/main/java
 
-# 多语言分别输出到不同目录
-foryc schema.fdl --java_out=./java/gen --python_out=./python/src --go_out=./go/gen --csharp_out=./csharp/gen --javascript_out=./javascript/src --swift_out=./swift/gen --dart_out=./dart/gen
+# Generate multiple languages to different directories
+foryc schema.fdl --java_out=./java/gen --python_out=./python/src --cpp_out=./cpp/gen --go_out=./go/gen --rust_out=./rust/gen --csharp_out=./csharp/gen --javascript_out=./javascript/src --swift_out=./swift/gen --dart_out=./dart/gen --scala_out=./scala/gen --kotlin_out=./kotlin/gen
 
-# 结合 import 路径
+# Combine with import paths
 foryc schema.fdl --java_out=./gen/java -I proto/ -I common/
+
+# Generate Scala 3 code to a specific directory
+foryc schema.fdl --scala_out=./src/main/scala
+
+# Generate Kotlin code to a specific directory
+foryc schema.fdl --kotlin_out=./src/main/kotlin
 ```
 
-使用 `--{lang}_out` 时：
+使用 `--{lang}_out` 选项时：
 
 - 只生成显式指定的语言（不会生成全部语言）
-- 输出写入指定目录（语言生成器可能继续按包/模块分层）
+- 编译器会写入指定目录（特定语言的生成器仍可能创建 package/module 子目录）
 - 兼容 protoc 风格工作流
 
-**查看 proto/fbs 输入转换后的 Fory IDL：**
+**查看从 proto/fbs 输入转换后的 Fory IDL：**
 
 ```bash
-# 输出到 stdout
+# Print translated Fory IDL to stdout
 foryc schema.proto --emit-fdl
 
-# 输出到目录
+# Write translated Fory IDL to a directory
 foryc schema.fbs --emit-fdl --emit-fdl-path ./translated
 ```
 
 ## Import 路径解析
 
-编译含 import 的 Fory IDL 文件时，导入文件按以下顺序查找：
+编译带有 import 的 Fory IDL 文件时，编译器按以下顺序查找被导入文件：
 
-1. **相对于导入者文件目录（默认）**：始终优先查找，无需 `-I`
-2. **按顺序遍历每个 `-I` 路径**
+1. **相对于导入者文件（默认）** - 始终会首先自动搜索包含 import 语句的文件所在目录。同目录 import 不需要 `-I` 标志。
+2. **每个 `-I` 路径的顺序** - 命令行上指定的额外搜索路径
 
-**同目录 import 可直接生效：**
+**同目录 import 会自动生效：**
 
 ```protobuf
 // main.fdl
-import "common.fdl";  // 若 common.fdl 在同目录，将自动找到
+import "common.fdl";  // Found if common.fdl is in the same directory
 ```
 
 ```bash
-# 同目录导入无需 -I
+# No -I needed for same-directory imports
 foryc main.fdl
 ```
 
-**示例目录结构：**
+**示例项目结构：**
 
 ```
 project/
@@ -216,7 +239,7 @@ project/
     └── common.fdl
 ```
 
-**不加 `-I`（失败）：**
+**不使用 `-I`（失败）：**
 
 ```bash
 $ foryc src/main.fdl
@@ -224,7 +247,7 @@ Import error: Import not found: common.fdl
   Searched in: /project/src
 ```
 
-**加 `-I`（成功）：**
+**使用 `-I`（成功）：**
 
 ```bash
 $ foryc src/main.fdl -I libs/
@@ -234,16 +257,19 @@ Compiling src/main.fdl...
 
 ## 支持语言
 
-| 语言       | 标记         | 输出后缀 | 说明                      |
-| ---------- | ------------ | -------- | ------------------------- |
-| Java       | `java`       | `.java`  | 带 Fory 注解的 POJO       |
-| Python     | `python`     | `.py`    | 带类型提示的 dataclass    |
-| Go         | `go`         | `.go`    | 带 struct tag 的结构体    |
-| Rust       | `rust`       | `.rs`    | 带 derive 宏的结构体      |
-| C++        | `cpp`        | `.h`     | 带 FORY 宏的结构体        |
-| JavaScript | `javascript` | `.ts`    | 带注册函数的接口          |
-| Swift      | `swift`      | `.swift` | `@ForyObject` Swift 模型  |
-| Dart       | `dart`       | `.dart`  | 带注解的 `@ForyStruct` 类 |
+| 语言                  | 标志         | 输出后缀 | 说明                                 |
+| --------------------- | ------------ | -------- | ------------------------------------ |
+| Java                  | `java`       | `.java`  | 带 Fory 注解的 POJO                  |
+| Python                | `python`     | `.py`    | 带类型提示的 dataclass               |
+| Go                    | `go`         | `.go`    | 带 struct tag 的结构体               |
+| Rust                  | `rust`       | `.rs`    | 带 derive 宏的结构体                 |
+| C++                   | `cpp`        | `.h`     | 带 FORY 宏的结构体                   |
+| C#                    | `csharp`     | `.cs`    | 带 Fory attribute 的类               |
+| JavaScript/TypeScript | `javascript` | `.ts`    | 带注册函数的 interface               |
+| Swift                 | `swift`      | `.swift` | Fory Swift 模型宏                    |
+| Dart                  | `dart`       | `.dart`  | 带注解的 `@ForyStruct` 类            |
+| Scala                 | `scala`      | `.scala` | 使用宏派生的 Scala 3 模型            |
+| Kotlin                | `kotlin`     | `.kt`    | 使用 KSP serializer 的 Kotlin 模型   |
 
 ## 输出结构
 
@@ -257,12 +283,12 @@ generated/
             ├── User.java
             ├── Order.java
             ├── Status.java
-            └── ExampleForyRegistration.java
+            └── ExampleForyModule.java
 ```
 
-- 每个类型（enum/message）单独一个文件
-- 包路径与 Fory IDL package 一致
-- 会生成注册辅助类
+- 每个类型（enum 或 message）一个文件
+- Package 结构与 Fory IDL package 一致
+- 生成 schema module 类
 
 ### Python
 
@@ -272,8 +298,8 @@ generated/
     └── example.py
 ```
 
-- 所有类型位于单模块
-- 模块名由 package 派生
+- 所有类型位于单个 module
+- Module 名称由 package 派生
 - 包含注册函数
 
 ### Go
@@ -285,8 +311,8 @@ generated/
         └── example.go
 ```
 
-- 所有类型在单文件中
-- 目录名与包名来自 `go_package` 或 Fory IDL package
+- 所有类型位于单个文件
+- 目录名和 package 名称由 `go_package` 或 Fory IDL package 派生
 - 包含注册函数
 
 ### Rust
@@ -297,8 +323,8 @@ generated/
     └── example.rs
 ```
 
-- 所有类型位于单模块
-- 模块名由 package 派生
+- 所有类型位于单个 module
+- Module 名称由 package 派生
 - 包含注册函数
 
 ### C++
@@ -309,23 +335,53 @@ generated/
     └── example.h
 ```
 
-- 单头文件输出
-- 命名空间与 package 对齐（点号转换为 `::`）
-- 自动包含 header guard 与前向声明
+- 单个头文件
+- Namespace 与 package 匹配（点号转换为 `::`）
+- Header guard 和前向声明
 
-### JavaScript
+### JavaScript/TypeScript
 
 ```
 generated/
 └── javascript/
-    └── example.ts
+  └── example.ts
 ```
 
-- 每个 schema 生成一个 `.ts` 文件
-- message 生成为 `export interface`
-- enum 生成为 `export enum`
+- 每个 schema 生成单个 `.ts` 文件
+- message 生成为 `export interface` 声明
+- enum 生成为 `export enum` 声明
 - union 生成为带 case enum 的判别联合
-- 文件内包含注册辅助函数
+- 包含注册辅助函数
+
+### C\#
+
+```
+generated/
+└── csharp/
+    └── example/
+        └── example.cs
+```
+
+- 每个 schema 生成单个 `.cs` 文件
+- Namespace 使用 `csharp_namespace`（如已设置）或 Fory IDL package
+- 包含以源文件为前缀的 `XXXForyModule` 安装 helper，以及 `ToBytes`/`FromBytes` 方法
+- 被导入的 schema 会由生成的 helper 传递安装（例如 `root.idl` 导入 `addressbook.fdl` 和 `tree.fdl`）
+
+### Swift
+
+```
+generated/
+└── swift/
+    └── addressbook/
+        └── addressbook.swift
+```
+
+- 每个 schema 生成单个 `.swift` 文件
+- Package 片段会映射为嵌套 Swift enum（例如 `addressbook.*` -> `Addressbook.*`）
+- 生成的 message 使用 `@ForyStruct`，enum 使用 `@ForyEnum`，union 使用 `@ForyUnion`/`@ForyCase`
+- Union 类型生成为带关联载荷值的 tagged enum
+- 每个 schema 都包含 schema 文件 module owner 和 `toBytes`/`fromBytes` helper
+- 被导入的 schema 会由生成的 module helper 传递安装
 
 ### Dart
 
@@ -337,16 +393,91 @@ generated/
         └── package.fory.dart
 ```
 
-- 每个 schema 生成两个文件：带注解类型的主 `.dart` 文件，以及带序列化器的 `.fory.dart` part 文件
-- package 各段映射为目录层级（例如 `demo.foo` -> `demo/foo/`）
-- 注册辅助类位于 part 文件中
-- 非可空、非 `ref` 的基础类型列表会使用类型化数组（例如 `Int32List`）
+- 每个 schema 生成两个文件：包含带注解类型的主 `.dart` 文件，以及包含生成 serializer 的 `.fory.dart` part 文件
+- Package 片段映射为目录（例如 `demo.foo` → `demo/foo/`）
+- IDL module 类包含在主文件中；生成的 serializer 元数据包含在 part 文件中
+- 非可选、非 `ref` 的 primitive list 使用类型化数组（例如 `Int32List`）
 
-## 构建系统集成
+### Scala
+
+```
+generated/
+└── scala/
+    └── example/
+        ├── User.scala
+        ├── Status.scala
+        ├── Animal.scala
+        └── ExampleForyModule.scala
+```
+
+- 每个生成类型一个 Scala 3 源文件
+- Package 结构与 Fory IDL package 一致
+- Message 派生 `org.apache.fory.scala.ForySerializer`
+- `optional T` 字段使用 `Option[T]`
+- Enum 使用 Scala 3 `enum`
+- Union 使用 Scala 3 ADT `enum`，并带 `@ForyUnion`、`@ForyCase` 和一个 `Unknown`
+- 包含 schema module object
+
+### Kotlin
+
+```
+generated/
+└── kotlin/
+    └── example/
+        ├── User.kt
+        ├── Status.kt
+        ├── Animal.kt
+        └── ExampleForyModule.kt
+```
+
+- 每个生成类型一个 Kotlin 源文件
+- Package 结构在设置 `kotlin_package` 时使用该选项，否则使用 Fory IDL package
+- Message 使用 `@ForyStruct` 和 KSP 生成的 serializer
+- Enum 使用稳定的 Fory enum ID
+- Union 使用 sealed class，并带 `@ForyUnion`、`@ForyCase` 和 unknown-case carrier
+- 包含 schema module object
+
+### C# IDL 矩阵验证
+
+运行端到端 C# IDL 矩阵（FDL/IDL/Proto/FBS 生成以及 roundtrip 测试）：
+
+```bash
+cd integration_tests/idl_tests
+./run_csharp_tests.sh
+```
+
+此 runner 会执行以下场景的 schema-consistent 和 compatible roundtrip：
+
+- `addressbook`、`auto_id`、`complex_pb` primitives
+- `collection` 和 union/list 变体
+- `optional_types`
+- `any_example`（`.fdl`）和 `any_example`（`.proto`）
+- `tree` 和 `graph` 引用跟踪场景
+- `monster.fbs` 和 `complex_fbs.fbs`
+- `root.idl` 跨 package import 覆盖
+- 演进 schema 兼容性场景
+
+### Swift IDL 矩阵验证
+
+运行端到端 Swift IDL 矩阵（FDL/IDL/Proto/FBS 生成以及 roundtrip 测试）：
+
+```bash
+cd integration_tests/idl_tests
+./run_swift_tests.sh
+```
+
+此脚本会运行：
+
+- compatible 和 schema-consistent 模式下的本地 Swift IDL roundtrip 测试
+- 使用 `IDL_PEER_LANG=swift` 的 Java 驱动 peer roundtrip 验证
+
+脚本还会设置 `DATA_FILE*` 变量，以便覆盖基于文件的 roundtrip 路径。
+
+## 构建集成
 
 ### Maven (Java)
 
-在 `pom.xml` 中添加：
+添加到 `pom.xml`：
 
 ```xml
 <build>
@@ -377,7 +508,7 @@ generated/
 </build>
 ```
 
-添加生成源码目录：
+添加生成源码：
 
 ```xml
 <build>
@@ -406,7 +537,7 @@ generated/
 
 ### Gradle (Java/Kotlin)
 
-在 `build.gradle` 中添加：
+添加到 `build.gradle`：
 
 ```groovy
 task generateForyTypes(type: Exec) {
@@ -428,7 +559,7 @@ sourceSets {
 
 ### Python (setuptools)
 
-在 `setup.py` 或 `pyproject.toml` 中加入生成步骤：
+添加到 `setup.py` 或 `pyproject.toml`：
 
 ```python
 # setup.py
@@ -451,24 +582,24 @@ setup(
 )
 ```
 
-### Go (`go generate`)
+### Go (go generate)
 
-在 Go 文件中添加：
+添加到你的 Go 文件：
 
 ```go
 //go:generate foryc ../schema.fdl --lang go --output .
 package models
 ```
 
-执行：
+运行：
 
 ```bash
 go generate ./...
 ```
 
-### Rust (`build.rs`)
+### Rust (build.rs)
 
-在 `build.rs` 中添加：
+添加到 `build.rs`：
 
 ```rust
 use std::process::Command;
@@ -489,7 +620,7 @@ fn main() {
 
 ### CMake (C++)
 
-在 `CMakeLists.txt` 中添加：
+添加到 `CMakeLists.txt`：
 
 ```cmake
 find_program(FORY_COMPILER foryc)
@@ -512,7 +643,7 @@ target_include_directories(mylib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 
 ### Bazel
 
-在 `BUILD` 中添加规则：
+在 `BUILD` 中创建规则：
 
 ```python
 genrule(
@@ -532,23 +663,23 @@ cc_library(
 
 ### Dart / Flutter
 
-在 `pubspec.yaml` 中加入 Fory 依赖：
+在 `pubspec.yaml` 中添加 Fory 依赖：
 
 ```yaml
 dependencies:
-  fory: ^1.0.0
+  fory: ^1.1.0
 
 dev_dependencies:
   build_runner: ^2.4.0
 ```
 
-用编译器生成 schema 类型：
+使用编译器生成 schema 类型：
 
 ```bash
 foryc schema.fdl --dart_out=lib/generated
 ```
 
-随后运行 `build_runner` 生成序列化器：
+然后运行 `build_runner` 生成 serializer：
 
 ```bash
 dart run build_runner build
@@ -562,19 +693,7 @@ dart run build_runner build
 Error: Line 5, Column 12: Expected ';' after field declaration
 ```
 
-### 未知类型引用
-
-```
-Error: Unknown type 'Address' in Customer.address
-```
-
-修复方式：先定义被引用的类型，或检查拼写是否正确。
-
-service RPC 的请求和响应类型也按同样规则校验。例如
-`rpc SayHello (HelloRequest) returns (HelloReply);`
-中的类型必须已定义；否则校验器会在 RPC 所在行报出 `Unknown type '...'` 错误。
-
-修复方式：检查对应行是否缺少分号或存在语法问题。
+修复方式：检查提示的行是否缺少分号或存在语法问题。
 
 ### 类型名重复
 
@@ -582,7 +701,7 @@ service RPC 的请求和响应类型也按同样规则校验。例如
 Error: Duplicate type name: User
 ```
 
-修复方式：确保同一文件内每个 enum/message 名称唯一。
+修复方式：确保同一文件中的每个 enum 和 message 名称唯一。
 
 ### 类型 ID 重复
 
@@ -590,7 +709,7 @@ Error: Duplicate type name: User
 Error: Duplicate type ID 100: User and Order
 ```
 
-修复方式：为每个类型分配唯一 ID。
+修复方式：为每个类型分配唯一类型 ID。
 
 ### 未知类型引用
 
@@ -598,7 +717,11 @@ Error: Duplicate type ID 100: User and Order
 Error: Unknown type 'Address' in Customer.address
 ```
 
-修复方式：先定义被引用类型，或检查类型名拼写。
+修复方式：先定义被引用的类型，或检查是否存在拼写错误。
+
+Service RPC 的请求和响应类型也按相同方式校验：像
+`rpc SayHello (HelloRequest) returns (HelloReply);` 这样的 RPC 必须引用已定义的
+message 类型，否则校验器会在 RPC 所在行报告 `Unknown type '...'` 错误。
 
 ### 字段号重复
 
@@ -606,7 +729,7 @@ Error: Unknown type 'Address' in Customer.address
 Error: Duplicate field number 1 in User: name and id
 ```
 
-修复方式：确保同一 message 内字段号唯一。
+修复方式：在每个 message 内分配唯一字段号。
 
 ## 最佳实践
 
@@ -626,9 +749,9 @@ project/
 ### 版本控制
 
 - **纳入版本控制**：Fory IDL schema 文件
-- **忽略生成代码**：可在构建时再生成
+- **忽略**：生成代码（可重新生成）
 
-在 `.gitignore` 中加入：
+添加到 `.gitignore`：
 
 ```
 # Generated Fory IDL code
@@ -638,10 +761,10 @@ generated/
 
 ### CI/CD 集成
 
-在构建流程中始终重新生成代码：
+构建时始终重新生成：
 
 ```yaml
-# GitHub Actions 示例
+# GitHub Actions example
 steps:
   - name: Install Fory IDL Compiler
     run: pip install ./compiler
@@ -655,12 +778,12 @@ steps:
 
 ### Schema 演进
 
-修改 schema 时建议遵循：
+修改 schema 时：
 
-1. **不要复用字段号**：删除字段后应保留/预留
-2. **不要改动类型 ID**：类型 ID 属于二进制协议的一部分
-3. **新增字段使用新字段号**
-4. **优先使用 `optional`**：保持向后兼容
+1. **不要复用字段号** - 改为标记为 reserved
+2. **不要修改类型 ID** - 它们是二进制格式的一部分
+3. **新增字段** - 使用新的字段号
+4. **使用 `optional`** - 保持向后兼容
 
 ```protobuf
 message User [id=100] {
@@ -679,7 +802,7 @@ message User [id=100] {
 foryc: command not found
 ```
 
-**解决：** 确认编译器已安装且在 PATH 中：
+**解决方式：** 确保编译器已安装且在 PATH 中：
 
 ```bash
 pip install -e ./compiler
@@ -693,15 +816,15 @@ export PATH=$PATH:~/.local/bin
 Permission denied: ./generated
 ```
 
-**解决：** 确保输出目录具备写权限：
+**解决方式：** 确保输出目录具备写权限：
 
 ```bash
 chmod -R u+w ./generated
 ```
 
-### 生成代码 import 错误
+### 生成代码中的 Import 错误
 
-**Java：** 确保项目包含 Fory 依赖：
+**Java：** 确保项目中包含 Fory 依赖：
 
 ```xml
 <dependency>
@@ -711,13 +834,13 @@ chmod -R u+w ./generated
 </dependency>
 ```
 
-**Python：** 确保安装 `pyfory`：
+**Python：** 确保已安装 pyfory：
 
 ```bash
 pip install pyfory
 ```
 
-**Go：** 确保可获取 fory 模块：
+**Go：** 确保 fory module 可用：
 
 ```bash
 go get github.com/apache/fory/go/fory
@@ -730,11 +853,11 @@ go get github.com/apache/fory/go/fory
 fory = "x.y.z"
 ```
 
-**C++：** 确保编译器 include 路径可找到 Fory 头文件。
+**C++：** 确保 Fory 头文件位于 include path 中。
 
-**Dart：** 确保 `pubspec.yaml` 中包含 fory 依赖：
+**Dart：** 确保 `pubspec.yaml` 中包含 fory package：
 
 ```yaml
 dependencies:
-  fory: ^1.0.0
+  fory: ^1.1.0
 ```
