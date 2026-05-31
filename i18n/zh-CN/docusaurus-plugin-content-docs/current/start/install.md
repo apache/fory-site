@@ -112,26 +112,18 @@ fory = "1.0.0"
 cargo add fory@1.0.0
 ```
 
-## JavaScript
+## JavaScript / TypeScript
 
-JavaScript 包尚未发布到 npm。
-
-目前请先从源码安装并构建：
+从 npm 安装已发布的 JavaScript 包：
 
 ```bash
-git clone https://github.com/apache/fory.git
-cd fory/javascript
-npm install
-npm run build
+npm install @apache-fory/core
 ```
-
-完成源码构建后，再在你的项目或 workspace 配置中使用 `@apache-fory/core`，并按需启用 `@apache-fory/hps`。
 
 可选的原生加速需要 Node.js 20+：
 
 ```bash
-cd packages/hps
-npm run build
+npm install @apache-fory/hps
 ```
 
 ## Dart

@@ -112,26 +112,18 @@ Or use `cargo add`:
 cargo add fory@1.0.0
 ```
 
-## JavaScript
+## JavaScript / TypeScript
 
-The JavaScript packages are not published to npm yet.
-
-Install and build them from source for now:
+Install the published JavaScript package from npm:
 
 ```bash
-git clone https://github.com/apache/fory.git
-cd fory/javascript
-npm install
-npm run build
+npm install @apache-fory/core
 ```
-
-After building from source, use `@apache-fory/core` and optionally `@apache-fory/hps` in your project or workspace setup.
 
 Optional native acceleration requires Node.js 20+:
 
 ```bash
-cd packages/hps
-npm run build
+npm install @apache-fory/hps
 ```
 
 ## Dart

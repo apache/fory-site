@@ -1,7 +1,7 @@
 {
   "version.label": {
-    "message": "dev",
-    "description": "The label for version current"
+    "message": "0.14",
+    "description": "The label for version 0.14"
   },
   "sidebar.docsSidebar.category.Introduction": {
     "message": "Apache Fory 介绍",
@@ -10,10 +10,6 @@
   "sidebar.docsSidebar.category.Start": {
     "message": "快速开始",
     "description": "The label for category Start in sidebar docsSidebar"
-  },
-  "sidebar.docsSidebar.category.Schema IDL & Compiler": {
-    "message": "Schema IDL 与编译器",
-    "description": "The label for category Schema IDL & Compiler in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Guide": {
     "message": "用户指南",

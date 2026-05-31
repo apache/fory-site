@@ -1,0 +1,951 @@
+.homepage {
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  --fory-border: #e4e8f0;
+  --fory-card-shadow: 0 18px 50px rgba(31, 41, 55, 0.1);
+  --fory-code-bg: #f7f9fc;
+  --fory-muted: #667085;
+  --fory-soft-band: #f7f9fc;
+  --fory-surface: #ffffff;
+}
+
+.hero {
+  align-items: center;
+  background:
+    linear-gradient(90deg, rgba(255, 112, 1, 0.055), transparent 32%),
+    linear-gradient(180deg, var(--ifm-background-color), #f9fafb);
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 0.9fr) minmax(440px, 0.82fr);
+  min-height: 560px;
+  padding: 4rem max(2rem, calc((100vw - 1180px) / 2)) 4rem;
+}
+
+.heroContent {
+  max-width: 690px;
+}
+
+.eyebrow,
+.sectionHeader span,
+.performanceCopy span {
+  color: var(--ifm-color-primary);
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+}
+
+.hero h1,
+.sectionHeader h2,
+.performanceCopy h2,
+.ecosystem h2 {
+  font-size: 3.65rem;
+  line-height: 1.02;
+  margin: 0;
+}
+
+.heroSubtitle {
+  color: var(--ifm-color-emphasis-800);
+  font-size: 1.2rem;
+  line-height: 1.72;
+  margin: 1.35rem 0 0;
+  max-width: 650px;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.primaryButton,
+.secondaryButton,
+.ghostButton {
+  align-items: center;
+  border-radius: 8px;
+  display: inline-flex;
+  font-weight: 700;
+  justify-content: center;
+  min-width: 11.25rem;
+  min-height: 44px;
+  padding: 0.7rem 1.1rem;
+  text-decoration: none;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.ghostButton:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.primaryButton {
+  background: var(--ifm-color-primary);
+  border: 1px solid var(--ifm-color-primary);
+  color: #fff;
+}
+
+.primaryButton::after {
+  content: "\2192";
+  font-size: 1.05rem;
+  line-height: 1;
+  margin-left: 0.45rem;
+}
+
+.primaryButton:hover {
+  background: var(--ifm-color-primary-dark);
+  color: #fff;
+}
+
+.secondaryButton {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-font-color-base);
+}
+
+.secondaryButton:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+.ghostButton {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-font-color-base);
+}
+
+.ghostButton:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+.runtimeTitleRow span {
+  display: block;
+  font-size: 1rem;
+}
+
+.surfacePanel {
+  justify-self: end;
+  max-width: 540px;
+  min-width: 0;
+  width: 100%;
+}
+
+.surfaceOptions {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.surfaceOption {
+  --surface-accent: var(--ifm-color-primary);
+  --surface-badge-bg: rgba(255, 112, 1, 0.09);
+  --surface-badge-border: rgba(255, 112, 1, 0.2);
+  --surface-wash: rgba(255, 112, 1, 0.045);
+  align-items: flex-start;
+  background:
+    linear-gradient(180deg, var(--surface-wash), rgba(255, 255, 255, 0) 74px),
+    var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-top: 1px solid var(--surface-badge-border);
+  border-radius: 8px;
+  color: var(--ifm-font-color-base);
+  display: grid;
+  gap: 0.7rem;
+  min-height: 136px;
+  padding: 1rem;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.surfaceOption:nth-child(2) {
+  --surface-accent: #0f766e;
+  --surface-badge-bg: rgba(15, 118, 110, 0.09);
+  --surface-badge-border: rgba(15, 118, 110, 0.18);
+  --surface-wash: rgba(15, 118, 110, 0.045);
+}
+
+.surfaceOption:nth-child(3) {
+  --surface-accent: #2563eb;
+  --surface-badge-bg: rgba(37, 99, 235, 0.08);
+  --surface-badge-border: rgba(37, 99, 235, 0.16);
+  --surface-wash: rgba(37, 99, 235, 0.04);
+}
+
+.surfaceOption:nth-child(4) {
+  --surface-accent: #475569;
+  --surface-badge-bg: rgba(71, 85, 105, 0.08);
+  --surface-badge-border: rgba(71, 85, 105, 0.16);
+  --surface-wash: rgba(71, 85, 105, 0.035);
+}
+
+.surfaceOption:hover {
+  border-color: var(--surface-accent);
+  box-shadow: 0 14px 34px rgba(31, 41, 55, 0.08);
+  color: var(--ifm-font-color-base);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.surfaceOptionBadge {
+  background: var(--surface-badge-bg);
+  border: 1px solid var(--surface-badge-border);
+  border-radius: 999px;
+  color: var(--surface-accent);
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 900;
+  justify-content: center;
+  max-width: max-content;
+  padding: 0.25rem 0.45rem;
+  text-align: center;
+}
+
+.surfaceOptionBody {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.surfaceOptionBody strong {
+  font-size: 1.02rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.surfaceOptionBody small {
+  color: var(--ifm-color-emphasis-800);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.quickStart,
+.capabilities,
+.schemaIdl,
+.useCases {
+  padding: 5rem max(2rem, calc((100vw - 1180px) / 2));
+}
+
+.sectionHeader {
+  margin: 0 auto 2rem;
+  max-width: 760px;
+  text-align: center;
+}
+
+.sectionHeader h2,
+.performanceCopy h2,
+.ecosystem h2 {
+  font-size: 2.35rem;
+  line-height: 1.12;
+}
+
+.sectionHeader p,
+.performanceCopy p,
+.ecosystem p {
+  color: var(--ifm-color-emphasis-800);
+  font-size: 1.04rem;
+  line-height: 1.7;
+  margin: 1rem 0 0;
+}
+
+.runtimeShell {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(31, 41, 55, 0.07);
+  overflow: hidden;
+}
+
+.runtimeTabs {
+  background: var(--fory-soft-band);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.75rem;
+}
+
+.runtimeTab,
+.runtimeTabActive {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-weight: 800;
+  min-height: 36px;
+  padding: 0.45rem 0.8rem;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.runtimeTab {
+  background: var(--ifm-background-color);
+  color: var(--ifm-color-emphasis-800);
+}
+
+.runtimeTab:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+.runtimeTabActive {
+  background: rgba(255, 112, 1, 0.11);
+  border-color: rgba(255, 112, 1, 0.35);
+  color: var(--ifm-color-primary-dark);
+}
+
+.runtimeDetail {
+  display: grid;
+  gap: 0;
+  grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1fr);
+}
+
+.runtimeSummary {
+  border-right: 1px solid var(--ifm-color-emphasis-200);
+  padding: 1.4rem;
+}
+
+.runtimeTitleRow {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.runtimeTitleRow span {
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.runtimeGuideButton {
+  align-items: center;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-emphasis-900);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.84rem;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.48rem 0.85rem;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.runtimeGuideButton:hover {
+  border-color: rgba(255, 117, 54, 0.48);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+  color: var(--ifm-color-primary);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.runtimeSummary p {
+  color: var(--ifm-color-emphasis-800);
+  line-height: 1.65;
+  margin: 0.9rem 0 1.25rem;
+}
+
+.installBlock,
+.codeBlock {
+  min-width: 0;
+}
+
+.blockLabel {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.76rem;
+  font-weight: 900;
+  margin-bottom: 0.55rem;
+  text-transform: uppercase;
+}
+
+.installBlock :global(.theme-code-block),
+.codeBlock :global(.theme-code-block) {
+  background: var(--fory-code-bg);
+  border: 1px solid var(--fory-border);
+  border-radius: 8px;
+  box-shadow: none;
+  margin: 0;
+}
+
+.installBlock :global(pre.prism-code),
+.codeBlock :global(pre.prism-code) {
+  background: var(--fory-code-bg) !important;
+  color: #111827;
+  font-size: 0.84rem;
+  line-height: 1.58;
+  padding: 1rem;
+}
+
+.codeBlock {
+  padding: 1.4rem;
+}
+
+.capabilities {
+  background: var(--fory-soft-band);
+}
+
+.capabilityGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.capabilityCard {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  color: inherit;
+  min-height: 220px;
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.capabilityCard:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 12px 35px rgba(16, 24, 39, 0.08);
+  color: inherit;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.capabilityCard > span {
+  background: rgba(20, 184, 166, 0.12);
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  border-radius: 999px;
+  color: #0f766e;
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 0.25rem 0.55rem;
+}
+
+.capabilityCard h3 {
+  font-size: 1.18rem;
+  margin: 1rem 0 0.65rem;
+}
+
+.capabilityCard p {
+  color: var(--ifm-color-emphasis-800);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.schemaIdl {
+  background: linear-gradient(180deg, var(--fory-soft-band), var(--ifm-background-color));
+}
+
+.schemaLayout {
+  align-items: center;
+  display: grid;
+  gap: 1.4rem;
+  grid-template-columns: minmax(0, 0.84fr) minmax(480px, 1fr);
+}
+
+.schemaCopy {
+  align-self: center;
+  max-width: 520px;
+}
+
+.schemaCopy h2 {
+  font-size: 2.35rem;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.schemaCopy > p {
+  color: var(--ifm-color-emphasis-800);
+  font-size: 1.04rem;
+  line-height: 1.7;
+  margin: 1rem 0 0;
+}
+
+.schemaFeatureList {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1.8rem 0 1.4rem;
+}
+
+.schemaFeature {
+  align-items: flex-start;
+  background:
+    linear-gradient(90deg, rgba(255, 112, 1, 0.055), transparent 44%),
+    var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: 42px minmax(0, 1fr);
+  padding: 0.95rem;
+}
+
+.schemaFeature > span {
+  align-items: center;
+  background: rgba(255, 112, 1, 0.11);
+  border-radius: 7px;
+  color: var(--ifm-color-primary);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 900;
+  height: 34px;
+  justify-content: center;
+}
+
+.schemaFeature h3 {
+  font-size: 1rem;
+  margin: 0 0 0.35rem;
+}
+
+.schemaFeature p {
+  color: var(--ifm-color-emphasis-800);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.schemaActions {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.schemaActionButton {
+  align-items: center;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-emphasis-900);
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 2.6rem;
+  padding: 0.58rem 0.9rem;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.schemaActionButton:hover {
+  border-color: rgba(255, 117, 54, 0.5);
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.schemaPreview {
+  align-self: center;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(31, 41, 55, 0.07);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.schemaPreviewHeader {
+  align-items: center;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+}
+
+.schemaPreviewHeader span {
+  color: var(--fory-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.schemaPreviewHeader strong {
+  color: var(--ifm-color-primary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.schemaPreview :global(.theme-code-block) {
+  background: var(--fory-code-bg);
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+}
+
+.schemaPreview :global(pre.prism-code) {
+  background: var(--fory-code-bg) !important;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  margin: 0;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.schemaPreview :global(pre.prism-code > code) {
+  padding: 1.2rem !important;
+}
+
+.performance {
+  align-items: center;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 0.8fr) minmax(420px, 1fr);
+  padding: 5rem max(2rem, calc((100vw - 1180px) / 2));
+}
+
+.performanceCopy {
+  max-width: 560px;
+}
+
+.performanceCopy .secondaryButton {
+  margin-top: 1.4rem;
+}
+
+.performanceCards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.performanceCard {
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  padding: 1.2rem;
+}
+
+.performanceCard strong {
+  color: var(--ifm-color-primary);
+  display: block;
+  font-size: 1.28rem;
+  line-height: 1.15;
+}
+
+.performanceCard p {
+  color: var(--ifm-color-emphasis-800);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0.75rem 0 0;
+}
+
+.useCaseGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.useCaseCard {
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.useCaseCard h3 {
+  font-size: 1.14rem;
+  margin: 0 0 0.65rem;
+}
+
+.useCaseCard p {
+  color: var(--ifm-color-emphasis-800);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.ecosystem {
+  background: var(--ifm-background-color);
+  border-top: 1px solid var(--fory-border);
+  color: var(--ifm-font-color-base);
+  padding: 5rem max(2rem, calc((100vw - 1180px) / 2));
+}
+
+.ecosystemHeader {
+  max-width: 760px;
+}
+
+.ecosystem p {
+  color: var(--ifm-color-emphasis-800);
+  max-width: 680px;
+}
+
+.adoptionGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 2rem;
+}
+
+.adoptionCard {
+  background: #ffffff;
+  border: 1px solid var(--fory-border);
+  border-left: 3px solid rgba(255, 112, 1, 0.65);
+  border-radius: 8px;
+  color: var(--ifm-font-color-base);
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+  min-height: 0;
+  padding: 1.05rem;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.adoptionCard:hover {
+  background: rgba(255, 112, 1, 0.045);
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 14px 36px rgba(31, 41, 55, 0.08);
+  color: var(--ifm-font-color-base);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.adoptionHeaderRow {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.adoptionStep {
+  align-items: center;
+  background: rgba(255, 112, 1, 0.1);
+  border-radius: 7px;
+  color: var(--ifm-color-primary);
+  display: inline-flex;
+  font-size: 0.76rem;
+  font-weight: 900;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.adoptionHeaderRow h3 {
+  color: var(--ifm-font-color-base);
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.adoptionCard p {
+  color: var(--ifm-color-emphasis-800);
+  font-size: 0.9rem;
+  line-height: 1.58;
+  margin: 0;
+}
+
+.adoptionButton {
+  align-items: center;
+  align-self: flex-start;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-emphasis-900);
+  display: inline-flex;
+  font-size: 0.86rem;
+  font-weight: 800;
+  margin-top: auto;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.86rem;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.adoptionButton:hover {
+  border-color: rgba(255, 117, 54, 0.5);
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .hero {
+  background:
+    linear-gradient(90deg, rgba(255, 112, 1, 0.12), transparent 34%),
+    linear-gradient(180deg, #10141d, var(--ifm-background-color));
+}
+
+[data-theme="dark"] .homepage {
+  --fory-border: #283244;
+  --fory-card-shadow: none;
+  --fory-code-bg: #151d2b;
+  --fory-muted: #aeb8c8;
+  --fory-soft-band: #111827;
+  --fory-surface: #172033;
+}
+
+[data-theme="dark"] .runtimeShell,
+[data-theme="dark"] .capabilityCard,
+[data-theme="dark"] .schemaFeature,
+[data-theme="dark"] .schemaPreview,
+[data-theme="dark"] .performanceCard,
+[data-theme="dark"] .useCaseCard,
+[data-theme="dark"] .adoptionCard {
+  box-shadow: none;
+}
+
+[data-theme="dark"] .runtimeTabActive {
+  background: rgba(255, 112, 1, 0.18);
+  color: #ffb27a;
+}
+
+[data-theme="dark"] .capabilityCard > span {
+  color: #99f6e4;
+}
+
+[data-theme="dark"] .surfaceOption {
+  background:
+    linear-gradient(180deg, var(--surface-wash), rgba(23, 32, 51, 0) 74px),
+    #172033;
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+[data-theme="dark"] .surfaceOption:hover {
+  border-color: var(--surface-accent);
+}
+
+[data-theme="dark"] .ecosystem {
+  background: var(--ifm-background-color);
+  border-top-color: var(--fory-border);
+}
+
+[data-theme="dark"] .adoptionCard {
+  background: #172033;
+}
+
+@media (max-width: 1100px) {
+  .hero,
+  .schemaLayout,
+  .performance {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .surfacePanel {
+    justify-self: start;
+    max-width: 640px;
+  }
+
+  .performanceCopy {
+    max-width: none;
+  }
+
+  .schemaCopy {
+    max-width: 760px;
+  }
+
+  .schemaPreview :global(pre.prism-code) {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 996px) {
+  .hero,
+  .quickStart,
+  .capabilities,
+  .schemaIdl,
+  .performance,
+  .useCases,
+  .ecosystem {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .hero {
+    padding-top: 3.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.55rem;
+  }
+
+  .sectionHeader h2,
+  .schemaCopy h2,
+  .performanceCopy h2,
+  .ecosystem h2 {
+    font-size: 2rem;
+  }
+
+  .capabilityGrid,
+  .performanceCards,
+  .useCaseGrid,
+  .adoptionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .runtimeDetail {
+    grid-template-columns: 1fr;
+  }
+
+  .runtimeSummary {
+    border-bottom: 1px solid var(--ifm-color-emphasis-200);
+    border-right: 0;
+  }
+
+}
+
+@media (max-width: 560px) {
+  .hero h1 {
+    font-size: 2.18rem;
+  }
+
+  .heroSubtitle,
+  .sectionHeader p,
+  .performanceCopy p,
+  .ecosystem p {
+    font-size: 0.98rem;
+  }
+
+  .heroActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .ghostButton {
+    width: 100%;
+  }
+
+  .runtimeTitleRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .schemaActions {
+    grid-template-columns: 1fr;
+  }
+
+  .surfaceOption {
+    grid-template-columns: 1fr;
+  }
+
+  .surfaceOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .installBlock :global(pre.prism-code),
+  .codeBlock :global(pre.prism-code),
+  .schemaPreview :global(pre.prism-code) {
+    font-size: 0.78rem;
+  }
+}
