@@ -31,14 +31,14 @@ license: |
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 **Gradle：**
 
 ```gradle
-implementation 'org.apache.fory:fory-core:1.0.0'
+implementation 'org.apache.fory:fory-core:1.1.0'
 ```
 
 ### Python
@@ -57,22 +57,64 @@ go get github.com/apache/fory/go/fory
 
 ```toml
 [dependencies]
-fory = "1.0.0"
+fory = "1.1.0"
 ```
 
-### JavaScript
+### JavaScript/TypeScript
 
 ```bash
-npm install @apache-fory/fory
+npm install @apache-fory/core
+```
+
+对于可选的 Node.js 字符串快速路径：
+
+```bash
+npm install @apache-fory/core @apache-fory/hps
+```
+
+### C\#
+
+```bash
+dotnet add package Apache.Fory --version 1.1.0
+```
+
+### Dart
+
+```bash
+dart pub add fory:^1.1.0
+dart pub add dev:build_runner
+```
+
+### Swift
+
+将 Fory 添加到 `Package.swift`：
+
+```swift
+dependencies: [
+  .package(url: "https://github.com/apache/fory.git", exact: "1.1.0")
+]
+```
+
+### Scala
+
+```scala
+libraryDependencies += "org.apache.fory" %% "fory-scala" % "1.1.0"
+```
+
+### Kotlin
+
+```kotlin
+implementation("org.apache.fory:fory-kotlin:1.1.0")
 ```
 
 ### C++
 
 使用 Bazel 或 CMake 从源码构建。详见 [C++ 指南](../cpp/index.md)。
 
-## 启用跨语言模式
+## 创建 Xlang 运行时
 
-每种语言都需要启用 xlang 模式，以确保跨语言之间的二进制兼容性。
+对于暴露模式开关的运行时，Xlang 模式是默认选项。Swift、C#、JavaScript/TypeScript 和 Dart
+只暴露 xlang 编码格式。下面的示例将兼容的 Schema 演进保留在默认路径上，只展示会改变其他设置的选项。
 
 ### Java
 
@@ -81,8 +123,8 @@ import org.apache.fory.*;
 import org.apache.fory.config.*;
 
 Fory fory = Fory.builder()
-    .withLanguage(Language.XLANG)  // 启用跨语言模式
-    .withRefTracking(true)          // 可选：用于循环引用
+    .withXlang(true)
+    .withRefTracking(true)  // Optional: for circular references
     .build();
 ```
 
@@ -91,10 +133,9 @@ Fory fory = Fory.builder()
 ```python
 import pyfory
 
-# 必须显式启用跨语言模式
 fory = pyfory.Fory(xlang=True)
 
-# 需要时启用引用跟踪
+# Enable reference tracking when needed
 fory = pyfory.Fory(xlang=True, ref=True)
 ```
 
@@ -104,7 +145,7 @@ fory = pyfory.Fory(xlang=True, ref=True)
 import forygo "github.com/apache/fory/go/fory"
 
 fory := forygo.NewFory(forygo.WithXlang(true))
-// 或启用引用跟踪
+// Or with reference tracking
 fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
 ```
 
@@ -113,15 +154,59 @@ fory := forygo.NewFory(forygo.WithXlang(true), forygo.WithTrackRef(true))
 ```rust
 use fory::Fory;
 
-let fory = Fory::default().xlang(true);
+let fory = Fory::builder().xlang(true).build();
 ```
 
-### JavaScript
+### JavaScript/TypeScript
 
 ```javascript
-import Fory from "@apache-fory/fory";
+import Fory, { Type } from "@apache-fory/core";
 
 const fory = new Fory();
+```
+
+### C\#
+
+```csharp
+using Apache.Fory;
+
+Fory fory = Fory.Builder().Build();
+```
+
+### Dart
+
+```dart
+import 'package:fory/fory.dart';
+
+final fory = Fory();
+```
+
+### Swift
+
+```swift
+import Fory
+
+let fory = Fory()
+```
+
+### Scala
+
+```scala
+import org.apache.fory.scala.ForyScala
+
+val fory = ForyScala.builder()
+  .withXlang(true)
+  .build()
+```
+
+### Kotlin
+
+```kotlin
+import org.apache.fory.kotlin.ForyKotlin
+
+val fory = ForyKotlin.builder()
+    .withXlang(true)
+    .build()
 ```
 
 ### C++
@@ -131,9 +216,7 @@ const fory = new Fory();
 
 using namespace fory::serialization;
 
-auto fory = Fory::builder()
-    .xlang(true)
-    .build();
+auto fory = Fory::builder().xlang(true).build();
 ```
 
 ## 类型注册
@@ -159,42 +242,80 @@ fory.register_type(Person, typename="example.Person")
 **Go：**
 
 ```go
-fory.RegisterNamedStruct(Person{}, "example.Person")
+fory.RegisterStructByName(Person{}, "example.Person")
 ```
 
 **Rust：**
 
 ```rust
-use fory::{Fory, ForyObject};
+use fory::{Fory, ForyStruct};
 
-#[derive(ForyObject)]
+#[derive(ForyStruct)]
 struct Person {
     name: String,
     age: i32,
 }
 
-let mut fory = Fory::default().xlang(true);
+let mut fory = Fory::builder().xlang(true).build();
 fory
-    .register_by_namespace::<Person>("example", "Person")
+    .register_by_name::<Person>("example", "Person")
     .expect("register Person");
 ```
 
-**JavaScript：**
+**JavaScript/TypeScript：**
 
 ```javascript
-const description = Type.object("example.Person", {
-  name: Type.string(),
-  age: Type.int32(),
-});
-fory.registerSerializer(description);
+const personType = Type.struct(
+  { typeName: "example.Person" },
+  {
+    name: Type.string(),
+    age: Type.int32(),
+  },
+);
+const { serialize, deserialize } = fory.register(personType);
 ```
 
 **C++：**
 
 ```cpp
-fory.register_struct<Person>("example.Person");
-// 对于枚举，使用 register_enum：
-// fory.register_enum<Color>("example.Color");
+fory.register_struct<Person>("example", "Person");
+// For enums, use register_enum:
+// fory.register_enum<Color>("example", "Color");
+```
+
+**C#：**
+
+```csharp
+fory.Register<Person>("example", "Person");
+```
+
+**Dart：**
+
+```dart
+PersonForyModule.register(
+  fory,
+  Person,
+  namespace: 'example',
+  typeName: 'Person',
+);
+```
+
+**Swift：**
+
+```swift
+try fory.register(Person.self, namespace: "example", name: "Person")
+```
+
+**Scala：**
+
+```scala
+fory.register(classOf[Person], "example.Person")
+```
+
+**Kotlin：**
+
+```kotlin
+fory.register(Person::class.java, "example.Person")
 ```
 
 ### 按 ID 注册
@@ -219,12 +340,60 @@ fory.register_type(Person, type_id=100)
 fory.RegisterStruct(Person{}, 100)
 ```
 
+**Rust：**
+
+```rust
+fory.register::<Person>(100)?;
+```
+
+**JavaScript/TypeScript：**
+
+```javascript
+const personType = Type.struct(
+  { typeId: 100 },
+  {
+    name: Type.string(),
+    age: Type.int32(),
+  },
+);
+```
+
 **C++：**
 
 ```cpp
 fory.register_struct<Person>(100);
-// 对于枚举，使用 register_enum：
+// For enums, use register_enum:
 // fory.register_enum<Color>(101);
+```
+
+**C#：**
+
+```csharp
+fory.Register<Person>(100);
+```
+
+**Dart：**
+
+```dart
+PersonForyModule.register(fory, Person, id: 100);
+```
+
+**Swift：**
+
+```swift
+fory.register(Person.self, id: 100)
+```
+
+**Scala：**
+
+```scala
+fory.register(classOf[Person], 100)
+```
+
+**Kotlin：**
+
+```kotlin
+fory.register(Person::class.java, 100)
 ```
 
 ## Hello World 示例
@@ -245,9 +414,7 @@ public class Person {
 
 public class HelloWorld {
     public static void main(String[] args) throws Exception {
-        Fory fory = Fory.builder()
-            .withLanguage(Language.XLANG)
-            .build();
+        Fory fory = Fory.builder().withXlang(true).build();
         fory.register(Person.class, "example.Person");
 
         Person person = new Person();
@@ -270,7 +437,7 @@ from dataclasses import dataclass
 @dataclass
 class Person:
     name: str
-    age: pyfory.Int32Type
+    age: pyfory.Int32
 
 fory = pyfory.Fory(xlang=True)
 fory.register_type(Person, typename="example.Person")
@@ -287,9 +454,9 @@ print(f"Name: {person.name}, Age: {person.age}")
 
 1. **使用一致的类型名**：确保所有语言使用相同的类型名或 ID。
 2. **启用引用跟踪**：如果你的数据包含循环引用或共享引用。
-3. **复用 Fory 实例**：创建 Fory 的成本较高，应尽量复用实例。
-4. **使用类型注解**：在 Python 中使用 `pyfory.Int32Type` 等精确类型映射。
-5. **测试跨语言链路**：验证序列化结果在所有目标语言之间都能正确工作。
+3. **复用 Fory 实例**：创建 Fory 实例成本较高，应尽量复用。
+4. **使用类型注解**：在 Python 中使用 `pyfory.Int32` 等标记来获得精确的类型映射。
+5. **测试跨语言链路**：验证序列化在所有目标语言之间都能正确工作。
 
 ## 后续步骤
 
