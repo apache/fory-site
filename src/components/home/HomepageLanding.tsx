@@ -99,12 +99,12 @@ const copies: Record<"en" | "zh", Copy> = {
     heroEyebrow: "Apache Fory™ - 高性能多语言序列化",
     heroTitle: "Apache Fory™",
     heroSubtitle:
-      "一个面向惯用领域对象、Schema IDL 和跨语言数据交换的高性能多语言序列化框架。",
+      "一个面向原生领域对象、Schema IDL 和跨语言数据交换的高性能多语言序列化框架。",
     heroPrimary: "开始使用",
     heroSecondary: "查看文档",
     heroGithub: "查看 GitHub",
     quickEyebrow: "快速开始",
-    quickTitle: "从惯用领域对象开始。",
+    quickTitle: "从原生领域对象开始。",
     quickSubtitle:
       "用你的语言创建原生对象，然后分别通过一行 Fory 调用完成序列化和反序列化。",
     installLabel: "安装",
@@ -113,7 +113,7 @@ const copies: Record<"en" | "zh", Copy> = {
     capabilitiesEyebrow: "核心能力",
     capabilitiesTitle: "Fory 面向这些问题而设计。",
     capabilitiesSubtitle:
-      "Fory 将跨语言序列化、惯用对象支持、Schema IDL/codegen、引用跟踪、Schema 演进和 row-format 访问组合在一起。",
+      "Fory 将跨语言序列化、原生对象支持、Schema IDL/codegen、引用跟踪、Schema 演进和 row-format 访问组合在一起。",
     schemaEyebrow: "Schema IDL",
     schemaTitle: "理解对象图的模型契约。",
     schemaSubtitle:
@@ -472,9 +472,9 @@ const capabilities = [
 const heroSurfaces = [
   {
     label: "Idiomatic",
-    zhLabel: "惯用",
+    zhLabel: "原生",
     title: "Idiomatic Objects",
-    zhTitle: "惯用对象",
+    zhTitle: "原生对象",
     text: "Serialize existing domain objects directly in the target language, without extra conversion code.",
     zhText: "在目标语言内直接序列化已有领域对象，无需额外手动转换代码。",
     link: "/docs/start/usage",
