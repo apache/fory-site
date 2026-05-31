@@ -18,5 +18,9 @@
   "sidebar.docsSidebar.category.Guide": {
     "message": "用户指南",
     "description": "The label for category Guide in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Cross Language": {
+    "message": "跨语言",
+    "description": "The label for category Cross Language in sidebar docsSidebar"
   }
 }
