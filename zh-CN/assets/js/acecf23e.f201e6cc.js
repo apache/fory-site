@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfory_site=self.webpackChunkfory_site||[]).push([["93220"],{1912(s){s.exports=JSON.parse('{"blogBasePath":"/zh-CN/blog","blogTitle":"Blog","authorsListPath":"/zh-CN/blog/authors"}')}}]);
