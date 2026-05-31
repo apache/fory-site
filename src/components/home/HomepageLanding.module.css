@@ -440,6 +440,10 @@
   margin: 0;
 }
 
+.noWrap {
+  white-space: nowrap;
+}
+
 .schemaIdl {
   background: linear-gradient(180deg, var(--fory-soft-band), var(--ifm-background-color));
 }

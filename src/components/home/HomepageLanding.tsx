@@ -258,7 +258,7 @@ auto out = fory.deserialize<Person>(bytes).value();`,
     id: "javascript",
     label: "JavaScript",
     installLanguage: "bash",
-    install: `npm install @apache-fory/core`,
+    install: `npm install @apache-fory/core fory-nps`,
     codeLanguage: "typescript",
     guide: "/docs/guide/javascript/",
     summary: "JavaScript/TypeScript is xlang-only, schema-driven, and runs in Node.js or browsers.",
@@ -443,8 +443,13 @@ const capabilities = [
     label: "FAST",
     description:
       "Use Java/JavaScript JIT serializers, Rust/C++/Swift macros, C# source generators, Kotlin KSP, and Dart build_runner output.",
-    zhDescription:
-      "使用 Java/JavaScript JIT serializer、Rust/C++/Swift macro、C# source generator、Kotlin KSP 和 Dart build_runner 输出。",
+    zhDescription: (
+      <>
+        {"使用 "}
+        <span className={styles.noWrap}>Java/JavaScript</span>
+        {" JIT serializer、Rust/C++/Swift macro、C# source generator、Kotlin KSP 和 Dart build_runner 输出。"}
+      </>
+    ),
     link: "/docs/guide/java/",
   },
   {
@@ -453,8 +458,13 @@ const capabilities = [
     label: "MULTI",
     description:
       "Use Fory from Java, Python, C++, Go, Rust, JavaScript/TypeScript, C#, Swift, Dart, Scala, Kotlin, and Android.",
-    zhDescription:
-      "覆盖 Java、Python、C++、Go、Rust、JavaScript/TypeScript、C#、Swift、Dart、Scala、Kotlin 和 Android。",
+    zhDescription: (
+      <>
+        {"覆盖 Java、Python、C++、Go、Rust、"}
+        <span className={styles.noWrap}>JavaScript/TypeScript</span>
+        {"、C#、Swift、Dart、Scala、Kotlin 和 Android。"}
+      </>
+    ),
     link: "/docs/start/usage",
   },
 ];
@@ -465,8 +475,8 @@ const heroSurfaces = [
     zhLabel: "惯用",
     title: "Idiomatic Objects",
     zhTitle: "惯用对象",
-    text: "Serialize existing domain objects inside one runtime.",
-    zhText: "在单一运行时内序列化已有领域对象。",
+    text: "Serialize existing domain objects directly in the target language, without extra conversion code.",
+    zhText: "在目标语言内直接序列化已有领域对象，无需额外手动转换代码。",
     link: "/docs/start/usage",
   },
   {
@@ -510,17 +520,17 @@ const schemaExamples = [
     zhTitle: "Union 类型",
     text: "Map one-of-several cases to tagged unions, and to native union or sum types where supported.",
     zhText: "把 one-of-several case 映射为 tagged union；在支持的语言中生成原生 union 或 sum type。",
-    code: `message Dog [id=104] {
+    code: `message Dog {
     string name = 1;
     int32 bark_volume = 2;
 }
 
-message Cat [id=105] {
+message Cat {
     string name = 1;
     int32 lives = 2;
 }
 
-union Animal [id=106] {
+union Animal {
     Dog dog = 1;
     Cat cat = 2;
 }`,
