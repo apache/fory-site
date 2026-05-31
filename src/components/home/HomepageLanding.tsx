@@ -60,7 +60,7 @@ type Copy = {
 
 const copies: Record<"en" | "zh", Copy> = {
   en: {
-    heroEyebrow: "Multi-language serialization framework",
+    heroEyebrow: "Apache Fory™ - Blazingly-Fast Multi-language Serialization",
     heroTitle: "Apache Fory™",
     heroSubtitle:
       "A blazingly-fast multi-language serialization framework for idiomatic domain objects, Schema IDL, and cross-language data exchange.",
@@ -68,16 +68,16 @@ const copies: Record<"en" | "zh", Copy> = {
     heroSecondary: "View Docs",
     heroGithub: "View GitHub",
     quickEyebrow: "Quick start",
-    quickTitle: "Start from native domain objects.",
+    quickTitle: "Start from idiomatic domain objects.",
     quickSubtitle:
-      "Pick a language, register a native type with a stable name, then serialize and deserialize with a small Fory runtime.",
+      "Create a native object in your language, then serialize and deserialize it with one-line Fory calls.",
     installLabel: "Install",
     codeLabel: "Serialize / deserialize",
     guideLabel: "Open guide",
     capabilitiesEyebrow: "Core capabilities",
     capabilitiesTitle: "What Fory is built to handle.",
     capabilitiesSubtitle:
-      "Fory brings together cross-language serialization, native object support, Schema IDL/code generation, reference tracking, schema evolution, and row-format access.",
+      "Fory brings together cross-language serialization, idiomatic object support, Schema IDL/code generation, reference tracking, schema evolution, and row-format access.",
     schemaEyebrow: "Schema IDL",
     schemaTitle: "Model contracts that still understand object graphs.",
     schemaSubtitle:
@@ -93,27 +93,27 @@ const copies: Record<"en" | "zh", Copy> = {
       "Use one serialization layer, but choose the payload surface by the boundary your data crosses.",
     ecosystemTitle: "Adopt Fory without changing the object model.",
     ecosystemSubtitle:
-      "Start with native objects, promote shared contracts to Schema IDL when teams need them, then validate the exact runtime path with benchmarks.",
+      "Choose the wire mode for each boundary, promote shared models into Fory IDL when contracts need to last, then validate the exact path with per-language benchmarks.",
   },
   zh: {
-    heroEyebrow: "多语言序列化框架",
+    heroEyebrow: "Apache Fory™ - 高性能多语言序列化",
     heroTitle: "Apache Fory™",
     heroSubtitle:
-      "一个面向原生领域对象、Schema IDL 和跨语言数据交换的高性能多语言序列化框架。",
+      "一个面向惯用领域对象、Schema IDL 和跨语言数据交换的高性能多语言序列化框架。",
     heroPrimary: "开始使用",
     heroSecondary: "查看文档",
     heroGithub: "查看 GitHub",
     quickEyebrow: "快速开始",
-    quickTitle: "从原生领域对象开始。",
+    quickTitle: "从惯用领域对象开始。",
     quickSubtitle:
-      "选择一种语言，用稳定名称注册原生类型，然后通过 Fory 运行时完成序列化和反序列化。",
+      "用你的语言创建原生对象，然后分别通过一行 Fory 调用完成序列化和反序列化。",
     installLabel: "安装",
     codeLabel: "序列化 / 反序列化",
     guideLabel: "打开指南",
     capabilitiesEyebrow: "核心能力",
     capabilitiesTitle: "Fory 面向这些问题而设计。",
     capabilitiesSubtitle:
-      "Fory 将跨语言序列化、原生对象支持、Schema IDL/codegen、引用跟踪、Schema 演进和 row-format 访问组合在一起。",
+      "Fory 将跨语言序列化、惯用对象支持、Schema IDL/codegen、引用跟踪、Schema 演进和 row-format 访问组合在一起。",
     schemaEyebrow: "Schema IDL",
     schemaTitle: "理解对象图的模型契约。",
     schemaSubtitle:
@@ -129,7 +129,7 @@ const copies: Record<"en" | "zh", Copy> = {
       "使用同一层序列化能力，但根据数据跨越的边界选择不同 payload 表面。",
     ecosystemTitle: "不改变对象模型地采用 Fory。",
     ecosystemSubtitle:
-      "从原生对象开始；当契约需要跨团队共享时推进到 Schema IDL；上线前用 Benchmark 验证具体运行时路径。",
+      "按数据边界选择 wire mode；当模型需要长期维护时推进到 Fory IDL；上线前用多语言 Benchmark 验证实际路径。",
   },
 };
 
@@ -380,7 +380,8 @@ val out = fory.deserialize(payload).asInstanceOf[Person]`,
     id: "kotlin",
     label: "Kotlin",
     installLanguage: "kotlin",
-    install: `implementation("org.apache.fory:fory-kotlin:1.0.0")`,
+    install: `implementation("org.apache.fory:fory-kotlin:1.0.0")
+ksp("org.apache.fory:fory-kotlin-ksp:1.0.0")`,
     codeLanguage: "kotlin",
     guide: "/docs/guide/kotlin/",
     summary: "Kotlin adds data-class support, Android guidance, and KSP static serializers for xlang/schema mode.",
@@ -441,66 +442,68 @@ const capabilities = [
     zhTitle: "运行时优化",
     label: "FAST",
     description:
-      "Use Java JIT serializers, generated JavaScript schemas, C# source generators, Kotlin KSP, and Dart build_runner output.",
-    zhDescription: "使用 Java JIT、JavaScript schema 生成缓存、C# source generator、Kotlin KSP 和 Dart build_runner 输出。",
+      "Use Java/JavaScript JIT serializers, Rust/C++/Swift macros, C# source generators, Kotlin KSP, and Dart build_runner output.",
+    zhDescription:
+      "使用 Java/JavaScript JIT serializer、Rust/C++/Swift macro、C# source generator、Kotlin KSP 和 Dart build_runner 输出。",
     link: "/docs/guide/java/",
   },
   {
     title: "Broad platform support",
     zhTitle: "多运行时生态",
-    label: "11X",
+    label: "MULTI",
     description:
-      "Use Fory from Java, Python, C++, Go, Rust, JavaScript/TypeScript, C#, Swift, Dart, Scala, and Kotlin.",
-    zhDescription: "覆盖 Java、Python、C++、Go、Rust、JavaScript/TypeScript、C#、Swift、Dart、Scala 和 Kotlin。",
+      "Use Fory from Java, Python, C++, Go, Rust, JavaScript/TypeScript, C#, Swift, Dart, Scala, Kotlin, and Android.",
+    zhDescription:
+      "覆盖 Java、Python、C++、Go、Rust、JavaScript/TypeScript、C#、Swift、Dart、Scala、Kotlin 和 Android。",
     link: "/docs/start/usage",
   },
 ];
 
 const heroSurfaces = [
   {
-    label: "Native",
-    zhLabel: "Native",
-    title: "Native Objects",
-    zhTitle: "原生对象",
+    label: "Idiomatic",
+    zhLabel: "惯用",
+    title: "Idiomatic Objects",
+    zhTitle: "惯用对象",
     text: "Serialize existing domain objects inside one runtime.",
     zhText: "在单一运行时内序列化已有领域对象。",
     link: "/docs/start/usage",
   },
   {
-    label: "xlang",
-    zhLabel: "xlang",
-    title: "Cross-language Payloads",
-    zhTitle: "跨语言 Payload",
-    text: "Exchange typed payloads across supported languages.",
-    zhText: "在受支持语言之间交换类型化 payload。",
+    label: "XLANG",
+    zhLabel: "XLANG",
+    title: "Cross-language Encoding",
+    zhTitle: "跨语言编码",
+    text: "Unified cross-language type system and binary encoding.",
+    zhText: "统一的跨语言类型系统与二进制编码。",
     link: "/docs/guide/xlang/",
   },
   {
     label: "IDL",
     zhLabel: "IDL",
-    title: "Schema IDL",
-    zhTitle: "Schema IDL",
-    text: "Define shared contracts and generate native code.",
-    zhText: "定义共享契约，并生成各语言原生代码。",
+    title: "Reference-aware IDL",
+    zhTitle: "引用感知 IDL",
+    text: "Define shared contracts with refs, unions, and native code generation.",
+    zhText: "用 refs、unions 和原生代码生成定义共享契约。",
     link: "/docs/compiler/",
   },
   {
-    label: "Row",
-    zhLabel: "Row",
-    title: "Row Format",
-    zhTitle: "Row Format",
-    text: "Read selected fields for partial-read and analytics workloads.",
-    zhText: "面向部分读取和分析工作负载读取指定字段。",
-    link: "/docs/guide/xlang/row_format",
+    label: "FAST",
+    zhLabel: "FAST",
+    title: "High Performance",
+    zhTitle: "高性能",
+    text: "Highly optimized JIT and statically generated serializers.",
+    zhText: "高度优化的 JIT serializer 与静态生成 serializer。",
+    link: "/docs/introduction/benchmark",
   },
 ];
 
 const schemaExamples = [
   {
-    title: "Simple object",
-    zhTitle: "简单对象",
-    text: "Define ordinary typed fields with explicit field IDs and optional values.",
-    zhText: "用明确字段 ID 和 optional 值定义普通类型化对象。",
+    title: "Message Type",
+    zhTitle: "Message 类型",
+    text: "Define structured data types with typed fields, field IDs, and explicit optional fields.",
+    zhText: "用 typed fields、字段 ID 和明确的 optional 字段定义结构化数据类型。",
     code: `message Person {
     string name = 1;
     int32 age = 2;
@@ -508,10 +511,10 @@ const schemaExamples = [
 }`,
   },
   {
-    title: "Typed union",
-    zhTitle: "类型化 union",
-    text: "Represent one-of-many domain cases without flattening every payload into a generic map.",
-    zhText: "表达 one-of-many 领域分支，而不是把所有载荷压平成通用 map。",
+    title: "Union Type",
+    zhTitle: "Union 类型",
+    text: "Map one-of-several cases to tagged unions, and to native union or sum types where supported.",
+    zhText: "把 one-of-several case 映射为 tagged union；在支持的语言中生成原生 union 或 sum type。",
     code: `message Dog [id=104] {
     string name = 1;
     int32 bark_volume = 2;
@@ -528,7 +531,7 @@ union Animal [id=106] {
 }`,
   },
   {
-    title: "Circular references",
+    title: "Circular References",
     zhTitle: "循环引用",
     text: "Use ref-tracked fields when the same object can be shared or a graph contains cycles.",
     zhText: "当对象会被共享，或图结构中存在环时，用 ref 字段保留引用语义。",
@@ -543,6 +546,24 @@ union Animal [id=106] {
 const schemaPreviewCode = `package example;\n\n${schemaExamples
   .map((item) => item.code)
   .join("\n\n")}`;
+
+const schemaLinks = [
+  {
+    label: "IDL Overview",
+    zhLabel: "IDL 概览",
+    link: "/docs/compiler/",
+  },
+  {
+    label: "Compiler Guide",
+    zhLabel: "编译器指南",
+    link: "/docs/compiler/compiler_guide",
+  },
+  {
+    label: "Generated Code",
+    zhLabel: "生成代码",
+    link: "/docs/compiler/generated_code",
+  },
+];
 
 const performanceCards = [
   {
@@ -595,35 +616,38 @@ const useCases = [
 const adoptionPaths = [
   {
     label: "01",
-    title: "Serialize native objects",
-    zhTitle: "序列化原生对象",
-    text: "Start with the object model your service already owns, then register stable names when payloads cross runtimes.",
-    zhText: "从服务已有的对象模型开始；当 payload 跨运行时边界时，再注册稳定类型名。",
+    title: "Choose the wire mode",
+    zhTitle: "选择 wire mode",
+    text: "Use xlang for portable payloads shared across languages; use native mode for same-runtime traffic that needs broader runtime-specific object models.",
+    zhText: "跨语言共享 payload 时使用 xlang；同运行时流量需要更完整的语言对象模型时使用 native mode。",
     cta: "Usage guide",
     zhCta: "使用指南",
-    doc: "/docs/start/usage",
+    action: "Usage guide",
+    zhAction: "使用指南",
     link: "/docs/start/usage",
   },
   {
     label: "02",
-    title: "Define shared schemas",
-    zhTitle: "定义共享 Schema",
-    text: "Use Fory IDL when models become long-lived, span teams, or need generated code across languages.",
-    zhText: "当模型生命周期变长、跨团队协作，或需要多语言代码生成时，使用 Fory IDL。",
+    title: "Promote shared contracts",
+    zhTitle: "沉淀共享契约",
+    text: "Define Fory IDL once, generate type-safe native models across languages, and use optional fields, refs, unions, or services when contracts evolve.",
+    zhText: "用 Fory IDL 定义一次模型，生成多语言类型安全代码；契约演进时使用 optional、ref、union 或 service。",
     cta: "Schema IDL guide",
     zhCta: "Schema IDL",
-    doc: "/docs/compiler",
+    action: "Schema IDL guide",
+    zhAction: "Schema IDL 指南",
     link: "/docs/compiler/",
   },
   {
     label: "03",
-    title: "Validate performance",
-    zhTitle: "验证性能",
-    text: "Compare the language and payload path you plan to ship before committing to a production rollout.",
-    zhText: "上线前对比你实际计划使用的语言和 payload 路径。",
+    title: "Benchmark the rollout path",
+    zhTitle: "验证上线路径",
+    text: "Compare serialization throughput, deserialization throughput, payload size, and reproduction steps for the runtime you plan to ship.",
+    zhText: "按计划上线的运行时对比序列化/反序列化吞吐、payload 大小和复现实验步骤。",
     cta: "Benchmark charts",
     zhCta: "Benchmark",
-    doc: "/docs/introduction/benchmark",
+    action: "Benchmark charts",
+    zhAction: "Benchmark 图表",
     link: "/docs/introduction/benchmark",
   },
 ];
@@ -724,7 +748,9 @@ function HomepageLanding(): JSX.Element {
             <div className={styles.runtimeSummary}>
               <div className={styles.runtimeTitleRow}>
                 <span>{selected.label}</span>
-                <Link to={selected.guide}>{copy.guideLabel}</Link>
+                <Link className={styles.runtimeGuideButton} to={selected.guide}>
+                  {isZh ? `${selected.label} 指南` : `${selected.label} Guide`}
+                </Link>
               </div>
               <p>{selected.summary}</p>
               <div className={styles.installBlock}>
@@ -758,9 +784,13 @@ function HomepageLanding(): JSX.Element {
                 </article>
               ))}
             </div>
-            <Link className={styles.secondaryButton} to="/docs/compiler/">
-              {copy.guideLabel}
-            </Link>
+            <div className={styles.schemaActions}>
+              {schemaLinks.map((item) => (
+                <Link className={styles.schemaActionButton} key={item.link} to={item.link}>
+                  {isZh ? item.zhLabel : item.label}
+                </Link>
+              ))}
+            </div>
           </div>
           <div className={styles.schemaPreview} aria-label={copy.schemaTitle}>
             <div className={styles.schemaPreviewHeader}>
@@ -816,14 +846,16 @@ function HomepageLanding(): JSX.Element {
         </div>
         <div className={styles.adoptionGrid}>
           {adoptionPaths.map((item) => (
-            <Link className={styles.adoptionCard} key={item.title} to={item.link}>
-              <span className={styles.adoptionStep}>{item.label}</span>
-              <span className={styles.adoptionDocText}>
-                <strong>{isZh ? item.zhCta : item.cta}</strong>
-                <small>{isZh ? item.zhTitle : item.title}</small>
-                <code>{item.doc}</code>
-              </span>
-            </Link>
+            <article className={styles.adoptionCard} key={item.title}>
+              <div className={styles.adoptionHeaderRow}>
+                <span className={styles.adoptionStep}>{item.label}</span>
+                <h3>{isZh ? item.zhTitle : item.title}</h3>
+              </div>
+              <p>{isZh ? item.zhText : item.text}</p>
+              <Link className={styles.adoptionButton} to={item.link}>
+                {isZh ? item.zhAction : item.action}
+              </Link>
+            </article>
           ))}
         </div>
       </section>

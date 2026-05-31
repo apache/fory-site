@@ -89,6 +89,13 @@
   color: #fff;
 }
 
+.primaryButton::after {
+  content: "\2192";
+  font-size: 1.05rem;
+  line-height: 1;
+  margin-left: 0.45rem;
+}
+
 .primaryButton:hover {
   background: var(--ifm-color-primary-dark);
   color: #fff;
@@ -313,10 +320,32 @@
   font-weight: 900;
 }
 
-.runtimeTitleRow a {
-  color: var(--ifm-color-primary);
+.runtimeGuideButton {
+  align-items: center;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-emphasis-900);
+  display: inline-flex;
   flex: 0 0 auto;
+  font-size: 0.84rem;
   font-weight: 800;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.48rem 0.85rem;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.runtimeGuideButton:hover {
+  border-color: rgba(255, 117, 54, 0.48);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+  color: var(--ifm-color-primary);
+  transform: translateY(-1px);
+  text-decoration: none;
 }
 
 .runtimeSummary p {
@@ -483,6 +512,40 @@
   margin: 0;
 }
 
+.schemaActions {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.schemaActionButton {
+  align-items: center;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-emphasis-900);
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 2.6rem;
+  padding: 0.58rem 0.9rem;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.schemaActionButton:hover {
+  border-color: rgba(255, 117, 54, 0.5);
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
 .schemaPreview {
   align-self: stretch;
   background: var(--ifm-background-surface-color);
@@ -631,17 +694,16 @@
 }
 
 .adoptionCard {
-  align-items: flex-start;
   background: #ffffff;
   border: 1px solid var(--fory-border);
   border-left: 3px solid rgba(255, 112, 1, 0.65);
   border-radius: 8px;
   color: var(--ifm-font-color-base);
-  display: grid;
-  gap: 0.9rem;
-  grid-template-columns: 34px minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
   min-height: 0;
-  padding: 1rem;
+  padding: 1.05rem;
   text-decoration: none;
   transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
@@ -655,6 +717,12 @@
   transform: translateY(-2px);
 }
 
+.adoptionHeaderRow {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
 .adoptionStep {
   align-items: center;
   background: rgba(255, 112, 1, 0.1);
@@ -665,35 +733,50 @@
   font-weight: 900;
   height: 34px;
   justify-content: center;
+  width: 34px;
 }
 
-.adoptionDocText {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.adoptionDocText strong {
+.adoptionHeaderRow h3 {
   color: var(--ifm-font-color-base);
   font-size: 1rem;
   font-weight: 900;
   line-height: 1.25;
+  margin: 0;
 }
 
-.adoptionDocText small {
+.adoptionCard p {
   color: var(--ifm-color-emphasis-800);
-  font-size: 0.82rem;
-  line-height: 1.35;
+  font-size: 0.9rem;
+  line-height: 1.58;
+  margin: 0;
 }
 
-.adoptionDocText code {
-  background: transparent;
-  border: 0;
+.adoptionButton {
+  align-items: center;
+  align-self: flex-start;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  color: var(--ifm-color-emphasis-900);
+  display: inline-flex;
+  font-size: 0.86rem;
+  font-weight: 800;
+  margin-top: auto;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.86rem;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.adoptionButton:hover {
+  border-color: rgba(255, 117, 54, 0.5);
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
   color: var(--ifm-color-primary);
-  font-size: 0.72rem;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-  padding: 0;
+  text-decoration: none;
+  transform: translateY(-1px);
 }
 
 [data-theme="dark"] .hero {
@@ -850,6 +933,10 @@
   .runtimeTitleRow {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .schemaActions {
+    grid-template-columns: 1fr;
   }
 
   .surfaceOption {
