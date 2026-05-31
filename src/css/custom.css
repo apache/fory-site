@@ -181,8 +181,8 @@
   --fory-doc-toc-right-inset: 5.5rem;
 }
 
-html[lang="zh-CN"]:root {
-  --doc-sidebar-width: 320px;
+html:root {
+  --doc-sidebar-width: 310px;
 }
 
 .theme-doc-breadcrumbs,
