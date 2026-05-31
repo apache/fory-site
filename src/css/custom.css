@@ -6,6 +6,7 @@
 
 /* You can override the default Infima variables here. */
 :root {
+  --ifm-navbar-height: 4rem;
   --ifm-color-primary: #ff6f01d2;
   --ifm-color-primary-dark: #FF7001;
   --ifm-color-primary-darker: #FF7001;
@@ -41,8 +42,8 @@
     max-width: 1180px;
   }
 
-  .navbar__brand {
-    margin-right: 1.25rem;
+.navbar__brand {
+    margin-right: 1.5rem;
   }
 }
 
@@ -52,8 +53,14 @@
   box-shadow: 0 1px 0 rgba(15, 23, 42, .06);
 }
 
+.navbar__brand {
+  flex-shrink: 0;
+  min-width: max-content;
+}
+
 .navbar__logo {
-  height: 1.75rem;
+  flex-shrink: 0;
+  height: 2rem;
 }
 
 .navbar__item {
@@ -65,12 +72,19 @@
 .navbar__link {
   color: var(--ifm-navbar-link-color);
   font-size: .9375rem;
-  padding-left: .5rem;
-  padding-right: .5rem;
+  padding-left: .55rem;
+  padding-right: .55rem;
+}
+
+.navbar__items--right .dropdown > .navbar__link {
+  color: var(--ifm-navbar-link-color);
+  font-size: .9375rem;
+  font-weight: 600;
 }
 
 .navbar__link:hover,
-.navbar__link--active {
+.navbar__link--active,
+.navbar__items--right .dropdown > .navbar__link:hover {
   color: var(--ifm-navbar-link-hover-color);
 }
 
@@ -79,7 +93,7 @@
   border: 1px solid #edf0f5;
   color: #475569;
   font-size: .9375rem;
-  height: 2rem;
+  height: 2.125rem;
 }
 
 .navbar__search-input::placeholder {
