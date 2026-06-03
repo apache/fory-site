@@ -156,20 +156,20 @@ FlatBuffers metadata attributes use `key:value`. For Fory-specific options, use
 
 ### Supported Field Attributes
 
-| FlatBuffers Attribute           | Effect in Fory                                                                   |
-| ------------------------------- | -------------------------------------------------------------------------------- |
-| `fory_ref:true`                 | Enable reference tracking for the field                                          |
-| `fory_nullable:true`            | Mark field optional/nullable                                                     |
-| `fory_weak_ref:true`            | Enable weak reference semantics and implies `ref`                                |
-| `fory_thread_safe_pointer:true` | For ref fields, select Rust `Arc`/`ArcWeak` instead of the default `Rc`/`RcWeak` |
+| FlatBuffers Attribute            | Effect in Fory                                                                   |
+| -------------------------------- | -------------------------------------------------------------------------------- |
+| `fory_ref:true`                  | Enable reference tracking for the field                                          |
+| `fory_nullable:true`             | Mark field optional/nullable                                                     |
+| `fory_weak_ref:true`             | Enable weak reference semantics and implies `ref`                                |
+| `fory_thread_safe_pointer:false` | For ref fields, select Rust `Rc`/`RcWeak` instead of the default `Arc`/`ArcWeak` |
 
 Semantics:
 
 - `fory_weak_ref:true` implies `ref`.
-- `fory_thread_safe_pointer` defaults to `false`, only takes effect when the field
+- `fory_thread_safe_pointer` defaults to `true`, only takes effect when the field
   is ref-tracked, and does not change the wire format.
-- In Rust codegen, `fory_weak_ref:true` uses `RcWeak` by default and switches to
-  `ArcWeak` only when `fory_thread_safe_pointer:true` is also set.
+- In Rust codegen, `fory_weak_ref:true` uses `ArcWeak` by default and switches to
+  `RcWeak` only when `fory_thread_safe_pointer:false` is set.
 - For list fields, `fory_ref:true` applies to list elements.
 
 Example:
@@ -178,7 +178,7 @@ Example:
 table Node {
   parent: Node (fory_weak_ref: true);
   children: [Node] (fory_ref: true);
-  cached: Node (fory_ref: true, fory_thread_safe_pointer: true);
+  local: Node (fory_ref: true, fory_thread_safe_pointer: false);
 }
 ```
 

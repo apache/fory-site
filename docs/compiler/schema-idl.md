@@ -1052,7 +1052,7 @@ message Node {
 | Java                  | `Node parent`  | `Node parent` with `@Ref`                  |
 | Python                | `parent: Node` | `parent: Node = pyfory.field(ref=True)`    |
 | Go                    | `Parent Node`  | `Parent *Node` with `fory:"ref"`           |
-| Rust                  | `parent: Node` | `parent: Rc<Node>`                         |
+| Rust                  | `parent: Node` | `parent: Arc<Node>`                        |
 | C++                   | `Node parent`  | `std::shared_ptr<Node> parent`             |
 | C#                    | `Node parent`  | `Node? parent` with runtime ref tracking   |
 | JavaScript/TypeScript | `parent: Node` | `parent: Node` (no ref distinction)        |
@@ -1061,21 +1061,21 @@ message Node {
 | Scala                 | `parent: Node` | `@Ref parent: Node`                        |
 | Kotlin                | `parent: Node` | `@Ref parent: Node?`                       |
 
-Rust uses `Rc` and `RcWeak` by default for ref-tracked fields. Use
-`ref(thread_safe=true)` when the generated Rust type must use `Arc` or
-`ArcWeak` for cross-thread shared ownership. This setting is a Rust codegen
-carrier choice; it does not change the wire format or make the referenced value
-itself thread-safe. For protobuf option syntax, see
+Rust uses `Arc` and `ArcWeak` by default for ref-tracked fields. Use
+`ref(thread_safe=false)` when a generated Rust type must use single-threaded
+`Rc` or `RcWeak` carriers. This setting is a Rust codegen carrier choice; it
+does not change the wire format or make the referenced value itself
+thread-safe. For protobuf option syntax, see
 [Protocol Buffers IDL Support](protobuf-idl.md#field-level-options).
 
 Rust pointer carrier mapping:
 
-| Fory IDL                                       | Rust type       |
-| ---------------------------------------------- | --------------- |
-| `ref Node parent`                              | `Rc<Node>`      |
-| `ref(thread_safe=true) Node parent`            | `Arc<Node>`     |
-| `ref(weak=true) Node parent`                   | `RcWeak<Node>`  |
-| `ref(weak=true, thread_safe=true) Node parent` | `ArcWeak<Node>` |
+| Fory IDL                                        | Rust type       |
+| ----------------------------------------------- | --------------- |
+| `ref Node parent`                               | `Arc<Node>`     |
+| `ref(thread_safe=false) Node parent`            | `Rc<Node>`      |
+| `ref(weak=true) Node parent`                    | `ArcWeak<Node>` |
+| `ref(weak=true, thread_safe=false) Node parent` | `RcWeak<Node>`  |
 
 #### `list`
 
@@ -1127,10 +1127,11 @@ accepted as an alias for `list`.
 | ----------------------- | ---------------------------------- | --------------------- | ----------------------- | --------------------- | ----------------------------------------- | ------------------------------------------------------------- | ---------------------- |
 | `optional list<string>` | `@Nullable List<String>`           | `Optional[List[str]]` | `[]string` + `nullable` | `Option<Vec<String>>` | `std::optional<std::vector<std::string>>` | `List<String>?`                                               | `Option[List[String]]` |
 | `list<optional string>` | `List<String>` (nullable elements) | `List[Optional[str]]` | `[]*string`             | `Vec<Option<String>>` | `std::vector<std::optional<std::string>>` | `List<String?>`                                               | `List[Option[String]]` |
-| `list<ref User>`        | `List<@Ref User>`                  | `List[User]`          | `[]*User` + `ref=false` | `Vec<Rc<User>>`       | `std::vector<std::shared_ptr<User>>`      | `List<User>` + `@ListField(element: DeclaredType(ref: true))` | `List[User @Ref]`      |
+| `list<ref User>`        | `List<@Ref User>`                  | `List[User]`          | `[]*User` + `ref=false` | `Vec<Arc<User>>`      | `std::vector<std::shared_ptr<User>>`      | `List<User>` + `@ListField(element: DeclaredType(ref: true))` | `List[User @Ref]`      |
 
-Use `ref(thread_safe=true)` in Fory IDL (or `[(fory).thread_safe_pointer = true]` in protobuf)
-to generate `Arc` instead of `Rc` in Rust.
+Use `ref(thread_safe=false)` in Fory IDL (or
+`[(fory).thread_safe_pointer = false]` in protobuf) to generate `Rc` instead of
+`Arc` in Rust.
 
 ## Field Numbers
 
@@ -1339,15 +1340,15 @@ Underscore spellings for integer encoding are not FDL type names.
 
 #### Any
 
-| Language              | Type           | Notes                |
-| --------------------- | -------------- | -------------------- |
-| Java                  | `Object`       | Runtime type written |
-| Python                | `Any`          | Runtime type written |
-| Go                    | `any`          | Runtime type written |
-| Rust                  | `Box<dyn Any>` | Runtime type written |
-| C++                   | `std::any`     | Runtime type written |
-| JavaScript/TypeScript | `any`          | Runtime type written |
-| Dart                  | `Object?`      | Runtime type written |
+| Language              | Type                         | Notes                |
+| --------------------- | ---------------------------- | -------------------- |
+| Java                  | `Object`                     | Runtime type written |
+| Python                | `Any`                        | Runtime type written |
+| Go                    | `any`                        | Runtime type written |
+| Rust                  | `Arc<dyn Any + Send + Sync>` | Runtime type written |
+| C++                   | `std::any`                   | Runtime type written |
+| JavaScript/TypeScript | `any`                        | Runtime type written |
+| Dart                  | `Object?`                    | Runtime type written |
 
 **Example:**
 
@@ -1369,15 +1370,15 @@ message Envelope [id=122] {
 
 **Generated Code (`Envelope.payload`):**
 
-| Language              | Generated Field Type    |
-| --------------------- | ----------------------- |
-| Java                  | `Object payload`        |
-| Python                | `payload: Any`          |
-| Go                    | `Payload any`           |
-| Rust                  | `payload: Box<dyn Any>` |
-| C++                   | `std::any payload`      |
-| JavaScript/TypeScript | `payload: any`          |
-| Dart                  | `Object? payload`       |
+| Language              | Generated Field Type                  |
+| --------------------- | ------------------------------------- |
+| Java                  | `Object payload`                      |
+| Python                | `payload: Any`                        |
+| Go                    | `Payload any`                         |
+| Rust                  | `payload: Arc<dyn Any + Send + Sync>` |
+| C++                   | `std::any payload`                    |
+| JavaScript/TypeScript | `payload: any`                        |
+| Dart                  | `Object? payload`                     |
 
 **Notes:**
 
