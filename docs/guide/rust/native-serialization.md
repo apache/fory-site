@@ -100,7 +100,7 @@ Native serialization owns the Rust-specific object surface:
 - `Box<T>`, `Rc<T>`, `Arc<T>`, `RcWeak<T>`, and `ArcWeak<T>`.
 - `RefCell<T>` and `Mutex<T>`.
 - Trait objects such as `Box<dyn Trait>`, `Rc<dyn Trait>`, and `Arc<dyn Trait>`.
-- Runtime type dispatch with `Rc<dyn Any>` and `Arc<dyn Any>`.
+- Runtime type dispatch with `Rc<dyn Any>` and `Arc<dyn Any + Send + Sync>`.
 - Date and time carriers, including optional `chrono` support.
 
 Use [Basic Serialization](basic-serialization.md), [References](references.md), and

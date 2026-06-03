@@ -80,7 +80,7 @@ let fory = Fory::builder().xlang(true).max_dyn_depth(10).build(); // Allow up to
 
 **Protected types:**
 
-- `Box<dyn Any>`, `Rc<dyn Any>`, `Arc<dyn Any>`
+- `Box<dyn Any>`, `Rc<dyn Any>`, `Arc<dyn Any + Send + Sync>`
 - `Box<dyn Trait>`, `Rc<dyn Trait>`, `Arc<dyn Trait>` (trait objects)
 - `RcWeak<T>`, `ArcWeak<T>`
 - Collection types (Vec, HashMap, HashSet)

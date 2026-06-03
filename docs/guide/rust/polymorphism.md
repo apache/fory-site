@@ -85,7 +85,8 @@ assert_eq!(decoded.star_animal.speak(), "Woof!");
 
 ## Serializing dyn Any Trait Objects
 
-Apache Fory™ supports serializing `Rc<dyn Any>` and `Arc<dyn Any>` for runtime type dispatch:
+Apache Fory™ supports serializing `Rc<dyn Any>` and
+`Arc<dyn Any + Send + Sync>` for runtime type dispatch:
 
 **Key points:**
 
@@ -98,13 +99,10 @@ Apache Fory™ supports serializing `Rc<dyn Any>` and `Arc<dyn Any>` for runtime
 use std::rc::Rc;
 use std::any::Any;
 
-let dog_rc: Rc<dyn Animal> = Rc::new(Dog {
+let dog_any: Rc<dyn Any> = Rc::new(Dog {
     name: "Rex".to_string(),
     breed: "Golden".to_string()
 });
-
-// Convert to Rc<dyn Any> for serialization
-let dog_any: Rc<dyn Any> = dog_rc.clone();
 
 // Serialize the Any wrapper
 let bytes = fory.serialize(&dog_any)?;
@@ -115,22 +113,19 @@ let unwrapped = decoded.downcast_ref::<Dog>().unwrap();
 assert_eq!(unwrapped.name, "Rex");
 ```
 
-For thread-safe scenarios, use `Arc<dyn Any>`:
+For thread-safe scenarios, use `Arc<dyn Any + Send + Sync>`:
 
 ```rust
 use std::sync::Arc;
 use std::any::Any;
 
-let dog_arc: Arc<dyn Animal> = Arc::new(Dog {
+let dog_any: Arc<dyn Any + Send + Sync> = Arc::new(Dog {
     name: "Buddy".to_string(),
     breed: "Labrador".to_string()
 });
 
-// Convert to Arc<dyn Any>
-let dog_any: Arc<dyn Any> = dog_arc.clone();
-
 let bytes = fory.serialize(&dog_any)?;
-let decoded: Arc<dyn Any> = fory.deserialize(&bytes)?;
+let decoded: Arc<dyn Any + Send + Sync> = fory.deserialize(&bytes)?;
 
 // Downcast to concrete type
 let unwrapped = decoded.downcast_ref::<Dog>().unwrap();
@@ -185,7 +180,7 @@ assert_eq!(decoded.animals_arc[0].speak(), "Woof!");
 
 Due to Rust's orphan rule, `Rc<dyn Trait>` and `Arc<dyn Trait>` cannot implement `Serializer` directly. For standalone serialization (not inside struct fields), the `register_trait_type!` macro generates wrapper types.
 
-**Note:** If you don't want to use wrapper types, you can serialize as `Rc<dyn Any>` or `Arc<dyn Any>` instead (see the dyn Any section above).
+**Note:** If you don't want to use wrapper types, you can serialize as `Rc<dyn Any>` or `Arc<dyn Any + Send + Sync>` instead (see the dyn Any section above).
 
 The `register_trait_type!` macro generates `AnimalRc` and `AnimalArc` wrapper types:
 
