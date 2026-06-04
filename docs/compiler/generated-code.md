@@ -218,7 +218,7 @@ resolver.registerUnion(Envelope.Detail.class, 1609214087L, new org.apache.fory.s
 resolver.register(Envelope.Payload.class, 2862577837L);
 ```
 
-If `option enable_auto_type_id = false;` is set, registration uses namespace and type name:
+If `option enable_auto_type_id = false;` is set, registration uses symbolic names:
 
 ```java
 resolver.register(Config.class, "myapp.models", "Config");
@@ -347,11 +347,10 @@ fory.register_type(Envelope.Payload, type_id=2862577837)
 If `option enable_auto_type_id = false;` is set:
 
 ```python
-fory.register_type(Config, namespace="myapp.models", typename="Config")
+fory.register_type(Config, name="myapp.models.Config")
 fory.register_union(
     Holder,
-    namespace="myapp.models",
-    typename="Holder",
+    name="myapp.models.Holder",
     serializer=HolderSerializer(fory),
 )
 ```
@@ -500,8 +499,8 @@ fory.register::<envelope::Payload>(2862577837)?;
 If `option enable_auto_type_id = false;` is set:
 
 ```rust
-fory.register_by_name::<Config>("myapp.models", "Config")?;
-fory.register_union_by_name::<Holder>("myapp.models", "Holder")?;
+fory.register_by_name::<Config>("myapp.models.Config")?;
+fory.register_union_by_name::<Holder>("myapp.models.Holder")?;
 ```
 
 ### Usage
@@ -636,8 +635,8 @@ fory.register_struct<Envelope::Payload>(2862577837);
 If `option enable_auto_type_id = false;` is set:
 
 ```cpp
-fory.register_struct<Config>("myapp.models", "Config");
-fory.register_union<Holder>("myapp.models", "Holder");
+fory.register_struct<Config>("myapp.models.Config");
+fory.register_union<Holder>("myapp.models.Holder");
 ```
 
 ### Usage
