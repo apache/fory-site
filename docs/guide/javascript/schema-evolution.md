@@ -91,7 +91,7 @@ const fixedType = Type.struct(
 
 ## Xlang Requirement
 
-Compatible mode only protects you from schema differences in the _fields_ of a type. You still need the same type identity (same numeric ID or same `namespace + typeName`) on every side. See [Xlang Serialization](xlang-serialization.md).
+Compatible mode only protects you from schema differences in the _fields_ of a type. You still need the same type identity (same numeric ID or same `typeName`) on every side. See [Xlang Serialization](xlang-serialization.md).
 
 ## Related Topics
 

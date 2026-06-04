@@ -73,7 +73,7 @@ If you add field IDs after payloads are already in production, existing stored m
 
 - Reuse an existing field ID for a different field.
 - Change a field's type to an incompatible type (e.g., `@ForyField(type: Int32Type()) int` → `String`).
-- Change the registration identity (`id`, `namespace`, or `typeName`) of a type after messages are in production.
+- Change the registration identity (`id` or `name`) of a type after messages are in production.
 - Change a field's logical meaning without changing its ID.
 
 ## Xlang Notes
@@ -81,7 +81,7 @@ If you add field IDs after payloads are already in production, existing stored m
 Evolution only works when **all** runtimes that exchange messages agree on:
 
 1. The same `compatible` setting.
-2. The same type registration identity (numeric ID or `namespace + typeName`).
+2. The same type registration identity (numeric ID or `name`).
 3. The logical meaning of field IDs.
 
 Test rolling-upgrade scenarios with real round trips before deploying.

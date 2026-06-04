@@ -25,8 +25,8 @@ schema evolution behavior.
 
 ## Type Identity
 
-Structs and enums can use a numeric ID or a namespace/name pair. Pick one identity strategy for a
-type and use it consistently in every runtime that reads or writes the payload.
+Structs and enums can use a numeric ID or a name. Pick one identity strategy for a type and use it
+consistently in every runtime that reads or writes the payload.
 
 ```ts
 import { Type } from "@apache-fory/core";
@@ -40,13 +40,15 @@ const byId = Type.struct(
 );
 
 const byName = Type.struct(
-  { namespace: "example", typeName: "user" },
+  { typeName: "example.user" },
   {
     id: Type.int64(),
     name: Type.string(),
   },
 );
 ```
+
+Use `.` inside `typeName` to add a namespace prefix.
 
 ## Decorator Metadata
 

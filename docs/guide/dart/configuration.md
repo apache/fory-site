@@ -54,7 +54,7 @@ final fory = Fory();
 When `compatible: true`:
 
 - Adding or removing fields on one side does not break the other.
-- Peers must still use the same `namespace` + `typeName` (or numeric `id`) to identify types.
+- Peers must still use the same `name` (or numeric `id`) to identify types.
 
 When `compatible: false`:
 
@@ -112,7 +112,7 @@ final fory = Fory(maxBinarySize: 8 * 1024 * 1024);
 When Fory is used to communicate between services written in different languages:
 
 - Keep compatible mode enabled on all sides if any side needs schema evolution.
-- Use the same numeric IDs or `namespace + typeName` pairs on every side.
+- Use the same numeric IDs or `name` values on every side.
 - Match the `compatible` setting on both the writing and reading side — mismatching modes will fail.
 
 ## Security

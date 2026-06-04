@@ -49,13 +49,17 @@ Internal type IDs 0-32 are reserved for built-in xlang types. Java native built-
 
 ### Register by Name
 
-Register class by ID will have better performance and smaller space overhead. But in some cases, management for a bunch of type IDs is complex. In such cases, registering class by name using API `register(Class<?> cls, String namespace, String typeName)` is recommended:
+Register class by ID has better performance and smaller space overhead. But in some cases,
+management for a bunch of type IDs is complex. In such cases, registering class by name using API
+`register(Class<?> cls, String name)` is recommended. Use `.` inside the name to add a namespace
+prefix:
 
 ```java
-fory.register(Foo.class, "demo", "Foo");
+fory.register(Foo.class, "demo.Foo");
 ```
 
-If there are no duplicate names for types, `namespace` can be left as empty to reduce serialized size.
+If there are no duplicate names for types, use a name without a namespace prefix to reduce
+serialized size.
 
 **Do not use this API to register class since it will increase serialized size a lot compared to registering class by ID.**
 

@@ -65,7 +65,7 @@ class User:
     age: pyfory.Int32
 
 f = pyfory.Fory(xlang=True)
-f.register(User, typename="User")
+f.register(User, name="User")
 data = f.dumps(User("Alice", 30))
 
 # Version 2: Add new field (backward compatible)
@@ -89,7 +89,7 @@ print(user.email)  # "unknown@example.com"
 ## Best Practices
 
 1. **Always provide default values** for new fields
-2. **Use typename for cross-language compatibility**
+2. **Use name for cross-language compatibility**
 3. **Test schema changes** before deploying
 4. **Document schema versions** for your team
 

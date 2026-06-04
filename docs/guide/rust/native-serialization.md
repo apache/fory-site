@@ -84,11 +84,11 @@ Register application structs and enum-like types before serialization:
 
 ```rust
 fory.register::<Order>(100)?;
-fory.register_by_name::<Order>("example", "Order")?;
+fory.register_by_name::<Order>("example.Order")?;
 ```
 
-Use explicit numeric IDs for compact payloads and stable deployments. Use namespace/type-name
-registration when independent teams coordinate type identity by names.
+Use explicit numeric IDs for compact payloads and stable deployments. Use named registration
+when independent teams coordinate type identity by names; add a namespace prefix with `.` when needed.
 
 ## Rust Object Surface
 

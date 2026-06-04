@@ -45,7 +45,7 @@ fory.register(Order.self, id: 100)
 ### Name-based registration
 
 ```swift
-try fory.register(Order.self, namespace: "com.example", name: "Order")
+try fory.register(Order.self, name: "com.example.Order")
 ```
 
 ## Xlang Rules

@@ -72,7 +72,7 @@ Symptoms: fields come back as default values or wrong types after a round trip t
 
 Checklist:
 
-1. Same registration identity on both sides (same numeric ID **or** same `namespace + typeName`).
+1. Same registration identity on both sides (same numeric ID **or** same `name`).
 2. Stable `@ForyField(id: ...)` assigned before the first payload was produced.
 3. Compatible numeric widths — use `@ForyField(type: Int32Type())` in Dart when the peer field is `int` (Java), `int32` (Go), or `int` (C#).
 4. `Timestamp` / `LocalDate` instead of raw `DateTime` for date/time fields.

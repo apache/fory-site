@@ -52,10 +52,10 @@ fory.Register<Person>(100);
 
 Use the same ID mapping on all languages.
 
-## Register by Namespace/Type Name
+## Register by Name
 
 ```csharp
-fory.Register<Person>("com.example", "Person");
+fory.Register<Person>("com.example.Person");
 ```
 
 ## Xlang Example

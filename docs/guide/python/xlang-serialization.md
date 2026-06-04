@@ -49,7 +49,7 @@ class Person:
     name: str
     age: pyfory.Int32
 
-f.register(Person, typename="example.Person")
+f.register(Person, name="example.Person")
 
 person = Person("Charlie", 35)
 binary_data = f.serialize(person)
@@ -89,7 +89,7 @@ struct Person {
 
 let mut fory = Fory::builder().xlang(true).build();
 
-fory.register_by_name::<Person>("example", "Person");
+fory.register_by_name::<Person>("example.Person");
 let person: Person = fory.deserialize(&binary_data)?;
 ```
 

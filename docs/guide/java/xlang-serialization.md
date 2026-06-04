@@ -129,7 +129,7 @@ class Person:
 fory = pyfory.Fory(xlang=True, ref=True)
 
 # Register with the same name as Java.
-fory.register_type(Person, typename="example.Person")
+fory.register_type(Person, name="example.Person")
 
 person = fory.deserialize(bytes_from_java)
 print(f"{person.name}, {person.age}")  # Output: Bob, 25

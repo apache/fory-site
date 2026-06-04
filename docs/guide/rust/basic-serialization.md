@@ -55,8 +55,8 @@ struct Address {
 }
 
 let mut fory = Fory::builder().xlang(true).build();
-fory.register_by_name::<Address>("example", "Address").unwrap();
-fory.register_by_name::<Person>("example", "Person").unwrap();
+fory.register_by_name::<Address>("example.Address").unwrap();
+fory.register_by_name::<Person>("example.Person").unwrap();
 
 let person = Person {
     name: "John Doe".to_string(),

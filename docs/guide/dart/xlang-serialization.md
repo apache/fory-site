@@ -53,8 +53,7 @@ Better when multiple teams define types independently:
 ModelsForyModule.register(
   fory,
   Person,
-  namespace: 'example',
-  typeName: 'Person',
+  name: 'example.Person',
 );
 ```
 
@@ -158,7 +157,7 @@ _ = f.Deserialize(bytesFromDart, &person)
 
 Fory matches fields by name or by stable field ID. For robust cross-language interop:
 
-1. Use the same type identity on every side (same numeric ID or same `namespace + typeName`).
+1. Use the same type identity on every side (same numeric ID or same `name`).
 2. Assign stable `@ForyField(id: ...)` values to all fields before shipping the first payload.
 3. Keep field names consistent or rely on IDs, since Dart typically uses `lowerCamelCase` while Go uses `PascalCase` for exported fields and C# often uses `PascalCase` properties.
 4. Use explicit numeric field metadata: `@ForyField(type: Int32Type())` in Dart for Java `int`, Go `int32`, and C# `int`; `double` in Dart for 64-bit floats; `double` plus `Float16Type` or `Bfloat16Type` for 16-bit floats; `Float32` for 32-bit; `Int64` / `Uint64` for full-range 64-bit values.

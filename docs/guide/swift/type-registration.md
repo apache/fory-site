@@ -52,16 +52,12 @@ fory.register(User.self, id: 1)
 try fory.register(User.self, name: "com.example.User")
 ```
 
-`name` is split by `.`:
+`name` is split by the last `.`:
 
 - namespace: `com.example`
 - type name: `User`
 
-### Explicit namespace + name
-
-```swift
-try fory.register(User.self, namespace: "com.example", name: "User")
-```
+Simple names such as `User` use an empty namespace. Empty names and names ending in `.` are invalid.
 
 ## Consistency Rules
 

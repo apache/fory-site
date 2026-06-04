@@ -64,7 +64,7 @@ This emits a `.fory.dart` file next to your source file. Re-run this command any
 
 ## Step 3 — Register and Use
 
-The generator creates a namespace (named after your file) with a `register` function. Call it before serializing:
+The generator creates a Fory module class (named after your file) with a `register` function. Call it before serializing:
 
 ```dart
 final fory = Fory();
@@ -78,8 +78,7 @@ Or use a stable name instead of a numeric ID (useful for cross-language scenario
 ModelsForyModule.register(
   fory,
   User,
-  namespace: 'example',
-  typeName: 'User',
+  name: 'example.User',
 );
 ```
 

@@ -79,7 +79,7 @@ User decoded = fory.Deserialize<User>(payload);
 
 - `Serialize<T>(in T value)` / `Deserialize<T>(...)`
 - `Serialize<object?>(...)` / `Deserialize<object?>(...)` for dynamic payloads
-- `Register<T>(uint typeId)` and namespace/name registration APIs
+- `Register<T>(uint typeId)` and name registration APIs
 - `Register<T, TSerializer>(...)` for custom serializers
 
 ## Documentation

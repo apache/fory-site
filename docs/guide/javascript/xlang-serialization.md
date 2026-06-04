@@ -33,7 +33,7 @@ Things to keep in mind:
 
 For a message to survive a round trip between JavaScript and another runtime:
 
-1. **Same type identity** on both sides — same numeric ID, or same `namespace + typeName`.
+1. **Same type identity** on both sides — same numeric ID, or same `typeName`.
 2. **Compatible field types** — a `Type.int32()` field in JavaScript matches Java `int`, Go `int32`, C# `int`.
 3. **Same nullability** — if one side marks a field nullable, the other should too.
 4. Compatible schema evolution on both sides. JavaScript enables it by default.

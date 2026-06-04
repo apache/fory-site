@@ -132,7 +132,7 @@ class Person:
     bio: Optional[str] = None       # Can be None
 
 fory = pyfory.Fory(xlang=True)
-fory.register_type(Person, typename="example.Person")
+fory.register_type(Person, name="example.Person")
 ```
 
 ### Rust

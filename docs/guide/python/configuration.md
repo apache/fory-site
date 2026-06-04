@@ -83,8 +83,8 @@ fory.register(MyClass, type_id=123)
 fory.register(MyClass, type_id=123, serializer=custom_serializer)
 
 # Type registration by name
-fory.register(MyClass, typename="my.package.MyClass")
-fory.register(MyClass, typename="my.package.MyClass", serializer=custom_serializer)
+fory.register(MyClass, name="my.package.MyClass")
+fory.register(MyClass, name="my.package.MyClass", serializer=custom_serializer)
 ```
 
 ## Xlang And Native Mode Comparison
@@ -107,7 +107,7 @@ Xlang mode is the default and restricts payloads to types compatible across Fory
 import pyfory
 
 fory = pyfory.Fory(xlang=True, ref=True)
-fory.register(MyDataClass, typename="com.example.MyDataClass")
+fory.register(MyDataClass, name="com.example.MyDataClass")
 data = fory.serialize(MyDataClass(field1="value", field2=42))
 ```
 
@@ -140,7 +140,7 @@ fory = pyfory.Fory(
     max_depth=20,
 )
 
-fory.register(UserModel, typename="example.User")
+fory.register(UserModel, name="example.User")
 ```
 
 ### Native Mode With Dynamic Types
@@ -179,8 +179,8 @@ fory = pyfory.Fory(
     max_depth=50,
 )
 
-fory.register(UserModel, typename="example.User")
-fory.register(OrderModel, typename="example.Order")
+fory.register(UserModel, name="example.User")
+fory.register(OrderModel, name="example.Order")
 ```
 
 Use dynamic native-mode deserialization (`strict=False`) only for trusted Python-only payloads:

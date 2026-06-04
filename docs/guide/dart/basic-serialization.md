@@ -53,8 +53,7 @@ void main() {
   PersonForyModule.register(
     fory,
     Person,
-    namespace: 'example',
-    typeName: 'Person',
+    name: 'example.Person',
   );
 
   final person = Person()

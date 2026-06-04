@@ -54,8 +54,7 @@ xlang payloads.
 ## Register Custom Types
 
 Register application classes with the same type identity on every peer. Numeric IDs are compact and
-fast, while namespace/type-name registration is easier to coordinate across independently owned
-services.
+fast, while name registration is easier to coordinate across independently owned services.
 
 ```java
 import org.apache.fory.annotation.ForyField;

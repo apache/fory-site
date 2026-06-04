@@ -268,7 +268,7 @@ val fory = ForyKotlin.builder()
     .requireClassRegistration(true)
     .build()
 
-fory.register<User>("example", "User")
+fory.register<User>("example.User")
 ```
 
 `ForyKotlin.builder()` installs the Kotlin runtime bootstrap for the Fory

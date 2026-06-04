@@ -104,11 +104,11 @@ Register structs with stable IDs or names before serialization:
 
 ```cpp
 fory.register_struct<Order>(100);
-fory.register_struct<Order>("example", "Order");
+fory.register_struct<Order>("example.Order");
 ```
 
-Use numeric IDs for compact payloads. Use namespace/type-name registration when independent teams
-coordinate type identity by names.
+Use numeric IDs for compact payloads. Use name registration when independent teams coordinate type
+identity by names; add a namespace prefix with `.` when needed.
 
 ## C++ Object Surface
 

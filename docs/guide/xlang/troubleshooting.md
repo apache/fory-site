@@ -44,7 +44,7 @@ Error: Type 'example.Person' is not registered
 
    ```python
    # Python
-   fory.register_type(Person, typename="example.Person")
+   fory.register_type(Person, name="example.Person")
    ```
 
 2. Check for typos or case differences in type names
