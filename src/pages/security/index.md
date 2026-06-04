@@ -9,6 +9,18 @@ Apache Fory™ uses the standard process outlined by the [Apache Security Team](
 
 To report a possible security vulnerability, please email private@fory.apache.org.
 
+### [CVE-2026-50076](https://www.cve.org/CVERecord?id=CVE-2026-50076): Apache Fory: Java ReplaceResolverSerializer deserialization checks bypass
+
+Severity: Important
+
+Vendor: The Apache Software Foundation
+
+Versions affected: Apache Fory (org.apache.fory:fory-core) before 1.1.0
+
+Description: Deserialization of untrusted data in the Java replace-resolve path in Apache Fory fory-core Java SDK before 1.1.0 on Java/JVM platforms allows a remote attacker to bypass class registration, TypeChecker, and DisallowedList checks and invoke classpath-present readResolve/readExternal hooks via crafted Fory serialized data.
+
+Mitigation: Users are recommended to upgrade to version 1.1.0 or later, which fixes this issue.
+
 ### [CVE-2026-48207](https://www.cve.org/CVERecord?id=CVE-2026-48207): PyFory ReduceSerializer DeserializationPolicy bypass
 
 Severity: Important
