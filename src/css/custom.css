@@ -6,7 +6,8 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --fory-layout-width: 1180px;
+  --fory-layout-width: 1280px;
+  --fory-marketing-width: 1240px;
   --ifm-navbar-height: 4rem;
   --ifm-color-primary: #ff6f01d2;
   --ifm-color-primary-dark: #FF7001;
@@ -33,8 +34,8 @@
 
 @media (min-width: 997px) {
   .navbar {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
   .navbar__inner {
@@ -43,8 +44,8 @@
     max-width: var(--fory-layout-width);
   }
 
-.navbar__brand {
-    margin-right: 1.5rem;
+  .navbar__brand {
+    margin-right: 1.75rem;
   }
 }
 
@@ -73,8 +74,8 @@
 .navbar__link {
   color: var(--ifm-navbar-link-color);
   font-size: .9375rem;
-  padding-left: .55rem;
-  padding-right: .55rem;
+  padding-left: .65rem;
+  padding-right: .65rem;
 }
 
 .navbar__items--right .dropdown > .navbar__link {
@@ -173,16 +174,16 @@
 
 /* Docs reading surface */
 :root {
-  --fory-doc-content-width: 860px;
-  --fory-doc-shell-width: 908px;
-  --fory-doc-wide-width: 860px;
-  --fory-doc-gutter-width: 24px;
-  --fory-doc-sidebar-inset: 2.75rem;
-  --fory-doc-toc-right-inset: 5.5rem;
+  --fory-doc-content-width: 940px;
+  --fory-doc-shell-width: 988px;
+  --fory-doc-wide-width: 988px;
+  --fory-doc-gutter-width: 18px;
+  --fory-doc-sidebar-inset: 2rem;
+  --fory-doc-toc-right-inset: 1.5rem;
 }
 
 html:root {
-  --doc-sidebar-width: 310px;
+  --doc-sidebar-width: 300px;
 }
 
 .theme-doc-breadcrumbs,
@@ -250,7 +251,21 @@ html:root {
     margin-left: auto;
     margin-right: auto;
     max-width: none;
-    width: calc(100% - 4rem);
+    width: 100%;
+  }
+
+  html body [class*="docItemCol_"] {
+    flex: 0 0 80% !important;
+    max-width: 80% !important;
+    min-width: 0;
+    width: 80% !important;
+  }
+
+  html body [class*="docItemCol_"] + .col.col--3 {
+    --ifm-col-width: 20%;
+    flex: 0 0 20% !important;
+    max-width: 20% !important;
+    width: 20% !important;
   }
 
   .theme-doc-breadcrumbs,
@@ -330,7 +345,7 @@ html:root {
 
 @media (min-width: 997px) {
   .theme-doc-sidebar-menu {
-    padding-left: max(.75rem, calc((100vw - var(--fory-layout-width)) / 2 - .5rem));
+    padding-left: max(.75rem, calc((100vw - var(--fory-layout-width)) / 2));
   }
 }
 

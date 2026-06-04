@@ -29,7 +29,6 @@ type RuntimeExample = {
 };
 
 type Copy = {
-  heroEyebrow: string;
   heroTitle: string;
   heroSubtitle: string;
   heroPrimary: string;
@@ -60,7 +59,6 @@ type Copy = {
 
 const copies: Record<"en" | "zh", Copy> = {
   en: {
-    heroEyebrow: "Apache Fory™ - Blazingly-Fast Multi-language Serialization",
     heroTitle: "Apache Fory™",
     heroSubtitle:
       "A blazingly-fast multi-language serialization framework for idiomatic domain objects, Schema IDL, and cross-language data exchange.",
@@ -96,7 +94,6 @@ const copies: Record<"en" | "zh", Copy> = {
       "Choose the wire mode for each boundary, promote shared models into Fory IDL when contracts need to last, then validate the exact path with per-language benchmarks.",
   },
   zh: {
-    heroEyebrow: "Apache Fory™ - 高性能多语言序列化",
     heroTitle: "Apache Fory™",
     heroSubtitle:
       "一个面向原生领域对象、Schema IDL 和跨语言数据交换的高性能多语言序列化框架。",
@@ -666,7 +663,6 @@ function HomepageLanding(): JSX.Element {
     <main className={styles.homepage}>
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <div className={styles.eyebrow}>{copy.heroEyebrow}</div>
           <h1>{copy.heroTitle}</h1>
           <p className={styles.heroSubtitle}>{copy.heroSubtitle}</p>
           <div className={styles.heroActions}>
