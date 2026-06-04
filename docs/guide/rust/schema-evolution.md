@@ -129,14 +129,16 @@ let decoded: Value = fory.deserialize(&bytes)?;
 assert_eq!(value, decoded);
 ```
 
-For typed ADT unions whose schema cases are unit or single-payload variants,
-`#[fory(unknown)] Unknown(::fory::UnknownCase)` is only the runtime
-forward-compatibility carrier. It cannot be the default variant, and the union
-must include at least one real schema case. The marker only selects the carrier
-and does not add an entry to the schema case table; schema cases use
-non-negative IDs. `UnknownCase` stores its payload as
-`Arc<dyn Any + Send + Sync>`, so locally registered future payload types must be
-thread-safe to be preserved as unknown cases.
+For typed ADT unions whose cases are unit or single-payload variants, add an
+`#[fory(unknown)] Unknown(::fory::UnknownCase)` variant when you need to
+preserve future payload variants. Do not make the unknown variant the default;
+keep a real schema case marked `#[fory(default)]`. Register future payload types
+locally before deserializing unknown cases you need to preserve.
+
+`UnknownCase` stores its payload as `Arc<dyn Any + Send + Sync>`, so preserved
+payload types must satisfy `Send + Sync`. Direct generic containers are not
+supported as erased `Any` payloads; wrap the container in a registered derived
+type if an unknown case needs to preserve it.
 
 ### Enum Schema Evolution
 
