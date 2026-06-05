@@ -111,9 +111,9 @@ implementation("org.apache.fory:fory-kotlin:1.1.0")
 
 Use Bazel or CMake to build from source. See [C++ Guide](../cpp/index.md) for details.
 
-## Create an Xlang Runtime
+## Create an Xlang Fory Instance
 
-Xlang mode is the default for runtimes that expose a mode switch. Swift, C#, JavaScript/TypeScript,
+Xlang mode is the default for implementations that expose a mode switch. Swift, C#, JavaScript/TypeScript,
 and Dart only expose the xlang wire format. The examples below keep compatible schema evolution on
 the default path and show only options that change another setting.
 

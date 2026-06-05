@@ -19,9 +19,9 @@ license: |
   limitations under the License.
 ---
 
-This page covers Python runtime configuration. `pyfory.Fory()` defaults to xlang mode with
-compatible schema evolution. Native mode is selected explicitly with `xlang=False` and defaults to
-schema-consistent payloads.
+This page covers Python Fory instance configuration. `pyfory.Fory()` defaults to xlang mode with
+compatible schema evolution. Native mode is selected explicitly with `xlang=False` and also defaults
+to compatible schema evolution.
 
 ## Fory Class
 
@@ -55,17 +55,17 @@ class ThreadSafeFory:
 
 ## Parameters
 
-| Parameter         | Type                            | Default | Description                                                                                                                                             |
-| ----------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `xlang`           | `bool`                          | `True`  | Use xlang mode. Set `False` for Python native mode.                                                                                                     |
-| `ref`             | `bool`                          | `False` | Enable reference tracking for shared/circular references. Disable for better performance if your data has no shared references.                         |
-| `strict`          | `bool`                          | `True`  | Require type registration for security. Keep this enabled for production unless a policy owns trust decisions.                                          |
-| `compatible`      | `bool \| None`                  | `None`  | Schema evolution mode. `None` follows the wire mode: xlang defaults to compatible mode, while native mode defaults to schema-consistent mode.           |
-| `max_depth`       | `int`                           | `50`    | Maximum deserialization depth for security, preventing stack overflow attacks.                                                                          |
-| `policy`          | `DeserializationPolicy \| None` | `None`  | Deserialization policy used for security checks. Strongly recommended when `strict=False`.                                                              |
-| `field_nullable`  | `bool`                          | `False` | Treat dataclass fields as nullable by default.                                                                                                          |
-| `meta_compressor` | `Any`                           | `None`  | Optional metadata compressor used for compatible-mode metadata encoding.                                                                                |
-| `fory_factory`    | `Callable \| None`              | `None`  | `ThreadSafeFory` factory hook. When set, `ThreadSafeFory` creates instances via this callback; otherwise it forwards `**kwargs` to `Fory` construction. |
+| Parameter         | Type                            | Default | Description                                                                                                                                              |
+| ----------------- | ------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `xlang`           | `bool`                          | `True`  | Use xlang mode. Set `False` for Python native mode.                                                                                                      |
+| `ref`             | `bool`                          | `False` | Enable reference tracking for shared/circular references. Disable for better performance if your data has no shared references.                          |
+| `strict`          | `bool`                          | `True`  | Require type registration for security. Keep this enabled for production unless a policy owns trust decisions.                                           |
+| `compatible`      | `bool \| None`                  | `None`  | Schema evolution mode. `None` enables compatible mode in both xlang and native mode. Set `False` only when every reader and writer uses the same schema. |
+| `max_depth`       | `int`                           | `50`    | Maximum deserialization depth for security, preventing stack overflow attacks.                                                                           |
+| `policy`          | `DeserializationPolicy \| None` | `None`  | Deserialization policy used for security checks. Strongly recommended when `strict=False`.                                                               |
+| `field_nullable`  | `bool`                          | `False` | Treat dataclass fields as nullable by default.                                                                                                           |
+| `meta_compressor` | `Any`                           | `None`  | Optional metadata compressor used for compatible-mode metadata encoding.                                                                                 |
+| `fory_factory`    | `Callable \| None`              | `None`  | `ThreadSafeFory` factory hook. When set, `ThreadSafeFory` creates instances via this callback; otherwise it forwards `**kwargs` to `Fory` construction.  |
 
 ## Key Methods
 
@@ -97,11 +97,11 @@ fory.register(MyClass, name="my.package.MyClass", serializer=custom_serializer)
 | Functions/lambdas   | Supported with trusted dynamic deserialization | Not allowed                                                                      |
 | Local classes       | Supported with trusted dynamic deserialization | Not allowed                                                                      |
 | Dynamic classes     | Supported with trusted dynamic deserialization | Not allowed                                                                      |
-| Schema mode default | Schema-consistent                              | Compatible                                                                       |
+| Schema mode default | Compatible                                     | Compatible                                                                       |
 
 ## Xlang Mode
 
-Xlang mode is the default and restricts payloads to types compatible across Fory runtimes:
+Xlang mode is the default and restricts payloads to types compatible across Fory implementations:
 
 ```python
 import pyfory
@@ -111,8 +111,7 @@ fory.register(MyDataClass, name="com.example.MyDataClass")
 data = fory.serialize(MyDataClass(field1="value", field2=42))
 ```
 
-Use `compatible=False` only when every xlang peer updates schema together and you want
-schema-consistent xlang payloads.
+Use `compatible=False` for xlang payloads only when every reader and writer always uses the same schema and you want faster serialization and smaller size. Use it only after verifying that every language uses that schema, or when native types are generated from Fory schema IDL.
 
 ## Native Mode
 
@@ -123,8 +122,17 @@ fory = pyfory.Fory(xlang=False, ref=True, strict=False)
 ```
 
 Native mode supports Python-specific object features such as functions, local classes, methods,
-`__reduce__`, and `__getstate__`. It defaults to schema-consistent mode. Set
-`compatible=True` only when Python-only deployments need schema evolution.
+`__reduce__`, and `__getstate__`. Compatible mode is still enabled by default. Set
+`compatible=False` only when every reader and writer always uses the same Python
+class schema and you want faster serialization and smaller size.
+
+## Compatible Mode
+
+Compatible mode is enabled by default for both xlang and native mode. Keep this default when Python
+classes may evolve independently, when services deploy separately, or when xlang schemas are written
+by hand in different languages.
+
+For xlang payloads, set `compatible=False` only after verifying that every language uses the same schema, or when native types are generated from Fory schema IDL.
 
 ## Example Configurations
 

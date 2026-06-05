@@ -44,12 +44,8 @@ Create one instance per application and reuse it; there is no benefit to creatin
 ### `compatible`
 
 Compatible mode is enabled by default. Keep it enabled when your service needs to handle payloads
-from code that may have a different version of the same model, for example when you deploy services
-independently and cannot guarantee that both sides update at the same time.
-
-```dart
-final fory = Fory();
-```
+from different versions of the same model, for example during rolling deployments or client/server
+version skew.
 
 When `compatible: true`:
 
@@ -58,11 +54,16 @@ When `compatible: true`:
 
 When `compatible: false`:
 
-- Both sides must have exactly the same schema. This is slightly faster and is fine when schemas do not change or all services deploy schema changes at the same time.
+- Both sides must have exactly the same schema. Use this only when every reader and writer always
+  uses that schema and you want faster serialization and smaller size. For cross-language payloads, set `compatible: false` only after verifying that every language uses the same schema, or when native types are generated from Fory schema IDL.
+
+```dart
+final fory = Fory(compatible: false);
+```
 
 ### `checkStructVersion`
 
-Relevant only when `compatible: false`. When `true`, Fory validates that the schema version in the payload matches the one the receiver knows about, catching accidental schema mismatches at runtime.
+Relevant only when `compatible: false`. When `true`, Fory validates that the schema version in the payload matches the one the receiver knows about, catching accidental mismatches for intentional same-schema payloads.
 
 ```dart
 final fory = Fory(
@@ -120,7 +121,7 @@ When Fory is used to communicate between services written in different languages
 Security-related configuration:
 
 - Register only the expected generated models before deserializing untrusted payloads.
-- Use `checkStructVersion: true` with `compatible: false` when exact schema matching is required.
+- Use `checkStructVersion: true` with `compatible: false` for intentional same-schema payloads.
 - Set `maxDepth`, `maxCollectionSize`, and `maxBinarySize` to reject unexpectedly large payloads.
 - Prefer generated schemas and explicit field metadata over broad dynamic fields for untrusted input.
 

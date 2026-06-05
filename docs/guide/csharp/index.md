@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Apache Fory™ C# is a high-performance, cross-language serialization runtime for .NET. It provides object graph serialization, schema evolution, generic object payload support, and a thread-safe wrapper for concurrent workloads.
+Apache Fory™ C# is a high-performance, cross-language serialization library for .NET. It provides object graph serialization, schema evolution, generic object payload support, and a thread-safe wrapper for concurrent workloads.
 
 ## Why Fory C#?
 
@@ -29,7 +29,7 @@ Apache Fory™ C# is a high-performance, cross-language serialization runtime fo
 - Source-generator-based serializers for `[ForyStruct]` types, plus `[ForyEnum]` and `[ForyUnion]` registration
 - Optional reference tracking for shared and circular object graphs
 - Compatible mode for schema evolution
-- Thread-safe runtime (`ThreadSafeFory`) for multi-threaded services
+- Thread-safe wrapper (`ThreadSafeFory`) for multi-threaded services
 
 ## Quick Start
 
@@ -40,7 +40,7 @@ Apache Fory™ C# is a high-performance, cross-language serialization runtime fo
 
 ### Install from NuGet
 
-Reference the single `Apache.Fory` package. It includes the runtime and the source generator for `[ForyStruct]`, `[ForyEnum]`, and `[ForyUnion]` types.
+Reference the single `Apache.Fory` package. It includes the Fory library and the source generator for `[ForyStruct]`, `[ForyEnum]`, and `[ForyUnion]` types.
 
 ```xml
 <ItemGroup>
@@ -86,7 +86,7 @@ User decoded = fory.Deserialize<User>(payload);
 
 | Topic                                         | Description                                   |
 | --------------------------------------------- | --------------------------------------------- |
-| [Configuration](configuration.md)             | Builder options and runtime modes             |
+| [Configuration](configuration.md)             | Builder options and mode settings             |
 | [Basic Serialization](basic-serialization.md) | Typed and dynamic serialization APIs          |
 | [Xlang Serialization](xlang-serialization.md) | Interoperability guidance                     |
 | [Schema Metadata](schema-metadata.md)         | `[ForyField]` ids and schema type descriptors |

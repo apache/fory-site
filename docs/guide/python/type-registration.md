@@ -24,7 +24,7 @@ strict-mode policy, max-depth limits, and trusted-data guidance.
 
 ## Type Registration
 
-Register xlang classes by type name so other runtimes can resolve the same
+Register xlang classes by type name so other languages can resolve the same
 schema identity:
 
 ```python
