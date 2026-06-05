@@ -319,8 +319,8 @@ foryc api.proto --java_out=./generated/java --python_out=./generated/python --gr
 
 Generated Java service files compile against grpc-java, and generated Python
 service modules import `grpc`. Add those dependencies in your application build;
-Fory runtime packages do not add gRPC as a hard dependency. Protobuf `oneof`
-fields are translated to Fory union fields inside request and response messages.
+Fory packages do not add gRPC as a hard dependency. Protobuf `oneof` fields are
+translated to Fory union fields inside request and response messages.
 Direct union RPC request or response types are not part of normal protobuf RPC
 syntax.
 

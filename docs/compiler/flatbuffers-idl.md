@@ -49,9 +49,9 @@ translates them into Fory IR for code generation.
 
 | Situation                                                          | Recommended Path       |
 | ------------------------------------------------------------------ | ---------------------- |
-| You already have `.fbs` schemas and want Fory runtime/codegen      | Use FlatBuffers input  |
+| You already have `.fbs` schemas and want Fory APIs/codegen         | Use FlatBuffers input  |
 | You are starting new schema work and want full Fory syntax control | Use native Fory IDL    |
-| You need FlatBuffers wire compatibility at runtime                 | Keep FlatBuffers stack |
+| You need FlatBuffers wire compatibility                            | Keep FlatBuffers stack |
 | You need Fory object-graph semantics (`ref`, weak refs, etc.)      | Use Fory               |
 
 ## FlatBuffers to Fory Mapping
@@ -62,7 +62,7 @@ translates them into Fory IR for code generation.
 - `include` entries map to Fory imports.
 - `table` is translated as `evolving=true`.
 - `struct` is translated as `evolving=false`.
-- `root_type` is parsed but ignored by Fory runtime/codegen.
+- `root_type` is parsed but ignored by Fory codegen.
 - `file_identifier` and `file_extension` are parsed but not used by Fory codegen.
 
 ### Field Numbering
@@ -140,12 +140,12 @@ foryc api.fbs --java_out=./generated/java --python_out=./generated/python --grpc
 ```
 
 Generated service code imports grpc APIs, so applications must provide grpc-java
-or `grpcio` dependencies when they compile or run those files. The Fory runtime
-packages do not add gRPC as a hard dependency.
+or `grpcio` dependencies when they compile or run those files. Fory packages do
+not add gRPC as a hard dependency.
 
 ### Defaults and Metadata
 
-- FlatBuffers default values are parsed but not applied as Fory runtime defaults.
+- FlatBuffers default values are parsed but not applied as Fory defaults.
 - Non-Fory metadata attributes are preserved as generic options in IR and may be
   consumed by downstream tooling.
 
@@ -221,5 +221,5 @@ foryc schema.fbs --emit-fdl --emit-fdl-path ./translated
 ## Summary
 
 FlatBuffers input lets you reuse existing `.fbs` schemas while moving to Fory's
-runtime and code generation model. This is useful for incremental adoption while
-preserving schema investment and using Fory-native object APIs.
+serialization and code generation model. This is useful for incremental adoption
+while preserving schema investment and using Fory-native object APIs.
