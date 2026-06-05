@@ -114,7 +114,7 @@ Notes:
 
 - Python `pyfory.Float16` and `pyfory.BFloat16` are reserved annotation markers; scalar values deserialize as native Python `float`.
 - Python `BoolArray`, `Int8Array`, `Int16Array`, `Int32Array`, `Int64Array`, `UInt8Array`, `UInt16Array`, `UInt32Array`, `UInt64Array`, `Float16Array`, `BFloat16Array`, `Float32Array`, and `Float64Array` are public dense-array wrappers with list-like sequence behavior.
-- JavaScript `BoolArray`, fallback `Float16Array`, and `BFloat16Array` are public dense-array wrappers backed by `Uint8Array` or `Uint16Array`. Scalar `float16` and `bfloat16` values use `number`. A JavaScript runtime with native `Float16Array` may return that native carrier for `array<float16>`.
+- JavaScript `BoolArray`, fallback `Float16Array`, and `BFloat16Array` are public dense-array wrappers backed by `Uint8Array` or `Uint16Array`. Scalar `float16` and `bfloat16` values use `number`. A JavaScript environment with native `Float16Array` may return that native carrier for `array<float16>`.
 - Java plain `byte[]` maps to `binary`. Numeric byte arrays use type-use annotations:
   `@Int8Type byte[]` for `array<int8>` and `@UInt8Type byte[]` for `array<uint8>`.
 - Dart uses `double` plus `Float16Type` or `Bfloat16Type` metadata for scalar
@@ -147,12 +147,12 @@ Notes:
 - The table above remains the canonical xlang schema mapping. Compatible readers may apply the
   scalar field adaptation rules defined by `xlang_serialization_spec.md` during schema-compatible
   struct/class field matching. Those rules do not change TypeDef metadata, dynamic root type
-  mapping, schema-consistent mode, or nested collection/map/array/union/generic positions.
+  mapping, same-schema mode, or nested collection/map/array/union/generic positions.
 
 ### Scala IDL Mapping
 
-The Scala schema IDL target emits Scala 3 source only. The `fory-scala` runtime
-artifact remains cross-built for Scala 2.13 and Scala 3.
+The Scala schema IDL target emits Scala 3 source only. The `fory-scala` artifact remains cross-built
+for Scala 2.13 and Scala 3.
 
 | Fory schema kind                      | Scala generated carrier                                                                  |
 | ------------------------------------- | ---------------------------------------------------------------------------------------- |
