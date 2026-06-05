@@ -205,6 +205,130 @@ as a dense array element value, the local `array<T>` field must raise a
 compatible-read error. Null list elements must not be coerced to dense-array
 default values.
 
+In schema-compatible mode only, a matched struct/class field may also read
+between direct top-level scalar schemas when the remote value can be represented
+by the local scalar schema without changing the logical value. This is a
+compatible read adaptation only: writers keep emitting their local canonical
+schema and payload, and TypeDef/ClassDef encodings, fingerprints, dynamic root
+serialization, schema-consistent mode, unknown-field skipping, and container
+element schemas continue to treat the original scalar types as distinct.
+
+The scalar conversion rule applies only to the immediate schema of the matched
+compatible field. It does not apply to dynamic root values, `any`, map keys, map
+values, list elements, set elements, array elements, union alternatives, enum
+values, time/date/duration values, binary values, structs, ext values, or nested
+generic/container positions. It also applies only when both the remote and local
+top-level field schemas have `trackingRef = false`; if either matched field
+schema has `trackingRef = true`, scalar conversion is outside the compatible
+layout matrix and scalar type changes remain schema/type incompatible. Same
+scalar type IDs with matching top-level `trackingRef` and null/optional framing
+are exact same-schema direct reads, not compatible scalar conversion. Same
+scalar type IDs with different top-level `trackingRef` framing are schema/type
+incompatible because the wire framing differs. Same scalar type IDs with
+different top-level null/optional framing may still use the nullable/optional
+composition rule below when both fields have `trackingRef = false`.
+
+The convertible scalar domains are `bool`, `string`, and numeric scalars.
+Numeric scalars are signed integers (`int8`, `int16`, `int32`, `int64`),
+unsigned integers (`uint8`, `uint16`, `uint32`, `uint64`), floating point
+(`float16`, `bfloat16`, `float32`, `float64`), and `decimal`. Integer encoding
+variants are the same semantic domain as their base width: fixed, variable, and
+tagged integer encodings do not create additional conversion domains.
+
+Compatible scalar conversion MUST follow these rules:
+
+- `string` to `bool` accepts exactly `"0"`, `"1"`, `"false"`, and `"true"`.
+  The match is byte-for-byte ASCII; readers MUST NOT trim whitespace, accept a
+  leading sign, accept other letter case, or use locale-specific text.
+- `bool` to `string` produces canonical lower-case `"false"` or `"true"`.
+- numeric to `bool` accepts only exact numeric zero and exact numeric one. `NaN`
+  and infinities fail. Negative floating zero is zero. Decimal scale does not
+  affect the zero/one check.
+- `bool` to numeric produces exact zero or one in the local numeric domain.
+- numeric to numeric succeeds only when the local numeric domain represents the
+  same mathematical value. Integer conversions check target range and signedness;
+  integer-to-floating conversions check exact representability in the target
+  floating domain; floating-to-integer conversions require a finite integral
+  value within range; floating-to-floating conversions require exact
+  preservation after converting to the target and back to the source, including
+  the sign of zero. Floating infinities may convert only when the target floating
+  domain preserves the same infinity. `NaN` is not convertible across different
+  floating type IDs.
+- decimal is an exact numeric scalar. Integer-to-decimal conversion uses scale
+  `0`; decimal-to-integer conversion requires an integral value in range;
+  floating-to-decimal conversion requires a finite value and converts the exact
+  binary floating value to canonical decimal form; decimal-to-floating
+  conversion requires exact representability in the target floating domain.
+  Same-type decimal reads preserve the ordinary decimal payload. Decimal values
+  produced by conversion use the canonical converted decimal form below.
+- `string` to numeric accepts only the compatible numeric literal grammar below
+  and then applies the same lossless target-domain checks. `"NaN"`,
+  `"Infinity"`, `"-Infinity"`, and spelling variants fail because numeric
+  strings are finite-only.
+- numeric to `string` emits canonical finite numeric text. Integer sources emit
+  decimal text with no leading zeros except `"0"`. Floating sources emit exact
+  plain decimal text that equals the source value and parses back to the same
+  source floating type; it includes a decimal point and at least one fractional
+  digit, preserves negative zero as `"-0.0"`, never uses exponent notation, and
+  fails for `NaN` and infinities. Decimal sources emit exact plain decimal text
+  with no exponent and no insignificant trailing fractional zeros; decimal zero
+  is `"0"`.
+
+The compatible numeric literal grammar is deliberately stricter than host
+language parsers:
+
+- no leading or trailing whitespace;
+- no leading plus sign;
+- ASCII grammar only: signs, digits, decimal points, and exponent markers are
+  the ASCII bytes `-`, `0` through `9`, `.`, `e`, and `E`;
+- no Unicode decimal digits, underscores, grouping separators, locale-specific
+  digits, hexadecimal, octal, binary, or type suffixes;
+- integer literal: `-?(0|[1-9][0-9]*)`;
+- decimal floating literal:
+  `-?(0|[1-9][0-9]*)\.[0-9]+([eE]-?(0|[1-9][0-9]*))?` or
+  `-?(0|[1-9][0-9]*)[eE]-?(0|[1-9][0-9]*)`.
+
+Readers MUST parse numeric strings with exact decimal, rational, or equivalent
+checked algorithms. Parsing through a host floating type and then casting is not
+valid unless the implementation also proves exactness against the original
+literal.
+
+Canonical converted decimal form is:
+
+- zero: `unscaled = 0`, `scale = 0`;
+- non-zero integers: `scale = 0` and the integer as `unscaled`;
+- finite fractional values: the smallest non-negative scale whose
+  `unscaled * 10^-scale` equals the value and whose `unscaled` is not divisible
+  by `10`.
+
+Compatible scalar conversion MUST reject a numeric string before arbitrary
+precision parsing when the raw string length is greater than `320`. It MUST also
+reject a converted decimal before constructing large powers of ten or formatting
+plain decimal text when its canonical converted form would require an exponent or
+scale outside `[-256, 256]`, a positive scale greater than `256`, an unscaled
+decimal magnitude with more than `256` significant digits, or a negative scale
+whose formatted integer digit count would exceed `256`. These bounds apply only
+to values produced by compatible scalar conversion, including string-to-decimal,
+decimal-to-string, and floating-to-decimal conversion. Same-type decimal reads
+preserve the ordinary decimal payload. A bounded public decimal carrier may
+reject smaller values when it cannot represent the value exactly.
+
+Nullable, boxed, optional, and nullable-field composition is supported for
+matched scalar pairs whose top-level field schemas have `trackingRef = false`.
+Readers first consume the remote null/optional framing described by the remote
+field metadata. If a value is present, the reader converts the unwrapped scalar
+value and then assigns or wraps it into the local carrier. If the remote value
+is null or absent, the runtime uses the same missing/null compatible-field rule
+it already applies for that local field; this feature does not introduce a
+second null policy. Reference-tracked scalar conversion is not supported.
+
+Conversion failures are data errors, not schema misses. A schema pair outside
+the conversion matrix remains a schema/type compatibility error when building
+the compatible layout. Once a matched field is accepted as a scalar conversion
+action, an invalid payload value MUST be reported through the runtime's
+data-error owner with enough context to identify the remote type, local type,
+and field when that owner has the information.
+
 Users can also provide meta hints for fields of a type, or the type whole. Here is an example in java which use
 annotation to provide such information.
 
