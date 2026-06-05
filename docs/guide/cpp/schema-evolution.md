@@ -98,8 +98,18 @@ Compatible mode supports the following schema changes:
 | Remove fields      | Supported     | Extra fields are skipped                |
 | Reorder fields     | Supported     | Fields matched by name, not position    |
 | Change nullability | Supported     | `T` ↔ `std::optional<T>`                |
-| Change field types | Not supported | Types must be compatible                |
+| Change field types | Selected      | Scalar changes must be lossless         |
 | Rename fields      | Not supported | Field names must match (case-sensitive) |
+
+Compatible readers can handle selected scalar field type changes when the value is lossless. A
+matched field can read between `bool`, `std::string`, numeric scalars, and decimal fields when the
+converted value has the same logical value. Boolean strings must be exactly `"0"`, `"1"`, `"true"`,
+or `"false"`. Numeric strings must use finite ASCII decimal notation without whitespace, a leading
+`+`, Unicode digits, separators, or non-finite values such as `NaN` and `Infinity`. Numbers and
+decimals can be read as canonical strings, and numeric widening or narrowing succeeds only when no
+precision or range is lost. Nullable and optional field wrappers still compose with these conversions,
+but reference-tracked scalar type changes are incompatible. Invalid strings and lossy conversions fail
+during deserialization.
 
 ## Adding Fields (Backward Compatibility)
 

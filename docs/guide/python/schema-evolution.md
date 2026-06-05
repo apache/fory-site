@@ -23,6 +23,21 @@ Apache Fory™ supports schema evolution in compatible mode, allowing fields to 
 while maintaining compatibility. Xlang mode enables compatible mode by default. In native mode,
 set `compatible=True` explicitly when Python-only payloads need schema evolution.
 
+Compatible readers also tolerate selected scalar field type changes when the value is lossless. A
+matched field can read between `bool`, `str`, numeric scalars, and `Decimal` when the converted value
+has the same logical value. For example, `"true"`, `"false"`, `"0"`, and `"1"` can be read as
+booleans; `"123"` can be read as a numeric field that can hold `123`; numbers and decimals can be
+read as canonical strings; and numeric widening or narrowing succeeds only when no precision or range
+is lost.
+
+Scalar conversion is only applied to matched compatible fields, not to root values or collection
+elements. String-to-number conversion accepts finite ASCII decimal literals without whitespace, a
+leading `+`, Unicode digits, underscores, or special values such as `NaN` and `Infinity`. Invalid
+strings, out-of-range values, and lossy conversions fail with `pyfory.error.ForyInvalidDataError`
+during deserialization.
+Optional and nullable fields still compose with these conversions, but reference-tracked scalar type
+changes are incompatible.
+
 ## Xlang Default
 
 ```python

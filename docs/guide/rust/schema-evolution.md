@@ -89,12 +89,23 @@ struct StableMessage {
 - Remove obsolete fields (skipped during deserialization)
 - Change field nullability (`T` ↔ `Option<T>`)
 - Reorder fields (matched by name, not position)
+- Change selected scalar field types when the value converts without precision or range loss
 - Type-safe fallback to default values for missing fields
+
+Compatible readers can handle selected scalar field type changes when the value is lossless. A
+matched field can read between `bool`, `String`, numeric scalars, and decimal fields when the
+converted value has the same logical value. For example, `"true"` and `"false"` can be read as
+booleans, `"123"` can be read as a numeric field that can hold `123`, numbers and decimals can be
+read as canonical strings, and numeric widening or narrowing succeeds only when no precision or range
+is lost. Numeric strings use finite ASCII decimal syntax. Optional fields still compose with these
+conversions, but reference-tracked scalar type changes are incompatible. Invalid strings and lossy
+conversions fail during deserialization.
 
 ## Compatibility Rules
 
 - Field names must match (case-sensitive)
-- Type changes are not supported (except nullable/non-nullable)
+- Type changes are supported only for nullable/non-nullable changes and selected lossless scalar
+  conversions
 - Nested struct types must be registered on both sides
 
 ## Enum Support

@@ -159,6 +159,33 @@ type PersonV2 struct {
 
 Compatible mode handles this automatically by matching fields by name.
 
+### Compatible Scalar Field Changes
+
+Compatible mode can also read selected scalar type changes for matched top-level
+struct fields when the serialized value converts without changing its logical
+value:
+
+- `bool` fields can be read from strings that are exactly `"0"`, `"1"`,
+  `"true"`, or `"false"`. Bool values read as strings become `"true"` or
+  `"false"`, and numeric `0` and `1` can be read as bools.
+- Integer, unsigned integer, floating point, and decimal fields can be read
+  across numeric scalar types only when the value is represented exactly by the
+  target field type.
+- Numeric fields can be read from strings only when the string is a finite ASCII
+  decimal literal with no whitespace, leading `+`, Unicode digits, separators,
+  radix prefixes, or special values such as `NaN` and `Infinity`.
+- Numeric fields read as strings use canonical output: integers have normal
+  decimal text, floating point values use exact plain decimal text with a
+  decimal point, and decimals omit insignificant trailing fractional zeros.
+
+Scalar conversion composes with pointer and `optional.Optional[T]` fields when
+the matched top-level scalar field is not reference-tracked. If a remote
+nullable or optional field is absent, the local field follows the normal
+missing/null compatible-mode behavior. Reference-tracked scalar type changes are
+incompatible. If a present value cannot be converted losslessly,
+deserialization fails with a data error instead of treating the field as
+missing.
+
 ## Incompatible Changes
 
 Some changes are NOT supported, even in compatible mode:
@@ -168,11 +195,11 @@ Some changes are NOT supported, even in compatible mode:
 ```go
 // NOT SUPPORTED
 type V1 struct {
-    Value int32  // int32
+    Value []int32  // list of int32
 }
 
 type V2 struct {
-    Value string  // Changed to string - INCOMPATIBLE
+    Value []string  // Element type changed - INCOMPATIBLE
 }
 ```
 

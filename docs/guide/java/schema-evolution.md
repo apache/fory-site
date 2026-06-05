@@ -40,6 +40,15 @@ option unless they previously overrode the schema mode.
 
 In this compatible mode, deserialization can handle schema changes such as missing or extra fields, allowing it to succeed even when the serialization and deserialization processes have different class schemas.
 
+Compatible readers also tolerate selected scalar field type changes when the value is lossless. A
+matched field can read between `boolean`, `String`, numeric scalars, and `BigDecimal` when the value
+has the same logical value after conversion. For example, `"true"` and `"false"` can be read as
+booleans, `"123"` can be read as a numeric field that can hold `123`, numbers and decimals can be
+read as canonical strings, and numeric widening or narrowing succeeds only when no precision or range
+is lost. Numeric strings use finite ASCII decimal syntax. Nullable and boxed fields still compose with
+these conversions, but reference-tracked scalar type changes are incompatible. Invalid strings and
+lossy conversions fail during deserialization.
+
 ```java
 Fory fory = Fory.builder().withXlang(false)
   .withCompatible(true)

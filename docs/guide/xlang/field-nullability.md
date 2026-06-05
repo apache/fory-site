@@ -242,13 +242,15 @@ When a non-nullable field receives a null value:
 
 ## Schema Compatibility
 
-The nullable flag is part of the struct schema fingerprint. Changing a field's nullability is a **breaking change** that will cause schema version mismatch errors.
+The nullable flag is part of the struct schema fingerprint. In schema-consistent reads, changing a field's nullability is a **breaking change** that will cause schema version mismatch errors.
 
 ```
 Schema A: { name: String (non-nullable) }
 Schema B: { name: String (nullable) }
-// These have different fingerprints and are incompatible
+// These have different fingerprints for schema-consistent reads
 ```
+
+In compatible mode, top-level scalar fields can still be matched when their scalar type is otherwise compatible and the nullability or optional wrapper differs. Present values are read through compatible scalar conversion and must satisfy the normal lossless conversion checks. Remote null values follow the compatible-read null/default behavior for the local field.
 
 ## Best Practices
 
