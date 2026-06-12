@@ -1376,6 +1376,77 @@ public object AddressbookForyModule : ForyModule {
 `registerUnion` discovers the generated `<Target>_ForySerializer`; callers do
 not pass a serializer instance.
 
+### gRPC Service Companions
+
+When a schema contains services and the compiler is run with `--grpc`, Kotlin
+generation emits one `<ServiceName>GrpcKt.kt` file per service next to the model
+types. The file contains a grpc-kotlin coroutine companion object, not Java
+`*Grpc.java` source.
+
+```kotlin
+public object AddressBookServiceGrpcKt {
+  public const val SERVICE_NAME: String = "addressbook.AddressBookService"
+
+  @JvmStatic
+  public val serviceDescriptor: io.grpc.ServiceDescriptor
+    get() = serviceDescriptorValue
+
+  @JvmStatic
+  public val lookupMethod: io.grpc.MethodDescriptor<Person, AddressBook>
+    get() = lookupMethodValue
+
+  public abstract class AddressBookServiceCoroutineImplBase(
+    coroutineContext: kotlin.coroutines.CoroutineContext =
+      kotlin.coroutines.EmptyCoroutineContext,
+  ) : io.grpc.kotlin.AbstractCoroutineServerImpl(coroutineContext) {
+    public open suspend fun lookup(request: Person): AddressBook =
+      throw io.grpc.StatusException(
+        io.grpc.Status.UNIMPLEMENTED.withDescription(
+          "Method addressbook.AddressBookService/Lookup is unimplemented",
+        ),
+      )
+  }
+
+  public class AddressBookServiceCoroutineStub @JvmOverloads constructor(
+    channel: io.grpc.Channel,
+    callOptions: io.grpc.CallOptions = io.grpc.CallOptions.DEFAULT,
+  ) : io.grpc.kotlin.AbstractCoroutineStub<AddressBookServiceCoroutineStub>(
+    channel,
+    callOptions,
+  ) {
+    public suspend fun lookup(
+      request: Person,
+      headers: io.grpc.Metadata = io.grpc.Metadata(),
+    ): AddressBook =
+      io.grpc.kotlin.ClientCalls.unaryRpc(
+        channel,
+        lookupMethod,
+        request,
+        callOptions,
+        headers,
+      )
+  }
+}
+```
+
+Streaming RPCs use `kotlinx.coroutines.flow.Flow`:
+
+| IDL shape                                 | Server method                             | Client method                             |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| `rpc A (Req) returns (Res)`               | `suspend fun a(request: Req): Res`        | `suspend fun a(request: Req): Res`        |
+| `rpc A (Req) returns (stream Res)`        | `fun a(request: Req): Flow<Res>`          | `fun a(request: Req): Flow<Res>`          |
+| `rpc A (stream Req) returns (Res)`        | `suspend fun a(requests: Flow<Req>): Res` | `suspend fun a(requests: Flow<Req>): Res` |
+| `rpc A (stream Req) returns (stream Res)` | `fun a(requests: Flow<Req>): Flow<Res>`   | `fun a(requests: Flow<Req>): Flow<Res>`   |
+
+Each method descriptor uses a Fory-backed `io.grpc.MethodDescriptor.Marshaller`
+that reuses the generated schema module's `ThreadSafeFory`. Generated service
+companions do not call protobuf parsers, do not expose KSP serializer class
+names, and do not create Fory instances per call.
+
+Applications compiling the generated Kotlin service files must provide
+grpc-java, grpc-kotlin, and `kotlinx-coroutines-core` dependencies. Fory Kotlin
+artifacts do not add those gRPC dependencies as hard dependencies.
+
 ## Scala
 
 The Scala target emits Scala 3 source only. The `fory-scala` artifact still

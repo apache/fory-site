@@ -141,23 +141,24 @@ foryc schema.fdl --output ./src/generated
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**Compile a simple schema containing service definitions (Java + Python + Rust models):**
+**Compile a simple schema containing service definitions (Java + Python + Rust + Kotlin models):**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --kotlin_out=./generated/kotlin
 ```
 
-**Generate Java, Python, and Rust gRPC service companions:**
+**Generate Java, Python, Rust, and Kotlin gRPC service companions:**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --grpc
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --kotlin_out=./generated/kotlin --grpc
 ```
 
 The generated gRPC service code uses Fory to serialize request and response
 payloads. Java output imports grpc-java APIs, Python output imports `grpc`, and
-Rust output imports `tonic` and `bytes`; applications that compile or run those
-generated service files must provide their own gRPC dependencies. Fory packages
-do not add a hard gRPC dependency for this feature.
+Rust output imports `tonic` and `bytes`. Kotlin output imports grpc-java and
+grpc-kotlin APIs and uses coroutine stubs. Applications that compile or run
+those generated service files must provide their own gRPC dependencies. Fory
+packages do not add a hard gRPC dependency for this feature.
 
 **Use import search paths:**
 
@@ -443,6 +444,8 @@ generated/
 - Enums use stable Fory enum IDs
 - Unions use sealed classes with `@ForyUnion`, `@ForyCase`, and an unknown-case carrier
 - Schema module object included
+- With `--grpc`, one `<ServiceName>GrpcKt.kt` coroutine service companion per
+  service
 
 ### C# IDL Matrix Verification
 
