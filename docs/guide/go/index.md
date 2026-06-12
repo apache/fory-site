@@ -150,6 +150,7 @@ See [Xlang Serialization](xlang-serialization.md) for type mapping and compatibi
 | [Schema Evolution](schema-evolution.md)         | Forward/backward compatibility         |
 | [Custom Serializers](custom-serializers.md)     | Extend serialization behavior          |
 | [Thread Safety](thread-safety.md)               | Concurrent usage patterns              |
+| [gRPC Support](grpc-support.md)                 | Fory payloads over grpc-go             |
 | [Troubleshooting](troubleshooting.md)           | Common issues and solutions            |
 
 ## Related Resources

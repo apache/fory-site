@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-sidebar_position: 13
+sidebar_position: 14
 id: troubleshooting
 license: |
   Licensed to the Apache Software Foundation (ASF) under one or more

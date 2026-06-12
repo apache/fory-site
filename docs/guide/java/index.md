@@ -244,6 +244,7 @@ ThreadSafeFory threadLocalFory = Fory.builder()
 - [Object Copy](object-copy.md) - Deep-copy Java object graphs in memory
 - [Compression](compression.md) - Integer, long, and array compression options
 - [Virtual Threads](virtual-threads.md) - Virtual-thread usage and pool sizing guidance
+- [gRPC Support](grpc-support.md) - Fory payloads over grpc-java
 - [Type Registration](type-registration.md) - Class registration and security
 - [Custom Serializers](custom-serializers.md) - Implement custom serializers
 - [Xlang Serialization](xlang-serialization.md) - Serialize data for other languages

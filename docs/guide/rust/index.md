@@ -193,3 +193,4 @@ fory-derive/           # Procedural macros
 - [Polymorphism](polymorphism.md) - Trait object serialization
 - [Custom Serializers](custom-serializers.md) - Extend serialization behavior
 - [Row Format](row-format.md) - Zero-copy row-based format
+- [gRPC Support](grpc-support.md) - Fory payloads over tonic

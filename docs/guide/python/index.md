@@ -159,6 +159,7 @@ See [Native Serialization](native-serialization.md) for Python-only serializatio
 - [Type Registration](type-registration.md) - User-defined type registration
 - [Custom Serializers](custom-serializers.md) - Extend serialization behavior
 - [Row Format](row-format.md) - Zero-copy row format
+- [gRPC Support](grpc-support.md) - Fory payloads over grpcio
 
 ## Links
 
