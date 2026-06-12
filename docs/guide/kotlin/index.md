@@ -40,6 +40,7 @@ Fory Kotlin inherits all features from Fory Java, plus Kotlin-specific optimizat
 - **Default Value Support**: Automatic handling of Kotlin data class default parameters during schema evolution
 - **Static Xlang Serializers**: KSP-generated schema serializers for Kotlin/JVM and Android xlang mode
 - **Schema IDL Generation**: Fory compiler output for Kotlin models, sealed unions, and schema modules
+- **Kotlin gRPC Support**: Coroutine service companions that use Fory payload serialization
 - **Schema Evolution**: Forward/backward compatibility for class schema changes
 
 See [Java Features](../java/index.md#features) for complete feature list.
@@ -130,4 +131,5 @@ Fory Kotlin is built on top of Fory Java. Most configuration options, features, 
 - [Schema Metadata](schema-metadata.md) - Kotlin annotations, nullability, references, and integer metadata
 - [Default Values](default-values.md) - Kotlin data class default values support
 - [Static Generated Serializers](static-generated-serializers.md) - KSP xlang/schema serializer generation
+- [Kotlin gRPC Support](grpc-support.md) - Coroutine stubs and service bases for Fory IDL services
 - [Android Support](android-support.md) - Android setup, R8 behavior, and release-build validation
