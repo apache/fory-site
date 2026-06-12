@@ -271,6 +271,142 @@ The current root read flow mirrors the write flow:
 Primitive and string-like hot paths should read directly from the buffer;
 complex payloads delegate to the resolved serializer.
 
+### Stream And Buffer Byte Reads
+
+Implementations must keep byte availability in the byte owner layer while
+keeping string, binary, primitive-array, compression, and collection semantics in
+serializers.
+
+The required byte-owner primitive for allocation-before-read checks is a
+readability check such as `checkReadableBytes(byteCount)`. Implementations do
+not need additional generic read-context methods for this design. After the
+readability check succeeds, serializers use their existing local buffer read,
+copy, or decode paths.
+
+The readability check is a byte operation only. It must not decode strings,
+primitive-array element counts, compression modes, or collection capacity
+policy.
+
+For large byte-counted values, every implementation should call the byte-owner
+readability check before allocating a variable-length result. This applies to
+binary values, strings, decimal or metadata bodies, and primitive wire arrays
+whose encoded body is measured in bytes. For multi-byte primitive wire arrays,
+compare the encoded byte count, not only the logical element count, with the
+readable bytes.
+
+1. Validate the encoded byte count in the serializer. For fixed-width primitive
+   arrays, check overflow and element alignment before allocation, such as
+   `wireByteCount % elementByteWidth == 0`, then derive the logical element
+   count from the encoded byte count.
+2. Call `checkReadableBytes(wireByteCount)` unconditionally before allocating
+   the variable-length result. Buffer-backed inputs normally return from this
+   check with only a bounds comparison. Stream-backed inputs use the same call;
+   the byte owner handles the fast path when enough bytes are already buffered
+   and otherwise fills the read buffer until the requested encoded body is
+   readable or an input error is recorded.
+3. After readability is proven, allocate the final value once and copy or decode
+   from the current readable buffer into the final result.
+
+`checkReadableBytes` is not an `ensureCapacity(wireByteCount)` operation. In
+stream mode it may end with the byte owner holding the full encoded body in its
+read buffer, but it must grow that buffer as bytes are successfully read from
+the stream. It should grow from current proven buffer capacity, such as by
+doubling current capacity, and cap only when that bounded growth step reaches
+the immediate target. A byte owner may use an owner-local availability signal as
+a one-shot growth hint when the stream implementation itself is caller-owned
+trusted code; if that hint is absent or insufficient, it must fall back to
+bounded growth from already buffered bytes. It must not reserve the
+attacker-declared length before input bytes or an owner-local growth hint
+justify that intermediate buffer capacity. The stream slow path may pay one
+extra intermediate buffer copy; this is preferable to serializer-local chunk
+accumulation and repeated final-container growth.
+
+For byte-counted values, the serializer should not duplicate the byte owner's
+fast-path branch by testing `availableBytes()` before calling
+`checkReadableBytes`. Keeping that branch in the byte owner gives every language
+the same correctness rule and keeps serializer hot paths focused on their own
+wire semantics.
+
+For primitive wire arrays:
+
+- Compare and prove the encoded wire byte count, not only the logical element
+  count.
+- Keep compression, bit-packing, byte-order conversion, and other primitive
+  array encoding semantics in the serializer. `checkReadableBytes` only proves
+  that the encoded bytes are present.
+- For compressed or transformed bodies, the serializer must still validate the
+  decoded length and encoding-specific metadata before allocating or returning
+  the final value.
+
+The common serializer shape is:
+
+```text
+wireByteCount = readVarUint32()
+elementWidth = primitiveWireElementWidth(kind)
+validate wireByteCount and element alignment
+elementCount = wireByteCount / elementWidth
+
+ctx.checkReadableBytes(wireByteCount)
+result = allocatePrimitiveResult(elementCount)
+copy or decode wireByteCount bytes from the current readable buffer into result
+advance the reader index by wireByteCount
+return result
+```
+
+Byte values are the `elementWidth == 1` specialization of the same policy. In
+that case the serializer shape is:
+
+```text
+byteCount = readVarUint32()
+
+ctx.checkReadableBytes(byteCount)
+result = allocateBytes(byteCount)
+copy byteCount bytes from the current readable buffer into result
+advance the reader index by byteCount
+return result
+```
+
+This policy avoids three inefficient implementation shapes:
+
+- allocating the complete final contiguous value before the encoded body is
+  readable
+- growing or repeatedly copying the final result container on stream slow paths
+- adding serializer-local chunk buffers when the byte owner can prove
+  readability once and expose a normal buffered read
+
+Scratch buffers remain appropriate when the target representation is not a
+direct byte target, such as string transcoding, compression, byte-order
+conversion that is not performed in place, bit-packed values, or runtimes whose
+stream API cannot read into a caller-provided target.
+
+For fixed-width primitive arrays, the final result must not become visible to
+callers until the exact encoded byte count has been read successfully.
+
+For list, set, map, and other container readers, the declared logical element
+count is not an encoded byte count, so serializers must still own all element,
+chunk, nullability, reference, and type-dispatch semantics. It is still the
+right allocation proof for count-based preallocation: after validating a
+non-empty count and reading any serializer-owned header or type metadata that
+precedes allocation, call `checkReadableBytes(logicalCount)` before allocating,
+reserving, or size-hinting from that count. The byte owner handles buffer versus
+stream readiness; the container serializer then allocates with the declared
+count and reads elements through its normal owner path.
+
+This check is not a full container-body validation. It only prevents a small or
+truncated input from causing a large count-based preallocation. Chunk sizes,
+duplicate keys, element value semantics, and protocol strictness remain owned by
+the container/map serializer and should be validated only when they protect a
+real owner invariant.
+
+For TypeDef or TypeMeta bodies, first prove that the encoded metadata body bytes
+are readable through the byte owner. Field-list allocation should happen after
+that body readability check and should not use a separate small initial-capacity
+cap as a security rule.
+
+Skip paths do not need to materialize skipped values. Existing byte-skip
+operations should consume any available buffered prefix first, then skip or drop
+remaining stream bytes in bounded steps.
+
 ### Nested reads use `ReadContext`
 
 Important rules:
