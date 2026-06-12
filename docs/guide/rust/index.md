@@ -36,11 +36,16 @@ The Rust implementation provides versatile and high-performance serialization wi
 
 ## Crates
 
-| Crate                                                                       | Description                       | Version                                       |
-| --------------------------------------------------------------------------- | --------------------------------- | --------------------------------------------- |
-| [`fory`](https://github.com/apache/fory/blob/main/rust/fory)                | High-level API with derive macros | [1.1.0](https://crates.io/crates/fory)        |
-| [`fory-core`](https://github.com/apache/fory/blob/main/rust/fory-core/)     | Core serialization engine         | [1.1.0](https://crates.io/crates/fory-core)   |
-| [`fory-derive`](https://github.com/apache/fory/blob/main/rust/fory-derive/) | Procedural macros                 | [1.1.0](https://crates.io/crates/fory-derive) |
+| Crate                                                                       | Description                                               | Version                                       |
+| --------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------- |
+| [`fory`](https://github.com/apache/fory/blob/main/rust/fory)                | User-facing API, runtime types, and derive macros         | [1.1.0](https://crates.io/crates/fory)        |
+| [`fory-core`](https://github.com/apache/fory/blob/main/rust/fory-core/)     | Lower-level runtime crate for advanced integrations       | [1.1.0](https://crates.io/crates/fory-core)   |
+| [`fory-derive`](https://github.com/apache/fory/blob/main/rust/fory-derive/) | Lower-level procedural macro crate for direct runtime use | [1.1.0](https://crates.io/crates/fory-derive) |
+
+Most applications should depend on `fory` only. It re-exports the derive
+macros and the public runtime types needed by generated code. Use `fory-core`
+or `fory-derive` directly only when intentionally building on the lower-level
+runtime crates.
 
 ## Quick Start
 

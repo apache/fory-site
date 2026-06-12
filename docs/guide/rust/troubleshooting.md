@@ -144,7 +144,7 @@ cargo test --features tests
 
 ## Error Handling Best Practices
 
-Prefer the static constructors on `fory_core::error::Error`:
+Prefer the static constructors on the facade `Error` type:
 
 - `Error::type_mismatch`
 - `Error::invalid_data`
