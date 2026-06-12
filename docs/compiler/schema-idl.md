@@ -907,7 +907,8 @@ union_field := ['repeated'] field_type IDENTIFIER '=' INTEGER [field_options] ';
 
 Services define RPC method contracts in Fory IDL. They are optional: schemas
 with services still generate the normal data model types, and gRPC service code
-is generated only when the compiler is run with `--grpc` for Java or Python.
+is generated only when the compiler is run with `--grpc` for supported language
+outputs such as Java, Python, Go, and Rust.
 
 ```protobuf
 message GetPetRequest [id=200] {
@@ -947,9 +948,10 @@ service PetDirectory {
 - Enum, primitive, collection, map, and array types are not valid direct RPC
   request or response types. Wrap those values in a message when they are part
   of a service contract.
-- The generated Java and Python gRPC companions use Fory serialization for each
-  RPC payload. Applications that compile or run those companions provide their
-  own grpc-java or `grpcio` dependency.
+- The generated gRPC companions use Fory serialization for each RPC payload.
+  Applications that compile or run those companions provide their own gRPC
+  dependency, such as grpc-java, `grpcio`, grpc-go, or Rust `tonic` and
+  `bytes`.
 
 **Grammar:**
 

@@ -404,6 +404,11 @@ Rust output is one module file per schema, for example:
 
 - `<rust_out>/addressbook.rs`
 
+When `--grpc` is used and the schema contains services, Rust also emits:
+
+- `<rust_out>/addressbook_service.rs`
+- `<rust_out>/addressbook_service_grpc.rs`
+
 ### Type Generation
 
 Unions map to Rust enums with `#[fory(id = ...)]` schema case attributes.
@@ -515,6 +520,51 @@ let person = Person {
 let bytes = person.to_bytes()?;
 let restored = Person::from_bytes(&bytes)?;
 ```
+
+### gRPC Service Companions
+
+When a schema contains services and the compiler is run with `--grpc`, Rust
+generation emits a service API module and a tonic binding module. For a schema
+module named `addressbook`, those files are `addressbook_service.rs` and
+`addressbook_service_grpc.rs`.
+
+The service API module contains the async trait and gRPC path constants:
+
+```rust
+#[::tonic::async_trait]
+pub trait AddressBookService: ::std::marker::Send + ::std::marker::Sync + 'static {
+    async fn lookup(
+        &self,
+        request: ::tonic::Request<crate::addressbook::Person>,
+    ) -> ::std::result::Result<
+        ::tonic::Response<crate::addressbook::AddressBook>,
+        ::tonic::Status,
+    >;
+}
+
+pub const ADDRESS_BOOK_SERVICE_SERVICE_NAME: &str = "addressbook.AddressBookService";
+pub const ADDRESS_BOOK_SERVICE_LOOKUP_PATH: &str = "/addressbook.AddressBookService/Lookup";
+```
+
+The tonic binding module contains Fory-backed codecs, payload implementations,
+and client/server wrappers. It serializes each request or response with the
+generated model type's `to_bytes` and `from_bytes` helpers:
+
+```rust
+impl codec::ForyGrpcPayload for crate::addressbook::Person {
+    fn encode_fory_payload(&self) -> ::std::result::Result<::std::vec::Vec<u8>, ::fory::Error> {
+        self.to_bytes()
+    }
+
+    fn decode_fory_payload(payload: &[u8]) -> ::std::result::Result<Self, ::fory::Error> {
+        Self::from_bytes(payload)
+    }
+}
+```
+
+Applications compiling the generated Rust service files must provide `tonic` and
+`bytes` dependencies; Fory's Rust crate does not add those gRPC dependencies as
+hard dependencies.
 
 ## C++
 
@@ -775,6 +825,42 @@ if err := restored.FromBytes(data); err != nil {
     panic(err)
 }
 ```
+
+### gRPC Service Companions
+
+When a schema contains services and the compiler is run with `--grpc`, Go
+generation emits one `<module>_grpc.go` file next to the model file. The
+companion contains grpc-go client and server interfaces plus a Fory-backed
+`CodecV2`.
+
+```go
+type AddressBookServiceClient interface {
+    Lookup(ctx context.Context, in *Person, opts ...grpc.CallOption) (*AddressBook, error)
+}
+
+func NewAddressBookServiceClient(cc grpc.ClientConnInterface) AddressBookServiceClient { ... }
+
+type CodecV2 struct{}
+```
+
+The generated codec uses the same package-level thread-safe Fory runtime as the
+generated `ToBytes` and `FromBytes` helpers. Applications should pass
+`CodecV2{}` to grpc-go server options, and generated clients force the same
+codec on each call:
+
+```go
+server := grpc.NewServer(grpc.ForceServerCodecV2(addressbook.CodecV2{}))
+addressbook.RegisterAddressBookServiceServer(server, service)
+
+client := addressbook.NewAddressBookServiceClient(conn)
+```
+
+Go method names are exported as PascalCase identifiers, while the gRPC method
+path keeps the exact service and method names from the schema. Regenerate both
+peers after changing service or method names.
+
+Applications compiling these files must provide grpc-go dependencies; Fory Go
+packages do not add gRPC as a hard dependency.
 
 ## C\#
 

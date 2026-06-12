@@ -52,27 +52,27 @@ foryc --scan-generated [OPTIONS]
 
 Compile options:
 
-| Option                                | Description                                           | Default       |
-| ------------------------------------- | ----------------------------------------------------- | ------------- |
-| `--lang`                              | Comma-separated target languages                      | `all`         |
-| `--output`, `-o`                      | Output directory                                      | `./generated` |
-| `-I`, `--proto_path`, `--import_path` | Add directory to import search path (can be repeated) | (none)        |
-| `--java_out=DST_DIR`                  | Generate Java code in DST_DIR                         | (none)        |
-| `--python_out=DST_DIR`                | Generate Python code in DST_DIR                       | (none)        |
-| `--cpp_out=DST_DIR`                   | Generate C++ code in DST_DIR                          | (none)        |
-| `--go_out=DST_DIR`                    | Generate Go code in DST_DIR                           | (none)        |
-| `--rust_out=DST_DIR`                  | Generate Rust code in DST_DIR                         | (none)        |
-| `--csharp_out=DST_DIR`                | Generate C# code in DST_DIR                           | (none)        |
-| `--javascript_out=DST_DIR`            | Generate JavaScript/TypeScript code in DST_DIR        | (none)        |
-| `--swift_out=DST_DIR`                 | Generate Swift code in DST_DIR                        | (none)        |
-| `--dart_out=DST_DIR`                  | Generate Dart code in DST_DIR                         | (none)        |
-| `--scala_out=DST_DIR`                 | Generate Scala 3 code in DST_DIR                      | (none)        |
-| `--kotlin_out=DST_DIR`                | Generate Kotlin code in DST_DIR                       | (none)        |
-| `--go_nested_type_style`              | Go nested type naming: `camelcase` or `underscore`    | `underscore`  |
-| `--swift_namespace_style`             | Swift namespace style: `enum` or `flatten`            | `enum`        |
-| `--emit-fdl`                          | Emit translated FDL (for non-FDL inputs)              | `false`       |
-| `--emit-fdl-path`                     | Write translated FDL to this path (file or directory) | (stdout)      |
-| `--grpc`                              | Generate gRPC service companions for Java and Python  | `false`       |
+| Option                                | Description                                            | Default       |
+| ------------------------------------- | ------------------------------------------------------ | ------------- |
+| `--lang`                              | Comma-separated target languages                       | `all`         |
+| `--output`, `-o`                      | Output directory                                       | `./generated` |
+| `-I`, `--proto_path`, `--import_path` | Add directory to import search path (can be repeated)  | (none)        |
+| `--java_out=DST_DIR`                  | Generate Java code in DST_DIR                          | (none)        |
+| `--python_out=DST_DIR`                | Generate Python code in DST_DIR                        | (none)        |
+| `--cpp_out=DST_DIR`                   | Generate C++ code in DST_DIR                           | (none)        |
+| `--go_out=DST_DIR`                    | Generate Go code in DST_DIR                            | (none)        |
+| `--rust_out=DST_DIR`                  | Generate Rust code in DST_DIR                          | (none)        |
+| `--csharp_out=DST_DIR`                | Generate C# code in DST_DIR                            | (none)        |
+| `--javascript_out=DST_DIR`            | Generate JavaScript/TypeScript code in DST_DIR         | (none)        |
+| `--swift_out=DST_DIR`                 | Generate Swift code in DST_DIR                         | (none)        |
+| `--dart_out=DST_DIR`                  | Generate Dart code in DST_DIR                          | (none)        |
+| `--scala_out=DST_DIR`                 | Generate Scala 3 code in DST_DIR                       | (none)        |
+| `--kotlin_out=DST_DIR`                | Generate Kotlin code in DST_DIR                        | (none)        |
+| `--go_nested_type_style`              | Go nested type naming: `camelcase` or `underscore`     | `underscore`  |
+| `--swift_namespace_style`             | Swift namespace style: `enum` or `flatten`             | `enum`        |
+| `--emit-fdl`                          | Emit translated FDL (for non-FDL inputs)               | `false`       |
+| `--emit-fdl-path`                     | Write translated FDL to this path (file or directory)  | (stdout)      |
+| `--grpc`                              | Generate gRPC service companions for supported outputs | `false`       |
 
 Schema-level file options are supported for language-specific generation choices.
 For `go_nested_type_style` and `swift_namespace_style`, the CLI flag overrides
@@ -141,23 +141,23 @@ foryc schema.fdl --output ./src/generated
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**Compile a simple schema containing service definitions (Java + Python models):**
+**Compile a simple schema containing service definitions (Java + Python + Rust models):**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust
 ```
 
-**Generate Java and Python gRPC service companions:**
+**Generate Java, Python, and Rust gRPC service companions:**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --grpc
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --grpc
 ```
 
 The generated gRPC service code uses Fory to serialize request and response
-payloads. Java output imports grpc-java APIs and Python output imports `grpc`;
-applications that compile or run those generated service files must provide
-their own gRPC dependencies. Fory's Java and Python packages do not add a hard
-gRPC dependency for this feature.
+payloads. Java output imports grpc-java APIs, Python output imports `grpc`, and
+Rust output imports `tonic` and `bytes`; applications that compile or run those
+generated service files must provide their own gRPC dependencies. Fory packages
+do not add a hard gRPC dependency for this feature.
 
 **Use import search paths:**
 
