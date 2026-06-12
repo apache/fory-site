@@ -97,6 +97,10 @@ let person: Person = fory.deserialize(&binary_data)?;
 
 Use pyfory type annotations for explicit xlang type mapping:
 
+Use these markers directly in Python type annotations. Field values remain
+ordinary Python `int` or `float` values, and Fory serializes them with the
+requested xlang numeric width and encoding.
+
 ```python
 from dataclasses import dataclass
 from typing import Dict, List

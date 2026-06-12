@@ -231,6 +231,10 @@ class Container:
 
 Fory provides type annotations to control integer encoding:
 
+Use these markers directly in Python type annotations. Field values remain
+ordinary Python `int` or `float` values, and Fory serializes them with the
+requested xlang numeric width and encoding.
+
 ### Signed Integers
 
 ```python
