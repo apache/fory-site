@@ -30,8 +30,6 @@ public struct Config {
   public let trackRef: Bool
   public let compatible: Bool
   public let checkClassVersion: Bool
-  public let maxCollectionSize: Int
-  public let maxBinarySize: Int
   public let maxDepth: Int
 }
 ```
@@ -88,11 +86,10 @@ let fory = Fory(compatible: false, checkClassVersion: true)
 
 ### Size and Depth Limits
 
-`maxCollectionSize`, `maxBinarySize`, and `maxDepth` bound decoded payload size
-and nesting depth.
+`maxDepth` bounds decoded payload nesting depth.
 
 ```swift
-let fory = Fory(maxCollectionSize: 1_000_000, maxBinarySize: 64 * 1024 * 1024, maxDepth: 5)
+let fory = Fory(maxDepth: 5)
 ```
 
 ## Recommended Presets
@@ -123,5 +120,4 @@ Security-related configuration:
 
 - Register only the expected generated models before deserializing untrusted payloads.
 - Use `checkClassVersion` with `compatible: false` for intentional same-schema payloads.
-- Set `maxCollectionSize`, `maxBinarySize`, and `maxDepth` for the largest payload shape your
-  service accepts.
+- Set `maxDepth` for the largest nesting depth your service accepts.

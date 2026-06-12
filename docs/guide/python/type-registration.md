@@ -81,5 +81,5 @@ same registration IDs or names on every peer that shares those payloads.
 ## Related Topics
 
 - [Configuration](configuration.md) - Fory parameters
-- [Configuration](configuration.md#security) - Strict mode, deserialization policies, and size limits
+- [Configuration](configuration.md#security) - Strict mode, deserialization policies, and maximum read depth
 - [Custom Serializers](custom-serializers.md) - Custom serialization

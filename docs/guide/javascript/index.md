@@ -31,7 +31,7 @@ Fory-supported languages.
 - **Fast**: serializer code is generated and cached the first time you register a schema, not on every call
 - **Reference-aware**: shared references and circular object graphs are supported when enabled
 - **Explicit schemas**: field types, nullability, and polymorphism are declared once with `Type.*` builders or TypeScript decorators
-- **Safe defaults**: configurable depth, binary size, and collection size limits reject unexpectedly large or deep payloads
+- **Safe defaults**: configurable depth checks reject unexpectedly deep payloads
 - **Modern types**: `bigint`, typed arrays, `Map`, `Set`, `Date`, `float16`, and `bfloat16` are supported
 
 ## Installation
@@ -103,7 +103,7 @@ Create one `Fory` instance per application and reuse it — creating a new one f
 ## Configuration
 
 Fory JavaScript is xlang-only. `new Fory()` uses compatible schema evolution by default. Configure
-reference tracking, size limits, and optional Node.js string acceleration through constructor
+reference tracking, maximum read depth, and optional Node.js string acceleration through constructor
 options; see [Configuration](configuration.md).
 
 ## Documentation
