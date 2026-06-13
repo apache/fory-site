@@ -141,24 +141,25 @@ foryc schema.fdl --output ./src/generated
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**Compile a simple schema containing service definitions (Java + Python + Rust + Kotlin models):**
+**Compile a simple schema containing service definitions (Java + Python + Rust + Scala + Kotlin models):**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --kotlin_out=./generated/kotlin
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --scala_out=./generated/scala --kotlin_out=./generated/kotlin
 ```
 
-**Generate Java, Python, Rust, and Kotlin gRPC service companions:**
+**Generate Java, Python, Rust, Scala, and Kotlin gRPC service companions:**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --kotlin_out=./generated/kotlin --grpc
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --scala_out=./generated/scala --kotlin_out=./generated/kotlin --grpc
 ```
 
 The generated gRPC service code uses Fory to serialize request and response
 payloads. Java output imports grpc-java APIs, Python output imports `grpc`, and
-Rust output imports `tonic` and `bytes`. Kotlin output imports grpc-java and
-grpc-kotlin APIs and uses coroutine stubs. Applications that compile or run
-those generated service files must provide their own gRPC dependencies. Fory
-packages do not add a hard gRPC dependency for this feature.
+Rust output imports `tonic` and `bytes`. Scala output imports grpc-java APIs.
+Kotlin output imports grpc-java and grpc-kotlin APIs and uses coroutine stubs.
+Applications that compile or run those generated service files must provide
+their own gRPC dependencies. Fory packages do not add a hard gRPC dependency for
+this feature.
 
 **Use import search paths:**
 
@@ -193,6 +194,9 @@ foryc schema.fdl --java_out=./gen/java -I proto/ -I common/
 
 # Generate Scala 3 code to a specific directory
 foryc schema.fdl --scala_out=./src/main/scala
+
+# Generate Scala 3 models and gRPC service companions
+foryc service.fdl --scala_out=./src/main/scala --grpc
 
 # Generate Kotlin code to a specific directory
 foryc schema.fdl --kotlin_out=./src/main/kotlin
@@ -415,6 +419,7 @@ generated/
         ├── User.scala
         ├── Status.scala
         ├── Animal.scala
+        ├── ExampleServiceGrpc.scala
         └── ExampleForyModule.scala
 ```
 
@@ -425,6 +430,8 @@ generated/
 - Enums use Scala 3 `enum`
 - Unions use Scala 3 ADT `enum` with `@ForyUnion`, `@ForyCase`, and an `Unknown`
 - Schema module object included
+- With `--grpc`, one `<ServiceName>Grpc.scala` service companion is generated
+  per local service definition
 
 ### Kotlin
 
