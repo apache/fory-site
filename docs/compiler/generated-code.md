@@ -23,7 +23,11 @@ This document explains generated code for each target language.
 
 Fory IDL generated types are idiomatic in host languages and can be used directly as domain objects. Generated types also include `to/from bytes` helpers and schema modules or registration helpers, depending on the target language.
 
-Generated schema modules are schema-file owners, not package or namespace owners. In targets that expose the owner directly in a language package or namespace, the owner name includes a source-file-derived prefix such as `AddressbookForyModule` or `ComplexPbForyModule` so multiple IDL files can target the same package or namespace without producing colliding `ForyModule` types.
+Generated schema modules are named from the schema source file, not from the
+package or namespace. In targets that expose the module directly in a language
+package or namespace, names such as `AddressbookForyModule` or
+`ComplexPbForyModule` let multiple IDL files target the same package or
+namespace without producing colliding `ForyModule` types.
 
 ## Reference Schemas
 
@@ -868,7 +872,11 @@ packages do not add gRPC as a hard dependency.
 
 C# output is one `.cs` file per schema, for example:
 
-- `<csharp_out>/addressbook/addressbook.cs`
+- `<csharp_out>/addressbook/Addressbook.cs`
+
+The C# model file name uses the normalized PascalCase source file stem. For
+example, `service.fdl` generates `Service.cs`, `order-events.fdl` generates
+`OrderEvents.cs`, and `123-schema.fdl` generates `Schema123Schema.cs`.
 
 ### Type Generation
 
@@ -916,7 +924,7 @@ public abstract partial record Animal
 
 ### Module Installation
 
-Each schema generates a module owner that installs imported modules first and
+Each schema generates a module class that installs imported modules first and
 then registers the local schema types:
 
 ```csharp
@@ -931,11 +939,73 @@ public static class AddressbookForyModule
 }
 ```
 
-The C# module owner keeps the schema-file prefix even when several schemas share
-the same C# namespace.
+The C# model file basename and module class both use the normalized source file
+stem. They do not use `csharp_namespace` and they do not use gRPC service names.
+For example, `service.fdl` generates `Service.cs` and `ServiceForyModule`,
+while `order-events.fdl` generates `OrderEvents.cs` and
+`OrderEventsForyModule`. A gRPC service named `Greeter` generates the service
+companion `GreeterGrpc.cs`; it does not change the schema module name. To get
+`GreeterForyModule`, name the schema file `greeter.fdl` or `Greeter.fdl`.
+
+This source-file rule lets several schemas target the same C# namespace without
+colliding. No namespace-derived or service-derived module alias is generated.
 
 When explicit type IDs are not provided, generated installation uses computed
 numeric IDs (same behavior as other targets).
+
+### gRPC Service Companions
+
+When a schema contains services and the compiler is run with `--grpc`, C#
+generation emits one `<ServiceName>Grpc.cs` file per service next to the schema
+model file.
+
+```csharp
+public static partial class AddressBookService
+{
+    public abstract partial class AddressBookServiceBase
+    {
+        public virtual Task<AddressBook> Lookup(
+            Person request,
+            grpc::ServerCallContext context) { ... }
+    }
+
+    public partial class AddressBookServiceClient
+        : grpc::ClientBase<AddressBookServiceClient>
+    {
+        public virtual AddressBook Lookup(Person request, grpc::CallOptions options) { ... }
+        public virtual grpc::AsyncUnaryCall<AddressBook> LookupAsync(
+            Person request,
+            grpc::CallOptions options) { ... }
+    }
+
+    public static grpc::ServerServiceDefinition BindService(
+        AddressBookServiceBase serviceImpl) { ... }
+
+    public static void BindService(
+        grpc::ServiceBinderBase serviceBinder,
+        AddressBookServiceBase? serviceImpl) { ... }
+}
+```
+
+Each generated method descriptor uses a static Fory-backed
+`Grpc.Core.Marshaller<T>` that reuses the schema module's `ThreadSafeFory`.
+Deserialization reads the gRPC body through `PayloadAsReadOnlySequence()` and
+rejects trailing bytes after the single Fory frame. Generated service companions
+do not use protobuf parsers and do not create Fory instances per RPC call.
+
+Streaming RPCs map to standard gRPC C# APIs:
+
+| IDL shape                                 | Server method                                                                 | Client method                               |
+| ----------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------- |
+| `rpc A (Req) returns (Res)`               | `Task<Res> A(Req request, ServerCallContext context)`                         | `A(...)` and `AAsync(...)`                  |
+| `rpc A (Req) returns (stream Res)`        | `Task A(Req request, IServerStreamWriter<Res> responseStream, ...)`           | `AsyncServerStreamingCall<Res> A(...)`      |
+| `rpc A (stream Req) returns (Res)`        | `Task<Res> A(IAsyncStreamReader<Req> requestStream, ...)`                     | `AsyncClientStreamingCall<Req, Res> A(...)` |
+| `rpc A (stream Req) returns (stream Res)` | `Task A(IAsyncStreamReader<Req> requestStream, IServerStreamWriter<Res> ...)` | `AsyncDuplexStreamingCall<Req, Res> A(...)` |
+
+Applications compiling generated C# service files must provide `Grpc.Core.Api`
+and their chosen .NET gRPC hosting or client package, such as `Grpc.AspNetCore`
+or `Grpc.Net.Client`. The `Apache.Fory` package does not add gRPC dependencies
+as hard dependencies.
 
 ## JavaScript/TypeScript
 

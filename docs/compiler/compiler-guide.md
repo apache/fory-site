@@ -141,22 +141,24 @@ foryc schema.fdl --output ./src/generated
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**Compile a simple schema containing service definitions (Java + Python + Rust + Scala + Kotlin models):**
+**Compile a simple schema containing service definitions (Java + Python + Rust + C# + Scala + Kotlin models):**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --scala_out=./generated/scala --kotlin_out=./generated/kotlin
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin
 ```
 
-**Generate Java, Python, Rust, Scala, and Kotlin gRPC service companions:**
+**Generate Java, Python, Rust, C#, Scala, and Kotlin gRPC service companions:**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --scala_out=./generated/scala --kotlin_out=./generated/kotlin --grpc
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin --grpc
 ```
 
 The generated gRPC service code uses Fory to serialize request and response
 payloads. Java output imports grpc-java APIs, Python output imports `grpc`, and
 Rust output imports `tonic` and `bytes`. Scala output imports grpc-java APIs.
 Kotlin output imports grpc-java and grpc-kotlin APIs and uses coroutine stubs.
+C# output imports `Grpc.Core.Api` types and can be hosted with normal .NET gRPC
+packages such as `Grpc.AspNetCore` or called through `Grpc.Net.Client`.
 Applications that compile or run those generated service files must provide
 their own gRPC dependencies. Fory packages do not add a hard gRPC dependency for
 this feature.
@@ -367,15 +369,18 @@ generated/
 generated/
 └── csharp/
     └── example/
-        └── example.cs
+        └── Example.cs
 ```
 
-- Single `.cs` file per schema
+- Single `.cs` file per schema named from the normalized PascalCase source file
+  stem
 - Namespace uses `csharp_namespace` (if set) or Fory IDL package
 - Includes source-file-prefixed `XXXForyModule` installation helper and
   `ToBytes`/`FromBytes` methods
 - Imported schemas are installed transitively (for example `root.idl` importing
   `addressbook.fdl` and `tree.fdl`)
+- With `--grpc`, one `<ServiceName>Grpc.cs` companion per service next to the
+  schema file output
 
 ### Swift
 
