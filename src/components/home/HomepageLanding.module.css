@@ -15,9 +15,9 @@
     linear-gradient(90deg, rgba(255, 112, 1, 0.04), transparent 34%),
     linear-gradient(180deg, var(--ifm-background-color), #fafbfc);
   display: grid;
-  gap: 3rem;
-  grid-template-columns: minmax(0, 1fr) minmax(430px, 0.78fr);
-  min-height: 520px;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 0.9fr) minmax(430px, 0.78fr);
+  min-height: max(600px, calc(100vh - var(--ifm-navbar-height, 60px) - 4rem));
   padding: 4.25rem max(2rem, calc((100vw - var(--fory-marketing-width, 1240px)) / 2)) 4.5rem;
 }
 
