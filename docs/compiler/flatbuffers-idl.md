@@ -126,7 +126,8 @@ message Container {
 
 FlatBuffers `rpc_service` definitions are translated to Fory services. With
 `--grpc`, the compiler emits gRPC service companions for supported outputs such
-as Java, Python, Go, Rust, C#, Scala, and Kotlin. These companions use Fory
+as Java, Python, Go, Rust, C#, Scala, Kotlin, and JavaScript. JavaScript browser
+clients are generated with `--grpc-web`. These companions use Fory
 serialization for request and response payloads.
 
 ```fbs
@@ -137,13 +138,15 @@ rpc_service SearchService {
 ```
 
 ```bash
-foryc api.fbs --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin --grpc
+foryc api.fbs --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript --grpc
 ```
 
 Generated service code imports grpc APIs, so applications must provide grpc-java,
 grpc-kotlin, Scala grpc-java APIs, `grpcio`, grpc-go, Rust `tonic` and `bytes`,
-or C# `Grpc.Core.Api` plus server/client dependencies when they compile or run
-those files. Fory packages do not add gRPC as a hard dependency.
+`@grpc/grpc-js`, or C# `Grpc.Core.Api` plus server/client dependencies when they
+compile or run those files. Fory packages do not add gRPC as a hard dependency.
+Use `--grpc-web` with JavaScript output to generate browser clients that import
+`grpc-web`.
 
 ### Defaults and Metadata
 
@@ -192,7 +195,7 @@ FlatBuffers `ByteBuffer`-style APIs.
 - Java, Scala, and Kotlin: JVM model types with Fory metadata and registration helpers
 - Python: dataclasses plus registration helpers
 - C++, Go, and Rust: native structs and Fory metadata
-- JavaScript/TypeScript: TypeScript interfaces and registration helpers
+- JavaScript/TypeScript: TypeScript interfaces and schema helpers
 - C#, Swift, and Dart: annotated or macro-based model types with registration helpers
 
 The serialization format is Fory binary protocol, not FlatBuffers wire format.

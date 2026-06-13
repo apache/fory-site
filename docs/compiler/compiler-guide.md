@@ -73,6 +73,7 @@ Compile options:
 | `--emit-fdl`                          | Emit translated FDL (for non-FDL inputs)               | `false`       |
 | `--emit-fdl-path`                     | Write translated FDL to this path (file or directory)  | (stdout)      |
 | `--grpc`                              | Generate gRPC service companions for supported outputs | `false`       |
+| `--grpc-web`                          | Generate JavaScript gRPC-Web client companions         | `false`       |
 
 Schema-level file options are supported for language-specific generation choices.
 For `go_nested_type_style` and `swift_namespace_style`, the CLI flag overrides
@@ -141,27 +142,39 @@ foryc schema.fdl --output ./src/generated
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**Compile a simple schema containing service definitions (Java + Python + Rust + C# + Scala + Kotlin models):**
+**Compile a simple schema containing service definitions (Java + Python + Go + Rust + C# + Scala + Kotlin + JavaScript models):**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript
 ```
 
-**Generate Java, Python, Rust, C#, Scala, and Kotlin gRPC service companions:**
+**Generate Java, Python, Go, Rust, C#, Scala, Kotlin, and Node.js JavaScript gRPC service companions:**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin --grpc
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript --grpc
 ```
 
 The generated gRPC service code uses Fory to serialize request and response
-payloads. Java output imports grpc-java APIs, Python output imports `grpc`, and
-Rust output imports `tonic` and `bytes`. Scala output imports grpc-java APIs.
-Kotlin output imports grpc-java and grpc-kotlin APIs and uses coroutine stubs.
-C# output imports `Grpc.Core.Api` types and can be hosted with normal .NET gRPC
-packages such as `Grpc.AspNetCore` or called through `Grpc.Net.Client`.
+payloads. Java output imports grpc-java APIs, Python output imports `grpc`, Go
+output imports grpc-go, Rust output imports `tonic` and `bytes`, Scala output
+imports grpc-java APIs, and Kotlin output imports grpc-java and grpc-kotlin APIs
+and uses coroutine stubs. C# output imports `Grpc.Core.Api` types and can be
+hosted with normal .NET gRPC packages such as `Grpc.AspNetCore` or called
+through `Grpc.Net.Client`. JavaScript output imports `@grpc/grpc-js`.
 Applications that compile or run those generated service files must provide
 their own gRPC dependencies. Fory packages do not add a hard gRPC dependency for
 this feature.
+
+**Generate JavaScript gRPC-Web browser clients:**
+
+```bash
+foryc compiler/examples/service.fdl --javascript_out=./generated/javascript --grpc-web
+```
+
+Use `--grpc` and `--grpc-web` together when the same JavaScript output should
+include both Node.js and browser companions. The browser companion imports
+`grpc-web`; the application must provide the package and a gRPC-Web compatible
+server or proxy.
 
 **Use import search paths:**
 
@@ -275,7 +288,7 @@ Compiling src/main.fdl...
 | Rust                  | `rust`       | `.rs`            | Structs with derive macros             |
 | C++                   | `cpp`        | `.h`             | Structs with FORY macros               |
 | C#                    | `csharp`     | `.cs`            | Classes with Fory attributes           |
-| JavaScript/TypeScript | `javascript` | `.ts`            | Interfaces with registration function  |
+| JavaScript/TypeScript | `javascript` | `.ts`            | Interfaces with schema module helpers  |
 | Swift                 | `swift`      | `.swift`         | Fory Swift model macros                |
 | Dart                  | `dart`       | `.dart`          | `@ForyStruct` classes with annotations |
 | Scala                 | `scala`      | `.scala`         | Scala 3 models with macro derivation   |
@@ -354,14 +367,19 @@ generated/
 ```
 generated/
 └── javascript/
-  └── example.ts
+    ├── example.ts
+    ├── example_grpc.ts      # with --grpc
+    └── example_grpc_web.ts  # with --grpc-web
 ```
 
 - Single `.ts` file per schema
 - `export interface` declarations for messages
 - `export enum` declarations for enums
 - Discriminated unions with case enums
-- Registration helper function included
+- Schema helpers `registerXxxTypes(fory)` plus default `serializeX` and
+  `deserializeX` helpers included
+- `--grpc` emits a Node.js companion using `@grpc/grpc-js`
+- `--grpc-web` emits a browser client companion using `grpc-web`
 
 ### C\#
 
