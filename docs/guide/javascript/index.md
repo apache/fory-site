@@ -78,6 +78,54 @@ console.log(user);
 // { id: 1n, name: 'Alice', age: 30 }
 ```
 
+## Generated Code from Fory IDL
+
+You can also define schemas in Fory IDL and generate TypeScript model files:
+
+```protobuf
+package example;
+
+message Person {
+  string name = 1;
+  int32 age = 2;
+}
+```
+
+Generate JavaScript/TypeScript code:
+
+```bash
+foryc person.fdl --javascript_out=./generated
+```
+
+The generated model file exports TypeScript interfaces, enums, unions, a
+registration helper, and root serialization helpers:
+
+```ts
+import {
+  Person,
+  deserializePerson,
+  registerPersonTypes,
+  serializePerson,
+} from "./generated/person";
+
+const bytes = serializePerson({ name: "Alice", age: 30 });
+const person: Person = deserializePerson(bytes);
+```
+
+When you manage your own `Fory` instance, register the generated schema module
+before serializing values with that instance:
+
+```ts
+import Fory from "@apache-fory/core";
+import { registerPersonTypes } from "./generated/person";
+
+const fory = new Fory();
+const { person } = registerPersonTypes(fory);
+
+const bytes = person.serialize({ name: "Alice", age: 30 });
+const copy = person.deserialize(bytes);
+```
+
 ## How it works
 
 Fory is schema-driven. You describe the shape of your data once with `Type.*` builders (or TypeScript decorators), then call `fory.register(schema)`. This returns a `{ serialize, deserialize }` pair that is fast to call repeatedly.
@@ -118,6 +166,8 @@ options; see [Configuration](configuration.md).
 | [References](references.md)                   | Shared references and circular object graphs            |
 | [Schema Evolution](schema-evolution.md)       | Compatible mode and evolving structs                    |
 | [Xlang Serialization](xlang-serialization.md) | Interop guidance and mapping rules                      |
+| [Fory IDL Compiler](../../compiler/index.md)  | Generate TypeScript models from `.fdl` schemas          |
+| [gRPC Support](grpc-support.md)               | Node.js gRPC and browser gRPC-Web generated clients     |
 | [Troubleshooting](troubleshooting.md)         | Common issues, limits, and debugging tips               |
 
 ## Related Resources
