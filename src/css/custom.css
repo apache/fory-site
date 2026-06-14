@@ -34,14 +34,14 @@
 
 @media (min-width: 997px) {
   .navbar {
-    padding-left: 1.5rem;
+    /* Align the logo with the docs sidebar inset and run full width so the
+     * brand sits above the sidebar instead of floating in a centered band. */
+    padding-left: var(--fory-doc-sidebar-inset);
     padding-right: 1.5rem;
   }
 
   .navbar__inner {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: var(--fory-layout-width);
+    max-width: none;
   }
 
   .navbar__brand {
