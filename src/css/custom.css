@@ -34,14 +34,14 @@
 
 @media (min-width: 997px) {
   .navbar {
-    padding-left: 1.5rem;
+    /* Align the logo with the docs sidebar inset and run full width so the
+     * brand sits above the sidebar instead of floating in a centered band. */
+    padding-left: var(--fory-doc-sidebar-inset);
     padding-right: 1.5rem;
   }
 
   .navbar__inner {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: var(--fory-layout-width);
+    max-width: none;
   }
 
   .navbar__brand {
@@ -180,17 +180,11 @@
   --fory-doc-gutter-width: 18px;
   --fory-doc-sidebar-inset: 2rem;
   --fory-doc-sidebar-panel-width: 300px;
-  --fory-doc-sidebar-offset: max(0px, calc((100vw - var(--fory-layout-width)) / 2));
   --fory-doc-toc-right-inset: 1.5rem;
 }
 
 html:root {
-  /*
-   * The menu is aligned with the centered navbar on wide screens. Keep the
-   * Docusaurus sidebar at least that wide, otherwise its overflow clipping
-   * hides the menu and the sidebar looks empty.
-   */
-  --doc-sidebar-width: calc(var(--fory-doc-sidebar-panel-width) + var(--fory-doc-sidebar-offset));
+  --doc-sidebar-width: var(--fory-doc-sidebar-panel-width);
 }
 
 .theme-doc-breadcrumbs,
@@ -352,7 +346,7 @@ html:root {
 
 @media (min-width: 997px) {
   .theme-doc-sidebar-menu {
-    padding-left: max(.75rem, var(--fory-doc-sidebar-offset));
+    padding-left: var(--fory-doc-sidebar-inset);
   }
 }
 
