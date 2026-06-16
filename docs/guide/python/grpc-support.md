@@ -121,7 +121,8 @@ so service implementations do not perform manual Fory registration.
 
 ## Create a Client
 
-Use the generated stub with a normal `grpcio` channel:
+Use the generated stub with a normal `grpcio` channel. Production clients
+usually pass a TLS/auth-configured channel:
 
 ```python
 import grpc
@@ -140,6 +141,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
+
+For local tests and development, an insecure channel can be used explicitly:
+
+```python
+# Test-only channel. Use a TLS/auth-configured grpc.Channel in production.
+with grpc.insecure_channel("localhost:50051") as channel:
+    stub = demo_greeter_grpc.GreeterStub(channel)
 ```
 
 `grpcio` still owns channel options, credentials, deadlines, metadata, retries,
@@ -161,12 +170,12 @@ service Greeter {
 
 Generated Python code follows `grpcio` conventions:
 
-| IDL shape                                 | Servicer method shape                       | Stub method shape                  |
-| ----------------------------------------- | ------------------------------------------- | ---------------------------------- |
-| `rpc A (Req) returns (Res)`               | returns one response object                 | returns one response object        |
-| `rpc A (Req) returns (stream Res)`        | yields response objects                     | returns an iterator of responses   |
-| `rpc A (stream Req) returns (Res)`        | consumes an iterator and returns a response | accepts an iterator of requests    |
-| `rpc A (stream Req) returns (stream Res)` | consumes and yields iterators               | accepts and returns iterators      |
+| IDL shape                                 | Servicer method shape                       | Stub method shape                |
+| ----------------------------------------- | ------------------------------------------- | -------------------------------- |
+| `rpc A (Req) returns (Res)`               | returns one response object                 | returns one response object      |
+| `rpc A (Req) returns (stream Res)`        | yields response objects                     | returns an iterator of responses |
+| `rpc A (stream Req) returns (Res)`        | consumes an iterator and returns a response | accepts an iterator of requests  |
+| `rpc A (stream Req) returns (stream Res)` | consumes and yields iterators               | accepts and returns iterators    |
 
 Servicer methods use snake_case names, while generated descriptors preserve the
 exact IDL service and method names for the gRPC path.

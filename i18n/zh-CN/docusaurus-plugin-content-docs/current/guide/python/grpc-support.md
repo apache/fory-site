@@ -67,9 +67,9 @@ foryc service.fdl --python_out=./generated/python --grpc
 
 该 schema 会生成：
 
-| 文件                   | 用途                              |
-| ---------------------- | --------------------------------- |
-| `demo_greeter.py`      | Fory dataclass 和注册辅助逻辑     |
+| 文件                   | 用途                                    |
+| ---------------------- | --------------------------------------- |
+| `demo_greeter.py`      | Fory dataclass 和注册辅助逻辑           |
 | `demo_greeter_grpc.py` | `grpcio` stub、servicer base 和注册函数 |
 
 Module 名称来自 Fory package，点号会替换成下划线；没有 package 的 schema 使用 `generated.py` 和
@@ -105,6 +105,8 @@ if __name__ == "__main__":
 
 ## 创建 Client
 
+使用生成的 stub 和普通 `grpcio` channel。生产 client 通常传入配置了 TLS/认证的 channel：
+
 ```python
 import grpc
 
@@ -122,6 +124,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
+
+本地测试和开发可以显式使用 insecure channel：
+
+```python
+# 仅用于本地测试和开发。
+# 生产环境请使用配置了 TLS/认证的 grpc.Channel。
+with grpc.insecure_channel("localhost:50051") as channel:
+    stub = demo_greeter_grpc.GreeterStub(channel)
 ```
 
 Channel、credential、deadline、metadata、interceptor、retry 和 server lifecycle 都保持 `grpcio`
@@ -142,12 +153,12 @@ service Greeter {
 
 生成 Python companion 遵循 `grpcio` 的 iterator/generator 约定：
 
-| IDL shape                                 | Servicer 方法形态                         | Stub 方法形态             |
-| ----------------------------------------- | ----------------------------------------- | ------------------------- |
-| `rpc A (Req) returns (Res)`               | 返回一个 response 对象                    | 返回一个 response 对象    |
-| `rpc A (Req) returns (stream Res)`        | yield 多个 response 对象                  | 返回 response iterator    |
-| `rpc A (stream Req) returns (Res)`        | 消费 request iterator 并返回一个 response | 接收 request iterator     |
-| `rpc A (stream Req) returns (stream Res)` | 消费 request iterator 并 yield response   | 接收并返回 iterator       |
+| IDL shape                                 | Servicer 方法形态                         | Stub 方法形态          |
+| ----------------------------------------- | ----------------------------------------- | ---------------------- |
+| `rpc A (Req) returns (Res)`               | 返回一个 response 对象                    | 返回一个 response 对象 |
+| `rpc A (Req) returns (stream Res)`        | yield 多个 response 对象                  | 返回 response iterator |
+| `rpc A (stream Req) returns (Res)`        | 消费 request iterator 并返回一个 response | 接收 request iterator  |
+| `rpc A (stream Req) returns (stream Res)` | 消费 request iterator 并 yield response   | 接收并返回 iterator    |
 
 Servicer 方法使用 snake_case 名称；生成 descriptor 会保留 IDL 中的 service 和 method 名称作为
 gRPC path。每个 message frame 都通过 Fory serializer/deserializer 编码。
