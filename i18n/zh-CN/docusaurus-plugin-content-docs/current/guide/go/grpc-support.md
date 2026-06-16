@@ -68,9 +68,9 @@ foryc service.fdl --go_out=./generated/go --grpc
 
 输出包含：
 
-| 文件                           | 用途                                 |
-| ------------------------------ | ------------------------------------ |
-| `greeter/demo_greeter.go`      | Fory model 类型和注册辅助逻辑        |
+| 文件                           | 用途                                      |
+| ------------------------------ | ----------------------------------------- |
+| `greeter/demo_greeter.go`      | Fory model 类型和注册辅助逻辑             |
 | `greeter/demo_greeter_grpc.go` | grpc-go client、server interface 和 codec |
 
 生成的 Go 方法使用导出的 PascalCase 名称，例如 `SayHello`。底层 gRPC method path 保留
@@ -175,10 +175,10 @@ Fory service 支持 unary、server-streaming、client-streaming 和 bidirectiona
 - Bidirectional streaming 使用生成的 stream client/server interface。
 - 每个 message frame 都使用生成 codec。
 
-## 运维语义
+## Service 行为
 
 生成的 service companion 只提供 Fory 序列化。deadline、取消、TLS、credential、unary/stream
-interceptor、status code、metadata、名称解析、负载均衡、连接生命周期和 backoff 都保持标准 grpc-go 行为。
+interceptor、status code、metadata、名称解析、负载均衡、连接生命周期和 backoff 等 Service 行为都遵循标准 grpc-go。
 
 ## 故障排查
 

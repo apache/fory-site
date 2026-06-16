@@ -71,10 +71,10 @@ foryc service.fdl --rust_out=./generated/rust --grpc
 
 该 schema 会生成：
 
-| 文件                           | 用途                                |
-| ------------------------------ | ----------------------------------- |
-| `demo_greeter.rs`              | Fory model 类型和注册辅助逻辑       |
-| `demo_greeter_service.rs`      | 异步 service trait 与 gRPC path 常量 |
+| 文件                           | 用途                                       |
+| ------------------------------ | ------------------------------------------ |
+| `demo_greeter.rs`              | Fory model 类型和注册辅助逻辑              |
+| `demo_greeter_service.rs`      | 异步 service trait 与 gRPC path 常量       |
 | `demo_greeter_service_grpc.rs` | tonic client、server wrapper 和 Fory codec |
 
 将生成文件加入 crate root：
@@ -283,7 +283,7 @@ while let Some(reply) = chat.message().await? {
 Rust gRPC payload 必须满足 `Send + 'static`，这样 tonic 才能在线程间移动 request/response。
 如果 request 或 response schema 使用非线程安全的引用元信息，Rust gRPC 生成会拒绝该 service。
 
-## 运维语义
+## Service 行为
 
 生成的 service companion 只提供 Fory 序列化和 tonic binding。deadline、取消、TLS、认证、
 Tower middleware、interceptor、status code、metadata、channel/server 生命周期和 backpressure

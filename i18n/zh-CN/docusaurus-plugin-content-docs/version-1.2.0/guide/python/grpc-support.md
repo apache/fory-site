@@ -207,9 +207,9 @@ with grpc.secure_channel("api.example.com:443", credentials) as channel:
         print(reply.reply)
 ```
 
-## 运维语义
+## Service 行为
 
-生成的 service companion 只提供 Fory serialization callback。运维行为仍遵循标准 `grpcio`：
+生成的 service companion 只提供 Fory serialization callback。Service 行为仍遵循标准 `grpcio`：
 
 - Deadline 和取消
 - TLS 和认证 credential
