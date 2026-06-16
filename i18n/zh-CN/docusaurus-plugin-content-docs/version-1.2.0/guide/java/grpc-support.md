@@ -37,6 +37,11 @@ coroutine stub 和 service base 见 [Kotlin gRPC 支持](../kotlin/grpc-support.
 
 ```xml
 <dependency>
+  <groupId>org.apache.fory</groupId>
+  <artifactId>fory-core</artifactId>
+  <version>${fory.version}</version>
+</dependency>
+<dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-api</artifactId>
   <version>${grpc.version}</version>
@@ -88,14 +93,25 @@ service Greeter {
 foryc service.fdl --java_out=./generated/java --grpc
 ```
 
-生成结果包含 model 类型、schema module 和 grpc-java service companion。生成的 method descriptor
-使用 Fory-backed `MethodDescriptor.Marshaller`，因此不会调用 protobuf parser。
+该 schema 会生成：
+
+| 文件                     | 用途                                  |
+| ------------------------ | ------------------------------------- |
+| `HelloRequest.java`      | request 的 Fory model 类型            |
+| `HelloReply.java`        | response 的 Fory model 类型           |
+| `GreeterForyModule.java` | 生成类型的 Fory 注册 module           |
+| `GreeterGrpc.java`       | grpc-java service base、stub 和 codec |
+
+生成的 method descriptor 使用 Fory-backed `MethodDescriptor.Marshaller`，因此不会调用 protobuf
+parser。
 
 ## 实现 Server
 
 实现生成的 service base，并注册到标准 grpc-java `Server`：
 
 ```java
+package demo.greeter;
+
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -103,18 +119,24 @@ import io.grpc.stub.StreamObserver;
 final class GreeterService extends GreeterGrpc.GreeterImplBase {
   @Override
   public void sayHello(
-      HelloRequest request,
-      StreamObserver<HelloReply> responseObserver) {
-    responseObserver.onNext(new HelloReply("Hello, " + request.name()));
+      HelloRequest request, StreamObserver<HelloReply> responseObserver) {
+    HelloReply reply = new HelloReply();
+    reply.setReply("Hello, " + request.getName());
+    responseObserver.onNext(reply);
     responseObserver.onCompleted();
   }
 }
 
-Server server = ServerBuilder
-    .forPort(50051)
-    .addService(new GreeterService())
-    .build()
-    .start();
+public final class GreeterServer {
+  public static void main(String[] args) throws Exception {
+    Server server =
+        ServerBuilder.forPort(50051)
+            .addService(new GreeterService())
+            .build()
+            .start();
+    server.awaitTermination();
+  }
+}
 ```
 
 生成代码负责注册和序列化 request/response 类型，service 实现不需要手动创建 Fory 实例。
@@ -124,16 +146,30 @@ Server server = ServerBuilder
 使用普通 grpc-java channel 和生成 stub：
 
 ```java
+package demo.greeter;
+
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-ManagedChannel channel = ManagedChannelBuilder
-    .forAddress("localhost", 50051)
-    .usePlaintext()
-    .build();
+public final class GreeterClient {
+  public static void main(String[] args) {
+    ManagedChannel channel =
+        ManagedChannelBuilder.forAddress("localhost", 50051)
+            .usePlaintext()
+            .build();
+    try {
+      GreeterGrpc.GreeterBlockingStub stub =
+          GreeterGrpc.newBlockingStub(channel);
 
-GreeterGrpc.GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(channel);
-HelloReply reply = stub.sayHello(new HelloRequest("Fory"));
+      HelloRequest request = new HelloRequest();
+      request.setName("Fory");
+      HelloReply reply = stub.sayHello(request);
+      System.out.println(reply.getReply());
+    } finally {
+      channel.shutdownNow();
+    }
+  }
+}
 ```
 
 Channel lifecycle、deadline、credential、metadata、load balancing、retry 和 interceptor 都保持
@@ -154,10 +190,180 @@ service Greeter {
 
 生成 Java service 方法遵循 grpc-java 约定：
 
-- Unary 方法使用 request 参数和 response `StreamObserver`。
-- Server-streaming 方法向 response observer 多次 `onNext`。
-- Client-streaming 与 bidirectional streaming 返回 request `StreamObserver`。
-- Blocking stub 暴露 grpc-java 支持的 blocking API。
+| IDL shape                                 | Server 方法形态                                         | Client 方法形态                    |
+| ----------------------------------------- | ------------------------------------------------------- | ---------------------------------- |
+| `rpc A (Req) returns (Res)`               | `void a(Req request, StreamObserver<Res> responses)`    | blocking、async、future unary stub |
+| `rpc A (Req) returns (stream Res)`        | `void a(Req request, StreamObserver<Res> responses)`    | blocking iterator 或 async observer |
+| `rpc A (stream Req) returns (Res)`        | `StreamObserver<Req> a(StreamObserver<Res> responses)`  | async request observer             |
+| `rpc A (stream Req) returns (stream Res)` | `StreamObserver<Req> a(StreamObserver<Res> responses)`  | async request observer             |
+
+Server 可以直接实现生成的 streaming 方法：
+
+```java
+package demo.greeter;
+
+import io.grpc.stub.StreamObserver;
+import java.util.ArrayList;
+import java.util.List;
+
+final class GreeterService extends GreeterGrpc.GreeterImplBase {
+  @Override
+  public void lotsOfReplies(
+      HelloRequest request, StreamObserver<HelloReply> responseObserver) {
+    HelloReply first = new HelloReply();
+    first.setReply("Hello, " + request.getName());
+    responseObserver.onNext(first);
+
+    HelloReply second = new HelloReply();
+    second.setReply("Welcome, " + request.getName());
+    responseObserver.onNext(second);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public StreamObserver<HelloRequest> lotsOfGreetings(
+      StreamObserver<HelloReply> responseObserver) {
+    List<String> names = new ArrayList<>();
+    return new StreamObserver<>() {
+      @Override
+      public void onNext(HelloRequest request) {
+        names.add(request.getName());
+      }
+
+      @Override
+      public void onError(Throwable error) {
+        responseObserver.onError(error);
+      }
+
+      @Override
+      public void onCompleted() {
+        HelloReply reply = new HelloReply();
+        reply.setReply(String.join(", ", names));
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+      }
+    };
+  }
+
+  @Override
+  public StreamObserver<HelloRequest> chat(
+      StreamObserver<HelloReply> responseObserver) {
+    return new StreamObserver<>() {
+      @Override
+      public void onNext(HelloRequest request) {
+        HelloReply reply = new HelloReply();
+        reply.setReply("Hello, " + request.getName());
+        responseObserver.onNext(reply);
+      }
+
+      @Override
+      public void onError(Throwable error) {
+        responseObserver.onError(error);
+      }
+
+      @Override
+      public void onCompleted() {
+        responseObserver.onCompleted();
+      }
+    };
+  }
+}
+```
+
+生成的 client 返回标准 grpc-java 调用形态：
+
+```java
+package demo.greeter;
+
+import io.grpc.stub.StreamObserver;
+import java.util.Iterator;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+final class StreamingClient {
+  private final GreeterGrpc.GreeterBlockingStub blockingStub;
+  private final GreeterGrpc.GreeterStub asyncStub;
+
+  StreamingClient(
+      GreeterGrpc.GreeterBlockingStub blockingStub,
+      GreeterGrpc.GreeterStub asyncStub) {
+    this.blockingStub = blockingStub;
+    this.asyncStub = asyncStub;
+  }
+
+  void run() throws InterruptedException {
+    Iterator<HelloReply> replies =
+        blockingStub.lotsOfReplies(newRequest("Fory"));
+    while (replies.hasNext()) {
+      System.out.println(replies.next().getReply());
+    }
+
+    CountDownLatch greetingsDone = new CountDownLatch(1);
+    StreamObserver<HelloRequest> greetings =
+        asyncStub.lotsOfGreetings(new StreamObserver<>() {
+          @Override
+          public void onNext(HelloReply reply) {
+            System.out.println(reply.getReply());
+          }
+
+          @Override
+          public void onError(Throwable error) {
+            greetingsDone.countDown();
+          }
+
+          @Override
+          public void onCompleted() {
+            greetingsDone.countDown();
+          }
+        });
+    greetings.onNext(newRequest("Ada"));
+    greetings.onNext(newRequest("Grace"));
+    greetings.onCompleted();
+    greetingsDone.await(5, TimeUnit.SECONDS);
+
+    CountDownLatch chatDone = new CountDownLatch(1);
+    StreamObserver<HelloRequest> chat =
+        asyncStub.chat(new StreamObserver<>() {
+          @Override
+          public void onNext(HelloReply reply) {
+            System.out.println(reply.getReply());
+          }
+
+          @Override
+          public void onError(Throwable error) {
+            chatDone.countDown();
+          }
+
+          @Override
+          public void onCompleted() {
+            chatDone.countDown();
+          }
+        });
+    chat.onNext(newRequest("Fory"));
+    chat.onCompleted();
+    chatDone.await(5, TimeUnit.SECONDS);
+  }
+
+  private static HelloRequest newRequest(String name) {
+    HelloRequest request = new HelloRequest();
+    request.setName(name);
+    return request;
+  }
+}
+```
+
+生成 descriptor 会保留 IDL 中的 service 和 method 名称作为 gRPC path。
+
+## 运维语义
+
+生成的 service code 只替换 request/response 序列化。常规 gRPC 运维能力仍由 grpc-java 提供：
+
+- Deadline 和取消
+- TLS 和认证
+- 名称解析与负载均衡
+- Client/server interceptor
+- Status code 和 metadata
+- Channel 池化与生命周期管理
 
 ## 故障排查
 
@@ -165,6 +371,11 @@ service Greeter {
 
 添加上面的 grpc-java 依赖。生成的 Fory service 文件导入 grpc-java API，但 Fory Java artifact
 不会自动依赖 gRPC。
+
+### `UNIMPLEMENTED`
+
+确认生成的 service 实现已通过 `ServerBuilder.addService(...)` 注册，并且 client 与 server 来自相同
+package、service 和 method 名称。
 
 ### Protobuf Client 无法解码
 

@@ -30,7 +30,7 @@ protobuf message bytes，请继续使用标准 protobuf gRPC 代码生成。
 
 编译生成 service 文件的 crate 需要添加 `tonic` 和 `bytes`。Fory Rust crate 不会将
 gRPC 作为硬依赖。异步 server/client 还需要 `tokio`；如果 service 实现需要构造
-streaming response，可添加 `tokio-stream`。
+streaming response 或 request stream，可添加 `tokio-stream`。
 
 ```toml
 [dependencies]
@@ -167,6 +167,118 @@ service Greeter {
 - Client-streaming 和 bidirectional 方法接收 `tonic::Streaming<T>`。
 - 生成的 client module 暴露与 service 方法对应的异步方法。
 - 每个 message frame 都使用生成 codec，包括 streaming frame。
+
+生成 trait 签名是 service 实现中具体 associated stream type 的准确信息来源：
+
+```rust
+use demo_greeter::{HelloReply, HelloRequest};
+use demo_greeter_service::Greeter;
+use std::pin::Pin;
+use tokio_stream::{self as stream, Stream, StreamExt};
+use tonic::{Request, Response, Status};
+
+#[derive(Default)]
+struct MyGreeter;
+
+type ReplyStream =
+    Pin<Box<dyn Stream<Item = Result<HelloReply, Status>> + Send + 'static>>;
+
+#[tonic::async_trait]
+impl Greeter for MyGreeter {
+    type LotsOfRepliesStream = ReplyStream;
+    type ChatStream = ReplyStream;
+
+    async fn lots_of_replies(
+        &self,
+        request: Request<HelloRequest>,
+    ) -> Result<Response<Self::LotsOfRepliesStream>, Status> {
+        let name = request.into_inner().name;
+        let replies = vec![
+            Ok(HelloReply {
+                reply: format!("Hello, {name}"),
+            }),
+            Ok(HelloReply {
+                reply: format!("Welcome, {name}"),
+            }),
+        ];
+        Ok(Response::new(Box::pin(stream::iter(replies))))
+    }
+
+    async fn lots_of_greetings(
+        &self,
+        request: Request<tonic::Streaming<HelloRequest>>,
+    ) -> Result<Response<HelloReply>, Status> {
+        let mut requests = request.into_inner();
+        let mut names = Vec::new();
+        while let Some(request) = requests.next().await {
+            names.push(request?.name);
+        }
+        Ok(Response::new(HelloReply {
+            reply: names.join(", "),
+        }))
+    }
+
+    async fn chat(
+        &self,
+        request: Request<tonic::Streaming<HelloRequest>>,
+    ) -> Result<Response<Self::ChatStream>, Status> {
+        let replies = request.into_inner().map(|request| {
+            request.map(|request| HelloReply {
+                reply: format!("Hello, {}", request.name),
+            })
+        });
+        Ok(Response::new(Box::pin(replies)))
+    }
+}
+```
+
+生成的 client 返回 tonic streaming response：
+
+```rust
+use demo_greeter::HelloRequest;
+use demo_greeter_service_grpc::greeter_client::GreeterClient;
+use tokio_stream as stream;
+
+let mut client = GreeterClient::connect("http://[::1]:50051").await?;
+
+let mut replies = client
+    .lots_of_replies(HelloRequest {
+        name: "Fory".to_string(),
+    })
+    .await?
+    .into_inner();
+while let Some(reply) = replies.message().await? {
+    println!("{}", reply.reply);
+}
+
+let greetings = stream::iter(vec![
+    HelloRequest {
+        name: "Ada".to_string(),
+    },
+    HelloRequest {
+        name: "Grace".to_string(),
+    },
+]);
+let summary = client.lots_of_greetings(greetings).await?.into_inner();
+println!("{}", summary.reply);
+
+let chat_requests = stream::iter(vec![
+    HelloRequest {
+        name: "Fory".to_string(),
+    },
+    HelloRequest {
+        name: "RPC".to_string(),
+    },
+]);
+let mut chat = client.chat(chat_requests).await?.into_inner();
+while let Some(reply) = chat.message().await? {
+    println!("{}", reply.reply);
+}
+```
+
+生成 descriptor 会保留 IDL 中的 service 和 method 名称作为 gRPC path。
+
+## 线程安全与 Payload 类型
 
 Rust gRPC payload 必须满足 `Send + 'static`，这样 tonic 才能在线程间移动 request/response。
 如果 request 或 response schema 使用非线程安全的引用元信息，Rust gRPC 生成会拒绝该 service。

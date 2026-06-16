@@ -22,6 +22,10 @@ license: |
 Fory 可以为包含 service 定义的 schema 生成 JavaScript service companion。生成的 service code
 使用普通 gRPC transport，但 request 和 response 对象使用 Fory 序列化，而不是 protobuf。
 
+当 RPC 两端都由同一份 Fory IDL、protobuf IDL 或 FlatBuffers IDL 生成，并且两端都期望
+Fory 编码的 message body 时，可以使用这种模式。如果 API 必须被通用 protobuf client、
+reflection 工具或期望 protobuf message bytes 的组件消费，请使用标准 protobuf gRPC 代码生成。
+
 使用 `--grpc` 生成 Node.js server/client 代码；使用 `--grpc-web` 生成调用 gRPC-Web 兼容
 server 或 proxy 的浏览器 client。
 
@@ -44,6 +48,9 @@ npm install @apache-fory/core grpc-web
 Fory 不会把 gRPC package 作为硬依赖。只需添加应用实际使用的 transport package。
 
 ## 定义 Service
+
+Service 定义可以来自 Fory IDL、protobuf IDL 或 FlatBuffers `rpc_service`。Fory IDL service
+示例如下：
 
 ```protobuf
 package demo.greeter;
@@ -186,11 +193,112 @@ service Greeter {
 Node.js server 实现使用普通 `@grpc/grpc-js` streaming call object。生成 companion 只负责把 Fory
 payload 接入 gRPC，deadline、credential、metadata、interceptor 和错误语义仍遵循 gRPC 库行为。
 
+```ts
+const greeter: GreeterHandlers = {
+  sayHello(call, callback) {
+    callback(null, { reply: `Hello, ${call.request.name}` });
+  },
+
+  lotsOfReplies(call) {
+    call.write({ reply: `Hello, ${call.request.name}` });
+    call.write({ reply: `Welcome, ${call.request.name}` });
+    call.end();
+  },
+
+  lotsOfGreetings(call, callback) {
+    const names: string[] = [];
+    call.on("data", (request) => {
+      names.push(request.name);
+    });
+    call.on("end", () => {
+      callback(null, { reply: `Hello, ${names.join(", ")}` });
+    });
+  },
+
+  chat(call) {
+    call.on("data", (request) => {
+      call.write({ reply: `Hello, ${request.name}` });
+    });
+    call.on("end", () => {
+      call.end();
+    });
+  },
+};
+```
+
+Node.js client 使用与 RPC shape 对应的生成方法：
+
+```ts
+const replies = client.lotsOfReplies({ name: "Fory" });
+replies.on("data", (reply) => {
+  console.log(reply.reply);
+});
+
+const greetings = client.lotsOfGreetings((error, reply) => {
+  if (error) {
+    throw error;
+  }
+  console.log(reply.reply);
+});
+greetings.write({ name: "Alice" });
+greetings.write({ name: "Bob" });
+greetings.end();
+
+const chat = client.chat();
+chat.on("data", (reply) => {
+  console.log(reply.reply);
+});
+chat.write({ name: "Alice" });
+chat.write({ name: "Bob" });
+chat.end();
+```
+
+包含 server-streaming 方法的 service 中，生成的 gRPC-Web companion 默认使用 `grpcwebtext`
+编码格式。只有 unary 方法的 service 默认使用 `grpcweb`。也可以显式指定：
+
+```ts
+const client = createGreeterWebClient("https://api.example.com", {
+  wireFormat: "grpcwebtext",
+});
+```
+
+浏览器 client 可以用 callback client 消费 server-streaming RPC：
+
+```ts
+const stream = client.lotsOfReplies({ name: "Fory" });
+
+stream.on("data", (reply) => {
+  console.log(reply.reply);
+});
+stream.on("error", (error) => {
+  console.error(error.message);
+});
+stream.on("end", () => {
+  console.log("stream ended");
+});
+```
+
+## 运维语义
+
+生成的 service code 只替换 request/response 序列化。常规 gRPC 运维能力仍由 transport package
+提供：
+
+- TLS 和 credential
+- Metadata 和 status code
+- Deadline 和取消
+- Client/server interceptor
+- 负载均衡和部署相关 proxy 配置
+
 ## 故障排查
 
 ### 缺少 gRPC Package
 
 Node.js 添加 `@grpc/grpc-js`，浏览器添加 `grpc-web`。生成 model 仍需要 `@apache-fory/core`。
+
+### gRPC-Web Client-Streaming 或 Bidirectional RPC 被拒绝
+
+gRPC-Web 不支持 client-streaming 或 bidirectional streaming。对于这些 shape，请使用 `--grpc`
+生成 Node.js companion，或只向浏览器 client 暴露 unary 和 server-streaming 方法。
 
 ### Protobuf Client 无法读取响应
 

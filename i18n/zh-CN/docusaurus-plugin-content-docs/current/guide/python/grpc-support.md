@@ -26,6 +26,11 @@ Fory 可以为包含 service 定义的 schema 生成 Python gRPC companion modul
 传输语义与 Fory payload 编码时，可以使用这种模式。如果客户端或工具必须直接消费 protobuf
 message bytes，请使用标准 protobuf gRPC 代码生成。
 
+当前生成的 Python companion 面向同步 `grpcio` API。请使用普通 `def` servicer 方法、
+`grpc.server(...)`、`grpc.insecure_channel(...)`，并用 Python iterator/generator 处理
+streaming RPC。Compiler 不会生成 `grpc.aio` stub 或 service base，因此不要把生成 servicer
+方法实现成 `async def`，除非你在生成 companion 外自行封装 adapter。
+
 ## 添加依赖
 
 ```bash
@@ -59,29 +64,42 @@ service Greeter {
 foryc service.fdl --python_out=./generated/python --grpc
 ```
 
-生成结果通常包含 model module 和 `<module>_grpc.py` companion。Companion 会导入生成的
-`to_bytes`/`from_bytes` 辅助逻辑，并把它们接入 `grpcio` serializer/deserializer。
+该 schema 会生成：
+
+| 文件                   | 用途                              |
+| ---------------------- | --------------------------------- |
+| `demo_greeter.py`      | Fory dataclass 和注册辅助逻辑     |
+| `demo_greeter_grpc.py` | `grpcio` stub、servicer base 和注册函数 |
+
+Module 名称来自 Fory package，点号会替换成下划线；没有 package 的 schema 使用 `generated.py` 和
+`generated_grpc.py`。
 
 ## 实现 Server
 
 ```python
 from concurrent import futures
+
 import grpc
 
-from generated.python.service import HelloReply
-from generated.python import service_grpc
+import demo_greeter
+import demo_greeter_grpc
 
 
-class Greeter(service_grpc.GreeterServicer):
-    def SayHello(self, request, context):
-        return HelloReply(reply=f"Hello, {request.name}")
+class Greeter(demo_greeter_grpc.GreeterServicer):
+    def say_hello(self, request, context):
+        return demo_greeter.HelloReply(reply=f"Hello, {request.name}")
 
 
-server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))
-service_grpc.add_GreeterServicer_to_server(Greeter(), server)
-server.add_insecure_port("[::]:50051")
-server.start()
-server.wait_for_termination()
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
+    demo_greeter_grpc.add_servicer(Greeter(), server)
+    server.add_insecure_port("[::]:50051")
+    server.start()
+    server.wait_for_termination()
+
+
+if __name__ == "__main__":
+    serve()
 ```
 
 ## 创建 Client
@@ -89,13 +107,19 @@ server.wait_for_termination()
 ```python
 import grpc
 
-from generated.python.service import HelloRequest
-from generated.python import service_grpc
+import demo_greeter
+import demo_greeter_grpc
 
-with grpc.insecure_channel("localhost:50051") as channel:
-    stub = service_grpc.GreeterStub(channel)
-    reply = stub.SayHello(HelloRequest(name="Fory"))
-    print(reply.reply)
+
+def main():
+    with grpc.insecure_channel("localhost:50051") as channel:
+        stub = demo_greeter_grpc.GreeterStub(channel)
+        reply = stub.say_hello(demo_greeter.HelloRequest(name="Fory"))
+        print(reply.reply)
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 Channel、credential、deadline、metadata、interceptor、retry 和 server lifecycle 都保持 `grpcio`
@@ -114,8 +138,71 @@ service Greeter {
 }
 ```
 
-生成 Python companion 使用 `grpcio` 的 iterator/generator 约定处理 streaming。每个 message
-frame 都通过 Fory serializer/deserializer 编码。
+生成 Python companion 遵循 `grpcio` 的 iterator/generator 约定：
+
+| IDL shape                                 | Servicer 方法形态                         | Stub 方法形态             |
+| ----------------------------------------- | ----------------------------------------- | ------------------------- |
+| `rpc A (Req) returns (Res)`               | 返回一个 response 对象                    | 返回一个 response 对象    |
+| `rpc A (Req) returns (stream Res)`        | yield 多个 response 对象                  | 返回 response iterator    |
+| `rpc A (stream Req) returns (Res)`        | 消费 request iterator 并返回一个 response | 接收 request iterator     |
+| `rpc A (stream Req) returns (stream Res)` | 消费 request iterator 并 yield response   | 接收并返回 iterator       |
+
+Servicer 方法使用 snake_case 名称；生成 descriptor 会保留 IDL 中的 service 和 method 名称作为
+gRPC path。每个 message frame 都通过 Fory serializer/deserializer 编码。
+
+Server 可以直接使用 Python iterator：
+
+```python
+class Greeter(demo_greeter_grpc.GreeterServicer):
+    def lots_of_replies(self, request, context):
+        yield demo_greeter.HelloReply(reply=f"Hello, {request.name}")
+        yield demo_greeter.HelloReply(reply=f"Welcome, {request.name}")
+
+    def lots_of_greetings(self, request_iterator, context):
+        names = [request.name for request in request_iterator]
+        return demo_greeter.HelloReply(reply=", ".join(names))
+
+    def chat(self, request_iterator, context):
+        for request in request_iterator:
+            yield demo_greeter.HelloReply(reply=f"Hello, {request.name}")
+```
+
+生成的 client 使用标准 `grpcio` streaming 调用形态：
+
+```python
+with grpc.insecure_channel("localhost:50051") as channel:
+    stub = demo_greeter_grpc.GreeterStub(channel)
+
+    for reply in stub.lots_of_replies(
+        demo_greeter.HelloRequest(name="Fory")
+    ):
+        print(reply.reply)
+
+    def greeting_requests():
+        yield demo_greeter.HelloRequest(name="Ada")
+        yield demo_greeter.HelloRequest(name="Grace")
+
+    summary = stub.lots_of_greetings(greeting_requests())
+    print(summary.reply)
+
+    def chat_requests():
+        yield demo_greeter.HelloRequest(name="Fory")
+        yield demo_greeter.HelloRequest(name="RPC")
+
+    for reply in stub.chat(chat_requests()):
+        print(reply.reply)
+```
+
+## 运维语义
+
+生成的 service companion 只提供 Fory serialization callback。运维行为仍遵循标准 `grpcio`：
+
+- Deadline 和取消
+- TLS 和认证 credential
+- Client/server interceptor
+- Status code、details 和 metadata
+- Channel/server 生命周期
+- 同步 server 的线程池大小
 
 ## 故障排查
 
@@ -126,6 +213,10 @@ frame 都通过 Fory serializer/deserializer 编码。
 ```bash
 pip install grpcio
 ```
+
+### `UNIMPLEMENTED`
+
+确认生成的 servicer 已注册到 server，并且 client 与 server 来自相同 package、service 和 method 名称。
 
 ### Protobuf Client 无法解码
 
