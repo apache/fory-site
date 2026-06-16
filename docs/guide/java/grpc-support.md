@@ -201,12 +201,12 @@ service Greeter {
 
 Generated Java service methods follow grpc-java conventions:
 
-| IDL shape                                 | Server method shape                                      | Client method shape                    |
-| ----------------------------------------- | -------------------------------------------------------- | -------------------------------------- |
-| `rpc A (Req) returns (Res)`               | `void a(Req request, StreamObserver<Res> responses)`     | blocking, async, and future unary stub |
-| `rpc A (Req) returns (stream Res)`        | `void a(Req request, StreamObserver<Res> responses)`     | blocking iterator or async observer    |
-| `rpc A (stream Req) returns (Res)`        | `StreamObserver<Req> a(StreamObserver<Res> responses)`   | async request observer                 |
-| `rpc A (stream Req) returns (stream Res)` | `StreamObserver<Req> a(StreamObserver<Res> responses)`   | async request observer                 |
+| IDL shape                                 | Server method shape                                    | Client method shape                    |
+| ----------------------------------------- | ------------------------------------------------------ | -------------------------------------- |
+| `rpc A (Req) returns (Res)`               | `void a(Req request, StreamObserver<Res> responses)`   | blocking, async, and future unary stub |
+| `rpc A (Req) returns (stream Res)`        | `void a(Req request, StreamObserver<Res> responses)`   | blocking iterator or async observer    |
+| `rpc A (stream Req) returns (Res)`        | `StreamObserver<Req> a(StreamObserver<Res> responses)` | async request observer                 |
+| `rpc A (stream Req) returns (stream Res)` | `StreamObserver<Req> a(StreamObserver<Res> responses)` | async request observer                 |
 
 Server implementations can use the generated streaming method shapes directly:
 

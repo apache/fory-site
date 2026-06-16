@@ -86,12 +86,12 @@ foryc service.fdl --kotlin_out=./generated/kotlin --grpc
 
 For this schema, the Kotlin generator emits:
 
-| File                 | Purpose                                      |
-| -------------------- | -------------------------------------------- |
-| `HelloRequest.kt`    | Fory model type for the request              |
-| `HelloReply.kt`      | Fory model type for the response             |
-| `ServiceForyModule`  | Fory registration module for generated types |
-| `GreeterGrpcKt.kt`   | Coroutine service base, stubs, and codecs    |
+| File                | Purpose                                      |
+| ------------------- | -------------------------------------------- |
+| `HelloRequest.kt`   | Fory model type for the request              |
+| `HelloReply.kt`     | Fory model type for the response             |
+| `ServiceForyModule` | Fory registration module for generated types |
+| `GreeterGrpcKt.kt`  | Coroutine service base, stubs, and codecs    |
 
 Run KSP when compiling the generated model files so the schema serializers are
 available at runtime. Generated request and response types are registered by
