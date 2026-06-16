@@ -34,7 +34,8 @@ instances, and Python iterators or generators for streaming RPCs. The generated
 stub accepts any channel configured by your application. The compiler does not
 generate `grpc.aio` stubs or service bases, so do not implement generated
 servicer methods as `async def` unless you add a custom adapter outside the
-generated companion.
+generated companion. Python gRPC async support based on `grpc.aio` will be
+available in the next Fory release.
 
 ## Install Dependencies
 

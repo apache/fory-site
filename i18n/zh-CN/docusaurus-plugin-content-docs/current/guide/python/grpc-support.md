@@ -30,6 +30,7 @@ message bytes，请使用标准 protobuf gRPC 代码生成。
 `grpc.server(...)`、标准 `grpc.Channel` 实例，并用 Python iterator/generator 处理 streaming RPC。
 生成的 stub 可以接收应用自行配置的任意 channel。Compiler 不会生成 `grpc.aio` stub 或 service
 base，因此不要把生成 servicer 方法实现成 `async def`，除非你在生成 companion 外自行封装 adapter。
+基于 `grpc.aio` 的 Python gRPC async 支持将在下一个 Fory 版本提供。
 
 ## 添加依赖
 
