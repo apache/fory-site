@@ -190,12 +190,12 @@ service Greeter {
 
 生成 Java service 方法遵循 grpc-java 约定：
 
-| IDL shape                                 | Server 方法形态                                         | Client 方法形态                    |
-| ----------------------------------------- | ------------------------------------------------------- | ---------------------------------- |
-| `rpc A (Req) returns (Res)`               | `void a(Req request, StreamObserver<Res> responses)`    | blocking、async、future unary stub |
-| `rpc A (Req) returns (stream Res)`        | `void a(Req request, StreamObserver<Res> responses)`    | blocking iterator 或 async observer |
-| `rpc A (stream Req) returns (Res)`        | `StreamObserver<Req> a(StreamObserver<Res> responses)`  | async request observer             |
-| `rpc A (stream Req) returns (stream Res)` | `StreamObserver<Req> a(StreamObserver<Res> responses)`  | async request observer             |
+| IDL shape                                 | Server 方法形态                                        | Client 方法形态                     |
+| ----------------------------------------- | ------------------------------------------------------ | ----------------------------------- |
+| `rpc A (Req) returns (Res)`               | `void a(Req request, StreamObserver<Res> responses)`   | blocking、async、future unary stub  |
+| `rpc A (Req) returns (stream Res)`        | `void a(Req request, StreamObserver<Res> responses)`   | blocking iterator 或 async observer |
+| `rpc A (stream Req) returns (Res)`        | `StreamObserver<Req> a(StreamObserver<Res> responses)` | async request observer              |
+| `rpc A (stream Req) returns (stream Res)` | `StreamObserver<Req> a(StreamObserver<Res> responses)` | async request observer              |
 
 Server 可以直接实现生成的 streaming 方法：
 
@@ -354,9 +354,9 @@ final class StreamingClient {
 
 生成 descriptor 会保留 IDL 中的 service 和 method 名称作为 gRPC path。
 
-## 运维语义
+## Service 行为
 
-生成的 service code 只替换 request/response 序列化。常规 gRPC 运维能力仍由 grpc-java 提供：
+生成的 service code 只替换 request/response 序列化。常规 gRPC service 行为仍由 grpc-java 提供：
 
 - Deadline 和取消
 - TLS 和认证

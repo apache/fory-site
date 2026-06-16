@@ -27,9 +27,10 @@ Fory 可以为包含 service 定义的 schema 生成 Python gRPC companion modul
 message bytes，请使用标准 protobuf gRPC 代码生成。
 
 当前生成的 Python companion 面向同步 `grpcio` API。请使用普通 `def` servicer 方法、
-`grpc.server(...)`、`grpc.insecure_channel(...)`，并用 Python iterator/generator 处理
-streaming RPC。Compiler 不会生成 `grpc.aio` stub 或 service base，因此不要把生成 servicer
-方法实现成 `async def`，除非你在生成 companion 外自行封装 adapter。
+`grpc.server(...)`、标准 `grpc.Channel` 实例，并用 Python iterator/generator 处理 streaming RPC。
+生成的 stub 可以接收应用自行配置的任意 channel。Compiler 不会生成 `grpc.aio` stub 或 service
+base，因此不要把生成 servicer 方法实现成 `async def`，除非你在生成 companion 外自行封装 adapter。
+基于 `grpc.aio` 的 Python gRPC async 支持将在下一个 Fory 版本提供。
 
 ## 添加依赖
 
@@ -66,9 +67,9 @@ foryc service.fdl --python_out=./generated/python --grpc
 
 该 schema 会生成：
 
-| 文件                   | 用途                              |
-| ---------------------- | --------------------------------- |
-| `demo_greeter.py`      | Fory dataclass 和注册辅助逻辑     |
+| 文件                   | 用途                                    |
+| ---------------------- | --------------------------------------- |
+| `demo_greeter.py`      | Fory dataclass 和注册辅助逻辑           |
 | `demo_greeter_grpc.py` | `grpcio` stub、servicer base 和注册函数 |
 
 Module 名称来自 Fory package，点号会替换成下划线；没有 package 的 schema 使用 `generated.py` 和
@@ -104,6 +105,8 @@ if __name__ == "__main__":
 
 ## 创建 Client
 
+使用生成的 stub 和普通 `grpcio` channel。生产 client 通常传入配置了 TLS/认证的 channel：
+
 ```python
 import grpc
 
@@ -112,7 +115,8 @@ import demo_greeter_grpc
 
 
 def main():
-    with grpc.insecure_channel("localhost:50051") as channel:
+    credentials = grpc.ssl_channel_credentials()
+    with grpc.secure_channel("api.example.com:443", credentials) as channel:
         stub = demo_greeter_grpc.GreeterStub(channel)
         reply = stub.say_hello(demo_greeter.HelloRequest(name="Fory"))
         print(reply.reply)
@@ -120,6 +124,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
+
+本地测试和开发可以显式使用 insecure channel：
+
+```python
+# 仅用于本地测试和开发。
+# 生产环境请使用配置了 TLS/认证的 grpc.Channel。
+with grpc.insecure_channel("localhost:50051") as channel:
+    stub = demo_greeter_grpc.GreeterStub(channel)
 ```
 
 Channel、credential、deadline、metadata、interceptor、retry 和 server lifecycle 都保持 `grpcio`
@@ -140,12 +153,12 @@ service Greeter {
 
 生成 Python companion 遵循 `grpcio` 的 iterator/generator 约定：
 
-| IDL shape                                 | Servicer 方法形态                         | Stub 方法形态             |
-| ----------------------------------------- | ----------------------------------------- | ------------------------- |
-| `rpc A (Req) returns (Res)`               | 返回一个 response 对象                    | 返回一个 response 对象    |
-| `rpc A (Req) returns (stream Res)`        | yield 多个 response 对象                  | 返回 response iterator    |
-| `rpc A (stream Req) returns (Res)`        | 消费 request iterator 并返回一个 response | 接收 request iterator     |
-| `rpc A (stream Req) returns (stream Res)` | 消费 request iterator 并 yield response   | 接收并返回 iterator       |
+| IDL shape                                 | Servicer 方法形态                         | Stub 方法形态          |
+| ----------------------------------------- | ----------------------------------------- | ---------------------- |
+| `rpc A (Req) returns (Res)`               | 返回一个 response 对象                    | 返回一个 response 对象 |
+| `rpc A (Req) returns (stream Res)`        | yield 多个 response 对象                  | 返回 response iterator |
+| `rpc A (stream Req) returns (Res)`        | 消费 request iterator 并返回一个 response | 接收 request iterator  |
+| `rpc A (stream Req) returns (stream Res)` | 消费 request iterator 并 yield response   | 接收并返回 iterator    |
 
 Servicer 方法使用 snake_case 名称；生成 descriptor 会保留 IDL 中的 service 和 method 名称作为
 gRPC path。每个 message frame 都通过 Fory serializer/deserializer 编码。
@@ -170,7 +183,8 @@ class Greeter(demo_greeter_grpc.GreeterServicer):
 生成的 client 使用标准 `grpcio` streaming 调用形态：
 
 ```python
-with grpc.insecure_channel("localhost:50051") as channel:
+credentials = grpc.ssl_channel_credentials()
+with grpc.secure_channel("api.example.com:443", credentials) as channel:
     stub = demo_greeter_grpc.GreeterStub(channel)
 
     for reply in stub.lots_of_replies(
@@ -193,9 +207,9 @@ with grpc.insecure_channel("localhost:50051") as channel:
         print(reply.reply)
 ```
 
-## 运维语义
+## Service 行为
 
-生成的 service companion 只提供 Fory serialization callback。运维行为仍遵循标准 `grpcio`：
+生成的 service companion 只提供 Fory serialization callback。Service 行为仍遵循标准 `grpcio`：
 
 - Deadline 和取消
 - TLS 和认证 credential

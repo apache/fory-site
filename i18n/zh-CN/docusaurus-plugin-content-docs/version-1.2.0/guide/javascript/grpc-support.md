@@ -88,11 +88,11 @@ foryc service.fdl --javascript_out=./generated/javascript --grpc --grpc-web
 
 输出包含：
 
-| 文件                  | 用途                                  |
-| --------------------- | ------------------------------------- |
+| 文件                  | 用途                                    |
+| --------------------- | --------------------------------------- |
 | `service.ts`          | interface、enum、union 和 schema helper |
-| `service_grpc.ts`     | Node.js `@grpc/grpc-js` server/client |
-| `service_grpc_web.ts` | 浏览器 `grpc-web` client              |
+| `service_grpc.ts`     | Node.js `@grpc/grpc-js` server/client   |
+| `service_grpc_web.ts` | 浏览器 `grpc-web` client                |
 
 ## 实现 Node.js Server
 
@@ -278,9 +278,9 @@ stream.on("end", () => {
 });
 ```
 
-## 运维语义
+## Service 行为
 
-生成的 service code 只替换 request/response 序列化。常规 gRPC 运维能力仍由 transport package
+生成的 service code 只替换 request/response 序列化。常规 gRPC service 行为仍由 transport package
 提供：
 
 - TLS 和 credential

@@ -151,12 +151,12 @@ service Greeter {
 
 Streaming RPC 使用 `kotlinx.coroutines.flow.Flow`。
 
-| IDL shape                                 | Server 方法                              | Client 方法                              |
-| ----------------------------------------- | ---------------------------------------- | ---------------------------------------- |
-| `rpc A (Req) returns (Res)`               | `suspend fun a(request: Req): Res`       | `suspend fun a(request: Req): Res`       |
-| `rpc A (Req) returns (stream Res)`        | `fun a(request: Req): Flow<Res>`         | `fun a(request: Req): Flow<Res>`         |
+| IDL shape                                 | Server 方法                               | Client 方法                               |
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
+| `rpc A (Req) returns (Res)`               | `suspend fun a(request: Req): Res`        | `suspend fun a(request: Req): Res`        |
+| `rpc A (Req) returns (stream Res)`        | `fun a(request: Req): Flow<Res>`          | `fun a(request: Req): Flow<Res>`          |
 | `rpc A (stream Req) returns (Res)`        | `suspend fun a(requests: Flow<Req>): Res` | `suspend fun a(requests: Flow<Req>): Res` |
-| `rpc A (stream Req) returns (stream Res)` | `fun a(requests: Flow<Req>): Flow<Res>`  | `fun a(requests: Flow<Req>): Flow<Res>`  |
+| `rpc A (stream Req) returns (stream Res)` | `fun a(requests: Flow<Req>): Flow<Res>`   | `fun a(requests: Flow<Req>): Flow<Res>`   |
 
 生成 method path 保留 schema 中的 service 和 method 名称，例如 `/demo.greeter.Greeter/SayHello`。
 
@@ -219,9 +219,9 @@ stub.chat(
 }
 ```
 
-## 运维语义
+## Service 行为
 
-生成的 service code 只替换 request/response 序列化。常规 gRPC 运维能力仍由 grpc-java 和
+生成的 service code 只替换 request/response 序列化。常规 gRPC service 行为仍由 grpc-java 和
 grpc-kotlin 提供：
 
 - Deadline 和取消
