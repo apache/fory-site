@@ -27,9 +27,9 @@ Fory 可以为包含 service 定义的 schema 生成 Python gRPC companion modul
 message bytes，请使用标准 protobuf gRPC 代码生成。
 
 当前生成的 Python companion 面向同步 `grpcio` API。请使用普通 `def` servicer 方法、
-`grpc.server(...)`、`grpc.insecure_channel(...)`，并用 Python iterator/generator 处理
-streaming RPC。Compiler 不会生成 `grpc.aio` stub 或 service base，因此不要把生成 servicer
-方法实现成 `async def`，除非你在生成 companion 外自行封装 adapter。
+`grpc.server(...)`、标准 `grpc.Channel` 实例，并用 Python iterator/generator 处理 streaming RPC。
+生成的 stub 可以接收应用自行配置的任意 channel。Compiler 不会生成 `grpc.aio` stub 或 service
+base，因此不要把生成 servicer 方法实现成 `async def`，除非你在生成 companion 外自行封装 adapter。
 
 ## 添加依赖
 
@@ -112,7 +112,8 @@ import demo_greeter_grpc
 
 
 def main():
-    with grpc.insecure_channel("localhost:50051") as channel:
+    credentials = grpc.ssl_channel_credentials()
+    with grpc.secure_channel("api.example.com:443", credentials) as channel:
         stub = demo_greeter_grpc.GreeterStub(channel)
         reply = stub.say_hello(demo_greeter.HelloRequest(name="Fory"))
         print(reply.reply)
@@ -170,7 +171,8 @@ class Greeter(demo_greeter_grpc.GreeterServicer):
 生成的 client 使用标准 `grpcio` streaming 调用形态：
 
 ```python
-with grpc.insecure_channel("localhost:50051") as channel:
+credentials = grpc.ssl_channel_credentials()
+with grpc.secure_channel("api.example.com:443", credentials) as channel:
     stub = demo_greeter_grpc.GreeterStub(channel)
 
     for reply in stub.lots_of_replies(

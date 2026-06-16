@@ -29,8 +29,9 @@ encoding. Use standard protobuf gRPC code generation when clients or tools must
 consume protobuf message bytes directly.
 
 Generated Python companions currently target the synchronous `grpcio` API. Use
-regular `def` servicer methods, `grpc.server(...)`, `grpc.insecure_channel(...)`,
-and Python iterators or generators for streaming RPCs. The compiler does not
+regular `def` servicer methods, `grpc.server(...)`, standard `grpc.Channel`
+instances, and Python iterators or generators for streaming RPCs. The generated
+stub accepts any channel configured by your application. The compiler does not
 generate `grpc.aio` stubs or service bases, so do not implement generated
 servicer methods as `async def` unless you add a custom adapter outside the
 generated companion.
@@ -129,7 +130,8 @@ import demo_greeter_grpc
 
 
 def main():
-    with grpc.insecure_channel("localhost:50051") as channel:
+    credentials = grpc.ssl_channel_credentials()
+    with grpc.secure_channel("api.example.com:443", credentials) as channel:
         stub = demo_greeter_grpc.GreeterStub(channel)
         reply = stub.say_hello(demo_greeter.HelloRequest(name="Fory"))
         print(reply.reply)
@@ -188,7 +190,8 @@ class Greeter(demo_greeter_grpc.GreeterServicer):
 Generated clients use the standard `grpcio` streaming call shapes:
 
 ```python
-with grpc.insecure_channel("localhost:50051") as channel:
+credentials = grpc.ssl_channel_credentials()
+with grpc.secure_channel("api.example.com:443", credentials) as channel:
     stub = demo_greeter_grpc.GreeterStub(channel)
 
     for reply in stub.lots_of_replies(
