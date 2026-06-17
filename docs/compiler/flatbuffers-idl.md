@@ -144,9 +144,10 @@ foryc api.fbs --java_out=./generated/java --python_out=./generated/python --go_o
 Generated service code imports grpc APIs, so applications must provide grpc-java,
 grpc-kotlin, Scala grpc-java APIs, `grpcio`, grpc-go, Rust `tonic` and `bytes`,
 `@grpc/grpc-js`, or C# `Grpc.Core.Api` plus server/client dependencies when they
-compile or run those files. Fory packages do not add gRPC as a hard dependency.
-Use `--grpc-web` with JavaScript output to generate browser clients that import
-`grpc-web`.
+compile or run those files. Python companions use `grpc.aio` by default and can
+be generated in sync mode with `--grpc-python-mode=sync`. Fory packages do not
+add gRPC as a hard dependency. Use `--grpc-web` with JavaScript output to
+generate browser clients that import `grpc-web`.
 
 ### Defaults and Metadata
 
