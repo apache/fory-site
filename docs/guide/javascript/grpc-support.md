@@ -291,7 +291,7 @@ stream.on("end", () => {
 });
 ```
 
-## Operations
+## gRPC Runtime Behavior
 
 Generated service code only replaces request and response serialization. Normal
 gRPC operational features still belong to the transport package:

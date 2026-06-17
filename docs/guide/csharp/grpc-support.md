@@ -284,7 +284,7 @@ A gRPC service named `Greeter` still generates the service companion
 schema files target the same C# namespace without colliding. No
 namespace-derived or service-derived module alias is generated.
 
-## Operations
+## gRPC Runtime Behavior
 
 The generated service code only replaces request and response serialization.
 All normal gRPC operational features still belong to your gRPC stack:

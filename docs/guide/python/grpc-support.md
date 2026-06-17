@@ -28,19 +28,16 @@ IDL, or FlatBuffers IDL and you want gRPC transport semantics with Fory payload
 encoding. Use standard protobuf gRPC code generation when clients or tools must
 consume protobuf message bytes directly.
 
-Generated Python companions currently target the synchronous `grpcio` API. Use
-regular `def` servicer methods, `grpc.server(...)`, standard `grpc.Channel`
-instances, and Python iterators or generators for streaming RPCs. The generated
-stub accepts any channel configured by your application. The compiler does not
-generate `grpc.aio` stubs or service bases, so do not implement generated
-servicer methods as `async def` unless you add a custom adapter outside the
-generated companion. Python gRPC async support based on `grpc.aio` will be
-available in the next Fory release.
+Python gRPC generation defaults to the `grpc.aio` AsyncIO API. Generated
+servicer bases use `async def` methods, generated stubs are used with
+`grpc.aio.Channel` instances, and streaming RPCs use async iterables. Synchronous
+`grpcio` companions are still available with `--grpc-python-mode=sync`.
 
 ## Install Dependencies
 
-Install `grpcio` alongside `pyfory`. The generated companion imports `grpc`, but
-`pyfory` does not add gRPC as a hard dependency.
+Install `grpcio` alongside `pyfory`. The generated companion imports `grpc` and,
+in the default mode, `grpc.aio`, but `pyfory` does not add gRPC as a hard
+dependency.
 
 ```bash
 pip install pyfory grpcio
@@ -75,79 +72,82 @@ foryc service.fdl --python_out=./generated/python --grpc
 
 For this schema, the Python generator emits:
 
-| File                   | Purpose                                     |
-| ---------------------- | ------------------------------------------- |
-| `demo_greeter.py`      | Fory dataclasses and registration helpers   |
-| `demo_greeter_grpc.py` | `grpcio` stub, servicer base, and registrar |
+| File                   | Purpose                                       |
+| ---------------------- | --------------------------------------------- |
+| `demo_greeter.py`      | Fory dataclasses and registration helpers     |
+| `demo_greeter_grpc.py` | `grpc.aio` stub, servicer base, and registrar |
 
 The module name is derived from the Fory package by replacing dots with
 underscores. A schema with no package uses `generated.py` and
 `generated_grpc.py`.
 
-## Implement a Server
+## Implement an Async Server
 
-Subclass the generated servicer and register it with a normal `grpcio` server.
+Subclass the generated servicer and register it with a `grpc.aio` server.
 Generated Python method names use snake_case, while the gRPC wire path keeps the
 original IDL method name.
 
 ```python
-from concurrent import futures
+import asyncio
 
-import grpc
+import grpc.aio
 
 import demo_greeter
 import demo_greeter_grpc
 
 
 class Greeter(demo_greeter_grpc.GreeterServicer):
-    def say_hello(self, request, context):
+    async def say_hello(self, request, context):
         return demo_greeter.HelloReply(reply=f"Hello, {request.name}")
 
 
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
+async def serve():
+    server = grpc.aio.server()
     demo_greeter_grpc.add_servicer(Greeter(), server)
     server.add_insecure_port("[::]:50051")
-    server.start()
-    server.wait_for_termination()
+    await server.start()
+    await server.wait_for_termination()
 
 
 if __name__ == "__main__":
-    serve()
+    asyncio.run(serve())
 ```
 
 Generated request and response types are serialized by the generated companion,
 so service implementations do not perform manual Fory registration.
 
-## Create a Client
+## Create an Async Client
 
-Use the generated stub with a normal `grpcio` channel. Production clients
-usually pass a TLS/auth-configured channel:
+Use the generated stub with a `grpc.aio` channel. Production clients usually
+pass a TLS/auth-configured channel:
 
 ```python
+import asyncio
+
 import grpc
+import grpc.aio
 
 import demo_greeter
 import demo_greeter_grpc
 
 
-def main():
+async def main():
     credentials = grpc.ssl_channel_credentials()
-    with grpc.secure_channel("api.example.com:443", credentials) as channel:
+    async with grpc.aio.secure_channel("api.example.com:443", credentials) as channel:
         stub = demo_greeter_grpc.GreeterStub(channel)
-        reply = stub.say_hello(demo_greeter.HelloRequest(name="Fory"))
+        reply = await stub.say_hello(demo_greeter.HelloRequest(name="Fory"))
         print(reply.reply)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
 ```
 
 For local tests and development, an insecure channel can be used explicitly:
 
 ```python
-# Test-only channel. Use a TLS/auth-configured grpc.Channel in production.
-with grpc.insecure_channel("localhost:50051") as channel:
+# Test-only channel. Use a TLS/auth-configured grpc.aio.Channel in production.
+async with grpc.aio.insecure_channel("localhost:50051") as channel:
     stub = demo_greeter_grpc.GreeterStub(channel)
 ```
 
@@ -168,63 +168,118 @@ service Greeter {
 }
 ```
 
-Generated Python code follows `grpcio` conventions:
+Default Python gRPC output follows `grpc.aio` conventions:
 
-| IDL shape                                 | Servicer method shape                       | Stub method shape                |
-| ----------------------------------------- | ------------------------------------------- | -------------------------------- |
-| `rpc A (Req) returns (Res)`               | returns one response object                 | returns one response object      |
-| `rpc A (Req) returns (stream Res)`        | yields response objects                     | returns an iterator of responses |
-| `rpc A (stream Req) returns (Res)`        | consumes an iterator and returns a response | accepts an iterator of requests  |
-| `rpc A (stream Req) returns (stream Res)` | consumes and yields iterators               | accepts and returns iterators    |
+| IDL shape                                 | Servicer method shape                           | Stub method shape                      |
+| ----------------------------------------- | ----------------------------------------------- | -------------------------------------- |
+| `rpc A (Req) returns (Res)`               | `async def` returns one response object         | awaitable returns one response object  |
+| `rpc A (Req) returns (stream Res)`        | `async def` yields response objects             | returns an async iterator of responses |
+| `rpc A (stream Req) returns (Res)`        | consumes an async iterator and returns response | accepts an async iterator of requests  |
+| `rpc A (stream Req) returns (stream Res)` | consumes and yields async iterators             | accepts and returns async iterators    |
 
 Servicer methods use snake_case names, while generated descriptors preserve the
 exact IDL service and method names for the gRPC path.
 
-Server implementations can use Python iterators directly:
+Server implementations use async methods and async iteration:
 
 ```python
 class Greeter(demo_greeter_grpc.GreeterServicer):
-    def lots_of_replies(self, request, context):
+    async def lots_of_replies(self, request, context):
         yield demo_greeter.HelloReply(reply=f"Hello, {request.name}")
         yield demo_greeter.HelloReply(reply=f"Welcome, {request.name}")
 
-    def lots_of_greetings(self, request_iterator, context):
-        names = [request.name for request in request_iterator]
+    async def lots_of_greetings(self, request_iterator, context):
+        names = []
+        async for request in request_iterator:
+            names.append(request.name)
         return demo_greeter.HelloReply(reply=", ".join(names))
 
-    def chat(self, request_iterator, context):
-        for request in request_iterator:
+    async def chat(self, request_iterator, context):
+        async for request in request_iterator:
             yield demo_greeter.HelloReply(reply=f"Hello, {request.name}")
 ```
 
-Generated clients use the standard `grpcio` streaming call shapes:
+Generated clients use `grpc.aio` streaming call shapes:
 
 ```python
 credentials = grpc.ssl_channel_credentials()
-with grpc.secure_channel("api.example.com:443", credentials) as channel:
+async with grpc.aio.secure_channel("api.example.com:443", credentials) as channel:
     stub = demo_greeter_grpc.GreeterStub(channel)
 
-    for reply in stub.lots_of_replies(
+    async for reply in stub.lots_of_replies(
         demo_greeter.HelloRequest(name="Fory")
     ):
         print(reply.reply)
 
-    def greeting_requests():
+    async def greeting_requests():
         yield demo_greeter.HelloRequest(name="Ada")
         yield demo_greeter.HelloRequest(name="Grace")
 
-    summary = stub.lots_of_greetings(greeting_requests())
+    summary = await stub.lots_of_greetings(greeting_requests())
     print(summary.reply)
 
-    def chat_requests():
+    async def chat_requests():
         yield demo_greeter.HelloRequest(name="Fory")
         yield demo_greeter.HelloRequest(name="RPC")
 
-    for reply in stub.chat(chat_requests()):
+    async for reply in stub.chat(chat_requests()):
         print(reply.reply)
 ```
 
-## Operations
+## Sync Mode
+
+Use sync mode for existing synchronous `grpcio` applications or environments
+that do not run an asyncio event loop. Generate sync companions explicitly:
+
+```bash
+foryc service.fdl --python_out=./generated/python --grpc --grpc-python-mode=sync
+```
+
+Sync mode emits the same `<module>_grpc.py` filename and public names, but the
+servicer methods use regular `def`, and applications use `grpc.server(...)` and
+standard `grpc.Channel` instances.
+
+Unary sync server example:
+
+```python
+from concurrent import futures
+
+import grpc
+
+import demo_greeter
+import demo_greeter_grpc
+
+
+class Greeter(demo_greeter_grpc.GreeterServicer):
+    def say_hello(self, request, context):
+        return demo_greeter.HelloReply(reply=f"Hello, {request.name}")
+
+
+server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
+demo_greeter_grpc.add_servicer(Greeter(), server)
+server.add_insecure_port("[::]:50051")
+server.start()
+server.wait_for_termination()
+```
+
+Unary sync client example:
+
+```python
+import grpc
+
+import demo_greeter
+import demo_greeter_grpc
+
+
+with grpc.insecure_channel("localhost:50051") as channel:
+    stub = demo_greeter_grpc.GreeterStub(channel)
+    reply = stub.say_hello(demo_greeter.HelloRequest(name="Fory"))
+    print(reply.reply)
+```
+
+Sync streaming follows the normal `grpcio` iterator and generator conventions.
+
+## gRPC Runtime Behavior
 
 The generated service companion only supplies Fory serialization callbacks.
 Operational behavior remains standard `grpcio` behavior:
@@ -233,8 +288,8 @@ Operational behavior remains standard `grpcio` behavior:
 - TLS and authentication credentials
 - Client and server interceptors
 - Status codes, details, and metadata
-- Channel and server lifecycle
-- Thread pool sizing for synchronous servers
+- Async event loop, channel, and server lifecycle in default mode
+- Thread pool sizing for synchronous servers in sync mode
 
 ## Troubleshooting
 
