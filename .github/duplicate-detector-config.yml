@@ -1,0 +1,44 @@
+# Duplicate Detection Configuration
+# This file configures the duplicate issue and PR detection behavior
+
+# Similarity threshold (0.0 to 1.0) - Issues with similarity above this will be flagged
+# Default: 0.75 means 75% similarity
+similarity_threshold: 0.75
+
+# High similarity threshold for exact matches
+# Issues above this threshold will be marked as exact duplicates
+# Default: 0.90 means 90% similarity
+high_similarity_threshold: 0.90
+
+# Maximum number of past issues/PRs to check against
+# Higher numbers = more thorough but slower
+# Default: 200
+max_issues_to_check: 200
+
+# Automatically close issues that are exact matches (high similarity)
+# Set to true to enable auto-closing
+# Default: false (recommended to keep false for review)
+auto_close_exact_match: false
+
+# Label to add for possible duplicates
+label_possible_duplicate: "possible-duplicate"
+
+# Label to add for exact duplicates
+label_exact_duplicate: "duplicate"
+
+# Labels to exclude from duplicate checking
+# Issues with these labels won't be considered as potential duplicates
+exclude_labels:
+  - "wontfix"
+  - "invalid"
+  - "spam"
+
+# Minimum text length (in characters) required for comparison
+# Issues with less text will be skipped
+# Default: 20
+min_text_length: 20
+
+# Additional settings (optional)
+# Number of top similar issues to show in the comment
+# Default: 5
+max_similar_to_show: 5
