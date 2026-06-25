@@ -41,22 +41,30 @@ const fory = new Fory({
   ref: true,
   compatible: true,
   maxDepth: 100,
+  maxTypeFields: 512,
+  maxTypeMetaBytes: 4096,
+  maxSchemaVersionsPerType: 10,
+  maxAverageSchemaVersionsPerType: 3,
   maxBinarySize: 64 * 1024 * 1024,
   maxCollectionSize: 1_000_000,
   hps,
 });
 ```
 
-| 选项                       | 默认值      | 说明                                                             |
-| -------------------------- | ----------- | ---------------------------------------------------------------- |
-| `ref`                      | `false`     | 为共享或循环对象图启用引用跟踪                                   |
-| `compatible`               | `true`      | 允许新增或删除字段而不破坏现有消息                               |
-| `maxDepth`                 | `50`        | 最大嵌套深度。必须 `>= 2`。对于深度嵌套结构可以调大              |
-| `maxBinarySize`            | 64 MiB      | 任意单个二进制字段可接受的最大字节数                             |
-| `maxCollectionSize`        | `1_000_000` | 任意 list、set 或 map 可接受的最大元素数                         |
-| `useSliceString`           | `false`     | Node.js 的可选字符串读取优化。除非已做基准测试，否则保持默认值   |
-| `hps`                      | 未设置      | 来自 `@apache-fory/hps` 的可选快速字符串辅助库（Node.js 20+）    |
-| `hooks.afterCodeGenerated` | 未设置      | 用于检查生成的序列化器代码的回调，便于调试                       |
+| 选项                              | 默认值      | 说明                                                             |
+| --------------------------------- | ----------- | ---------------------------------------------------------------- |
+| `ref`                             | `false`     | 为共享或循环对象图启用引用跟踪                                   |
+| `compatible`                      | `true`      | 允许新增或删除字段而不破坏现有消息                               |
+| `maxDepth`                        | `50`        | 最大嵌套深度。必须 `>= 2`。对于深度嵌套结构可以调大              |
+| `maxTypeFields`                   | `512`       | 一个收到的远端 struct metadata body 最大字段数                   |
+| `maxTypeMetaBytes`                | `4096`      | 一个收到的 TypeMeta body 最大编码字节数                          |
+| `maxSchemaVersionsPerType`        | `10`        | 一个逻辑类型最大远端 metadata 版本数                             |
+| `maxAverageSchemaVersionsPerType` | `3`         | 所有远端类型的平均 metadata 版本数                               |
+| `maxBinarySize`                   | 64 MiB      | 任意单个二进制字段可接受的最大字节数                             |
+| `maxCollectionSize`               | `1_000_000` | 任意 list、set 或 map 可接受的最大元素数                         |
+| `useSliceString`                  | `false`     | Node.js 的可选字符串读取优化。除非已做基准测试，否则保持默认值   |
+| `hps`                             | 未设置      | 来自 `@apache-fory/hps` 的可选快速字符串辅助库（Node.js 20+）    |
+| `hooks.afterCodeGenerated`        | 未设置      | 用于检查生成的序列化器代码的回调，便于调试                       |
 
 ## 引用跟踪
 
@@ -96,6 +104,8 @@ const fory = new Fory({ hps });
 
 - 在反序列化不可信载荷前，只注册预期的 schema。
 - 根据服务可接受的最大载荷形状设置 `maxDepth`、`maxBinarySize` 和 `maxCollectionSize`。
+- 除非数据不是恶意输入，且可信 peer 会发送更大的远端 metadata，否则保持 `maxTypeFields` 和 `maxTypeMetaBytes` 的默认值。
+- 除非数据不是恶意输入，且可信 peer 会发送大量远端 schema 版本，否则保持 `maxSchemaVersionsPerType` 和 `maxAverageSchemaVersionsPerType` 的默认值。
 - 对不可信输入，优先使用显式的 `Type.struct(...)` schema，而不是 `Type.any()`。
 - 只传入与你部署的运行时版本配套的官方包中的 `hps`。
 

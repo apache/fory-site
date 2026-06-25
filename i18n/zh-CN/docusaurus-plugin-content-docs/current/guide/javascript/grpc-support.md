@@ -278,7 +278,7 @@ stream.on("end", () => {
 });
 ```
 
-## Service 行为
+## gRPC 运行时行为
 
 生成的 service code 只替换 request/response 序列化。常规 gRPC service 行为仍由 transport package
 提供：

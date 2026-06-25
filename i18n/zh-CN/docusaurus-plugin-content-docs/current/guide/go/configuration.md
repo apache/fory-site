@@ -33,12 +33,16 @@ f := fory.New()
 
 默认设置：
 
-| Option     | Default | Description              |
-| ---------- | ------- | ------------------------ |
-| TrackRef   | false   | 关闭引用跟踪             |
-| MaxDepth   | 20      | 最大嵌套深度             |
-| IsXlang    | false   | 关闭跨语言模式           |
-| Compatible | false   | 关闭 Schema 演进兼容模式 |
+| Option                          | Default | Description                            |
+| ------------------------------- | ------- | -------------------------------------- |
+| TrackRef                        | false   | 关闭引用跟踪                           |
+| MaxDepth                        | 20      | 最大嵌套深度                           |
+| IsXlang                         | false   | 关闭跨语言模式                         |
+| Compatible                      | false   | 关闭 Schema 演进兼容模式               |
+| MaxTypeFields                   | 512     | 一个收到的 struct metadata body 最大字段数 |
+| MaxTypeMetaBytes                | 4096    | 一个收到的 metadata body 最大编码字节数 |
+| MaxSchemaVersionsPerType        | 10      | 一个逻辑类型最大远端 metadata 版本数   |
+| MaxAverageSchemaVersionsPerType | 3       | 所有远端类型的平均 metadata 版本数     |
 
 ### 通过选项配置
 
@@ -47,6 +51,10 @@ f := fory.New(
     fory.WithTrackRef(true),
     fory.WithCompatible(true),
     fory.WithMaxDepth(10),
+    fory.WithMaxTypeFields(512),
+    fory.WithMaxTypeMetaBytes(4096),
+    fory.WithMaxSchemaVersionsPerType(10),
+    fory.WithMaxAverageSchemaVersionsPerType(3),
 )
 ```
 
@@ -117,6 +125,38 @@ f := fory.New(fory.WithMaxDepth(30))
 - 默认值：20
 - 防护深层递归结构或恶意数据
 - 超过限制会返回错误
+
+### WithMaxTypeFields
+
+设置一个收到的远端 struct metadata body 中可接受的最大字段数：
+
+```go
+f := fory.New(fory.WithMaxTypeFields(512))
+```
+
+### WithMaxTypeMetaBytes
+
+设置一个收到的 TypeDef body 可接受的最大编码 body 字节数，不包含 8 字节 header 和扩展 size varint：
+
+```go
+f := fory.New(fory.WithMaxTypeMetaBytes(4096))
+```
+
+### WithMaxSchemaVersionsPerType
+
+设置一个逻辑类型可接受的最大远端 metadata 版本数：
+
+```go
+f := fory.New(fory.WithMaxSchemaVersionsPerType(10))
+```
+
+### WithMaxAverageSchemaVersionsPerType
+
+设置所有已接受远端类型的平均 metadata 版本数限制。有效全局下限为 `8192` 个 schema：
+
+```go
+f := fory.New(fory.WithMaxAverageSchemaVersionsPerType(3))
+```
 
 ### WithXlang
 
@@ -330,6 +370,7 @@ for req := range requests {
 4. **需要长期保存数据时请复制**：默认实例返回的字节切片会在后续调用后失效。
 5. **合理设置最大深度**：深层结构可适当调大，但需关注内存占用。
 6. **Schema 可能演进时启用兼容模式**：服务版本存在结构差异时建议开启。
+7. **保留远端 metadata 限制默认值**：除非输入可信且 peer 确实会发送更大的 metadata 或大量 schema 版本。
 
 ## 相关主题
 

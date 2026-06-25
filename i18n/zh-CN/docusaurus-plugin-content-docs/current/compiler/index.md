@@ -20,7 +20,7 @@ license: |
 ---
 
 Fory IDL 是 Apache Fory 的 Schema 定义语言，可实现类型安全的跨语言序列化。
-你只需定义一次数据结构，即可为 Java、Python、Go、Rust、C++、C#、Swift、JavaScript 和 Dart 生成原生数据结构代码。
+你只需定义一次数据结构，即可为 Java、Python、Go、Rust、C++、C#、Swift、Dart、Scala、Kotlin 和 JavaScript/TypeScript 生成原生数据结构代码。Fory IDL 也可以描述 RPC service；对于 Java、Python、Go、Rust、C#、Dart、Scala、Kotlin 和 JavaScript，compiler 可以生成使用 Fory 序列化 request/response payload 的 gRPC service companion。
 
 ## 示例 Schema
 
@@ -142,6 +142,14 @@ foryc example.fdl --output ./generated
 # 为指定语言生成
 foryc example.fdl --lang java,python,csharp,javascript,swift,dart --output ./generated
 ```
+
+为包含 service 定义的 schema 生成 Java、Python、Go、Rust、C#、Dart、Scala、Kotlin 和 JavaScript model 以及 gRPC service companion：
+
+```bash
+foryc animals.fdl --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --dart_out=./generated/dart --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript --grpc
+```
+
+生成的 service 代码使用标准 gRPC API，但 request 和 response 对象使用 Fory 序列化。应用需要自行提供 grpc-java、grpc-kotlin、Scala grpc-java API、`grpcio`、grpc-go、Rust `tonic` 和 `bytes`、C# `Grpc.Core.Api` 及 server/client 依赖，或 Dart `package:grpc`；Fory package 不会把 gRPC 作为硬依赖。Python companion 默认使用 `grpc.aio`，也可以通过 `--grpc-python-mode=sync` 生成同步模式。JavaScript Node.js companion 使用 `@grpc/grpc-js`；浏览器 client 通过 `--grpc-web` 单独生成并使用 `grpc-web`。
 
 ### 4. 使用生成代码
 

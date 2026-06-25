@@ -38,6 +38,10 @@ license: |
 | `registerGuavaTypes`                | 是否预注册 Guava 类型，例如 `RegularImmutableMap` / `RegularImmutableList`。这些类型不是公共 API，但看起来相当稳定。                                                                                                                                                                                                                                                                          | `true`                                                             |
 | `requireClassRegistration`          | 关闭后可能允许未知类被反序列化，从而带来安全风险。                                                                                                                                                                                                                                                                                                                                             | `true`                                                             |
 | `maxDepth`                          | 设置反序列化的最大深度，超过时会抛出异常。可用于阻止反序列化 DDOS 攻击。                                                                                                                                                                                                                                                                                                                       | `50`                                                               |
+| `maxTypeFields`                     | 一个收到的远端 struct metadata body 中可接受的最大字段数。                                                                                                                                                                                                                                                                                                                                     | `512`                                                              |
+| `maxTypeMetaBytes`                  | 一个收到的 TypeDef 或 TypeMeta body 可接受的最大编码 body 字节数，不包含 8 字节 header 和扩展 size varint。                                                                                                                                                                                                                                                                                   | `4096`                                                             |
+| `maxSchemaVersionsPerType`          | 一个逻辑类型可接受的最大远端 metadata 版本数。                                                                                                                                                                                                                                                                                                                                                 | `10`                                                               |
+| `maxAverageSchemaVersionsPerType`   | 所有已接受远端类型的平均 metadata 版本数限制；有效全局下限为 `8192` 个 metadata entry。                                                                                                                                                                                                                                                                                                        | `3`                                                                |
 | `suppressClassRegistrationWarnings` | 是否抑制类注册警告。这些警告可用于安全审计，但可能较为烦人，因此默认启用抑制。                                                                                                                                                                                                                                                                                                                 | `true`                                                             |
 | `metaShareEnabled`                  | 启用或禁用元数据共享模式。                                                                                                                                                                                                                                                                                                                                                                     | 如果设置了 `CompatibleMode.COMPATIBLE` 则为 `true`，否则为 false。 |
 | `scopedMetaShareEnabled`            | 作用域元数据共享只关注单次序列化过程。在该过程中创建或识别的元数据只归属于这次序列化，不会与其他序列化共享。                                                                                                                                                                                                                                                                                  | 如果设置了 `CompatibleMode.COMPATIBLE` 则为 `true`，否则为 false。 |
@@ -69,6 +73,17 @@ Fory fory = Fory.builder()
   .withAsyncCompilation(true)
   .build();
 ```
+
+## 安全
+
+安全相关选项：
+
+- `requireClassRegistration(true)` 将反序列化限制为已注册类。
+- `withMaxDepth(...)` 拒绝异常深的对象图。
+- `withMaxTypeFields(...)` 和 `withMaxTypeMetaBytes(...)` 约束一个收到的远端 metadata body 的字段数和编码 body 大小。
+- `withMaxSchemaVersionsPerType(...)` 和 `withMaxAverageSchemaVersionsPerType(...)` 约束可接受的远端 metadata 版本数，但不改变注册、动态加载或 Schema 演进语义。
+- `withDeserializeUnknownClass(false)` 避免从 metadata 物化 unknown class。
+- `checkJdkClassSerializable(true)` 保持对 `java.*` class 的 JDK serializability 检查。
 
 ## 相关主题
 

@@ -48,9 +48,9 @@ license: |
 | 循环引用  | 不支持                | 支持                   |
 | 未知字段  | 保留                  | 不保留                 |
 | 生成类型  | protobuf 专用模型类型 | 语言原生构造           |
-| gRPC 生态 | 原生成熟              | 持续建设中（活跃开发） |
+| gRPC 生态 | 原生成熟              | Java/Python/Go/Rust/C#/Dart/Scala/Kotlin/JavaScript service codegen |
 
-Fory 的 gRPC 支持仍在持续开发中。当前生产级 gRPC 工作流里，protobuf 仍是更成熟的默认选择。
+Fory 可以通过 `--grpc` 生成 Java、Python、Go、Rust、C#、Dart、Scala、Kotlin 和 JavaScript gRPC service companion。JavaScript 浏览器 client 通过 `--grpc-web` 生成。这些 service 使用标准 gRPC 传输，但 request 和 response payload 使用 Fory 序列化，而不是 protobuf。对于广泛的 gRPC 生态工具、schema reflection 和 protobuf-native interceptor，protobuf 仍是更成熟的默认选择。
 
 ## 为什么使用 Apache Fory
 
@@ -294,6 +294,14 @@ message TreeNode {
 ### 第 4 步：更新构建与代码生成
 
 将 protobuf 代码生成步骤替换为 Fory 编译器针对目标语言的生成命令。
+
+对于支持的 service 输出，添加 `--grpc` 以生成 gRPC companion 代码：
+
+```bash
+foryc api.proto --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --dart_out=./generated/dart --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript --grpc
+```
+
+生成的 Java service 文件依赖 grpc-java；Python service module 默认使用 `grpc.aio`；Rust service 文件导入 `tonic` 和 `bytes`；Go service 文件导入 grpc-go；JavaScript Node.js service 文件导入 `@grpc/grpc-js`；C# service 文件导入 `Grpc.Core.Api` 类型；Dart service 文件导入 `package:grpc`；Scala service 文件依赖 grpc-java；Kotlin service 文件依赖 grpc-java 和 grpc-kotlin。请在应用构建中加入这些依赖；Fory package 不会把 gRPC 作为硬依赖。同步 Python `grpcio` companion 可使用 `--grpc-python-mode=sync`。JavaScript 输出配合 `--grpc-web` 可生成导入 `grpc-web` 的浏览器 client。
 
 ### 第 5 步：执行兼容性验证
 

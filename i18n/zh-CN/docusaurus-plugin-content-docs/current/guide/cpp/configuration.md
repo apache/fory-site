@@ -69,6 +69,10 @@ auto fory = Fory::builder()
     .xlang(true)
     .track_ref(true)
     .max_dyn_depth(10)
+    .max_type_fields(512)
+    .max_type_meta_bytes(4096)
+    .max_schema_versions_per_type(10)
+    .max_average_schema_versions_per_type(3)
     .check_struct_version(true)
     .build();
 ```
@@ -136,6 +140,54 @@ auto fory = Fory::builder()
 - **增加**：对于合法的深度嵌套数据结构
 - **减少**：对于更严格的安全要求或浅层数据结构
 
+### max_schema_versions_per_type(uint32_t)
+
+设置一个逻辑类型可接受的最大远端 metadata 版本数。
+
+```cpp
+auto fory = Fory::builder()
+    .max_schema_versions_per_type(10)
+    .build();
+```
+
+**默认值：** `10`
+
+### max_type_fields(uint32_t)
+
+设置一个收到的远端 struct metadata body 中可接受的最大字段数。
+
+```cpp
+auto fory = Fory::builder()
+    .max_type_fields(512)
+    .build();
+```
+
+**默认值：** `512`
+
+### max_type_meta_bytes(uint32_t)
+
+设置一个收到的 TypeDef body 可接受的最大编码 body 字节数，不包含 8 字节 header 和扩展 size varint。
+
+```cpp
+auto fory = Fory::builder()
+    .max_type_meta_bytes(4096)
+    .build();
+```
+
+**默认值：** `4096`
+
+### max_average_schema_versions_per_type(uint32_t)
+
+设置所有已接受远端类型的平均 metadata 版本数限制。有效全局下限为 `8192` 个 schema。
+
+```cpp
+auto fory = Fory::builder()
+    .max_average_schema_versions_per_type(3)
+    .build();
+```
+
+**默认值：** `3`
+
 ### check_struct_version(bool)
 
 启用/禁用结构体版本检查。
@@ -174,13 +226,27 @@ auto fory = Fory::builder()
 
 ## 配置摘要
 
-| 选项                         | 说明                   | 默认值  |
-| ---------------------------- | ---------------------- | ------- |
-| `xlang(bool)`                | 启用跨语言模式         | `true`  |
-| `compatible(bool)`           | 启用 schema 演化       | `false` |
-| `track_ref(bool)`            | 启用引用跟踪           | `true`  |
-| `max_dyn_depth(uint32_t)`    | 动态类型的最大嵌套深度 | `5`     |
-| `check_struct_version(bool)` | 启用结构体版本检查     | `false` |
+| 选项                                             | 说明                              | 默认值  |
+| ------------------------------------------------ | --------------------------------- | ------- |
+| `xlang(bool)`                                    | 启用跨语言模式                    | `true`  |
+| `compatible(bool)`                               | 启用 schema 演化                  | `false` |
+| `track_ref(bool)`                                | 启用引用跟踪                      | `true`  |
+| `max_dyn_depth(uint32_t)`                        | 动态类型的最大嵌套深度            | `5`     |
+| `max_type_fields(uint32_t)`                      | 一个收到的 struct metadata body 最大字段数 | `512`   |
+| `max_type_meta_bytes(uint32_t)`                  | 一个收到的 metadata body 最大编码字节数 | `4096`  |
+| `max_schema_versions_per_type(uint32_t)`         | 一个逻辑类型最大远端 metadata 版本数 | `10`    |
+| `max_average_schema_versions_per_type(uint32_t)` | 所有远端类型的平均 metadata 版本数 | `3`     |
+| `check_struct_version(bool)`                     | 启用结构体版本检查                | `false` |
+
+## 安全
+
+安全相关配置：
+
+- 在反序列化不可信 payload 前，只注册预期的类型。
+- 对 intentional same-schema payload，将 `check_struct_version(true)` 与 `compatible(false)` 配合使用。
+- 尽可能降低 `max_dyn_depth(...)`，以拒绝异常深的多态对象图。
+- 除非数据不是恶意输入，且可信 peer 会发送更大的 metadata 或大量 schema 版本，否则保持远端 schema metadata 限制的默认值。
+- 对不可信输入，优先使用具体字段，避免宽泛的多态字段。
 
 ## 相关主题
 

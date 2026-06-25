@@ -144,3 +144,4 @@ prettier --write "**/*.md"
 ## 贡献
 
 更多信息，请参考[如何贡献到 Apache Fory™](https://github.com/apache/fory/blob/main/CONTRIBUTING.md)。
+对于 AI 辅助贡献，请遵循 [AI Contribution Policy](https://github.com/apache/fory/blob/main/AI_POLICY.md)，包括 substantial AI assistance 所需的自审、双 reviewer AI review 循环、披露和验证证据。

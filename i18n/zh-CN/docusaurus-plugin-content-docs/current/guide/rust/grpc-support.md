@@ -34,7 +34,7 @@ streaming response 或 request stream，可添加 `tokio-stream`。
 
 ```toml
 [dependencies]
-fory = "1.2.0"
+fory = "1.3.0"
 bytes = "1"
 tonic = { version = "0.14", features = ["transport"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
@@ -283,7 +283,7 @@ while let Some(reply) = chat.message().await? {
 Rust gRPC payload 必须满足 `Send + 'static`，这样 tonic 才能在线程间移动 request/response。
 如果 request 或 response schema 使用非线程安全的引用元信息，Rust gRPC 生成会拒绝该 service。
 
-## Service 行为
+## gRPC 运行时行为
 
 生成的 service companion 只提供 Fory 序列化和 tonic binding。deadline、取消、TLS、认证、
 Tower middleware、interceptor、status code、metadata、channel/server 生命周期和 backpressure

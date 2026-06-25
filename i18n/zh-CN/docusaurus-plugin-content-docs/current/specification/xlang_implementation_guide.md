@@ -312,13 +312,28 @@ struct 专属的 schema/version 包装与 compatible-field staging
 - 运行时会在 struct 载荷前写入 schema hash
 - 读取侧会在读字段之前检查该 hash
 
+## 远端 Metadata 资源限制
+
+实现应在 cold metadata parse path 上限制收到的 metadata body 和 struct 字段列表。
+`maxTypeMetaBytes` 限制一个 TypeDef 或 TypeMeta 的编码 body，不包含 8 字节 header 和扩展
+size varint，并且应在复制或解压 body 前检查。`maxTypeFields` 限制一个收到的 struct metadata
+body 声明的字段数，并应在预留或分配字段列表前检查。
+
+这些限制是运行时资源控制；它们不会改变编码格式、类型标识、动态加载、unknown-type 行为、
+反序列化策略或 Schema 演进语义。Metadata cache hit 和生成的字段 reader 仍是 hot path，不应为这些限制增加额外工作。
+
+远端 schema-version 限制属于同一个 cold metadata owner path。Header cache hit 必须跳过剩余
+metadata body，并返回已缓存 metadata；不要重新执行 schema-limit 检查、hash 复验、分配或 policy 工作。Header miss 时，应在同一个具体 owner path 中完成处理：证明并读取 metadata body bytes，按 header 校验 body，校验字段数，通过现有注册与反序列化策略检查解析类型，必要时按原始编码字节比较精确本地 metadata，对非本地远端 metadata 检查 schema-version 限制，构建所需 read state，发布到持久 metadata cache，最后记录 schema count。失败或不兼容的 metadata 不得发布到持久 cache，也不得消耗 schema-version count。
+
+编码字节与本地已注册 metadata 精确匹配的远端 metadata，在完成选择本地类型所需的现有类型与反序列化策略检查后，可以使用本地 metadata，且不消耗远端 schema-version 限制。这个 exact-local bypass 不只适用于 struct；当 named enum、ext 和 union metadata 带有 metadata body 且与本地编码字节匹配时，同样适用。纯 id-based enum、ext 和 typed-union value 不携带 TypeDef 或 TypeMeta body，必须继续走普通 type-id 加 user-type-id 路径。兼容 named enum、ext 和 union metadata 通常只有一个版本，但当它作为 shared metadata 发送且不精确匹配本地 metadata 时，仍会计入已接受远端 metadata 总数。`maxTypeFields` 只适用于 struct 字段列表。
+
 ## Meta string 与共享类型元信息
 
 xlang 类型元信息由两类显式状态支撑：
 
 - `MetaStringWriter` 和 `MetaStringReader`
   负责去重与解码命名空间和类型名字串
-- 共享 TypeDef 的读写状态负责跟踪已声明的 compatible struct 元数据
+- 共享 TypeDef 的读写状态负责跟踪已声明的 TypeDef 元数据
 
 所有权规则：
 

@@ -323,6 +323,41 @@ data = person.to_bytes()
 restored = Person.from_bytes(data)
 ```
 
+### gRPC Service Companion
+
+当 schema 包含 service，且 compiler 使用 `--grpc` 运行时，Python 会生成名为
+`<module>_grpc.py` 的 companion module。Module 名称由 Fory package 的点号替换为下划线得到；
+没有 package 时使用 `generated`。Python gRPC 输出默认使用 `grpc.aio` AsyncIO API。
+
+```python
+import grpc
+import grpc.aio
+
+
+class AddressBookServiceStub:
+    def __init__(self, channel):
+        self.lookup = channel.unary_unary(
+            "/example.AddressBookService/Lookup",
+            request_serializer=...,
+            response_deserializer=...,
+        )
+
+
+class AddressBookServiceServicer:
+    async def lookup(self, request, context):
+        await context.abort(grpc.StatusCode.UNIMPLEMENTED, "Method not implemented!")
+
+
+def add_servicer(servicer, server): ...
+```
+
+编译或运行生成 companion module 的应用必须安装 `grpcio`；`pyfory` 不会加入硬 gRPC 依赖。
+Python API 使用 snake_case 方法名，同时在 gRPC wire path 中保留原始 IDL method 名称。
+
+使用 `--grpc --grpc-python-mode=sync` 可以生成同步 Python `grpcio` companion。Sync 模式保持
+相同的生成文件名和 public name，但 servicer 方法使用普通 `def`，并使用同步 `grpc.Channel`
+和 `grpc.Server` 实例。
+
 ## Rust
 
 ### 输出布局
@@ -999,6 +1034,38 @@ void main() {
   final roundTrip = fory.deserialize<Person>(bytes);
 }
 ```
+
+### gRPC Service Companion
+
+当 schema 包含 service，且 compiler 使用 `--grpc` 运行时，Dart 会在 model type 旁为每个
+schema 生成一个 `<module>_grpc.dart` 文件。它面向 `package:grpc`。Request 和 response
+序列化使用 companion 自动获取的 Fory runtime，并在首次使用时注册该 schema 的类型，因此不需要手动注册；应用也可以在第一次调用前通过 schema module 的 `install(...)` 注入自定义 `Fory`。
+
+生成支持四种 RPC 模式：unary、server-streaming、client-streaming 和 bidirectional。Client
+class 继承 `Client`；service base class 继承 `Service` 并通过 `$addMethod` 注册各方法。
+
+```dart
+class GreeterClient extends Client {
+  // Single response: ResponseFuture. Streaming response: ResponseStream.
+  ResponseFuture<HelloReply> sayHello(HelloRequest request, {CallOptions? options}) { ... }
+  ResponseStream<HelloReply> sayHellos(HelloRequest request, {CallOptions? options}) { ... }
+  ResponseFuture<HelloReply> collectHellos(Stream<HelloRequest> request, {CallOptions? options}) { ... }
+  ResponseStream<HelloReply> chatHellos(Stream<HelloRequest> request, {CallOptions? options}) { ... }
+}
+
+abstract class GreeterServiceBase extends Service {
+  Future<HelloReply> sayHello(ServiceCall call, HelloRequest request);
+  Stream<HelloReply> sayHellos(ServiceCall call, HelloRequest request);
+  Future<HelloReply> collectHellos(ServiceCall call, Stream<HelloRequest> request);
+  Stream<HelloReply> chatHellos(ServiceCall call, Stream<HelloRequest> request);
+}
+```
+
+单响应 client 方法返回 `ResponseFuture<R>`（client-streaming 会用 `.single` 适配 streaming 调用）；
+streaming 响应方法返回 `ResponseStream<R>`。Server 端实现会 override 抽象方法：单请求以 `Q`
+传入，client-streaming 请求以 `Stream<Q>` 传入；单响应返回 `Future`，streaming 响应返回
+`Stream`。编译这些文件的应用必须提供 `grpc` 依赖；Fory Dart runtime 不会加入此依赖。原始
+IDL method 名称用于 gRPC wire path。
 
 ## 跨语言说明
 

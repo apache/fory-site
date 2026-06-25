@@ -107,6 +107,9 @@ val fory = ForyKotlin.builder().withXlang(false)
     .withRefTracking(true)
     // Enable schema evolution support for native-mode payloads
     .withCompatible(true)
+    // Bound remote schema metadata resource usage
+    .withMaxTypeFields(512)
+    .withMaxTypeMetaBytes(4096)
     // Enable async compilation for better startup performance
     .withAsyncCompilation(true)
     // Compression options
@@ -114,3 +117,23 @@ val fory = ForyKotlin.builder().withXlang(false)
     .withLongCompressed(true)
     .build()
 ```
+
+## 安全
+
+生产环境以及任何不受信任的 payload 来源都应保持启用类注册：
+
+```kotlin
+val fory = ForyKotlin.builder()
+    .requireClassRegistration(true)
+    .withMaxDepth(50)
+    .withMaxTypeFields(512)
+    .withMaxTypeMetaBytes(4096)
+    .build()
+```
+
+安全相关配置：
+
+- 保持 `requireClassRegistration(true)`，并注册应用类或生成的 module。
+- 使用 `withMaxDepth(...)` 拒绝异常深的对象图。
+- 除非数据不是恶意输入，且可信 peer 会发送更大的 metadata 或大量 schema 版本，否则保持 `withMaxTypeFields(...)`、`withMaxTypeMetaBytes(...)` 以及远端 schema-version 限制的默认值。
+- Allow-listing 和 unknown-class 控制请遵循 [Java 配置](../java/configuration.md#forybuilder-选项)。

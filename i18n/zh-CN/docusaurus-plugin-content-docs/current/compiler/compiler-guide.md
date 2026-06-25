@@ -72,7 +72,9 @@ foryc --scan-generated [OPTIONS]
 | `--swift_namespace_style`             | Swift 命名空间方式：`enum` 或 `flatten`            | `enum`        |
 | `--emit-fdl`                          | 输出转换后的 FDL（用于非 FDL 输入）                | `false`       |
 | `--emit-fdl-path`                     | 将转换后的 FDL 写入此路径（文件或目录）            | （stdout）    |
-| `--grpc`                              | 为 Java 和 Python 生成 gRPC service companion 代码 | `false`       |
+| `--grpc`                              | 为支持的输出生成 gRPC service companion 代码       | `false`       |
+| `--grpc-python-mode=MODE`             | Python gRPC 模式：`async` 或 `sync`                | `async`       |
+| `--grpc-web`                          | 生成 JavaScript gRPC-Web client companion          | `false`       |
 
 支持 schema 级文件选项，用于控制特定语言的生成行为。
 对于 `go_nested_type_style` 和 `swift_namespace_style`，当 CLI 标志和
@@ -139,22 +141,37 @@ foryc schema.fdl --output ./src/generated
 foryc user.fdl order.fdl product.fdl --output ./generated
 ```
 
-**编译包含 service 定义的简单 schema（Java + Python 模型）：**
+**编译包含 service 定义的简单 schema（Java + Python + Go + Rust + C# + Dart + Scala + Kotlin + JavaScript 模型）：**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --dart_out=./generated/dart --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript
 ```
 
-**生成 Java 和 Python gRPC service companion 代码：**
+**生成 Java、Python、Go、Rust、C#、Dart、Scala、Kotlin 和 Node.js JavaScript gRPC service companion 代码：**
 
 ```bash
-foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --grpc
+foryc compiler/examples/service.fdl --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --dart_out=./generated/dart --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript --grpc
 ```
 
 生成的 gRPC service 代码使用 Fory 序列化请求和响应载荷。Java 输出会导入
-grpc-java API，Python 输出会导入 `grpc`；编译或运行这些生成 service 文件的
-应用需要自行提供 gRPC 依赖。Fory 的 Java 和 Python 运行时包不会为此功能加入
-强制 gRPC 依赖。
+grpc-java API，Python 输出默认使用 `grpc.aio`，Go 输出会导入 grpc-go，Rust 输出会导入
+`tonic` 和 `bytes`，Scala 输出会导入 grpc-java API，Kotlin 输出会导入 grpc-java 和
+grpc-kotlin API 并使用 coroutine stub。C# 输出会导入 `Grpc.Core.Api` 类型，并可由
+`Grpc.AspNetCore` 等常规 .NET gRPC package 承载，或通过 `Grpc.Net.Client` 调用。Dart 输出
+会导入 `package:grpc`。JavaScript 输出会导入 `@grpc/grpc-js`。编译或运行这些生成
+service 文件的应用需要自行提供 gRPC 依赖。Fory package 不会为此功能加入强制 gRPC 依赖。
+
+为已有同步 `grpcio` 应用生成同步 Python gRPC companion：
+
+```bash
+foryc compiler/examples/service.fdl --python_out=./generated/python --grpc --grpc-python-mode=sync
+```
+
+**生成 JavaScript gRPC-Web 浏览器 client：**
+
+```bash
+foryc compiler/examples/service.fdl --javascript_out=./generated/javascript --grpc --grpc-web
+```
 
 **使用 import 搜索路径：**
 
@@ -397,6 +414,8 @@ generated/
 - Package 片段映射为目录（例如 `demo.foo` → `demo/foo/`）
 - IDL module 类包含在主文件中；生成的 serializer 元数据包含在 part 文件中
 - 非可选、非 `ref` 的 primitive list 使用类型化数组（例如 `Int32List`）
+- 使用 `--grpc` 时，会在 model 文件旁为每个 schema 生成一个 `<stem>_grpc.dart` companion，
+  其中包含各 service 的 `Client` 和 `ServiceBase`，并导入 `package:grpc`
 
 ### Scala
 
@@ -667,7 +686,7 @@ cc_library(
 
 ```yaml
 dependencies:
-  fory: ^1.2.0
+  fory: ^1.3.0
 
 dev_dependencies:
   build_runner: ^2.4.0
@@ -859,5 +878,5 @@ fory = "x.y.z"
 
 ```yaml
 dependencies:
-  fory: ^1.2.0
+  fory: ^1.3.0
 ```

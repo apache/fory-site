@@ -35,6 +35,10 @@ final fory = Fory();
 final fory = Fory(
   compatible: true,
   maxDepth: 512,
+  maxTypeFields: 512,
+  maxTypeMetaBytes: 4096,
+  maxSchemaVersionsPerType: 10,
+  maxAverageSchemaVersionsPerType: 3,
 );
 ```
 
@@ -80,6 +84,24 @@ final fory = Fory(
 final fory = Fory(maxDepth: 128);
 ```
 
+### 远端 Schema Metadata 限制
+
+兼容模式可能接收用于 Schema 演进的远端 metadata。以下限制用于约束 metadata 大小和可接受的 schema 版本数：
+
+```dart
+final fory = Fory(
+  maxTypeFields: 512,
+  maxTypeMetaBytes: 4096,
+  maxSchemaVersionsPerType: 10,
+  maxAverageSchemaVersionsPerType: 3,
+);
+```
+
+- `maxTypeFields` 限制一个收到的 struct metadata body 中的字段数。
+- `maxTypeMetaBytes` 限制一个收到的 TypeMeta body 的编码 body 字节数，不包含 8 字节 header 和扩展 size varint。
+- `maxSchemaVersionsPerType` 限制一个逻辑类型可接受的远端 metadata 版本数。
+- `maxAverageSchemaVersionsPerType` 限制所有已接受远端类型的平均版本数；有效全局下限为 `8192` 个 schema。
+
 ### `maxCollectionSize`
 
 任意单个 list、set 或 map 字段可接受的最大元素数。用于防止畸形消息触发失控的内存分配。
@@ -98,13 +120,17 @@ final fory = Fory(maxBinarySize: 8 * 1024 * 1024);
 
 ## 默认值
 
-| 选项                 | 默认值    |
-| -------------------- | --------- |
-| `compatible`         | `false`   |
-| `checkStructVersion` | `true`    |
-| `maxDepth`           | 256       |
-| `maxCollectionSize`  | 1 048 576 |
-| `maxBinarySize`      | 64 MiB    |
+| 选项                              | 默认值    |
+| --------------------------------- | --------- |
+| `compatible`                      | `false`   |
+| `checkStructVersion`              | `true`    |
+| `maxDepth`                        | 256       |
+| `maxTypeFields`                   | 512       |
+| `maxTypeMetaBytes`                | 4096      |
+| `maxSchemaVersionsPerType`        | 10        |
+| `maxAverageSchemaVersionsPerType` | 3         |
+| `maxCollectionSize`               | 1 048 576 |
+| `maxBinarySize`                   | 64 MiB    |
 
 ## 跨语言说明
 
@@ -113,6 +139,7 @@ final fory = Fory(maxBinarySize: 8 * 1024 * 1024);
 - 如果任意一端需要 Schema 演进，则**所有**端都应设置 `compatible: true`。
 - 每一端都要使用相同的数字 ID，或者相同的 `namespace + typeName` 组合。
 - 写端和读端的 `compatible` 设置必须一致，模式不匹配会直接失败。
+- 除非数据不是恶意输入，且可信 peer 会发送更大的 metadata 或大量 schema 版本，否则保持远端 schema metadata 限制的默认值。
 
 ## 相关主题
 

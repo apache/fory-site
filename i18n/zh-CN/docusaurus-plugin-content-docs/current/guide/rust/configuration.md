@@ -74,6 +74,24 @@ let fory = Fory::default().max_dyn_depth(10); // 允许最多 10 层
 
 注意：静态数据类型（非动态类型）本质上是安全的，不受深度限制约束，因为它们的结构在编译时就已知。
 
+### 远端 Schema Metadata 限制
+
+兼容模式可能接收用于 Schema 演进的远端 metadata。以下限制用于约束 metadata 大小和可接受的 schema 版本数：
+
+```rust
+let fory = Fory::builder()
+    .max_type_fields(512)
+    .max_type_meta_bytes(4096)
+    .max_schema_versions_per_type(10)
+    .max_average_schema_versions_per_type(3)
+    .build();
+```
+
+- `max_type_fields` 默认值为 `512`，限制一个收到的 struct metadata body 中的字段数。
+- `max_type_meta_bytes` 默认值为 `4096`，限制一个收到的 TypeDef 或 TypeMeta body 的编码 body 字节数，不包含 8 字节 header 和扩展 size varint。
+- `max_schema_versions_per_type` 默认值为 `10`，限制一个逻辑类型可接受的远端 metadata 版本数。
+- `max_average_schema_versions_per_type` 默认值为 `3`，限制所有已接受远端类型的平均版本数；有效全局下限为 `8192` 个 schema。
+
 ### 跨语言模式
 
 启用跨语言序列化：
@@ -112,11 +130,22 @@ let fory = Fory::default()
 
 ## 配置摘要
 
-| 选项                 | 描述                   | 默认值  |
-| -------------------- | ---------------------- | ------- |
-| `compatible(bool)`   | 启用 schema 演化       | `false` |
-| `xlang(bool)`        | 启用跨语言模式         | `false` |
-| `max_dyn_depth(u32)` | 动态类型的最大嵌套深度 | `5`     |
+| 选项                                          | 描述                              | 默认值  |
+| --------------------------------------------- | --------------------------------- | ------- |
+| `compatible(bool)`                            | 启用 schema 演化                  | `false` |
+| `xlang(bool)`                                 | 启用跨语言模式                    | `false` |
+| `max_dyn_depth(u32)`                          | 动态类型的最大嵌套深度            | `5`     |
+| `max_type_fields(usize)`                      | 一个收到的 struct metadata body 最大字段数 | `512`   |
+| `max_type_meta_bytes(usize)`                  | 一个收到的 metadata body 最大编码字节数 | `4096`  |
+| `max_schema_versions_per_type(usize)`         | 一个逻辑类型最大远端 metadata 版本数 | `10`    |
+| `max_average_schema_versions_per_type(usize)` | 所有远端类型的平均 metadata 版本数 | `3`     |
+
+## 安全建议
+
+- 反序列化不可信 payload 前，先注册应用 struct 和 trait-object 实现。
+- 使用 `max_dyn_depth(...)` 拒绝异常深的动态对象图。
+- 除非数据不是恶意输入，且可信 peer 会发送更大的 metadata 或大量 schema 版本，否则保持远端 schema metadata 限制的默认值。
+- 对不可信输入，优先使用具体类型字段，避免宽泛的 `dyn Any` 或 trait-object 字段。
 
 ## 相关主题
 

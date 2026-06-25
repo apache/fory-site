@@ -30,6 +30,12 @@ public struct ForyConfig {
     public var xlang: Bool
     public var trackRef: Bool
     public var compatible: Bool
+    public let checkClassVersion: Bool
+    public let maxDepth: Int
+    public let maxTypeFields: Int
+    public let maxTypeMetaBytes: Int
+    public let maxSchemaVersionsPerType: Int
+    public let maxAverageSchemaVersionsPerType: Int
 }
 ```
 
@@ -78,6 +84,25 @@ let fory = Fory(xlang: true, trackRef: true)
 let fory = Fory(xlang: true, trackRef: false, compatible: true)
 ```
 
+### Size 和 Depth 限制
+
+`maxDepth` 限制解码 payload 的嵌套深度。兼容模式下的远端 metadata 也会被限制：
+
+- `maxTypeFields` 默认值为 `512`，限制一个收到的 struct metadata body 中的字段数。
+- `maxTypeMetaBytes` 默认值为 `4096`，限制一个收到的 TypeMeta body 的编码 body 字节数，不包含 8 字节 header 和扩展 size varint。
+- `maxSchemaVersionsPerType` 默认值为 `10`，限制一个逻辑类型可接受的远端 metadata 版本数。
+- `maxAverageSchemaVersionsPerType` 默认值为 `3`，限制所有已接受远端类型的平均版本数；有效全局下限为 `8192` 个 schema。
+
+```swift
+let fory = Fory(
+  maxDepth: 5,
+  maxTypeFields: 512,
+  maxTypeMetaBytes: 4096,
+  maxSchemaVersionsPerType: 10,
+  maxAverageSchemaVersionsPerType: 3
+)
+```
+
 ## 推荐配置
 
 ### 本地严格 Schema
@@ -97,3 +122,12 @@ let fory = Fory(xlang: true, trackRef: false, compatible: true)
 ```swift
 let fory = Fory(xlang: true, trackRef: true, compatible: true)
 ```
+
+## 安全
+
+安全相关配置：
+
+- 在反序列化不可信 payload 前，只注册预期的生成 model。
+- 对 intentional same-schema payload，将 `checkClassVersion` 与 `compatible: false` 配合使用。
+- 根据服务接受的最大嵌套深度设置 `maxDepth`。
+- 除非数据不是恶意输入，且可信 peer 会发送更大的 metadata 或大量 schema 版本，否则保持远端 schema metadata 限制的默认值。

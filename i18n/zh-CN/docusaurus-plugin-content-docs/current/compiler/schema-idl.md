@@ -860,6 +860,20 @@ message Order [id=206] {
 }
 ```
 
+## Service 定义
+
+Service 用于在 Fory IDL 中定义 RPC method 契约。它是可选的：包含 service 的 schema 仍会生成常规数据 model；只有在 compiler 使用 `--grpc` 且目标语言受支持时，才会生成 gRPC service 代码。支持的输出包括 Java、Python、Go、Rust、C#、Dart、Scala、Kotlin 和 JavaScript。JavaScript 浏览器 gRPC-Web client 通过 `--grpc-web` 生成。
+
+```protobuf
+service PetDirectory {
+  rpc Lookup (PetRequest) returns (PetResponse);
+  rpc Watch (PetRequest) returns (stream PetResponse);
+}
+```
+
+- 生成的 gRPC companion 会对每个 RPC payload 使用 Fory 序列化。
+- 编译或运行这些 companion 的应用需要自行提供 gRPC 依赖，例如 grpc-java、grpc-kotlin、`grpcio`、grpc-go、Rust `tonic` 和 `bytes`、Scala grpc-java API、`@grpc/grpc-js`、`grpc-web`、C# `Grpc.Core.Api` 及 server/client package，或 Dart `package:grpc`。Python companion 默认使用 `grpc.aio`，也可以通过 `--grpc-python-mode=sync` 生成同步模式。
+
 ## 语法摘要
 
 以下为简化文法（便于快速查阅，具体以编译器实现为准）：

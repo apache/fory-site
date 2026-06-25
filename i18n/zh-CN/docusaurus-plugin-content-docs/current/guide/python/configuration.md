@@ -33,7 +33,11 @@ class Fory:
         ref: bool = False,
         strict: bool = True,
         compatible: bool = False,
-        max_depth: int = 50
+        max_depth: int = 50,
+        max_type_fields: int = 512,
+        max_type_meta_bytes: int = 4096,
+        max_schema_versions_per_type: int = 10,
+        max_average_schema_versions_per_type: int = 3
     )
 ```
 
@@ -49,19 +53,27 @@ class ThreadSafeFory:
         ref: bool = False,
         strict: bool = True,
         compatible: bool = False,
-        max_depth: int = 50
+        max_depth: int = 50,
+        max_type_fields: int = 512,
+        max_type_meta_bytes: int = 4096,
+        max_schema_versions_per_type: int = 10,
+        max_average_schema_versions_per_type: int = 3
     )
 ```
 
 ## 参数
 
-| 参数         | 类型   | 默认值  | 描述                                                                                                                                    |
-| ------------ | ------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `xlang`      | `bool` | `False` | 启用跨语言序列化。当为 `False` 时，启用 Python 原生模式，支持所有 Python 对象。当为 `True` 时，启用跨语言模式，兼容 Java、Go、Rust 等。 |
-| `ref`        | `bool` | `False` | 启用引用跟踪以支持共享/循环引用。如果数据没有共享引用，禁用此选项可获得更好性能。                                                       |
-| `strict`     | `bool` | `True`  | 出于安全考虑需要类型注册。**生产环境强烈推荐**。仅在受信任的环境中禁用。                                                                |
-| `compatible` | `bool` | `False` | 在跨语言模式中启用 schema 演化，允许在保持兼容性的同时添加/删除字段。                                                                   |
-| `max_depth`  | `int`  | `50`    | 反序列化的最大深度，用于安全防护，防止栈溢出攻击。                                                                                      |
+| 参数                                   | 类型   | 默认值  | 描述                                                                                                                                    |
+| -------------------------------------- | ------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `xlang`                                | `bool` | `False` | 启用跨语言序列化。当为 `False` 时，启用 Python 原生模式，支持所有 Python 对象。当为 `True` 时，启用跨语言模式，兼容 Java、Go、Rust 等。 |
+| `ref`                                  | `bool` | `False` | 启用引用跟踪以支持共享/循环引用。如果数据没有共享引用，禁用此选项可获得更好性能。                                                       |
+| `strict`                               | `bool` | `True`  | 出于安全考虑需要类型注册。**生产环境强烈推荐**。仅在受信任的环境中禁用。                                                                |
+| `compatible`                           | `bool` | `False` | 在跨语言模式中启用 schema 演化，允许在保持兼容性的同时添加/删除字段。                                                                   |
+| `max_depth`                            | `int`  | `50`    | 反序列化的最大深度，用于安全防护，防止栈溢出攻击。                                                                                      |
+| `max_type_fields`                      | `int`  | `512`   | 一个收到的远端 struct metadata body 中可接受的最大字段数。                                                                              |
+| `max_type_meta_bytes`                  | `int`  | `4096`  | 一个收到的 TypeDef body 可接受的最大编码 body 字节数，不包含 8 字节 header 和扩展 size varint。                                         |
+| `max_schema_versions_per_type`         | `int`  | `10`    | 一个逻辑类型可接受的最大远端 metadata 版本数。                                                                                          |
+| `max_average_schema_versions_per_type` | `int`  | `3`     | 所有已接受远端类型的平均 metadata 版本数限制；有效全局下限为 `8192` 个 schema。                                                         |
 
 ## 核心方法
 
@@ -151,7 +163,11 @@ fory = pyfory.Fory(
     ref=False,          # 如果有共享/循环引用则启用
     strict=True,        # 关键：生产环境始终为 True
     compatible=False,   # 仅在需要 schema 演化时启用
-    max_depth=20        # 根据数据结构深度调整
+    max_depth=20,       # 根据数据结构深度调整
+    max_type_fields=512,
+    max_type_meta_bytes=4096,
+    max_schema_versions_per_type=10,
+    max_average_schema_versions_per_type=3,
 )
 
 # 预先注册所有类型
@@ -159,6 +175,15 @@ fory.register(UserModel, type_id=100)
 fory.register(OrderModel, type_id=101)
 fory.register(ProductModel, type_id=102)
 ```
+
+收到的远端 metadata 也会受到限制：
+
+- `max_type_fields` 限制一个收到的 struct metadata body 中的字段数。
+- `max_type_meta_bytes` 限制一个收到的 TypeDef body 可接受的编码 body 字节数。
+- `max_schema_versions_per_type` 限制一个逻辑类型可接受的远端 metadata 版本数。
+- `max_average_schema_versions_per_type` 限制所有已接受远端类型的平均版本数。
+
+这些限制不会改变 `strict`、policy、动态加载、unknown-class handling 或 Schema 演进语义。
 
 ### 开发环境配置
 

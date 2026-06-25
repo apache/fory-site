@@ -210,6 +210,10 @@ class_layer:
 | namespace | type_name | field_infos |
 ```
 
+Reader 可以拒绝超过运行时资源限制的 TypeDef，例如 metadata body 字节数上限或一个
+TypeDef 中的最大字段数。这些限制是接收侧资源控制，不改变 TypeDef 编码格式、类型标识、
+动态类加载、unknown-class handling、注册策略或 Schema 演进语义。
+
 ### Field info
 
 每个字段：

@@ -113,6 +113,23 @@ message Container {
 }
 ```
 
+### gRPC Service
+
+FlatBuffers `rpc_service` 定义会转换为 Fory service。使用 `--grpc` 时，compiler 会为 Java、Python、Go、Rust、C#、Dart、Scala、Kotlin 和 JavaScript 等支持的输出生成 gRPC service companion。JavaScript 浏览器 client 通过 `--grpc-web` 生成。这些 companion 使用 Fory 序列化 request 和 response payload。
+
+```fbs
+rpc_service SearchService {
+  Lookup(SearchRequest):SearchResponse;
+  StreamLookup(SearchRequest):SearchResponse (streaming: "server");
+}
+```
+
+```bash
+foryc api.fbs --java_out=./generated/java --python_out=./generated/python --go_out=./generated/go --rust_out=./generated/rust --csharp_out=./generated/csharp --dart_out=./generated/dart --scala_out=./generated/scala --kotlin_out=./generated/kotlin --javascript_out=./generated/javascript --grpc
+```
+
+生成的 service 代码会导入 gRPC API，因此编译或运行这些文件的应用需要提供 grpc-java、grpc-kotlin、Scala grpc-java API、`grpcio`、grpc-go、Rust `tonic` 和 `bytes`、`@grpc/grpc-js`、C# `Grpc.Core.Api` 及 server/client 依赖，或 Dart `package:grpc`。Python companion 默认使用 `grpc.aio`，也可以通过 `--grpc-python-mode=sync` 生成同步模式。Fory package 不会把 gRPC 作为硬依赖。JavaScript 输出配合 `--grpc-web` 可生成导入 `grpc-web` 的浏览器 client。
+
 ### 默认值与元数据
 
 - FlatBuffers 默认值会被解析，但不会作为 Fory 运行时默认值生效。

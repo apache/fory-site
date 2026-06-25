@@ -21,6 +21,33 @@ license: |
 
 本页演示常见的跨语言序列化模式。当各端使用匹配的类型标识、字段 schema 和兼容性设置时，在一种受支持语言中序列化的数据可以在任何其他受支持语言中反序列化。
 
+## 远端 Schema Metadata 限制
+
+兼容模式可能为 reader 尚未知的类型接收远端 metadata（`TypeDef` 或 `TypeMeta`）。Fory 会限制可接受的不同远端 metadata 版本数量，并限制每个收到的 metadata body 大小：
+
+- `maxSchemaVersionsPerType`：一个逻辑类型可接受的最大远端 metadata 版本数，默认值为 `10`。
+- `maxAverageSchemaVersionsPerType`：所有已接受远端类型的平均 metadata 版本数，默认值为 `3`；有效全局下限为 `8192` 个 metadata entry。
+- `maxTypeFields`：一个收到的 struct metadata body 可声明的最大字段数，默认值为 `512`。
+- `maxTypeMetaBytes`：一个收到的 TypeDef 或 TypeMeta body 的最大编码 metadata body 字节数，不包含 8 字节 header 和扩展 size varint，默认值为 `4096`。
+
+这些限制是资源保护。它们不会改变编码格式、注册要求、动态类型加载、unknown-type handling 或 Schema 演进兼容性。
+
+仅当数据不是恶意输入，且可信 peer 会发送更大的 metadata 或大量 schema 版本时，才调高这些值。
+
+| 语言                  | 字段数选项          | Metadata 字节选项     | 单类型版本选项                 | 平均版本选项                          |
+| --------------------- | ------------------- | --------------------- | ------------------------------ | ------------------------------------- |
+| Java                  | `withMaxTypeFields` | `withMaxTypeMetaBytes` | `withMaxSchemaVersionsPerType` | `withMaxAverageSchemaVersionsPerType` |
+| Scala                 | `withMaxTypeFields` | `withMaxTypeMetaBytes` | `withMaxSchemaVersionsPerType` | `withMaxAverageSchemaVersionsPerType` |
+| Kotlin                | `withMaxTypeFields` | `withMaxTypeMetaBytes` | `withMaxSchemaVersionsPerType` | `withMaxAverageSchemaVersionsPerType` |
+| Python                | `max_type_fields`   | `max_type_meta_bytes` | `max_schema_versions_per_type` | `max_average_schema_versions_per_type` |
+| JavaScript/TypeScript | `maxTypeFields`     | `maxTypeMetaBytes`    | `maxSchemaVersionsPerType`     | `maxAverageSchemaVersionsPerType`     |
+| C++                   | `max_type_fields`   | `max_type_meta_bytes` | `max_schema_versions_per_type` | `max_average_schema_versions_per_type` |
+| Go                    | `WithMaxTypeFields` | `WithMaxTypeMetaBytes` | `WithMaxSchemaVersionsPerType` | `WithMaxAverageSchemaVersionsPerType` |
+| Rust                  | `max_type_fields`   | `max_type_meta_bytes` | `max_schema_versions_per_type` | `max_average_schema_versions_per_type` |
+| C#                    | `MaxTypeFields`     | `MaxTypeMetaBytes`    | `MaxSchemaVersionsPerType`     | `MaxAverageSchemaVersionsPerType`     |
+| Swift                 | `maxTypeFields`     | `maxTypeMetaBytes`    | `maxSchemaVersionsPerType`     | `maxAverageSchemaVersionsPerType`     |
+| Dart                  | `maxTypeFields`     | `maxTypeMetaBytes`    | `maxSchemaVersionsPerType`     | `maxAverageSchemaVersionsPerType`     |
+
 ## 序列化内置类型
 
 常见类型可以自动序列化，无需注册：原始数值类型、字符串、二进制、数组、列表、映射等。

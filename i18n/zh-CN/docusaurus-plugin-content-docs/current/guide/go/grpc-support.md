@@ -175,7 +175,7 @@ Fory service 支持 unary、server-streaming、client-streaming 和 bidirectiona
 - Bidirectional streaming 使用生成的 stream client/server interface。
 - 每个 message frame 都使用生成 codec。
 
-## Service 行为
+## gRPC 运行时行为
 
 生成的 service companion 只提供 Fory 序列化。deadline、取消、TLS、credential、unary/stream
 interceptor、status code、metadata、名称解析、负载均衡、连接生命周期和 backoff 等 Service 行为都遵循标准 grpc-go。

@@ -354,7 +354,7 @@ final class StreamingClient {
 
 生成 descriptor 会保留 IDL 中的 service 和 method 名称作为 gRPC path。
 
-## Service 行为
+## gRPC 运行时行为
 
 生成的 service code 只替换 request/response 序列化。常规 gRPC service 行为仍由 grpc-java 提供：
 
