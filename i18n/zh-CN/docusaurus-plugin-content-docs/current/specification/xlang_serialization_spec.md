@@ -203,6 +203,13 @@ TypeDef 头部包含：
 - 每层字段数量与类型标识
 - 字段级元信息（名称编码/tag、nullable/ref、field type）
 
+Reader 可以拒绝超过运行时资源限制的 TypeDef，例如 metadata body 字节数上限或一个 struct
+TypeDef 中的最大字段数。这些限制是接收侧资源控制，不改变 TypeDef 编码格式、类型标识、
+动态加载、unknown-type handling、注册策略或 Schema 演进语义。
+
+纯 id-based enum、ext 和 typed-union value 不携带 TypeDef body。接收侧 TypeDef 资源限制只在
+stream 实际携带 shared TypeDef metadata 时适用。
+
 ## Meta String
 
 meta string 用于 namespace、typename、fieldname 的压缩表示。
