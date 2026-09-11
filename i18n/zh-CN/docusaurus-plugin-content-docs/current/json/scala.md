@@ -24,7 +24,7 @@ Fory JSON 通过可选的 `fory-json-scala` 制品支持 Scala 2.13 和 Scala 3�
 ## 设置 {#setup}
 
 ```sbt
-libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.1"
+libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.2"
 ```
 
 `ForyJsonScala.builder()` 安装 Scala 模块并返回标准 Fory JSON builder：
@@ -67,6 +67,9 @@ case class Media(
 `JsonIgnore` 适用于字段、属性方法、setter 参数和选定的构造函数参数。`JsonCodec` 子槽位绑定直接集合元素、`Option` 内容，以及 Map 键或值。其他 Fory JSON 注解保持[注解](annotations.md)中描述的行为。
 
 如果必需且没有默认值的引用参数使用了会省略 `null` 的包含规则，序列化会拒绝 null 值，以确保 Fory 写出的 JSON 仍可按同一个 case class Schema 读取。
+全局设置 `defaultPropertyInclusion(NON_EMPTY)` 会保留必需构造函数参数中的空值。
+如果必需参数的类型可能为空，显式的 `@JsonProperty(include = NON_EMPTY)` 会被拒绝；
+为该参数添加构造函数默认值后，才允许省略。
 
 ## 支持的 Scala 类型 {#supported-scala-types}
 

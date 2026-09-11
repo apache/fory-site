@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.1")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.2")
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.1")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.2")
 }
 ```
 
@@ -121,6 +121,13 @@ data class Request(
 类体 `val`、计算属性、委托属性、仅 getter 的属性和委托 `var` 必须被忽略，或由精确的自定义编解码器处理。输入中存在的延后赋值 setter 在构造后按固定属性顺序执行，随后运行验证器；输入成员顺序不能决定应用调用顺序。Kotlin 类实例始终通过正常构造创建，因此不会绕过主构造函数初始化和验证。
 
 Fory 必须能在相同配置下读取自身输出。因此，可空构造函数参数和可空延后赋值属性在为 null 时会显式输出，即使 builder 的 Java 通用默认行为是省略 null 字段。如果省略属性可能导致失败或调用不同的编译器默认值，则会拒绝该属性上显式设置的 `JsonProperty.Include.NON_NULL`。
+
+同样的规则也适用于 `NON_EMPTY`。全局设置
+`defaultPropertyInclusion(JsonProperty.Include.NON_EMPTY)` 会保留 Kotlin 构造函数参数和延后赋值属性中的
+空值，包括声明了 `emptyList()` 默认值的属性。Fory 不会通过比较编译器默认值或执行初始化器来决定
+是否省略属性。对于可重建的属性，如果其逻辑类型可能为空，或者其可空值可能因此被省略，显式的
+`NON_EMPTY` 注解会被拒绝。非空值类即使底层字符串或集合为空，也仍会输出。如果包含这些属性的模型
+需要不同的省略与重建规则，请为该模型使用自定义编解码器。
 
 ## 可空性 {#nullability}
 
