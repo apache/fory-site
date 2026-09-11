@@ -124,9 +124,29 @@ public final class User {
 
 支持以下包含策略：
 
-- `DEFAULT`：使用 `ForyJsonBuilder.writeNullFields`。
+- `DEFAULT`：使用 `ForyJsonBuilder.defaultPropertyInclusion`（初始值为 `NON_NULL`）。
 - `ALWAYS`：即使选中的值为 null，也写入该属性。
 - `NON_NULL`：省略 null 值。
+- `NON_EMPTY`：省略 null、长度为零的 `CharSequence`（包括字符串）和 Java 数组、
+  空的 `java.util.Collection` 和 `java.util.Map`，以及不含值的 JDK `Optional`、
+  `OptionalInt`、`OptionalLong` 和 `OptionalDouble`。
+
+```java
+public final class Response {
+  @JsonProperty(include = JsonProperty.Include.NON_EMPTY)
+  public java.util.List<String> items;
+}
+```
+
+当 `items` 是空列表时，该对象会写为 `{}`。属性上显式指定的包含策略优先于 builder 默认值。
+空值检查针对属性的逻辑值，在调用选定的编解码器之前执行。自定义编解码器将普通对象写为 `""`
+或 `{}`，并不会使该对象被视为空。空 `byte[]` 无论使用 Base64 还是数字数组表示，都属于空值。
+
+过滤只检查当前属性值，不递归检查内部内容：`0`、`false`、含 null 的列表、含空列表的列表，
+以及包含空列表的非空 Optional 都会保留。属性包含策略不会过滤根值、集合元素、Map 条目或
+Any 条目。原始 JSON String 属性按字符串检查，不会解析其中的 JSON 文本。
+
+各语言的重建规则仍然适用；请参阅 [Kotlin 包含策略](kotlin.md#immutable-classes-and-compiler-defaults)。
 
 包含策略只影响写入。对于没有写入来源、仅供创建器使用的属性，非默认包含策略无效。可以重复相同声明；
 同一逻辑属性中相互冲突的显式名称、索引或非默认包含策略会被拒绝。规范化为同一最终 JSON 名称的两个
@@ -136,7 +156,7 @@ public final class User {
 且在可写属性中必须唯一。`-1` 表示未指定，更小的值无效。不能为仅有 setter、仅供创建器使用或忽略写入的
 属性指定索引。
 
-不支持 `NON_EMPTY`、别名、格式化以及相互独立的读写名称。`JsonProperty` 不能与 Any 逻辑属性组合，
+不支持别名以及相互独立的读写名称。`JsonProperty` 不能与 Any 逻辑属性组合，
 也不能声明在 `JsonAnySetter` 上。
 
 ## `JsonPropertyOrder`

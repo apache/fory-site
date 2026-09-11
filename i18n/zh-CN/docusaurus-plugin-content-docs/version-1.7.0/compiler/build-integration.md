@@ -211,7 +211,7 @@ cc_library(
 
 ```yaml
 dependencies:
-  fory: ^1.7.1
+  fory: ^1.7.2
 
 dev_dependencies:
   build_runner: ^2.4.0

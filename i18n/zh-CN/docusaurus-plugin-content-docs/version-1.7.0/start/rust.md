@@ -34,7 +34,7 @@ cargo --version
 
 ```toml title="Cargo.toml"
 [dependencies]
-fory = "1.7.1"
+fory = "1.7.2"
 ```
 
 ```rust

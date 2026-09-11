@@ -182,11 +182,26 @@ JSON 对象成员名都是字符串。声明的 Map 键支持 `String`、`byte`�
 对应的装箱类型和枚举。声明使用 `Object` 键的 Map 可以写出 String、数值、boolean、字符和
 枚举键，但读取时都会得到字符串，因为 JSON 不保留原始键类型。不接受 null Map 键。
 
-## Builder 配置
+## Builder 配置 {#builder-configuration}
+
+如需默认省略空的对象属性：
+
+```java
+import org.apache.fory.json.ForyJson;
+import org.apache.fory.json.annotation.JsonProperty.Include;
+
+ForyJson json = ForyJson.builder().defaultPropertyInclusion(Include.NON_EMPTY).build();
+```
+
+`defaultPropertyInclusion` 和 `writeNullFields` 修改同一个设置，以最后一次调用为准。
+builder 接受 `ALWAYS`、`NON_NULL` 和 `NON_EMPTY`；`DEFAULT` 仅适用于属性注解。
+显式的 `JsonProperty.include` 优先于 builder 默认值。空值的定义与适用范围请参阅
+[属性包含策略](annotations.md#jsonproperty)。
 
 | Builder 方法 | 默认值 | 用户可见的效果 |
 | -------------------------------------- | ----------------------------------------- | ---------------------------------------------- |
-| `writeNullFields(boolean)` | `false` | 是否默认包含值为 null 的对象属性 |
+| `defaultPropertyInclusion(Include)` | `NON_NULL` | 对象属性的默认包含策略 |
+| `writeNullFields(boolean)` | `false` | 为 true 时选择 `ALWAYS`，为 false 时选择 `NON_NULL` |
 | `writeLongAsString(boolean)` | `false` | 将内置 64 位整数值写为十进制字符串 |
 | `withCodegen(boolean)` | `true` | 启用生成的对象编解码器 |
 | `withAsyncCompilation(boolean)` | `true` | 异步编译生成的编解码器 |

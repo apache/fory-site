@@ -25,7 +25,7 @@ module works on the ordinary JVM and GraalVM Native Image. Android is not suppor
 ## Setup
 
 ```sbt
-libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.1"
+libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.2"
 ```
 
 `ForyJsonScala.builder()` installs the Scala module and returns the standard Fory JSON builder:
@@ -80,7 +80,9 @@ or values. All other Fory JSON annotations retain the behavior described in
 
 If a required non-defaulted reference parameter uses an inclusion rule that would omit `null`,
 serialization rejects a null value. This guarantees that JSON written by Fory remains readable by
-the same case-class schema.
+the same case-class schema. A global `defaultPropertyInclusion(NON_EMPTY)` retains empty values of
+required constructor parameters. An explicit `@JsonProperty(include = NON_EMPTY)` is rejected for
+a required parameter whose type can be empty; add a constructor default to allow omission.
 
 ## Supported Scala types
 

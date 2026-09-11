@@ -66,32 +66,8 @@ go func() {
 }()
 ```
 
-### 工作原理
-
-线程安全包装器使用 `sync.Pool`：
-
-1. **获取**：从池中取得 Fory 实例
-2. **使用**：执行序列化或反序列化
-3. **复制**：复制结果数据（缓冲区会被复用）
-4. **释放**：将实例归还池中
-
-```go
-// Simplified implementation
-func (f *Fory) Serialize(v any) ([]byte, error) {
-    fory := f.pool.Get().(*fory.Fory)
-    defer f.pool.Put(fory)
-
-    data, err := fory.Serialize(v)
-    if err != nil {
-        return nil, err
-    }
-
-    // Copy because underlying buffer will be reused
-    result := make([]byte, len(data))
-    copy(result, data)
-    return result, nil
-}
-```
+包装器按需创建实例，并在 goroutine 之间复用。每次操作独占借用一个实例，并在结束后归还。
+即使垃圾回收清除了缓存实例，已注册的类型仍然可用。序列化结果会在返回前复制，调用方可以安全保留。
 
 ### API
 
@@ -114,32 +90,44 @@ err = threadsafe.Unmarshal(data, &target)
 
 ## 类型注册
 
-类型注册应在并发使用前完成：
+必须在第一次序列化或反序列化之前注册所有类型。第一次操作会永久冻结包装器的注册状态，
+即使该操作失败也是如此。之后再尝试注册会返回错误。
 
 ```go
 f := threadsafe.New()
 
-// Register types BEFORE concurrent access
-f.RegisterStruct(User{}, 1)
-f.RegisterStruct(Order{}, 2)
+if err := f.RegisterStruct(User{}, 1); err != nil {
+    panic(err)
+}
+if err := f.RegisterStruct(Order{}, 2); err != nil {
+    panic(err)
+}
 
-// Now safe to use concurrently
+// 所有并发操作都使用这些已注册的类型。
 go func() {
-    f.Serialize(&User{ID: 1})
+    data, err := f.Serialize(&User{ID: 1})
+    // 使用 data 并处理 err。
+    _, _ = data, err
 }()
 ```
 
-### 线程安全注册
+包装器也直接提供 `RegisterStructByName`、`RegisterEnum` 和 `RegisterEnumByName`。
+每个已注册的类型都可供所有并发操作使用，并且不会因垃圾回收而丢失注册信息。
 
-线程安全包装器会安全地处理注册：
+如需为每个实例执行自定义初始化，请使用 `NewWithFactory`：
 
 ```go
-// Safe: Registration is synchronized
-f := threadsafe.New()
-f.RegisterStruct(User{}, 1)  // Thread-safe
+f := threadsafe.NewWithFactory(func() *fory.Fory {
+    inner := fory.New()
+    if err := inner.RegisterExtension(CustomType{}, 100, newCustomSerializer()); err != nil {
+        panic(err)
+    }
+    return inner
+})
 ```
 
-不过，为获得最佳性能，请在启动时、并发使用前注册所有类型。
+需要更多实例时，工厂可能被并发调用。每次调用都必须返回配置相同的全新实例，并在返回前完成注册。
+有状态的自定义序列化器必须为每个实例分别创建。
 
 ## 零拷贝注意事项
 
@@ -331,11 +319,11 @@ go func() {
 }()
 ```
 
-**修复方法**：在并发使用前注册所有类型。
+**修复方法**：在第一次序列化或反序列化之前注册所有类型。
 
 ## 最佳实践
 
-1. **启动时注册类型**：在任何并发操作之前完成
+1. **启动时注册类型**：在第一次序列化或反序列化之前完成
 2. **保留引用时克隆数据**：适用于非线程安全实例
 3. **热路径每个工作线程使用独立实例**：消除池竞争
 4. **优化前先分析性能**：线程安全开销可能可以忽略
