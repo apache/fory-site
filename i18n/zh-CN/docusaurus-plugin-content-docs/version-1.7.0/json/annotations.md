@@ -29,13 +29,13 @@ Kotlin/JVM 模型使用 Kotlin JSON 模块。平台设置见 [Kotlin 指南](kot
 
 Kotlin 注解与对应 Java 字段、访问器或选定构造函数参数合并为同一个逻辑属性。请显式指定使用位置，避免依赖 Kotlin 的默认目标策略：
 
-| Kotlin 使用位置 | 逻辑声明 |
-| ------------ | ---------------------------------------------- |
-| `@field:` | 后备字段 |
-| `@get:` | getter |
-| `@set:` | setter |
-| `@param:` | 选定构造函数的参数 |
-| `@setparam:` | 支持参数注解的 setter 值参数 |
+| Kotlin 使用位置 | 逻辑声明                     |
+| --------------- | ---------------------------- |
+| `@field:`       | 后备字段                     |
+| `@get:`         | getter                       |
+| `@set:`         | setter                       |
+| `@param:`       | 选定构造函数的参数           |
+| `@setparam:`    | 支持参数注解的 setter 值参数 |
 
 不支持 `@property:`，因为 Fory JSON 注解不以 Kotlin 专有的属性元数据为目标。`@setparam:JsonProperty` 会被拒绝，因为 setter 参数命名不属于 JSON 属性名契约。`@setparam:JsonIgnore`、`@setparam:JsonCodec` 和 `@setparam:JsonUnwrapped` 作用于对应的单参数 setter 属性，也直接支持有效的 `@set:JsonCodec`。
 
@@ -146,7 +146,9 @@ public final class Response {
 以及包含空列表的非空 Optional 都会保留。属性包含策略不会过滤根值、集合元素、Map 条目或
 Any 条目。原始 JSON String 属性按字符串检查，不会解析其中的 JSON 文本。
 
-各语言的重建规则仍然适用；请参阅 [Kotlin 包含策略](kotlin.md#immutable-classes-and-compiler-defaults)。
+Kotlin 属性遵循配置的包含策略，即使省略属性会因默认值而改变读取结果，或导致缺少必需属性的读取失败；
+请参阅 [Kotlin 包含策略](kotlin.md#immutable-classes-and-compiler-defaults)。
+Scala 仍遵循[必需构造函数参数规则](scala.md#case-classes-and-annotations)。
 
 包含策略只影响写入。对于没有写入来源、仅供创建器使用的属性，非默认包含策略无效。可以重复相同声明；
 同一逻辑属性中相互冲突的显式名称、索引或非默认包含策略会被拒绝。规范化为同一最终 JSON 名称的两个

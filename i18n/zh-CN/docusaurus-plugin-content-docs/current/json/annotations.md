@@ -146,7 +146,9 @@ public final class Response {
 以及包含空列表的非空 Optional 都会保留。属性包含策略不会过滤根值、集合元素、Map 条目或
 Any 条目。原始 JSON String 属性按字符串检查，不会解析其中的 JSON 文本。
 
-各语言的重建规则仍然适用；请参阅 [Kotlin 包含策略](kotlin.md#immutable-classes-and-compiler-defaults)。
+Kotlin 属性遵循配置的包含策略，即使省略属性会因默认值而改变读取结果，或导致缺少必需属性的读取失败；
+请参阅 [Kotlin 包含策略](kotlin.md#immutable-classes-and-compiler-defaults)。
+Scala 仍遵循[必需构造函数参数规则](scala.md#case-classes-and-annotations)。
 
 包含策略只影响写入。对于没有写入来源、仅供创建器使用的属性，非默认包含策略无效。可以重复相同声明；
 同一逻辑属性中相互冲突的显式名称、索引或非默认包含策略会被拒绝。规范化为同一最终 JSON 名称的两个

@@ -41,7 +41,7 @@ Maven:
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-json</artifactId>
-  <version>1.7.2</version>
+  <version>1.7.3</version>
 </dependency>
 ```
 
@@ -55,7 +55,7 @@ repositories {
   mavenCentral()
 }
 
-implementation("org.apache.fory:fory-json:1.7.2")
+implementation("org.apache.fory:fory-json:1.7.3")
 ```
 
 ### Kotlin
@@ -64,7 +64,7 @@ Kotlin/JVM 应用添加可选的 Kotlin JSON 运行时，并使用其统一 buil
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.2")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.3")
 }
 ```
 
@@ -145,14 +145,14 @@ public final class JsonExample {
 
 Fory JSON 支持 String 输入/输出、UTF-8 字节输入/输出，以及通过 `ByteBuffer` 分块提供的增量 UTF-8 输入。目前不提供阻塞式 `InputStream` 解析 API。
 
-| 操作 | 运行时类型 | 声明的 `Class` | 声明的 `TypeRef` |
-| -------------------- | ------------------------- | ---------------------------- | ------------------------------ |
-| String 输出 | `toJson(value)` | `toJson(value, type)` | `toJson(value, typeRef)` |
-| UTF-8 字节 | `toJsonBytes(value)` | `toJsonBytes(value, type)` | `toJsonBytes(value, typeRef)` |
-| UTF-8 `OutputStream` | `writeJsonTo(value, out)` | `writeJsonTo(value, type, out)` | `writeJsonTo(value, typeRef, out)` |
-| String 输入 | - | `fromJson(text, type)` | `fromJson(text, typeRef)` |
-| UTF-8 输入 | - | `fromJson(bytes, type)` | `fromJson(bytes, typeRef)` |
-| UTF-8 字节范围 | - | `fromJson(bytes, offset, length, type)` | `fromJson(bytes, offset, length, typeRef)` |
+| 操作                 | 运行时类型                | 声明的 `Class`                          | 声明的 `TypeRef`                           |
+| -------------------- | ------------------------- | --------------------------------------- | ------------------------------------------ |
+| String 输出          | `toJson(value)`           | `toJson(value, type)`                   | `toJson(value, typeRef)`                   |
+| UTF-8 字节           | `toJsonBytes(value)`      | `toJsonBytes(value, type)`              | `toJsonBytes(value, typeRef)`              |
+| UTF-8 `OutputStream` | `writeJsonTo(value, out)` | `writeJsonTo(value, type, out)`         | `writeJsonTo(value, typeRef, out)`         |
+| String 输入          | -                         | `fromJson(text, type)`                  | `fromJson(text, typeRef)`                  |
+| UTF-8 输入           | -                         | `fromJson(bytes, type)`                 | `fromJson(bytes, typeRef)`                 |
+| UTF-8 字节范围       | -                         | `fromJson(bytes, offset, length, type)` | `fromJson(bytes, offset, length, typeRef)` |
 
 每次 `fromJson` 调用恰好消费一个 JSON 值，并拒绝其后的非空白内容。字节范围重载只解析指定范围，忽略范围之前和之后的字节。返回的 String 和字节数组与内部可复用缓冲区相互独立。
 

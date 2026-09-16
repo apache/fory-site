@@ -44,7 +44,7 @@ Apache Fory™ C# 是面向 .NET 的高性能跨语言序列化库。它支持�
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Apache.Fory" Version="1.7.2" />
+  <PackageReference Include="Apache.Fory" Version="1.7.3" />
 </ItemGroup>
 ```
 
@@ -87,7 +87,7 @@ User decoded = fory.Deserialize<User>(payload);
 | 主题                                    | 说明                                  |
 | --------------------------------------- | ------------------------------------- |
 | [配置](configuration.md)                | 构建器选项和模式设置                  |
-| [基本序列化](basic-serialization.md)               | 类型化和动态序列化 API                |
+| [基本序列化](basic-serialization.md)    | 类型化和动态序列化 API                |
 | [Schema 元数据](schema-metadata.md)     | `[ForyField]` ID 和 Schema 类型描述符 |
 | [类型注册](type-registration.md)        | 注册用户类型和自定义序列化器          |
 | [外部类型](external-types.md)           | 第三方类型的序列化器                  |
