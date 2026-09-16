@@ -22,7 +22,7 @@ Apache Fory JSON 为 Kotlin/JVM 提供了专门的对象映射层。它通过 Ko
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.1")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.3")
 }
 ```
 
@@ -173,7 +173,7 @@ Kotlin 元数据 + 声明的根类型
 
 ### 测试方法 {#benchmark-setup}
 
-两组基准测试都在 Apple M5 和 OpenJDK 25.0.3 上运行，参与对比的是 Fory JSON for Kotlin 1.7.1、kotlinx.serialization 1.11.0、Moshi 1.15.2（使用代码生成的适配器）和 Jackson Kotlin 2.22.1。
+两组基准测试都在 Apple M5 和 OpenJDK 25.0.3 上运行，参与对比的是 Fory JSON for Kotlin 1.7.3、kotlinx.serialization 1.11.0、Moshi 1.15.2（使用代码生成的适配器）和 Jackson Kotlin 2.22.1。
 
 每个测试场景下，各库使用相同的 Kotlin 模型和输入数据。正确性测试会检查能否正确读取样本、序列化后能否还原原对象，以及各库输出的 JSON 是否等价。模型、输入数据及各库的序列化器、适配器和读写器都在计时前准备好，Fory 的编解码器编译也在计时前完成。
 
