@@ -29,7 +29,7 @@ license: |
 
 ```yaml
 dependencies:
-  fory: ^1.7.2
+  fory: ^1.7.3
   grpc: ^4.0.0
 
 dev_dependencies:

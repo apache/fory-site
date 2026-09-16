@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.2")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.3")
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.2")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.3")
 }
 ```
 
@@ -120,25 +120,44 @@ data class Request(
 
 类体 `val`、计算属性、委托属性、仅 getter 的属性和委托 `var` 必须被忽略，或由精确的自定义编解码器处理。输入中存在的延后赋值 setter 在构造后按固定属性顺序执行，随后运行验证器；输入成员顺序不能决定应用调用顺序。Kotlin 类实例始终通过正常构造创建，因此不会绕过主构造函数初始化和验证。
 
-Fory 必须能在相同配置下读取自身输出。因此，可空构造函数参数和可空延后赋值属性在为 null 时会显式输出，即使 builder 的 Java 通用默认行为是省略 null 字段。如果省略属性可能导致失败或调用不同的编译器默认值，则会拒绝该属性上显式设置的 `JsonProperty.Include.NON_NULL`。
+Kotlin 的构造函数参数和类体属性都遵循配置的[属性包含策略](annotations.md#jsonproperty)。
+默认的 `NON_NULL` 省略 null，`NON_EMPTY` 还会省略空字符串、数组、集合、Map 和不含值的 JDK Optional。
+属性上的 `@JsonProperty(include = ...)` 优先于 builder 默认值。使用 `ALWAYS` 或
+`writeNullFields(true)` 可以保留 null。
 
-同样的规则也适用于 `NON_EMPTY`。全局设置
-`defaultPropertyInclusion(JsonProperty.Include.NON_EMPTY)` 会保留 Kotlin 构造函数参数和延后赋值属性中的
-空值，包括声明了 `emptyList()` 默认值的属性。Fory 不会通过比较编译器默认值或执行初始化器来决定
-是否省略属性。对于可重建的属性，如果其逻辑类型可能为空，或者其可空值可能因此被省略，显式的
-`NON_EMPTY` 注解会被拒绝。非空值类即使底层字符串或集合为空，也仍会输出。如果包含这些属性的模型
-需要不同的省略与重建规则，请为该模型使用自定义编解码器。
+```kotlin
+import org.apache.fory.json.annotation.JsonProperty.Include
+import org.apache.fory.json.kotlin.ForyJsonKotlin
+
+data class Response(
+    val id: Int,
+    val name: String? = null,
+    val items: List<String>? = null,
+)
+
+val json = ForyJsonKotlin.builder().defaultPropertyInclusion(Include.NON_EMPTY).build()
+val text = json.toJson(Response(1, items = emptyList())) // {"id":1}
+```
+
+包含策略只影响写入。读取示例输出时，`items` 使用声明的默认值 null，因此不会保留原来的空列表。
+缺失的构造函数参数使用声明的默认值；如果没有默认值则读取失败。缺失的类体属性保留初始化值。
+显式 null 与字段缺失不同，非空属性仍会拒绝显式 null。如果需要精确往返，应选择能保留所需值的包含策略。
+
+序列化时不会比较 Kotlin 默认值，也不会执行初始化器。无论默认值为 null、`emptyList()` 还是非空列表，
+`NON_EMPTY` 都会省略空列表。非空值类不会因为底层字符串或集合为空而被当作空属性。
+对于本身实现 `CharSequence`、`Collection` 或 `Map` 的未装箱值类，不支持显式的 `NON_EMPTY`；
+这类模型应使用包含它的对象的自定义编解码器。
 
 ## 可空性 {#nullability}
 
 Kotlin 类型使用位置的可空性在根值、属性、容器元素、Map 值和泛型子类型上均会被检查：
 
-| 声明 | 成员缺失 | 显式 JSON `null` |
-| --------------------------------- | --------------------- | ---------- |
-| `val value: String` | 失败 | 失败 |
-| `val value: String?` | 失败 | 传入 null |
-| `val value: String = expression` | 求值默认值 | 失败 |
-| `val value: String? = expression` | 求值默认值 | 传入 null |
+| 声明                              | 成员缺失   | 显式 JSON `null` |
+| --------------------------------- | ---------- | ---------------- |
+| `val value: String`               | 失败       | 失败             |
+| `val value: String?`              | 失败       | 传入 null        |
+| `val value: String = expression`  | 求值默认值 | 失败             |
+| `val value: String? = expression` | 求值默认值 | 传入 null        |
 
 `List<String?>` 接受 null 元素，`List<String>` 拒绝 null 元素。Map 键必须非空。自动构造 Kotlin 模型时，不会猜测平台类型或未知的可空性。
 
@@ -217,56 +236,56 @@ Fory 执行经过验证的编译器构造操作，因此值类初始化检查仍
 
 从 Kotlin 使用 Java/JDK 标量、时间类型、Optional、原子类型、数组、集合、Map、枚举和 JSON 树类型时，它们保持常规 Fory JSON 表示：
 
-| 核心类型类别 | Kotlin 中的行为 |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Any` / `Any?` | 自然 JSON Boolean、数字、String、数组、对象或 null；写入时按运行时类型动态分派 |
-| 有符号标量及装箱类型 | `Boolean`、`Byte`、`Short`、`Int`、`Long`、`Float`、`Double`、`Char` 和 `Number` 使用核心标量编解码器；非有限浮点值使用核心的带引号表示 |
-| 文本 | `String`、精确 `CharSequence`、`StringBuilder` 和 `StringBuffer` 使用字符串表示 |
-| 任意精度/低精度数值 | `BigInteger`、`BigDecimal`、Fory `Float16` 和 `BFloat16` 使用核心数值表示与限制 |
-| 枚举 | 带引号的枚举常量名 |
-| Java/Kotlin 数组 | 除 `ByteArray` 默认使用 Base64 字符串外，均为普通 JSON 数组；`@field:JsonByteArray(JsonByteArray.Format.ARRAY)` 可选择数字数组；无符号语义数组见下文 |
-| Optional 与原子类 | `Optional<T>`、基本类型 Optional、原子标量/引用和原子数组保持核心透明表示，并受上述可空性规则约束 |
-| 带引号的 JDK 值 | `Currency`、`File`、`URI`、`Path`、`Pattern`、`UUID`、`Locale`、`Charset` 和 `TimeZone` 保持核心字符串表示 |
-| 旧版日期/时间 | `Date`、`Calendar` 及可用的 `java.sql.Date`、`Time` 和 `Timestamp` 保持自 Unix 纪元起的毫秒数表示 |
-| Java 时间类型 | `LocalDate`、`LocalTime`、`LocalDateTime`、`Instant`、`java.time.Duration`、`ZoneOffset`、`ZoneId`、`ZonedDateTime`、`Year`、`YearMonth`、`MonthDay`、`Period`、`OffsetTime`、`OffsetDateTime` 和受支持的历法日期保持核心精确文本语法 |
-| 其他核心值 | `BitSet`、`ByteBuffer`、`JsonArray` 和 `JsonObject` 保持常规核心表示 |
-| 集合/Map | 受支持的 Java/Kotlin `Collection`、`Map` 接口和实现使用核心数组/对象表示；受支持的 Guava 不可变载体仍为可选依赖 |
-| Map 键 | String、枚举、有符号 `Byte`/`Short`/`Int`/`Long`，以及下文补充的 Kotlin 无符号类型/值类；Boolean、浮点、可空和任意对象键需要显式键编解码器或完整 Map 编解码器 |
-| 固定拒绝的类型 | 仍拒绝 `Class`、URL/网络/socket/地址类型、不支持的 JDK 内部集合实现，以及未注册的 `Number`/`CharSequence` 子类；应用可在常规类型和安全检查允许的范围内显式定义自有表示 |
+| 核心类型类别         | Kotlin 中的行为                                                                                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Any` / `Any?`       | 自然 JSON Boolean、数字、String、数组、对象或 null；写入时按运行时类型动态分派                                                                                                                                                        |
+| 有符号标量及装箱类型 | `Boolean`、`Byte`、`Short`、`Int`、`Long`、`Float`、`Double`、`Char` 和 `Number` 使用核心标量编解码器；非有限浮点值使用核心的带引号表示                                                                                               |
+| 文本                 | `String`、精确 `CharSequence`、`StringBuilder` 和 `StringBuffer` 使用字符串表示                                                                                                                                                       |
+| 任意精度/低精度数值  | `BigInteger`、`BigDecimal`、Fory `Float16` 和 `BFloat16` 使用核心数值表示与限制                                                                                                                                                       |
+| 枚举                 | 带引号的枚举常量名                                                                                                                                                                                                                    |
+| Java/Kotlin 数组     | 除 `ByteArray` 默认使用 Base64 字符串外，均为普通 JSON 数组；`@field:JsonByteArray(JsonByteArray.Format.ARRAY)` 可选择数字数组；无符号语义数组见下文                                                                                  |
+| Optional 与原子类    | `Optional<T>`、基本类型 Optional、原子标量/引用和原子数组保持核心透明表示，并受上述可空性规则约束                                                                                                                                     |
+| 带引号的 JDK 值      | `Currency`、`File`、`URI`、`Path`、`Pattern`、`UUID`、`Locale`、`Charset` 和 `TimeZone` 保持核心字符串表示                                                                                                                            |
+| 旧版日期/时间        | `Date`、`Calendar` 及可用的 `java.sql.Date`、`Time` 和 `Timestamp` 保持自 Unix 纪元起的毫秒数表示                                                                                                                                     |
+| Java 时间类型        | `LocalDate`、`LocalTime`、`LocalDateTime`、`Instant`、`java.time.Duration`、`ZoneOffset`、`ZoneId`、`ZonedDateTime`、`Year`、`YearMonth`、`MonthDay`、`Period`、`OffsetTime`、`OffsetDateTime` 和受支持的历法日期保持核心精确文本语法 |
+| 其他核心值           | `BitSet`、`ByteBuffer`、`JsonArray` 和 `JsonObject` 保持常规核心表示                                                                                                                                                                  |
+| 集合/Map             | 受支持的 Java/Kotlin `Collection`、`Map` 接口和实现使用核心数组/对象表示；受支持的 Guava 不可变载体仍为可选依赖                                                                                                                       |
+| Map 键               | String、枚举、有符号 `Byte`/`Short`/`Int`/`Long`，以及下文补充的 Kotlin 无符号类型/值类；Boolean、浮点、可空和任意对象键需要显式键编解码器或完整 Map 编解码器                                                                         |
+| 固定拒绝的类型       | 仍拒绝 `Class`、URL/网络/socket/地址类型、不支持的 JDK 内部集合实现，以及未注册的 `Number`/`CharSequence` 子类；应用可在常规类型和安全检查允许的范围内显式定义自有表示                                                                |
 
 核心表示详情见[对象映射](object-mapping.md#supported-java-types)。Kotlin 特有行为如下：
 
-| 类型类别 | 自动 JSON 表示或处理方式 |
-| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| 普通类、data class 和嵌套类 | 具有命名属性的 JSON 对象 |
-| `inner` 类、普通抽象类/接口 | 仅支持封闭的 `JsonSubTypes` 或精确自定义编解码器 |
-| sealed 类/接口 | 推导或显式声明的封闭 `JsonSubTypes` 表 |
-| 枚举 | 带引号的枚举名 |
-| 无状态 `object`、`data object`、`Unit` | 严格的 `{}` |
-| 有状态对象、伴生对象 | 仅支持精确自定义编解码器 |
-| 值类 | 透明的底层值；需要精确绑定 |
-| `Nothing?` / `Nothing` | 仅允许 null / 拒绝 |
-| `Pair`、`Triple` | 具有 `first`、`second` 和 `third` 命名属性的对象 |
-| `Result`、`Lazy`、Kotlin 标准属性委托 | 仅支持精确自定义编解码器 |
-| 有符号基本类型、基本类型数组、`Array<T>` | 常规核心数字/Boolean/字符与数组表示 |
-| `UByte`、`UShort`、`UInt`、`ULong` 及其数组 | 无符号十进制数字和数组 |
-| 只读与可变集合/Map、Kotlin `ArrayDeque` | 常规核心数组/Map |
-| `Map.Entry`、私有集合载体、`Iterable`、`Sequence`、迭代器、`EnumEntries` | 自动映射时拒绝 |
-| `CharRange`、有符号/无符号整数区间 | `{"start":...,"endInclusive":...}` |
-| 对应的步进序列 | `{"first":...,"last":...,"step":...}` |
-| `ClosedRange`、`OpenEndRange`、抽象/开放/浮点区间 | 自动映射时拒绝 |
-| `kotlin.time.Duration` | 带引号的规范 Kotlin ISO 时长 |
-| `kotlin.time.Instant` | 带引号的规范 Kotlin ISO 时刻 |
-| `TimedValue<T>` | `{"value":...,"duration":...}` |
-| `DurationUnit`、`RegexOption` | 带引号的枚举名 |
-| 时钟、时间源/时间标记、Regex/匹配状态、Random | 仅支持精确自定义编解码器 |
-| `kotlin.uuid.Uuid` | 带引号的规范连字符 UUID |
-| 完整泛型类 / 声明处型变 | 精确替换后的 Schema |
-| `out X` / `in X` / 星投影 | 仅允许精确 final 或封闭的 `X` / 拒绝 / 拒绝 |
-| 递归泛型 | 仅允许相同的精确递归绑定；正在处理时展开到另一绑定会被拒绝 |
-| 类型别名 | 完全展开后的类型 |
-| 函数/挂起函数、反射类型、协程/flow/channel 状态 | 拒绝 |
-| 符合条件的第三方不可变 Kotlin 模型 | 在 JVM 上自动映射；应用注解覆盖时需注册精确 Mixin |
+| 类型类别                                                                 | 自动 JSON 表示或处理方式                                   |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| 普通类、data class 和嵌套类                                              | 具有命名属性的 JSON 对象                                   |
+| `inner` 类、普通抽象类/接口                                              | 仅支持封闭的 `JsonSubTypes` 或精确自定义编解码器           |
+| sealed 类/接口                                                           | 推导或显式声明的封闭 `JsonSubTypes` 表                     |
+| 枚举                                                                     | 带引号的枚举名                                             |
+| 无状态 `object`、`data object`、`Unit`                                   | 严格的 `{}`                                                |
+| 有状态对象、伴生对象                                                     | 仅支持精确自定义编解码器                                   |
+| 值类                                                                     | 透明的底层值；需要精确绑定                                 |
+| `Nothing?` / `Nothing`                                                   | 仅允许 null / 拒绝                                         |
+| `Pair`、`Triple`                                                         | 具有 `first`、`second` 和 `third` 命名属性的对象           |
+| `Result`、`Lazy`、Kotlin 标准属性委托                                    | 仅支持精确自定义编解码器                                   |
+| 有符号基本类型、基本类型数组、`Array<T>`                                 | 常规核心数字/Boolean/字符与数组表示                        |
+| `UByte`、`UShort`、`UInt`、`ULong` 及其数组                              | 无符号十进制数字和数组                                     |
+| 只读与可变集合/Map、Kotlin `ArrayDeque`                                  | 常规核心数组/Map                                           |
+| `Map.Entry`、私有集合载体、`Iterable`、`Sequence`、迭代器、`EnumEntries` | 自动映射时拒绝                                             |
+| `CharRange`、有符号/无符号整数区间                                       | `{"start":...,"endInclusive":...}`                         |
+| 对应的步进序列                                                           | `{"first":...,"last":...,"step":...}`                      |
+| `ClosedRange`、`OpenEndRange`、抽象/开放/浮点区间                        | 自动映射时拒绝                                             |
+| `kotlin.time.Duration`                                                   | 带引号的规范 Kotlin ISO 时长                               |
+| `kotlin.time.Instant`                                                    | 带引号的规范 Kotlin ISO 时刻                               |
+| `TimedValue<T>`                                                          | `{"value":...,"duration":...}`                             |
+| `DurationUnit`、`RegexOption`                                            | 带引号的枚举名                                             |
+| 时钟、时间源/时间标记、Regex/匹配状态、Random                            | 仅支持精确自定义编解码器                                   |
+| `kotlin.uuid.Uuid`                                                       | 带引号的规范连字符 UUID                                    |
+| 完整泛型类 / 声明处型变                                                  | 精确替换后的 Schema                                        |
+| `out X` / `in X` / 星投影                                                | 仅允许精确 final 或封闭的 `X` / 拒绝 / 拒绝                |
+| 递归泛型                                                                 | 仅允许相同的精确递归绑定；正在处理时展开到另一绑定会被拒绝 |
+| 类型别名                                                                 | 完全展开后的类型                                           |
+| 函数/挂起函数、反射类型、协程/flow/channel 状态                          | 拒绝                                                       |
+| 符合条件的第三方不可变 Kotlin 模型                                       | 在 JVM 上自动映射；应用注解覆盖时需注册精确 Mixin          |
 
 时间和 UUID API 的 Kotlin 实验性 opt-in 要求仍适用于应用源码。Fory 制品支持的编译器和元数据范围，并不意味着实验性 Kotlin API 获得跨 Kotlin 版本的兼容保证。
 

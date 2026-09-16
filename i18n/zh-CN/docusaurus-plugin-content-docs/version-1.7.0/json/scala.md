@@ -24,7 +24,7 @@ Fory JSON 通过可选的 `fory-json-scala` 制品支持 Scala 2.13 和 Scala 3�
 ## 设置 {#setup}
 
 ```sbt
-libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.2"
+libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.3"
 ```
 
 `ForyJsonScala.builder()` 安装 Scala 模块并返回标准 Fory JSON builder：
@@ -73,25 +73,25 @@ case class Media(
 
 ## 支持的 Scala 类型 {#supported-scala-types}
 
-| Scala 类型 | JSON 表示形式 |
-| ----------------------------------------------------------- | ----------------------------------------------- |
-| `Unit` | `null` |
-| case class | 对象 |
-| 单例对象 | 空对象 |
-| 值类 | 底层值 |
-| `Option[A]`、`Some[A]`、`None` | 所含值或 `null` |
-| `Either[L, R]` | 恰好包含一个 `l` 或 `r` 成员的对象 |
-| `List`、`Seq`、`Vector`、`Queue`、`ArraySeq`、buffer、set | 数组 |
-| Scala Map、`IntMap`、`LongMap` | 对象 |
-| 不可变与可变 `BitSet` | 升序整数数组 |
-| `Tuple1` 至 `Tuple22` | 定长数组 |
-| Scala 3 `EmptyTuple` | 空数组 |
-| `BigInt`、`BigDecimal` | JSON 数字 |
-| Scala `StringBuilder` | string |
-| `Range`、受支持的 `NumericRange` | 已求值的值数组 |
-| `FiniteDuration`、`Duration` | 固定的 `length`/`unit` 或 `special` 对象 |
-| 无参数的 Scala 3 枚举 | 字符串形式的枚举分支名 |
-| Scala 2 `Enumeration` | 通过绑定所属枚举的编解码器表示为字符串 |
+| Scala 类型                                                | JSON 表示形式                            |
+| --------------------------------------------------------- | ---------------------------------------- |
+| `Unit`                                                    | `null`                                   |
+| case class                                                | 对象                                     |
+| 单例对象                                                  | 空对象                                   |
+| 值类                                                      | 底层值                                   |
+| `Option[A]`、`Some[A]`、`None`                            | 所含值或 `null`                          |
+| `Either[L, R]`                                            | 恰好包含一个 `l` 或 `r` 成员的对象       |
+| `List`、`Seq`、`Vector`、`Queue`、`ArraySeq`、buffer、set | 数组                                     |
+| Scala Map、`IntMap`、`LongMap`                            | 对象                                     |
+| 不可变与可变 `BitSet`                                     | 升序整数数组                             |
+| `Tuple1` 至 `Tuple22`                                     | 定长数组                                 |
+| Scala 3 `EmptyTuple`                                      | 空数组                                   |
+| `BigInt`、`BigDecimal`                                    | JSON 数字                                |
+| Scala `StringBuilder`                                     | string                                   |
+| `Range`、受支持的 `NumericRange`                          | 已求值的值数组                           |
+| `FiniteDuration`、`Duration`                              | 固定的 `length`/`unit` 或 `special` 对象 |
+| 无参数的 Scala 3 枚举                                     | 字符串形式的枚举分支名                   |
+| Scala 2 `Enumeration`                                     | 通过绑定所属枚举的编解码器表示为字符串   |
 
 严格求值的标准库集合通过标准 Scala builder 重建。`Either` 写入紧凑的 `l` 和 `r` 成员名，读取器也接受旧的 `left` 和 `right` 名称。Fory 不增加 Scala 专用集合大小限制；编解码器使用与 Fory JSON 核心相同的输入长度、深度、对象图内存和读取进度限制。如果稀疏 `BitSet` 的最高索引要求分配与可用 JSON 输入不成比例的底层存储，则会被拒绝。
 

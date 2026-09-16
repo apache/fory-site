@@ -178,8 +178,10 @@ present Optional containing an empty list remain included. Root values, collecti
 entries, and Any entries are not filtered by property inclusion. Raw JSON String properties are
 checked as strings without parsing their text.
 
-Language-specific reconstruction rules still apply; see
-[Kotlin inclusion](kotlin.md#immutable-classes-and-compiler-defaults).
+Kotlin properties follow the configured inclusion even when omission changes the value restored by
+a default or causes a missing-property read failure; see
+[Kotlin inclusion](kotlin.md#immutable-classes-and-compiler-defaults). Scala retains its
+[required-constructor-property rules](scala.md#case-classes-and-annotations).
 
 Inclusion affects writing only. A non-default inclusion is invalid for a creator-only property with
 no write source. Repeating the same declaration is allowed; conflicting explicit names, indexes, or

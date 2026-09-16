@@ -25,7 +25,7 @@ module works on the ordinary JVM and GraalVM Native Image. Android is not suppor
 ## Setup
 
 ```sbt
-libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.2"
+libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.3"
 ```
 
 `ForyJsonScala.builder()` installs the Scala module and returns the standard Fory JSON builder:
@@ -106,7 +106,6 @@ a required parameter whose type can be empty; add a constructor default to allow
 | parameterless Scala 3 enum                                  | string case name                                |
 | Scala 2 `Enumeration`                                       | string through an owner-bound codec             |
 
-Strict standard-library collections are reconstructed through their standard Scala builders.
 `Either` writes compact `l` and `r` member names. Readers also accept the legacy `left` and
 `right` member names.
 Fory does not add a Scala-specific collection-size limit; the codecs use the same input-length,

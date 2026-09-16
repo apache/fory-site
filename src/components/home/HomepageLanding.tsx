@@ -138,11 +138,12 @@ const runtimeExamples: RuntimeExample[] = [
     install: `<dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>1.7.2</version>
+  <version>1.7.3</version>
 </dependency>`,
     codeLanguage: "java",
     guide: "/docs/object-serialization/java/",
-    summary: "Java supports xlang and native modes, JIT serializers, schema evolution, and Java-native object graph features.",
+    summary:
+      "Java supports xlang and native modes, JIT serializers, schema evolution, and Java-native object graph features.",
     code: `import org.apache.fory.Fory;
 
 public record Person(String name, int age) {}
@@ -159,10 +160,11 @@ Person out = (Person) fory.deserialize(bytes);`,
     id: "python",
     label: "Python",
     installLanguage: "bash",
-    install: `pip install pyfory==1.7.2`,
+    install: `pip install pyfory==1.7.3`,
     codeLanguage: "python",
     guide: "/docs/object-serialization/python/",
-    summary: "pyfory supports xlang, Python native mode, dataclasses, row format, and out-of-band buffers.",
+    summary:
+      "pyfory supports xlang, Python native mode, dataclasses, row format, and out-of-band buffers.",
     code: `from dataclasses import dataclass
 import pyfory
 
@@ -181,10 +183,11 @@ out = fory.deserialize(data)`,
     id: "rust",
     label: "Rust",
     installLanguage: "bash",
-    install: `cargo add fory@1.7.2`,
+    install: `cargo add fory@1.7.3`,
     codeLanguage: "rust",
     guide: "/docs/object-serialization/rust/",
-    summary: "Rust uses derive macros for type-safe structs and supports both xlang and native payloads.",
+    summary:
+      "Rust uses derive macros for type-safe structs and supports both xlang and native payloads.",
     code: `use fory::{Error, Fory, ForyStruct};
 
 #[derive(ForyStruct, Debug, PartialEq)]
@@ -206,10 +209,11 @@ fn main() -> Result<(), Error> {
     id: "go",
     label: "Go",
     installLanguage: "bash",
-    install: `go get github.com/apache/fory/go/fory@v1.7.2`,
+    install: `go get github.com/apache/fory/go/fory@v1.7.3`,
     codeLanguage: "go",
     guide: "/docs/object-serialization/go/",
-    summary: "Go supports xlang and native modes with exported structs, circular references, and schema-aware serializers.",
+    summary:
+      "Go supports xlang and native modes with exported structs, circular references, and schema-aware serializers.",
     code: `type Person struct {
     Name string
     Age  int32
@@ -230,13 +234,14 @@ _ = f.Deserialize(payload, &out)`,
 FetchContent_Declare(
   fory
   GIT_REPOSITORY https://github.com/apache/fory.git
-  GIT_TAG v1.7.2
+  GIT_TAG v1.7.3
   SOURCE_SUBDIR cpp
 )
 FetchContent_MakeAvailable(fory)`,
     codeLanguage: "cpp",
     guide: "/docs/object-serialization/cpp/",
-    summary: "C++17 support covers xlang/native payloads, macro-based type registration, and row-format APIs.",
+    summary:
+      "C++17 support covers xlang/native payloads, macro-based type registration, and row-format APIs.",
     code: `struct Person {
   std::string name;
   int32_t age;
@@ -257,10 +262,11 @@ auto out = fory.deserialize<Person>(bytes).value();`,
     id: "javascript",
     label: "JavaScript",
     installLanguage: "bash",
-    install: `npm install @apache-fory/core@1.7.2 @apache-fory/hps@1.7.2`,
+    install: `npm install @apache-fory/core@1.7.3 @apache-fory/hps@1.7.3`,
     codeLanguage: "typescript",
     guide: "/docs/object-serialization/javascript/",
-    summary: "JavaScript/TypeScript is xlang-only, schema-driven, and runs in Node.js or browsers.",
+    summary:
+      "JavaScript/TypeScript is xlang-only, schema-driven, and runs in Node.js or browsers.",
     code: `import Fory, { Type } from "@apache-fory/core";
 
 const personType = Type.struct(
@@ -278,10 +284,11 @@ const out = deserialize(payload);`,
     id: "csharp",
     label: "C#",
     installLanguage: "bash",
-    install: `dotnet add package Apache.Fory --version 1.7.2`,
+    install: `dotnet add package Apache.Fory --version 1.7.3`,
     codeLanguage: "csharp",
     guide: "/docs/object-serialization/csharp/",
-    summary: ".NET support uses source-generated serializers for Fory structs, enums, and unions.",
+    summary:
+      ".NET support uses source-generated serializers for Fory structs, enums, and unions.",
     code: `using Apache.Fory;
 
 [ForyStruct]
@@ -301,10 +308,11 @@ Person out = fory.Deserialize<Person>(payload);`,
     id: "swift",
     label: "Swift",
     installLanguage: "swift",
-    install: `.package(url: "https://github.com/apache/fory.git", exact: "1.7.2")`,
+    install: `.package(url: "https://github.com/apache/fory.git", exact: "1.7.3")`,
     codeLanguage: "swift",
     guide: "/docs/object-serialization/swift/",
-    summary: "Swift uses @ForyStruct, @ForyEnum, and @ForyUnion macros for xlang-compatible models.",
+    summary:
+      "Swift uses @ForyStruct, @ForyEnum, and @ForyUnion macros for xlang-compatible models.",
     code: `import Fory
 
 @ForyStruct
@@ -324,13 +332,14 @@ let out: Person = try fory.deserialize(payload)`,
     label: "Dart",
     installLanguage: "yaml",
     install: `dependencies:
-  fory: ^1.7.2
+  fory: ^1.7.3
 
 dev_dependencies:
   build_runner: ^2.4.13`,
     codeLanguage: "dart",
     guide: "/docs/object-serialization/dart/",
-    summary: "Dart uses generated serializers across Dart VM, Flutter, AOT, and web targets.",
+    summary:
+      "Dart uses generated serializers across Dart VM, Flutter, AOT, and web targets.",
     code: `import 'package:fory/fory.dart';
 
 part 'person.fory.dart';
@@ -359,10 +368,11 @@ final out = fory.deserialize<Person>(payload);`,
     id: "scala",
     label: "Scala",
     installLanguage: "sbt",
-    install: `libraryDependencies += "org.apache.fory" %% "fory-scala" % "1.7.2"`,
+    install: `libraryDependencies += "org.apache.fory" %% "fory-scala" % "1.7.3"`,
     codeLanguage: "scala",
     guide: "/docs/object-serialization/scala/",
-    summary: "Scala builds on Fory Java with optimized serializers for case classes, collections, tuples, and Option.",
+    summary:
+      "Scala builds on Fory Java with optimized serializers for case classes, collections, tuples, and Option.",
     code: `import org.apache.fory.scala.ForyScala
 
 case class Person(name: String, age: Int)
@@ -379,11 +389,12 @@ val out = fory.deserialize(payload).asInstanceOf[Person]`,
     id: "kotlin",
     label: "Kotlin",
     installLanguage: "kotlin",
-    install: `implementation("org.apache.fory:fory-kotlin:1.7.2")
-ksp("org.apache.fory:fory-kotlin-ksp:1.7.2")`,
+    install: `implementation("org.apache.fory:fory-kotlin:1.7.3")
+ksp("org.apache.fory:fory-kotlin-ksp:1.7.3")`,
     codeLanguage: "kotlin",
     guide: "/docs/object-serialization/kotlin/",
-    summary: "Kotlin adds data-class support, Android guidance, and KSP static serializers for xlang/schema mode.",
+    summary:
+      "Kotlin adds data-class support, Android guidance, and KSP static serializers for xlang/schema mode.",
     code: `import org.apache.fory.kotlin.ForyKotlin
 
 data class Person(val name: String, val age: Int)
@@ -406,7 +417,8 @@ const capabilities = [
     label: "XLANG",
     description:
       "Serialize in one supported runtime and deserialize in another with the xlang wire format.",
-    zhDescription: "通过 xlang 线格式，在一个受支持运行时序列化，在另一个运行时反序列化。",
+    zhDescription:
+      "通过 xlang 线格式，在一个受支持运行时序列化，在另一个运行时反序列化。",
     link: "/docs/object-serialization/xlang/",
   },
   {
@@ -415,7 +427,8 @@ const capabilities = [
     label: "OBJECTS",
     description:
       "Work with Java classes, Python dataclasses, Go structs, Rust/C++ structs, and generated or annotated models.",
-    zhDescription: "直接使用 Java 类、Python dataclass、Go struct、Rust/C++ struct，以及生成或注解模型。",
+    zhDescription:
+      "直接使用 Java 类、Python dataclass、Go struct、Rust/C++ struct，以及生成或注解模型。",
     link: "/docs/start/",
   },
   {
@@ -424,7 +437,8 @@ const capabilities = [
     label: "IDL",
     description:
       "Define schemas once with optional fields, refs, IDs, unions, and services, then generate native code.",
-    zhDescription: "一次定义 optional、ref、ID、union 和 service 等 schema，再生成各语言原生代码。",
+    zhDescription:
+      "一次定义 optional、ref、ID、union 和 service 等 schema，再生成各语言原生代码。",
     link: "/docs/compiler/",
   },
   {
@@ -433,7 +447,8 @@ const capabilities = [
     label: "ROW",
     description:
       "Read fields, arrays, and nested values without deserializing the whole object; integrate with Arrow where supported.",
-    zhDescription: "无需反序列化完整对象即可读取字段、数组和嵌套值，并在支持语言中对接 Arrow。",
+    zhDescription:
+      "无需反序列化完整对象即可读取字段、数组和嵌套值，并在支持语言中对接 Arrow。",
     link: "/docs/row-format/",
   },
   {
@@ -446,7 +461,9 @@ const capabilities = [
       <>
         {"使用 "}
         <span className={styles.noWrap}>Java/JavaScript</span>
-        {" JIT serializer、Rust/C++/Swift macro、C# source generator、Kotlin KSP 和 Dart build_runner 输出。"}
+        {
+          " JIT serializer、Rust/C++/Swift macro、C# source generator、Kotlin KSP 和 Dart build_runner 输出。"
+        }
       </>
     ),
     link: "/docs/object-serialization/java/",
@@ -512,13 +529,15 @@ const schemaExamples = [
     title: "Message Type",
     zhTitle: "Message 类型",
     text: "Define structured data types with typed fields, field IDs, and explicit optional fields.",
-    zhText: "用 typed fields、字段 ID 和明确的 optional 字段定义结构化数据类型。",
+    zhText:
+      "用 typed fields、字段 ID 和明确的 optional 字段定义结构化数据类型。",
   },
   {
     title: "Union Type",
     zhTitle: "Union 类型",
     text: "Map one-of-several cases to tagged unions, and to native union or sum types where supported.",
-    zhText: "把 one-of-several case 映射为 tagged union；在支持的语言中生成原生 union 或 sum type。",
+    zhText:
+      "把 one-of-several case 映射为 tagged union；在支持的语言中生成原生 union 或 sum type。",
     code: `message Dog {
     string name = 1;
     int32 bark_volume = 2;
@@ -548,7 +567,7 @@ union Animal {
 ];
 
 const schemaPreviewCode = `package example;\n\n${schemaExamples
-  .flatMap((item) => item.code ? [item.code] : [])
+  .flatMap((item) => (item.code ? [item.code] : []))
   .join("\n\n")}`;
 
 const schemaLinks = [
@@ -574,7 +593,8 @@ const performanceCards = [
     value: "Optimized Serializers",
     zhValue: "优化 Serializer",
     text: "Use JIT serializers, source generators, macros, KSP, and build_runner where each runtime supports them.",
-    zhText: "在各运行时使用 JIT serializer、source generator、macro、KSP 和 build_runner。",
+    zhText:
+      "在各运行时使用 JIT serializer、source generator、macro、KSP 和 build_runner。",
   },
   {
     value: "Efficient Encoding",
@@ -595,7 +615,8 @@ const useCases = [
     title: "Runtime boundary",
     zhTitle: "运行时边界",
     text: "Use native mode when objects stay inside one runtime and object graph fidelity matters.",
-    zhText: "当对象只在同一运行时内流转，且对象图语义重要时，使用 native mode。",
+    zhText:
+      "当对象只在同一运行时内流转，且对象图语义重要时，使用 native mode。",
   },
   {
     title: "Read boundary",
@@ -611,7 +632,8 @@ const adoptionPaths = [
     title: "Choose the wire mode",
     zhTitle: "选择 wire mode",
     text: "Use xlang for portable payloads shared across languages; use native mode for same-runtime traffic that needs broader runtime-specific object models.",
-    zhText: "跨语言共享 payload 时使用 xlang；同运行时流量需要更完整的语言对象模型时使用 native mode。",
+    zhText:
+      "跨语言共享 payload 时使用 xlang；同运行时流量需要更完整的语言对象模型时使用 native mode。",
     cta: "Usage guide",
     zhCta: "使用指南",
     action: "Usage guide",
@@ -623,7 +645,8 @@ const adoptionPaths = [
     title: "Promote shared contracts",
     zhTitle: "沉淀共享契约",
     text: "Define Fory IDL once, generate type-safe native models across languages, and use optional fields, refs, unions, or services when contracts evolve.",
-    zhText: "用 Fory IDL 定义一次模型，生成多语言类型安全代码；契约演进时使用 optional、ref、union 或 service。",
+    zhText:
+      "用 Fory IDL 定义一次模型，生成多语言类型安全代码；契约演进时使用 optional、ref、union 或 service。",
     cta: "Schema IDL guide",
     zhCta: "Schema IDL",
     action: "Schema IDL guide",
@@ -635,7 +658,8 @@ const adoptionPaths = [
     title: "Benchmark the rollout path",
     zhTitle: "验证上线路径",
     text: "Compare serialization throughput, deserialization throughput, payload size, and reproduction steps for the runtime you plan to ship.",
-    zhText: "按计划上线的运行时对比序列化/反序列化吞吐、payload 大小和复现实验步骤。",
+    zhText:
+      "按计划上线的运行时对比序列化/反序列化吞吐、payload 大小和复现实验步骤。",
     cta: "Benchmark charts",
     zhCta: "Benchmark",
     action: "Benchmark charts",
@@ -657,7 +681,9 @@ function HomepageLanding(): JSX.Element {
   const [selectedRuntime, setSelectedRuntime] = useState<RuntimeId>("java");
 
   const selected = useMemo(
-    () => runtimeExamples.find((item) => item.id === selectedRuntime) ?? runtimeExamples[0],
+    () =>
+      runtimeExamples.find((item) => item.id === selectedRuntime) ??
+      runtimeExamples[0],
     [selectedRuntime],
   );
 
@@ -674,17 +700,29 @@ function HomepageLanding(): JSX.Element {
             <Link className={styles.secondaryButton} to="/docs/introduction/">
               {copy.heroSecondary}
             </Link>
-            <Link className={styles.ghostButton} to="https://github.com/apache/fory">
+            <Link
+              className={styles.ghostButton}
+              to="https://github.com/apache/fory"
+            >
               {copy.heroGithub}
             </Link>
           </div>
         </div>
 
-        <div className={styles.surfacePanel} aria-label={isZh ? "Fory 文档入口" : "Fory documentation paths"}>
+        <div
+          className={styles.surfacePanel}
+          aria-label={isZh ? "Fory 文档入口" : "Fory documentation paths"}
+        >
           <div className={styles.surfaceOptions}>
             {heroSurfaces.map((item) => (
-              <Link className={styles.surfaceOption} key={item.title} to={item.link}>
-                <span className={styles.surfaceOptionBadge}>{isZh ? item.zhLabel : item.label}</span>
+              <Link
+                className={styles.surfaceOption}
+                key={item.title}
+                to={item.link}
+              >
+                <span className={styles.surfaceOptionBadge}>
+                  {isZh ? item.zhLabel : item.label}
+                </span>
                 <span className={styles.surfaceOptionBody}>
                   <strong>{isZh ? item.zhTitle : item.title}</strong>
                   <small>{isZh ? item.zhText : item.text}</small>
@@ -703,7 +741,11 @@ function HomepageLanding(): JSX.Element {
         </div>
         <div className={styles.capabilityGrid}>
           {capabilities.map((item) => (
-            <Link className={styles.capabilityCard} key={item.title} to={item.link}>
+            <Link
+              className={styles.capabilityCard}
+              key={item.title}
+              to={item.link}
+            >
               <span>{item.label}</span>
               <h3>{isZh ? item.zhTitle : item.title}</h3>
               <p>{isZh ? item.zhDescription : item.description}</p>
@@ -720,11 +762,19 @@ function HomepageLanding(): JSX.Element {
         </div>
 
         <div className={styles.runtimeShell}>
-          <div className={styles.runtimeTabs} role="tablist" aria-label="Runtime examples">
+          <div
+            className={styles.runtimeTabs}
+            role="tablist"
+            aria-label="Runtime examples"
+          >
             {runtimeExamples.map((runtime) => (
               <button
                 aria-selected={runtime.id === selectedRuntime}
-                className={runtime.id === selectedRuntime ? styles.runtimeTabActive : styles.runtimeTab}
+                className={
+                  runtime.id === selectedRuntime
+                    ? styles.runtimeTabActive
+                    : styles.runtimeTab
+                }
                 key={runtime.id}
                 onClick={() => setSelectedRuntime(runtime.id)}
                 role="tab"
@@ -746,13 +796,17 @@ function HomepageLanding(): JSX.Element {
               <p>{selected.summary}</p>
               <div className={styles.installBlock}>
                 <div className={styles.blockLabel}>{copy.installLabel}</div>
-                <CodeBlock language={selected.installLanguage}>{selected.install}</CodeBlock>
+                <CodeBlock language={selected.installLanguage}>
+                  {selected.install}
+                </CodeBlock>
               </div>
             </div>
 
             <div className={styles.codeBlock}>
               <div className={styles.blockLabel}>{copy.codeLabel}</div>
-              <CodeBlock language={selected.codeLanguage}>{selected.code}</CodeBlock>
+              <CodeBlock language={selected.codeLanguage}>
+                {selected.code}
+              </CodeBlock>
             </div>
           </div>
         </div>
@@ -777,7 +831,11 @@ function HomepageLanding(): JSX.Element {
             </div>
             <div className={styles.schemaActions}>
               {schemaLinks.map((item) => (
-                <Link className={styles.schemaActionButton} key={item.link} to={item.link}>
+                <Link
+                  className={styles.schemaActionButton}
+                  key={item.link}
+                  to={item.link}
+                >
                   {isZh ? item.zhLabel : item.label}
                 </Link>
               ))}
@@ -830,7 +888,9 @@ function HomepageLanding(): JSX.Element {
 
       <section className={styles.ecosystem}>
         <div className={styles.ecosystemHeader}>
-          <span className={styles.eyebrow}>{isZh ? "采用路径" : "Adoption path"}</span>
+          <span className={styles.eyebrow}>
+            {isZh ? "采用路径" : "Adoption path"}
+          </span>
           <h2>{copy.ecosystemTitle}</h2>
           <p>{copy.ecosystemSubtitle}</p>
         </div>

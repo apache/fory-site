@@ -21,7 +21,7 @@ license: |
 
 ## Standard Row 对端无法读取 Compact Row 字节
 
-Compact Row 是仅支持 Java 的 Row 系列。需要在 Java、Python、C++ 和 Rust 之间共享字节时，
+Compact Row 是仅支持 Java 的 Row 系列。需要在 Java、Python、C++、Rust 和 Go 之间共享字节时，
 请使用 Standard Row。
 
 ## 字段查找失败

@@ -29,7 +29,7 @@ license: |
 
 ```toml
 [dependencies]
-fory = "1.7.2"
+fory = "1.7.3"
 bytes = "1"
 tonic = { version = "0.14", features = ["transport"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
