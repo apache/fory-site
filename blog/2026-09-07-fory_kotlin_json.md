@@ -22,7 +22,7 @@ Add the module from Maven Central to your existing Kotlin/JVM project, keeping a
 
 ```kotlin title="build.gradle.kts"
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.1")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.3")
 }
 ```
 
@@ -173,7 +173,7 @@ The benchmarks cover a small structured message and two documents of approximate
 
 ### Methodology {#benchmark-setup}
 
-Both benchmark suites ran on an Apple M5 with OpenJDK 25.0.3, comparing Fory JSON for Kotlin 1.7.1, kotlinx.serialization 1.11.0, Moshi 1.15.2 with generated adapters, and Jackson Kotlin 2.22.1.
+Both benchmark suites ran on an Apple M5 with OpenJDK 25.0.3, comparing Fory JSON for Kotlin 1.7.3, kotlinx.serialization 1.11.0, Moshi 1.15.2 with generated adapters, and Jackson Kotlin 2.22.1.
 
 All libraries process the same Kotlin models and input within each workload. Correctness checks verify fixture reads, round trips, and equivalent JSON output. Models and inputs are prepared before timing, as are the serializers, adapters, and typed readers/writers; Fory's codec compilation also finishes before measurement.
 
