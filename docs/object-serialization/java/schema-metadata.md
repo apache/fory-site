@@ -166,6 +166,10 @@ public class Record {
 - When a field is non-nullable, Fory skips writing the null flag.
 - Boxed types (`Integer`, `Long`, etc.) that can be null should use `@Nullable`.
 
+Serialization fails if a field without a null or reference flag contains null. The error identifies
+the field and recommends `@Nullable`. For Java-only serialization, use
+`Fory.builder().withXlang(false)` to make unannotated reference fields nullable by default.
+
 ## Reference Tracking (`@Ref`)
 
 Enable reference tracking for fields that may be shared or circular:
