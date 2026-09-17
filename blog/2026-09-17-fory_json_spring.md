@@ -8,7 +8,7 @@ tags: [fory, java, json, spring, serialization]
 
 Spring applications can use Apache Fory JSON to read HTTP request bodies into Java objects and write controller results as JSON. [Spring Fory](https://github.com/chaokunyang/spring-fory) supplies the Spring MVC message converter, Spring WebFlux codecs, and Spring Boot starters that connect Fory to the web framework. Controllers keep their usual `@RequestBody`, return types, `Mono`, and `Flux` APIs.
 
-This guide builds a small order API, then shows how to configure JSON mapping, stream a sequence of orders, and integrate without Spring Boot. The examples use **Spring Fory 1.1.0**, which depends on **Apache Fory 1.7.3**, and require **Java 17 or later**.
+This guide builds a small order API, then shows how to configure JSON mapping, stream a sequence of orders, and integrate without Spring Boot. The examples use **Spring Fory 1.1.0** and require **Java 17 or later**.
 
 <!-- truncate -->
 

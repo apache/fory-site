@@ -8,7 +8,7 @@ tags: [fory, java, json, spring, serialization]
 
 Spring 应用可以使用 Apache Fory JSON 将 HTTP 请求体反序列化为 Java 对象，并将控制器的返回值序列化为 JSON。[Spring Fory](https://github.com/chaokunyang/spring-fory) 提供了 Spring MVC 消息转换器、Spring WebFlux 编解码器和 Spring Boot starter，将 Fory 接入 Web 框架。控制器仍然使用熟悉的 `@RequestBody`、返回值类型、`Mono` 和 `Flux` API。
 
-本文从一个简单的订单 API 出发，介绍 JSON 映射配置、订单流的处理方式，以及不使用 Spring Boot 时的手动接入方法。示例使用 **Spring Fory 1.1.0**，依赖 **Apache Fory 1.7.3**，要求 **Java 17 或更高版本**。
+本文从一个简单的订单 API 出发，介绍 JSON 映射配置、订单流的处理方式，以及不使用 Spring Boot 时的手动接入方法。示例使用 **Spring Fory 1.1.0**，要求 **Java 17 或更高版本**。
 
 <!-- truncate -->
 
