@@ -108,6 +108,10 @@ val json = ForyJson.builder().withModule(ForyJsonKotlin).build()
 
 There is no automatic classpath installation or Kotlin-specific encode/decode alias.
 
+For framework callbacks with a runtime Kotlin `KType`, use `jsonTypeRef<Any?>(kType)`.
+See [Kotlin integration](integration.md#kotlin-integration) for controller type discovery,
+request and response conversion, and Spring MVC adapter requirements.
+
 ## Immutable classes and compiler defaults
 
 An ordinary or data class is mapped as a named JSON object. Fory selects one valid public Kotlin

@@ -34,6 +34,7 @@ reference identity, circular graphs, or Fory's binary-only features.
 | Goal                                                            | Page                                  |
 | --------------------------------------------------------------- | ------------------------------------- |
 | First runnable JSON round trip                                  | [Getting Started](getting-started.md) |
+| Integrate with Spring and Kotlin framework callbacks            | [Integration](integration.md)         |
 | Understand Java object mapping and configuration                | [Object Mapping](object-mapping.md)   |
 | Configure properties, creators, values, validators, and mixins  | [Annotations](annotations.md)         |
 | Extend complete values, children, and map keys                  | [Custom Codecs](custom-codecs.md)     |
