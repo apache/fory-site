@@ -24,13 +24,13 @@ Fory 已经提供紧凑的二进制对象序列化和跨语言协议，Fory JSON
 
 ## 快速开始
 
-Fory JSON 1.6.0 已发布到 Maven Central：
+Fory JSON 1.7.3 已发布到 Maven Central：
 
 ```xml
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-json</artifactId>
-  <version>1.6.0</version>
+  <version>1.7.3</version>
 </dependency>
 ```
 
@@ -96,7 +96,7 @@ Fory JSON 的高性能主要来自四项关键实现。
 
 1000 KB 测试衡量每次调用都需要完成大量解析、对象遍历和输出工作时的性能。
 
-该测试使用 Fory JSON 1.6.0、Jackson Databind 2.17.1 和 Gson 2.11.0，三者均采用数据绑定 API。JMH 运行两个 fork 和三个线程；每个 fork 包含五轮 3 秒预热迭代和五轮 3 秒测量迭代。Users 与 Clients 载荷每次调用都包含一个 1000 KB 对象。
+该测试使用 Fory JSON 1.7.3、Jackson Databind 2.17.1 和 Gson 2.11.0，三者均采用数据绑定 API。JMH 运行两个 fork 和三个线程；每个 fork 包含五轮 3 秒预热迭代和五轮 3 秒测量迭代。Users 与 Clients 载荷每次调用都包含一个 1000 KB 对象。
 
 ![Fory JSON、Jackson 和 Gson 对 1000 KB Users 载荷进行序列化与反序列化时的吞吐量](/img/blog/fory-json/users-throughput.png)
 
