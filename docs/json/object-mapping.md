@@ -237,7 +237,7 @@ An explicit `JsonProperty.include` overrides the builder default. See
 | `withPropertyNamingStrategy(strategy)` | `LOWER_CAMEL_CASE`                        | Name properties without an explicit `JsonProperty` name    |
 | `withMaxCachedFieldNames(int)`         | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | Field-name cache entries per reader; zero disables caching |
 | `withConcurrencyLevel(int)`            | `max(1, 2 * processors)`                  | Maximum concurrent root operations                         |
-| `withBufferSizeLimitBytes(int)`        | 2 MiB                                     | Maximum reusable capacity retained by each pooled writer   |
+| `withBufferSizeLimitBytes(int)`        | 2 MiB                                     | Maximum retained output/string-decoding buffer capacity    |
 | `registerCodec(type, codec)`           | None                                      | Replace an eligible exact class's complete JSON codec      |
 | `registerMixin(mixinType)`             | None                                      | Apply one annotation Mixin to its exact declared target    |
 
@@ -252,7 +252,8 @@ their own output shape.
 Concurrency-level and buffer-retention limits must be positive. The cached-field-name limit
 applies independently to each reader; zero disables this cache. It bounds only cached field names,
 not names accepted from the input. The buffer-retention setting does not limit JSON input or output
-size, only reusable writer storage retained after an operation.
+size. It limits the capacity of each reusable output or string-decoding buffer after an operation,
+not the total memory used by the instance.
 
 For class loading, type policy, nesting depth, graph-memory limits, and external input controls,
 see [Fory JSON Security](security.md).
