@@ -117,6 +117,9 @@ license: |
 - Python 的 `pyfory.Float16` 和 `pyfory.BFloat16` 是预留的注解标记；标量值反序列化为 Python 原生 `float`。
 - Python 的 `BoolArray`、`Int8Array`、`Int16Array`、`Int32Array`、`Int64Array`、`UInt8Array`、`UInt16Array`、`UInt32Array`、`UInt64Array`、`Float16Array`、`BFloat16Array`、`Float32Array` 和 `Float64Array` 是公开的稠密数组包装器，具有类似列表的序列行为。
 - JavaScript 的 `BoolArray`、回退实现 `Float16Array` 和 `BFloat16Array` 是基于 `Uint8Array` 或 `Uint16Array` 的公开稠密数组包装器。`float16` 和 `bfloat16` 标量值使用 `number`。原生支持 `Float16Array` 的 JavaScript 环境可以为 `array<float16>` 返回该原生载体。
+- Java 的 `java.util.Date` 和 `java.sql.Date` 也映射到 `timestamp`，使用秒数和纳秒数。
+  声明类型的字段保留其 Java 载体类型；动态时间戳使用 `Instant`。
+  Date 载体保留毫秒精度，读取时间戳时向下取整到毫秒。
 - Java 中不带注解的 `byte[]` 映射到 `binary`。数值字节数组使用类型使用位置注解：
   `@Int8Type byte[]` 用于 `array<int8>`，`@UInt8Type byte[]` 用于 `array<uint8>`。
 - Dart 使用 `double` 加 `Float16Type` 或 `Bfloat16Type` 元数据表示 `float16` 和 `bfloat16`

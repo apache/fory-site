@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.3")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.4")
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.3")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.4")
 }
 ```
 
@@ -94,6 +94,10 @@ val json = ForyJson.builder().withModule(ForyJsonKotlin).build()
 ```
 
 不会按类路径自动安装模块，也没有 Kotlin 专用的编码/解码别名。
+
+当框架回调在运行时提供 Kotlin `KType` 时，请使用 `jsonTypeRef<Any?>(kType)`。
+控制器类型发现、请求和响应转换以及 Spring MVC 适配要求见
+[Kotlin 集成](integration.md#kotlin-integration)。
 
 ## 不可变类与编译器默认值 {#immutable-classes-and-compiler-defaults}
 
