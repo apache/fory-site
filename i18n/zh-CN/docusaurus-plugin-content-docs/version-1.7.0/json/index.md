@@ -27,19 +27,20 @@ Fory JSON 与 Fory 的 native 和 xlang 二进制协议是不同的数据格式�
 
 ## 文档导航
 
-| 目标 | 页面 |
-| --------------------------------------------------------------- | ---------------------------------- |
-| 运行第一个 JSON 往返示例 | [快速开始](getting-started.md) |
-| 了解 Java 对象映射和配置 | [对象映射](object-mapping.md) |
-| 配置属性、creator、值、validator 和 Mixin | [注解](annotations.md) |
-| 扩展完整值、子值和 Map 键 | [自定义 Codec](custom-codecs.md) |
-| 打包并分发可复用的 JSON 扩展 | [模块](modules.md) |
-| 使用 data class、Kotlin 可空性、默认值和值类型 | [Kotlin](kotlin.md) |
-| 使用 case class、Scala 集合和 Scala 枚举 | [Scala](scala.md) |
-| 部署到 Android | [Android](android.md) |
-| 构建 GraalVM Native Image | [GraalVM Native Image](graalvm.md) |
-| 安全解码输入 | [安全](security.md) |
-| 诊断故障 | [故障排查](troubleshooting.md) |
+| 目标                                           | 页面                               |
+| ---------------------------------------------- | ---------------------------------- |
+| 运行第一个 JSON 往返示例                       | [快速开始](getting-started.md)     |
+| 集成 Spring 和 Kotlin 框架回调                 | [框架集成](integration.md)         |
+| 了解 Java 对象映射和配置                       | [对象映射](object-mapping.md)      |
+| 配置属性、creator、值、validator 和 Mixin      | [注解](annotations.md)             |
+| 扩展完整值、子值和 Map 键                      | [自定义 Codec](custom-codecs.md)   |
+| 打包并分发可复用的 JSON 扩展                   | [模块](modules.md)                 |
+| 使用 data class、Kotlin 可空性、默认值和值类型 | [Kotlin](kotlin.md)                |
+| 使用 case class、Scala 集合和 Scala 枚举       | [Scala](scala.md)                  |
+| 部署到 Android                                 | [Android](android.md)              |
+| 构建 GraalVM Native Image                      | [GraalVM Native Image](graalvm.md) |
+| 安全解码输入                                   | [安全](security.md)                |
+| 诊断故障                                       | [故障排查](troubleshooting.md)     |
 
 ## 性能
 
@@ -51,12 +52,12 @@ Java JSON 基准测试使用相同数据对比 fory-json、Jackson 和 Gson。�
 
 ![Java JSON UTF-8 字节基准测试吞吐量](../benchmarks/json/java/utf8_bytes_throughput.png)
 
-| 表示形式   | 操作       | fory-json ops/sec | jackson ops/sec | gson ops/sec |
-| ---------- | ---------- | ----------------: | --------------: | -----------: |
-| String     | 序列化     |         7,387,465 |       2,049,368 |    1,084,042 |
-| String     | 反序列化   |         2,897,955 |       1,074,885 |      902,772 |
-| UTF-8 字节 | 序列化     |        10,375,498 |       1,868,614 |    1,037,211 |
-| UTF-8 字节 | 反序列化   |         3,077,158 |       1,268,397 |      933,079 |
+| 表示形式   | 操作     | fory-json ops/sec | jackson ops/sec | gson ops/sec |
+| ---------- | -------- | ----------------: | --------------: | -----------: |
+| String     | 序列化   |         7,387,465 |       2,049,368 |    1,084,042 |
+| String     | 反序列化 |         2,897,955 |       1,074,885 |      902,772 |
+| UTF-8 字节 | 序列化   |        10,375,498 |       1,868,614 |    1,037,211 |
+| UTF-8 字节 | 反序列化 |         3,077,158 |       1,268,397 |      933,079 |
 
 ## 相关 Java 指南
 

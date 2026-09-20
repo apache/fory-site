@@ -265,6 +265,18 @@ byte[] bytes = fory.serialize(node1);
 - 除非每种目标语言都有约定的映射，否则避免使用 `Optional`、`BigDecimal` 和 `EnumSet` 等 Java 专用类型。
 - 完整兼容性矩阵参见[类型映射指南](../../specification/xlang_type_mapping.md)。
 
+#### 时间戳 {#timestamps}
+
+在 xlang 模式（`withXlang(true)`）下，`java.util.Date` 和 `java.sql.Date` 与 `java.time.Instant`
+一样使用 `timestamp` 类型：先写入 8 字节的秒数，再写入 4 字节的纳秒数。声明为 `Date` 的字段保留
+对应的 Java 类型。未声明字段类型的时间戳，例如动态根值，读取后返回 `Instant`。
+
+`Date` 值保留毫秒精度。将时间戳读为 `Date` 时，会向下取整到前一个毫秒，舍弃亚毫秒精度。
+超出有符号 64 位毫秒范围的时间戳无法表示为 `Date`。
+
+在 Java 原生模式（`withXlang(false)`）下，`java.util.Date` 和 `java.sql.Date` 将 Unix 纪元以来的
+毫秒数编码为 8 字节有符号整数。反序列化会保留原始 Java 类型，根值也不例外。
+
 #### 列表与稠密数组
 
 Java 原始类型数组是稠密 `array<T>` 载体，但普通 `byte[]` 默认映射为 `bytes`。常规 Java 集合以及 `Int32List`、`Float16List`、`BFloat16List` 等 Fory 原始类型列表载体使用 `list<T>`，除非字段具有显式 `@ArrayType` 元数据。

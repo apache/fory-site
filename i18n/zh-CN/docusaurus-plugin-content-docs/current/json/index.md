@@ -30,6 +30,7 @@ Fory JSON 与 Fory 的 native 和 xlang 二进制协议是不同的数据格式�
 | 目标 | 页面 |
 | --------------------------------------------------------------- | ---------------------------------- |
 | 运行第一个 JSON 往返示例 | [快速开始](getting-started.md) |
+| 集成 Spring 和 Kotlin 框架回调 | [框架集成](integration.md) |
 | 了解 Java 对象映射和配置 | [对象映射](object-mapping.md) |
 | 配置属性、creator、值、validator 和 Mixin | [注解](annotations.md) |
 | 扩展完整值、子值和 Map 键 | [自定义 Codec](custom-codecs.md) |

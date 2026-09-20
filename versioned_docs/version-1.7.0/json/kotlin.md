@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.3")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.4")
 }
 ```
 
@@ -54,7 +54,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.3")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.4")
 }
 ```
 
@@ -107,6 +107,10 @@ val json = ForyJson.builder().withModule(ForyJsonKotlin).build()
 ```
 
 There is no automatic classpath installation or Kotlin-specific encode/decode alias.
+
+For framework callbacks with a runtime Kotlin `KType`, use `jsonTypeRef<Any?>(kType)`.
+See [Kotlin integration](integration.md#kotlin-integration) for controller type discovery,
+request and response conversion, and Spring MVC adapter requirements.
 
 ## Immutable classes and compiler defaults
 

@@ -163,6 +163,9 @@ public class Record {
 - 字段不可空时，Fory 会跳过 null 标志的写入。
 - 可为 null 的装箱类型（`Integer`、`Long` 等）应使用 `@Nullable`。
 
+如果没有 null 或引用标志的字段包含 null，序列化会失败。错误会指出具体字段，并建议使用 `@Nullable`。
+对于仅在 Java 中使用的序列化，可通过 `Fory.builder().withXlang(false)` 让未标注的引用字段默认可空。
+
 ## 引用跟踪（`@Ref`）
 
 可能共享或形成循环的字段应启用引用跟踪：
