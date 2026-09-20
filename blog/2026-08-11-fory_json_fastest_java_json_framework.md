@@ -24,13 +24,13 @@ Fory already provides compact binary object serialization and a cross-language p
 
 ## Quick Start
 
-Fory JSON 1.6.0 is available from Maven Central:
+Fory JSON 1.7.3 is available from Maven Central:
 
 ```xml
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-json</artifactId>
-  <version>1.6.0</version>
+  <version>1.7.3</version>
 </dependency>
 ```
 
@@ -96,7 +96,7 @@ The tables compare Fory JSON only with Jackson and Gson. For the wider large-pay
 
 The 1000 KB suite measures workloads in which each invocation performs substantial parsing, object traversal, and output work.
 
-The 1000 KB run used Fory JSON 1.6.0, Jackson Databind 2.17.1, and Gson 2.11.0 with the databind API. JMH ran two forks and three threads. Each fork used five 3-second warmup iterations and five 3-second measurement iterations. The Users and Clients payloads each contained one 1000 KB object per invocation.
+The 1000 KB run used Fory JSON 1.7.3, Jackson Databind 2.17.1, and Gson 2.11.0 with the databind API. JMH ran two forks and three threads. Each fork used five 3-second warmup iterations and five 3-second measurement iterations. The Users and Clients payloads each contained one 1000 KB object per invocation.
 
 ![Fory JSON, Jackson, and Gson serialization and deserialization throughput for a 1000 KB Users payload](/img/blog/fory-json/users-throughput.png)
 
