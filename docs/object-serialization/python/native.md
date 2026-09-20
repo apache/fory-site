@@ -104,6 +104,51 @@ assert restored == record
 
 Writers and readers must use the same named tuple definition, including field order.
 
+## Container Subclasses
+
+Native mode preserves ordinary `list`, `set`, and `dict` subclasses, including
+their contents, instance attributes, and inherited `__slots__`. Register the
+concrete subclass on both peers before the first operation:
+
+```python
+import pyfory
+
+class LabeledDict(dict):
+    pass
+
+fory = pyfory.Fory(xlang=False, ref=True)
+fory.register(LabeledDict, type_id=100)
+
+value = LabeledDict(answer=42)
+value.label = "example"
+value["self"] = value
+restored = fory.loads(fory.dumps(value))
+
+assert type(restored) is LabeledDict
+assert restored.label == "example"
+assert restored["self"] is restored
+```
+
+The ordinary subclass path does not call `__init__`. Both peers must use the
+same subclass and slot definitions. Enable `ref=True` to preserve shared
+objects and cycles across container contents and attributes.
+
+Native subclasses preserve their base container storage even when iteration or
+mutation methods are overridden. State hooks run after the contents have been
+restored; `__getstate__` and `__setstate__` only need to describe instance state.
+Explicit custom serializers and custom reduction hooks take precedence. Classes
+with a custom `__new__`, `__getnewargs__`, or `__getnewargs_ex__` require a custom
+reduction hook or a [custom serializer](custom-serializers.md). The interfaces in `collections.abc`
+do not define how to construct arbitrary concrete classes; use an explicit
+serializer when their ordinary object state or hooks do not describe the full
+value.
+
+Fields declared as `Mapping`, `Sequence`, or `Set` use collection value semantics
+and return built-in `dict`, `list`, or `set` values. Declare the registered
+concrete subclass, or use a dynamic field, when its Python identity and state
+must be preserved. In xlang mode, container subclasses likewise use collection
+value semantics and omit Python-specific instance state.
+
 ## Security And Dynamic Types
 
 Native mode can reconstruct Python objects that execute import and construction logic during
