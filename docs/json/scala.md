@@ -52,13 +52,34 @@ can erase Scala value-type arguments to `Object`.
 Case classes are decoded by calling their full primary constructor. Fory invokes Scala's generated
 constructor-default methods for missing defaulted parameters; it does not parse default expressions
 or mutate constructor `val` fields. Defaults in later parameter lists receive the preceding
-constructor arguments exactly as Scala defines them. A missing parameter without a default is an
-error. Mutable body properties are applied after construction.
+constructor arguments exactly as Scala defines them. When a constructor parameter has no explicit
+default, an omitted property uses its type's default:
+
+- Numeric values use zero, and Boolean values use `false`.
+- Collections, maps, and arrays use empty values. Mutable defaults are fresh for each object.
+- `Option[A]` uses `None`.
+- Other reference values, including strings and nested objects, use `null`.
+
+Mutable body properties retain their initializers when omitted and are applied after construction
+when present.
+
+```scala
+case class Options(value: Option[Int], selected: Option[Int] = Some(7))
+case class Profile(age: Int, enabled: Boolean, tags: List[String], name: String)
+
+json.fromJson("{}", classOf[Options]) // Options(None, Some(7))
+json.fromJson("""{"selected":null}""", classOf[Options]) // Options(None, None)
+json.fromJson("{}", classOf[Profile]) // Profile(0, false, List(), null)
+```
+
+Explicit constructor defaults take precedence for omitted properties. An explicit JSON `null`
+decodes as `None` for `Option[A]`, even when its constructor default is `Some(...)`.
 
 A case class may be declared at the top level, or inside an `object` at any nesting depth, as long
 as every enclosing scope is itself an `object`. A case class enclosed by a `class`, a trait, or a
 method is rejected for both reading and writing, because Fory cannot reach the enclosing instance
-or the companion it needs to rebuild the value.
+or the companion it needs to rebuild the value. Construction requires a public JVM constructor
+with a matching public companion `apply`; unsupported private constructor shapes are rejected.
 
 Fory JSON annotations can be placed directly on Scala constructor properties:
 
@@ -78,11 +99,10 @@ parameters. `JsonCodec` child slots bind direct collection elements, `Option` co
 or values. All other Fory JSON annotations retain the behavior described in
 [Annotations](annotations.md).
 
-If a required non-defaulted reference parameter uses an inclusion rule that would omit `null`,
-serialization rejects a null value. This guarantees that JSON written by Fory remains readable by
-the same case-class schema. A global `defaultPropertyInclusion(NON_EMPTY)` retains empty values of
-required constructor parameters. An explicit `@JsonProperty(include = NON_EMPTY)` is rejected for
-a required parameter whose type can be empty; add a constructor default to allow omission.
+Property inclusion controls which values are written. Omitted properties use constructor or type
+defaults when read, so omitting an empty string can restore `null`. Use `ALWAYS` when those values
+must remain distinct. An explicit JSON `null` keeps the declared type's normal null behavior; it
+does not request a constructor default.
 
 ## Supported Scala types
 
@@ -141,6 +161,33 @@ import org.apache.fory.json.scala.ScalaTypeRef
 val rangeType = ScalaTypeRef[scala.collection.immutable.NumericRange[Int]]
 val range = json.fromJson("[1,3,5,7]", rangeType)
 ```
+
+Generic case classes preserve their type arguments, including finite nesting of the same class:
+
+```scala
+case class Box[A](value: A)
+
+val boxType = ScalaTypeRef[Box[Box[Int]]]
+val box = json.fromJson("""{"value":{"value":1}}""", boxType)
+json.toJson(box, boxType) // {"value":{"value":1}}
+```
+
+Recursive declarations that continually expand their type arguments, such as `Node[A]` containing
+`Node[List[A]]`, need a custom codec.
+
+Use `ScalaTypeRef[Unit]` for a `Unit` root value:
+
+```scala
+val unitType = ScalaTypeRef[Unit]
+json.toJson((), unitType)       // "null"
+json.fromJson("null", unitType) // ()
+```
+
+`Unit` also works in case-class fields and nested types such as `List[Unit]`, `Array[Unit]`,
+and `Option[Unit]`. Each `Unit` value is encoded as JSON `null`. Under the value-or-null
+representation of `Option`, `Some(())` writes `null` and reads back as `None`.
+Do not pass `classOf[Unit]` to the Java `Class` overload: it denotes JVM `void`, which is
+rejected when writing a root value.
 
 `Some[Int]` is a valid declared type when supplied with its complete type argument. A non-null JSON
 value decodes to `Some(value)`; JSON `null` is rejected for `Some[Int]` but decodes to `None` for
@@ -257,7 +304,8 @@ non-finite number, and supported direct-wrapper behavior.
 
 ## Scala 3 closed enums and sealed hierarchies
 
-A parameterless Scala 3 enum uses its case name as a JSON string. Add `derives ScalaJsonCodec` to an
+A parameterless Scala 3 enum uses its case name as a JSON string, including as the key of a typed
+Scala map such as `Map[Color, String]`. Add `derives ScalaJsonCodec` to an
 enum with parameterized cases to define one closed wrapper-object representation for every case:
 
 ```scala

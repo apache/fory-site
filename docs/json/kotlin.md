@@ -137,7 +137,7 @@ For this model:
 
 - `{"id":1}` invokes both compiler defaults.
 - `{"id":1,"label":null}` passes an explicit null and does not invoke the `label` default.
-- a missing `id` fails before constructor invocation.
+- a missing `id` uses `0`.
 - `{"id":1,"retries":null}` fails; null never asks Kotlin to use a default.
 
 Normal body `var` properties preserve their initializer when absent and are assigned after
@@ -172,7 +172,9 @@ val text = json.toJson(Response(1, items = emptyList())) // {"id":1}
 
 Inclusion affects writing only. Reading the example's output uses the declared `items` default
 of null, so the original empty list is not preserved. A missing constructor parameter uses its
-declared default, or fails if it has no default; a missing body property keeps its initializer.
+declared default first. Otherwise, non-null numeric and Boolean parameters use zero and `false`,
+nullable parameters use `null`, and other non-null parameters remain required. A missing body
+property keeps its initializer.
 Explicit null remains distinct from a missing field and is rejected for a non-nullable property.
 Choose an inclusion rule that retains values when exact round trips are required.
 
@@ -190,7 +192,10 @@ and generic children:
 | Declaration                       | Missing member        | Explicit JSON `null` |
 | --------------------------------- | --------------------- | -------------------- |
 | `val value: String`               | Fails                 | Fails                |
-| `val value: String?`              | Fails                 | Passes null          |
+| `val value: String?`              | Passes null           | Passes null          |
+| `val value: Int`                  | Uses `0`              | Fails                |
+| `val value: Boolean`              | Uses `false`          | Fails                |
+| `val value: Int?`                 | Passes null           | Passes null          |
 | `val value: String = expression`  | Evaluates the default | Fails                |
 | `val value: String? = expression` | Evaluates the default | Passes null          |
 
