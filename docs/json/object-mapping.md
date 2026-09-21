@@ -265,3 +265,22 @@ image, runtime compilation is unavailable. Fory JSON generates codecs for reacha
 default configuration and each reachable `ForyJsonProvider` configuration. A model without a
 matching generated codec uses an interpreted codec. Every other builder option keeps the behavior
 described above.
+
+## Pretty printing
+
+Choose readable output for an individual serialization call:
+
+```java
+ForyJson json = ForyJson.builder().build();
+String text = json.toPrettyJson(value);
+byte[] utf8 = json.toPrettyJsonBytes(value);
+String compact = json.toJson(value);
+```
+
+The format matches Jackson's pretty printer configured with two-space indenters for both objects
+and arrays. Each container adds one indentation level, and colons have a space on each side.
+Empty objects and arrays are `{ }` and `[ ]`. Line breaks use `\n`, with no trailing line break.
+Both APIs preserve string contents. Raw JSON values remain verbatim, including their supplied
+whitespace. Reading accepts both compact and pretty JSON. Pretty output is selected per call;
+the same instance can alternate formats. Existing `toJson`, `toJsonBytes`, and `writeJsonTo`
+calls continue to produce compact output.
