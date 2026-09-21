@@ -22,7 +22,7 @@ license: |
 Fory JSON provides these mapping and validation annotations in
 `org.apache.fory.json.annotation`:
 `JsonAnyGetter`, `JsonAnyProperty`, `JsonAnySetter`, `JsonByteArray`, `JsonCodec`, `JsonCreator`, `JsonFormat`,
-`JsonIgnore`, `JsonProperty`, `JsonPropertyOrder`, `JsonRawValue`, `JsonSubTypes`, `JsonUnwrapped`,
+`JsonIgnore`, `JsonInclude`, `JsonProperty`, `JsonPropertyOrder`, `JsonRawValue`, `JsonSubTypes`, `JsonUnwrapped`,
 `JsonValidator`, and `JsonValue`. `JsonType` is a separate build-time model marker. They are
 Fory JSON APIs, not Jackson, Gson, or Fory binary-protocol compatibility annotations.
 
@@ -125,7 +125,7 @@ above.
 
 ## `JsonProperty`
 
-`JsonProperty` configures the canonical name, serialization index, and null inclusion of one
+`JsonProperty` configures the canonical name, serialization index, and value inclusion of one
 complete logical property. An annotation on a field, getter, or setter applies to the merged
 field/getter/setter group.
 
@@ -154,12 +154,17 @@ public final class User {
 
 The supported inclusion values are:
 
-- `DEFAULT`: use `ForyJsonBuilder.defaultPropertyInclusion` (initially `NON_NULL`).
+- `DEFAULT`: inherit `JsonInclude` on the class, then `ForyJsonBuilder.defaultPropertyInclusion`
+  (initially `NON_NULL`).
 - `ALWAYS`: write the property even when its selected value is null.
 - `NON_NULL`: omit a null value.
 - `NON_EMPTY`: omit null, zero-length `CharSequence` values (including strings) and Java arrays,
   empty `java.util.Collection` and `java.util.Map` values, and absent
   JDK `Optional`, `OptionalInt`, `OptionalLong`, and `OptionalDouble` values.
+  With the Scala module, also omit `None` and supported empty strict Scala collections and maps.
+- `NON_DEFAULT`: explicitly authorize omission when the property equals a supported default.
+  Different values, including null or empty values, remain included. Unsupported default sources
+  cause an error when the model is initialized. See [Default omission](#jsoninclude-and-default-omission).
 
 ```java
 public final class Response {
@@ -169,9 +174,11 @@ public final class Response {
 ```
 
 With an empty `items` list, this object writes `{}`. Explicit property inclusion overrides the
-builder default. Empty checks apply to the property's logical value before its selected codec is
-called. A custom codec that writes an ordinary object as `""` or `{}` does not make that object
-empty. An empty `byte[]` is empty with either Base64 or numeric-array representation.
+class and builder defaults. Java empty-value checks run directly, even with a custom codec.
+Other types use the selected codec's `isEmpty(writer, value)`, which defaults to `false`.
+A custom codec must override it to define empty values; writing `""` or `{}` alone does not make
+an ordinary object empty. An empty `byte[]` is empty with either Base64 or numeric-array
+representation. See [Custom codecs](custom-codecs.md#custom-empty-values).
 
 Filtering is shallow: `0`, `false`, a list containing null, a list containing an empty list, and a
 present Optional containing an empty list remain included. Root values, collection elements, Map
@@ -195,6 +202,93 @@ setter-only, creator-only, or write-ignored property is invalid.
 
 Aliases and independent read/write names are not supported.
 `JsonProperty` cannot be combined with an Any logical property or declared on a `JsonAnySetter`.
+
+## `JsonInclude` and default omission
+
+Defaults may depend on constructor arguments, time, randomness, or external state. Being able to
+evaluate a default does not prove that omitting it preserves the value. `NON_DEFAULT` therefore
+requires explicit authorization on each property, or batch authorization on its class:
+
+```java
+import org.apache.fory.json.annotation.JsonInclude;
+import org.apache.fory.json.annotation.JsonProperty;
+import org.apache.fory.json.annotation.JsonProperty.Include;
+
+@JsonInclude(Include.NON_DEFAULT)
+public final class Options {
+  public int retries = 3;
+  public String label = "default";
+  @JsonProperty(include = Include.ALWAYS)
+  public long timestamp;
+}
+```
+
+An unchanged `Options` writes `{"timestamp":0}`. To authorize only `retries`, remove `JsonInclude`
+and put `@JsonProperty(include = Include.NON_DEFAULT)` on that field. Property policies override
+class policies, which override the builder default. Class annotations are not inherited by
+subclasses. `DEFAULT` on a class uses the builder setting.
+
+Class-level authorization covers **future added properties** too. Maintainers must confirm stable
+defaults, safe evaluation, and matching missing-field recovery for each new property, or exclude it
+with `ALWAYS`. `defaultPropertyInclusion(NON_DEFAULT)` immediately throws a configuration error:
+global authorization would silently apply this contract to unrelated models. `NON_EMPTY` does not
+grant default-evaluation authorization.
+
+| Model                                                                                                                     | Supported default source                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Scala constructor property                                                                                                | Declared compiler default method, evaluated on each write with actual preceding parameters |
+| Java ordinary no-argument model                                                                                           | One reference object constructed using the reader's no-argument constructor                |
+| Kotlin selected constructor with defaults for every parameter                                                             | One reference object constructed using those language defaults                             |
+| Ordinary Kotlin no-argument model                                                                                         | One reference object using that constructor                                                |
+| Java required constructor parameters, Kotlin constructor with any required parameter, or Scala missing default/dependency | Rejected for an authorized property                                                        |
+
+Reference construction happens once per initialized model metadata, not once per serialization.
+Distinct declared and dynamic model occurrences can initialize separately. Authorization permits
+the **entire constructor**, other field initializers, and Kotlin `init` blocks to execute. Models
+without `NON_DEFAULT` do not create a reference object. An alternative no-argument constructor
+cannot replace a different selected creator. Construction or authorized-property access failures
+report the model and property; there is no silent fallback or allocation bypassing constructors.
+
+The caller guarantees stable defaults, no externally visible effects from comparison evaluation,
+and recovery of the same logical value when the field is missing. Fory does not prove purity or
+analyze default expressions. A Scala dependent method can be safe when it receives the actual
+parameters and reading restores the same context. A fixed Java/Kotlin reference cannot represent
+a default that changes with the current input: for `low=1, high=low+1`, omitting `high=2` from an
+object with `low=5` would restore `high=6`. Retain `high` with `ALWAYS` in that situation.
+
+Primitive comparisons use their values. Floating-point comparisons distinguish positive and
+negative zero and retain non-finite values for normal output. Arrays compare exact array types and
+contents, recursively for nested arrays; other references use `equals`. Cyclic deep comparison is
+unsupported. Reading is independent: explicit null is not missing, and mutable reference defaults
+are never shared with decoded objects.
+
+Existing Mixins can authorize defaults without modifying a model:
+
+```java
+import org.apache.fory.json.ForyJson;
+import org.apache.fory.json.annotation.JsonMixin;
+import org.apache.fory.json.annotation.JsonProperty;
+import org.apache.fory.json.annotation.JsonProperty.Include;
+
+final class RetryPolicy {
+  public int retries = 3;
+  public long timestamp;
+}
+
+@JsonMixin(target = RetryPolicy.class)
+abstract class RetryPolicyMixin {
+  @JsonProperty(include = Include.NON_DEFAULT)
+  int retries;
+}
+
+// A class-level @JsonInclude on a Mixin can also supply the target's class policy.
+var json = ForyJson.builder().registerMixin(RetryPolicyMixin.class).build();
+json.toJson(new RetryPolicy()); // {"timestamp":0}
+```
+
+For Android or Native Image, continue using the existing `@JsonType` or Mixin build setup.
+Kotlin applications using R8/ProGuard must run JSON KSP. Default evaluation takes place at runtime,
+not during annotation processing. See [Kotlin](kotlin.md).
 
 ## `JsonPropertyOrder`
 
@@ -546,7 +640,10 @@ before dynamic Any handling.
 Fory rejects duplicate final names, recursive chains made only of unwrapped properties,
 parameterized children, JSON Any children, polymorphic or custom-codec child roots, and scalar,
 array, collection, or Map children. Use `JsonAnyProperty`, `JsonAnyGetter`, or `JsonAnySetter` to
-flatten a Map. `JsonProperty.value`, non-default `JsonProperty.include`, `JsonCodec`, and `JsonFormat` are not
+flatten a Map. An unwrapped group may use `NON_DEFAULT` to omit the whole group when it matches
+its authorized default, or `ALWAYS` to opt out of a class default policy. Its children's policies
+still govern each emitted member. Other explicit group inclusion policies, `JsonProperty.value`,
+`JsonCodec`, and `JsonFormat` are not
 valid on an unwrapped property; ordinary child leaf properties may still use them.
 
 ## Dynamic Object Members

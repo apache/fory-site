@@ -153,7 +153,8 @@ validation are not bypassed.
 Kotlin properties follow the configured [property inclusion](annotations.md#jsonproperty),
 including constructor parameters and body properties. The default `NON_NULL` omits null values;
 `NON_EMPTY` also omits empty strings, arrays, collections, and maps, and absent JDK Optional values.
-A property's `@JsonProperty(include = ...)` overrides the builder default. Use `ALWAYS` or
+A property's `@JsonProperty(include = ...)` overrides the class's `@JsonInclude` policy, which
+overrides the builder default. Use `ALWAYS` or
 `writeNullFields(true)` to retain null values.
 
 ```kotlin
@@ -178,7 +179,55 @@ property keeps its initializer.
 Explicit null remains distinct from a missing field and is rejected for a non-nullable property.
 Choose an inclusion rule that retains values when exact round trips are required.
 
-Fory does not compare values with Kotlin defaults or evaluate initializers during serialization.
+`NON_DEFAULT` requires explicit field authorization with `@JsonProperty`, or class authorization
+with `@JsonInclude`. It is supported when **every parameter of the selected constructor has a
+language default**, or the model uses an ordinary no-argument constructor. Fory constructs one
+reference object per initialized model metadata and captures authorized property values. This
+executes the complete constructor, all initializers, and `init` blocks. It is not repeated on each
+write, and models without authorization do not construct a reference. Dynamic and declared model
+occurrences can initialize separately.
+
+Models with required parameters are rejected, even if another constructor happens to have no
+arguments. Fory does not fabricate parameters, borrow them from the first object, change creator
+selection, bypass a constructor, or analyze bytecode. Failed construction reports the model and
+property. Global `defaultPropertyInclusion(NON_DEFAULT)` is rejected.
+
+Kotlin metadata indicates default presence but does not reveal expressions or dependencies. The
+caller must confirm stable defaults, no externally visible side effects from reference construction,
+and matching recovery for missing fields. A fixed reference cannot represent defaults that depend
+on the current input, time, randomness, or external state. Exclude those properties:
+
+```kotlin
+import org.apache.fory.json.annotation.JsonInclude
+import org.apache.fory.json.annotation.JsonProperty
+import org.apache.fory.json.annotation.JsonProperty.Include
+import org.apache.fory.json.kotlin.ForyJsonKotlin
+
+@JsonInclude(Include.NON_DEFAULT)
+data class Limits(
+  val low: Int = 1,
+  @param:JsonProperty(include = Include.ALWAYS) val high: Int = low + 1
+)
+
+val json = ForyJsonKotlin.builder().build()
+json.toJson(Limits()) // {"high":2}
+json.toJson(Limits(5, 2)) // {"low":5,"high":2}
+json.fromJson("""{"low":5}""", Limits::class.java) // Limits(5, 6)
+```
+
+Here `high=2` must remain present when `low=5`: omitting it would restore `high=6`. Parameter
+dependencies are not universally unsafe, but this fixed reference cannot supply their changing
+context. To authorize only individual fields, omit `JsonInclude` and put
+`@param:JsonProperty(include = Include.NON_DEFAULT)` on those fields. A registered Mixin may provide
+the class or field policy without editing the model. Class authorization also covers future fields;
+maintainers must verify each new default or exclude it with `ALWAYS`.
+
+Reading still invokes the normal Kotlin defaults for missing fields. Explicit null is not missing.
+The reference object and its mutable collections are never shared with decoded objects. Comparison
+uses primitive values, reference equality contracts (`equals`), and array contents; see
+[Default omission](annotations.md#jsoninclude-and-default-omission). When minifying, use the existing
+JSON KSP setup. Default evaluation takes place at runtime, not during KSP processing.
+
 An empty list is omitted by `NON_EMPTY` regardless of whether its default is null, `emptyList()`, or
 a non-empty list. Empty underlying string or collection carriers do not make non-null value-class
 properties empty. An explicit `NON_EMPTY` is unsupported when an unboxed value class itself

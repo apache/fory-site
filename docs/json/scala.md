@@ -104,6 +104,55 @@ defaults when read, so omitting an empty string can restore `null`. Use `ALWAYS`
 must remain distinct. An explicit JSON `null` keeps the declared type's normal null behavior; it
 does not request a constructor default.
 
+`NON_EMPTY` recognizes `None` and supported empty strict Scala sequences, sets, and maps, including
+mutable collections and ranges. Filtering is shallow: `Some("")`, `Some(Nil)`, `Some(null)`, and
+nonempty containers remain included. It does not traverse lazy collections to determine emptiness.
+Root values, array elements, map entries, and tuple positions are not removed.
+
+These Scala codecs implement `isEmpty(writer, value)`. If you replace one with a custom codec,
+override that method to preserve the desired omission behavior; its default returns `false`.
+For example, a custom Option codec without that override retains `None` fields under `NON_EMPTY`.
+Dynamic `Any` properties use the codec selected for the actual value, while a field-specific custom
+codec controls its own empty check. See [Custom empty values](custom-codecs.md#custom-empty-values).
+
+Explicitly authorize stable declared defaults with `NON_DEFAULT`:
+
+```scala
+import org.apache.fory.json.annotation.JsonProperty.Include
+import org.apache.fory.json.annotation.{JsonInclude, JsonProperty}
+import org.apache.fory.json.scala.ForyJsonScala
+
+@JsonInclude(Include.NON_DEFAULT)
+case class Request(
+  @JsonProperty(include = Include.ALWAYS) id: Int,
+  retries: Int = 3,
+  tags: List[String] = Nil
+)
+
+val json = ForyJsonScala.builder().build()
+json.toJson(Request(0)) // {"id":0}
+json.fromJson("""{"id":0}""", classOf[Request]) // Request(0, 3, Nil)
+json.toJson(Request(0, retries = 0)) // {"id":0,"retries":0}
+```
+
+`id` is explicitly excluded because it has no declared default; otherwise class-level authorization
+would fail. A reader's implicit zero, empty collection, or `None` fallback is not a declared default.
+Alternatively, omit the class annotation and place `@JsonProperty(include = Include.NON_DEFAULT)`
+only on selected defaulted properties. Mixins support both forms. Global `NON_DEFAULT` is rejected.
+
+Default expressions run during writing and must be deterministic and free of externally visible
+side effects. For `case class Limits(low: Int)(val high: Int = low + 1)`, the comparison for `high`
+uses the object's actual `low`. For `low=5, high=2`, high is retained because its default is 6.
+Missing default methods or unavailable write-schema dependencies cause a model-initialization error.
+`Unit` defaults whose JVM methods return `void` are not supported comparison sources; retain those
+properties with `ALWAYS` when authorizing the class.
+Authorization confirms that missing input restores the same context; Fory does not prove this or
+expression purity. Use `ALWAYS` for time-, random-, or state-dependent defaults. Arrays compare by contents, and
+floating-point comparisons distinguish positive and negative zero. Class-body initializers are
+not inferred as Scala constructor defaults. Values differing from a default, including null and
+empty collections, remain written. Reading stays independent and creates fresh mutable defaults.
+Class authorization covers future added fields too; see [Default omission](annotations.md#jsoninclude-and-default-omission).
+
 ## Supported Scala types
 
 | Scala type                                                  | JSON representation                             |

@@ -114,9 +114,9 @@ that needs this distinction after construction must retain the flag for its late
 call; it must not infer the value from resolver state.
 
 The containing property still controls its name, ignore direction, and inclusion policy. If a
-property is omitted by `NON_NULL` or `NON_EMPTY`, the value codec is not called. `NON_EMPTY` checks
-the logical property value, so an empty List remains empty even with a custom List codec. An
-ordinary application object is not considered empty based on the JSON its codec writes. If the property is emitted, or the value
+property is omitted by `NON_NULL` or `NON_EMPTY`, the codec's write operation is not called.
+`NON_EMPTY` checks Java empty-value types directly and otherwise uses the codec's `isEmpty` method;
+see [Custom empty values](#custom-empty-values). If the property is emitted, or the value
 is an array element, collection element, map value, Optional value, or atomic-reference value, the
 codec receives and owns null. The registered instance is shared across concurrent operations and
 must be thread-safe.
@@ -132,6 +132,31 @@ with the target type's `JsonValidator` methods.
 Registering a custom codec for a `JsonSubTypes` base replaces that base's subtype annotation.
 Registering one for a listed subtype is supported by the two wrapper inclusions but not by inline
 property inclusion.
+
+## Custom empty values
+
+`NON_EMPTY` calls the selected codec's `isEmpty(JsonWriter writer, T value)` for non-null values
+outside the built-in Java empty-value types. The default returns `false`. Override it when your
+type has an empty state:
+
+```java
+// Inside MoneyCodec: treat a missing amount as an empty Money value.
+@Override
+public boolean isEmpty(JsonWriter writer, Money value) {
+  return value.amount == null;
+}
+```
+
+Enable omission on the property with `@JsonProperty(include = JsonProperty.Include.NON_EMPTY)`,
+on its class with `@JsonInclude(JsonProperty.Include.NON_EMPTY)`, or with
+`defaultPropertyInclusion(JsonProperty.Include.NON_EMPTY)`. The method must not write output.
+Its writer argument provides the current operation's context for dynamic codecs.
+
+Strings and other Java `CharSequence` values, arrays, Java collections/maps, and JDK Optional
+values use direct empty checks and do not call a custom `isEmpty`. These checks apply to the
+original value, independent of how your codec represents it. For other types, including Scala
+Option and collections, replacing the built-in codec also replaces its emptiness behavior.
+Root values, container elements, and present wrapper contents are not filtered recursively.
 
 ## Selecting Codecs with `JsonCodec`
 
