@@ -87,6 +87,10 @@ val text = json.toJson(Account(7u, "Alice"), accountType)
 val decoded = json.fromJson(text, accountType)
 ```
 
+Use `ForyJsonKotlin.builder().escapeNonAscii(true)` to escape non-ASCII string contents and names
+in compact and pretty output. The setting is fixed per instance; raw JSON remains verbatim.
+See [Non-ASCII escaping](object-mapping.md#non-ascii-escaping).
+
 Use `ForyJsonKotlin.builder().writeLongAsString(true)` when signed `Long` and unsigned `ULong`
 values must be emitted as quoted decimal strings. The setting also applies to their declared
 collection and map values, nullable values, Kotlin value classes backed by them, `ULongArray`, and

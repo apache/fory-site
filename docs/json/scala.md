@@ -41,6 +41,10 @@ val person = json.fromJson(text, classOf[Person])
 ```
 
 Reuse the resulting `ForyJson` instance. It is immutable and thread-safe after construction.
+Use `ForyJsonScala.builder().escapeNonAscii(true)` to escape non-ASCII string contents and names
+in compact and pretty output. The setting is fixed per instance; raw JSON remains verbatim.
+See [Non-ASCII escaping](object-mapping.md#non-ascii-escaping).
+
 Use `ForyJsonScala.builder().writeLongAsString(true)` to emit Scala `Long` values, including
 declared collection and map values, `Option[Long]`, `Long`-backed value classes, and Java Long-like
 wrappers as quoted decimal strings. Readers accept both quoted and unquoted integer tokens.

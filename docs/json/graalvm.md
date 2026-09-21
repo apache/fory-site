@@ -212,6 +212,8 @@ one-String `JsonCreator` constructors and public static factories. Fixed `JsonRa
 getters support trusted raw String values, and `JsonByteArray` fields and getters select Base64 strings,
 Base16 strings, or numeric byte arrays as on the JVM. The builder's `byteArrayFormat` controls the
 default representation; include that setting in a provider when using generated object codecs.
+The `escapeNonAscii(true)` setting applies to the same string values and names as on the JVM;
+include it in a provider when using generated object codecs. Raw JSON remains verbatim.
 `JsonFormat` date/time fields use the same direct-field,
 one-wrapper-level, and `timezone` behavior as on the JVM. For direct target annotations, annotate
 each reachable owning model with `JsonType` so Native Image retains these members and the selected byte-array

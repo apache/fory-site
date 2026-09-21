@@ -25,6 +25,11 @@ reader. It is not a JSON abstract syntax tree (AST) or `JsonNode` codec. It owns
 including JSON null, but never handles a Map key; `MapKeyCodec` remains responsible for JSON object
 member names.
 
+Use `writeString`, `writeChar`, `writeFieldName`, or the writer's escaped append methods to honor
+the instance's `escapeNonAscii` setting. Direct raw writes preserve the supplied content; custom
+codecs that emit raw tokens are responsible for their own escaping. See
+[Non-ASCII escaping](object-mapping.md#non-ascii-escaping).
+
 For an application codec with the same semantics in every representation, extend
 `AbstractJsonValueCodec<T>` and implement the JSON shape once:
 
