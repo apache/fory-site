@@ -229,20 +229,42 @@ for supported sources, construction/evaluation effects, and errors. An explicit 
 overrides `JsonInclude` on the class, which overrides the builder default. See
 [Property inclusion](annotations.md#jsonproperty) for the empty-value definitions and boundaries.
 
-| Builder method                         | Default                                   | User-visible effect                                        |
-| -------------------------------------- | ----------------------------------------- | ---------------------------------------------------------- |
-| `defaultPropertyInclusion(Include)`    | `NON_NULL`                                | Default inclusion of object properties                     |
-| `writeNullFields(boolean)`             | `false`                                   | Select `ALWAYS` when true or `NON_NULL` when false         |
-| `writeLongAsString(boolean)`           | `false`                                   | Write built-in 64-bit integer values as decimal strings    |
-| `withCodegen(boolean)`                 | `true`                                    | Enable generated object codecs                             |
-| `withAsyncCompilation(boolean)`        | `true`                                    | Compile generated codecs asynchronously                    |
-| `withFieldMode(boolean)`               | `false`                                   | When true, discover fields without getters/setters         |
-| `withPropertyNamingStrategy(strategy)` | `LOWER_CAMEL_CASE`                        | Name properties without an explicit `JsonProperty` name    |
-| `withMaxCachedFieldNames(int)`         | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | Field-name cache entries per reader; zero disables caching |
-| `withConcurrencyLevel(int)`            | `max(1, 2 * processors)`                  | Maximum concurrent root operations                         |
-| `withBufferSizeLimitBytes(int)`        | 2 MiB                                     | Maximum retained output/string-decoding buffer capacity    |
-| `registerCodec(type, codec)`           | None                                      | Replace an eligible exact class's complete JSON codec      |
-| `registerMixin(mixinType)`             | None                                      | Apply one annotation Mixin to its exact declared target    |
+| Builder method                          | Default                                   | User-visible effect                                        |
+| --------------------------------------- | ----------------------------------------- | ---------------------------------------------------------- |
+| `defaultPropertyInclusion(Include)`     | `NON_NULL`                                | Default inclusion of object properties                     |
+| `writeNullFields(boolean)`              | `false`                                   | Select `ALWAYS` when true or `NON_NULL` when false         |
+| `writeLongAsString(boolean)`            | `false`                                   | Write built-in 64-bit integer values as decimal strings    |
+| `byteArrayFormat(JsonByteArray.Format)` | `BASE64`                                  | Default byte-array representation for reading and writing  |
+| `withCodegen(boolean)`                  | `true`                                    | Enable generated object codecs                             |
+| `withAsyncCompilation(boolean)`         | `true`                                    | Compile generated codecs asynchronously                    |
+| `withFieldMode(boolean)`                | `false`                                   | When true, discover fields without getters/setters         |
+| `withPropertyNamingStrategy(strategy)`  | `LOWER_CAMEL_CASE`                        | Name properties without an explicit `JsonProperty` name    |
+| `withMaxCachedFieldNames(int)`          | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | Field-name cache entries per reader; zero disables caching |
+| `withConcurrencyLevel(int)`             | `max(1, 2 * processors)`                  | Maximum concurrent root operations                         |
+| `withBufferSizeLimitBytes(int)`         | 2 MiB                                     | Maximum retained output/string-decoding buffer capacity    |
+| `registerCodec(type, codec)`            | None                                      | Replace an eligible exact class's complete JSON codec      |
+| `registerMixin(mixinType)`              | None                                      | Apply one annotation Mixin to its exact declared target    |
+
+Use `byteArrayFormat` to choose one representation for ordinary `byte[]` roots, unannotated
+properties, and container values, including nested arrays, collections, maps, and optionals:
+
+```java
+import org.apache.fory.json.ForyJson;
+import org.apache.fory.json.annotation.JsonByteArray;
+
+ForyJson hexJson = ForyJson.builder().byteArrayFormat(JsonByteArray.Format.BASE16).build();
+String text = hexJson.toJson(new byte[] {1, -2, 3}); // "\"01fe03\""
+byte[] bytes = hexJson.fromJson(text, byte[].class);
+```
+
+`BASE64` is the default and writes padded standard Base64 strings. `BASE16` writes lowercase
+hexadecimal strings without prefixes or separators; reading accepts either case and JSON string
+escapes. Odd-length strings and non-hexadecimal characters are rejected. `ARRAY` uses signed
+numbers in `[-128, 127]`. Empty arrays become `""` for either string format or `[]` for `ARRAY`.
+All three formats accept JSON `null`. The reader uses the configured representation and does not
+guess another format. A [property's `JsonByteArray` annotation](annotations.md#jsonbytearray),
+including one supplied by a Mixin, overrides the global default. Custom occurrence codecs retain
+their complete representation; Kotlin unsigned semantic arrays remain numeric arrays.
 
 Enable `writeLongAsString(true)` when 64-bit integer values must pass through JavaScript without
 `Number` precision loss. The setting writes built-in `long`/`Long`, `AtomicLong`,

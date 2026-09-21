@@ -209,8 +209,10 @@ JVM and Android.
 
 `JsonValue` fields and effective public zero-argument methods are supported, including matching
 one-String `JsonCreator` constructors and public static factories. Fixed `JsonRawValue` fields and
-getters support trusted raw String values, and `JsonByteArray` fields and getters select Base64 strings or numeric
-byte arrays as on the JVM. `JsonFormat` date/time fields use the same direct-field,
+getters support trusted raw String values, and `JsonByteArray` fields and getters select Base64 strings,
+Base16 strings, or numeric byte arrays as on the JVM. The builder's `byteArrayFormat` controls the
+default representation; include that setting in a provider when using generated object codecs.
+`JsonFormat` date/time fields use the same direct-field,
 one-wrapper-level, and `timezone` behavior as on the JVM. For direct target annotations, annotate
 each reachable owning model with `JsonType` so Native Image retains these members and the selected byte-array
 codec constructor.

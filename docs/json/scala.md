@@ -47,6 +47,25 @@ wrappers as quoted decimal strings. Readers accept both quoted and unquoted inte
 Use `ScalaTypeRef` when a parameterized declaration contains `Long` because normal JVM signatures
 can erase Scala value-type arguments to `Object`.
 
+## Byte-array formats
+
+Scala `Array[Byte]` uses Base64 strings by default. Use the standard builder's
+`byteArrayFormat` to select numeric arrays or hexadecimal strings, including arrays inside
+`Option`, Scala collections, and maps:
+
+```scala
+import org.apache.fory.json.annotation.JsonByteArray
+import org.apache.fory.json.scala.{ForyJsonScala, ScalaTypeRef}
+
+val hexJson = ForyJsonScala.builder().byteArrayFormat(JsonByteArray.Format.BASE16).build()
+val bytesType = ScalaTypeRef[Array[Byte]]
+val text = hexJson.toJson(Array[Byte](1, -2, 3), bytesType) // "\"01fe03\""
+val bytes = hexJson.fromJson(text, bytesType)
+```
+
+`JsonByteArray` on a field or getter, including a Mixin, overrides the default for that property.
+See [byte-array formats](object-mapping.md#builder-configuration) for the read/write contract.
+
 ## Case classes and annotations
 
 Case classes are decoded by calling their full primary constructor. Fory invokes Scala's generated

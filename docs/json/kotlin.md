@@ -93,6 +93,24 @@ collection and map values, nullable values, Kotlin value classes backed by them,
 the Java Long-like wrappers supported by the core JSON runtime. Readers accept both quoted and
 unquoted integer tokens.
 
+`ByteArray` uses Base64 strings by default. The standard builder's `byteArrayFormat` also controls
+root arrays and arrays nested in properties, collections, and maps:
+
+```kotlin
+import org.apache.fory.json.annotation.JsonByteArray
+import org.apache.fory.json.kotlin.ForyJsonKotlin
+import org.apache.fory.json.kotlin.jsonTypeRef
+
+val hexJson = ForyJsonKotlin.builder().byteArrayFormat(JsonByteArray.Format.BASE16).build()
+val bytesType = jsonTypeRef<ByteArray>()
+val text = hexJson.toJson(byteArrayOf(1, -2, 3), bytesType) // "\"01fe03\""
+val bytes = hexJson.fromJson(text, bytesType)
+```
+
+`@field:JsonByteArray` or `@get:JsonByteArray`, including a Mixin declaration, overrides the default
+for that property. `UByteArray` retains its unsigned numeric-array representation. See
+[byte-array formats](object-mapping.md#builder-configuration) for accepted input and null behavior.
+
 `jsonTypeRef<T>()` is a type token, not a codec lookup. Construct it once and reuse it. A Java
 `Class` or ordinary Java `TypeRef` cannot express distinctions such as `List<Account?>`, `UInt`, or
 a logical value class lowered to a primitive carrier.

@@ -177,7 +177,7 @@ With an empty `items` list, this object writes `{}`. Explicit property inclusion
 class and builder defaults. Java empty-value checks run directly, even with a custom codec.
 Other types use the selected codec's `isEmpty(writer, value)`, which defaults to `false`.
 A custom codec must override it to define empty values; writing `""` or `{}` alone does not make
-an ordinary object empty. An empty `byte[]` is empty with either Base64 or numeric-array
+an ordinary object empty. An empty `byte[]` is empty with Base64, Base16, or numeric-array
 representation. See [Custom codecs](custom-codecs.md#custom-empty-values).
 
 Filtering is shallow: `0`, `false`, a list containing null, a list containing an empty list, and a
@@ -477,8 +477,8 @@ as a trusted raw root value. That combination is serialization-only: the ordinar
 
 ## `JsonByteArray`
 
-Unannotated `byte[]` values use quoted standard Base64 JSON strings. `JsonByteArray` selects
-`BASE64` or `ARRAY` for one exact `byte[]` field or getter, in both reading and writing:
+`JsonByteArray` selects `BASE64`, `BASE16`, or `ARRAY` for one exact `byte[]` field or getter, in
+both reading and writing. It overrides the builder's `byteArrayFormat`, whose default is `BASE64`:
 
 ```java
 import org.apache.fory.json.annotation.JsonByteArray;
@@ -489,10 +489,16 @@ public final class Attachment {
 
   @JsonByteArray(JsonByteArray.Format.BASE64)
   public byte[] content;
+
+  @JsonByteArray(JsonByteArray.Format.BASE16)
+  public byte[] hex;
 }
 ```
 
-For bytes `{1, -2, 3}`, `numbers` is written as `[1,-2,3]` and `content` as `"Af4D"`.
+For bytes `{1, -2, 3}`, `numbers` is written as `[1,-2,3]`, `content` as `"Af4D"`, and `hex` as
+`"01fe03"`. `BASE16` writes lowercase hexadecimal digits without a prefix or separators; it reads
+uppercase or lowercase digits, including JSON string escapes, and rejects odd-length or invalid
+hexadecimal strings.
 `ARRAY` reads JSON arrays using the signed byte range `[-128, 127]`; `BASE64` reads standard
 Base64 strings and preserves padding when writing. Each representation also accepts JSON null,
 and null output follows the property's normal inclusion rule. The default Base64 codec does not
@@ -503,7 +509,7 @@ property, not to container elements or map values. Mixin declarations can select
 It cannot share a logical property with `JsonRawValue`, an occurrence `JsonCodec`, `JsonFormat`,
 or an Any declaration. Conflicting formats on the field and getter of one property are rejected.
 
-Base64 values are binary leaves excluded from the graph-memory budget. Numeric arrays count their
+Base64 and Base16 values are binary leaves excluded from the graph-memory budget. Numeric arrays count their
 array storage against that budget; see [Security](security.md#depth-and-graph-memory-limits).
 
 ## `JsonFormat`
