@@ -665,7 +665,7 @@ numeric-array mapping details.</p>
             <description><![CDATA[Apache Fory JSON maps Java objects to and from standard JSON text and UTF-8 bytes, combining high performance with flexible object mapping and controlled polymorphism.]]></description>
             <content:encoded><![CDATA[<p><strong>TL;DR</strong>: Apache Fory JSON is a high-performance serialization framework that maps Java objects to and from standard JSON text and UTF-8 bytes. It supports common Java models and runs on JDK 8+, Android, and GraalVM Native Image. Fory JSON is the fastest Java JSON serialization framework in the published benchmarks: up to <strong>10.91× the throughput of Jackson and 10.89× the throughput of Gson</strong> with 1000 KB payloads, and up to <strong>5.55× the throughput of Jackson and 10.00× the throughput of Gson</strong> in the <code>jvm-serializers</code> MediaContent benchmark.</p>
 <ul>
-<li class="">GitHub: <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer" class="">apache/fory</a></li>
+<li class="">GitHub: <a href="https://github.com/apache/fory/tree/main/java/fory-json" target="_blank" rel="noopener noreferrer" class="">apache/fory</a></li>
 <li class="">Documentation: <a class="" href="https://fory.apache.org/docs/json/">Fory JSON</a></li>
 <li class="">Wider 1000 KB benchmark context: <a href="https://github.com/fabienrenaud/java-json-benchmark/pull/129" target="_blank" rel="noopener noreferrer" class="">java-json-benchmark</a></li>
 </ul>
@@ -748,7 +748,7 @@ numeric-array mapping details.</p>
 <li class="">Run the <a class="" href="https://fory.apache.org/docs/json/getting-started">Getting Started example</a>.</li>
 <li class="">Inspect the <a class="" href="https://fory.apache.org/docs/benchmarks/json/java/">complete <code>jvm-serializers</code> MediaContent benchmark</a>.</li>
 <li class="">Review the <a href="https://github.com/fabienrenaud/java-json-benchmark/pull/129" target="_blank" rel="noopener noreferrer" class="">1000 KB benchmark and broader matrix</a>.</li>
-<li class="">Join development at <a href="https://github.com/apache/fory" target="_blank" rel="noopener noreferrer" class="">apache/fory</a>.</li>
+<li class="">Join development at <a href="https://github.com/apache/fory/tree/main/java/fory-json" target="_blank" rel="noopener noreferrer" class="">apache/fory</a>.</li>
 </ul>
 <p>Fory JSON preserves standard JSON interoperability while providing a high-performance implementation for Java services.</p>]]></content:encoded>
             <category>fory</category>
