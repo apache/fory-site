@@ -10,6 +10,8 @@ tags: [fory, kotlin, java, json, serialization, performance]
 
 <img src="/img/fory-logo-light.png" width="50%"/>
 
+Github repo: [fory-json-kotlin](https://github.com/apache/fory/tree/main/kotlin/fory-json-kotlin)
+
 ## JSON Mapping for Kotlin {#kotlin-json-mapping}
 
 In Kotlin, JSON mapping involves more than reading and writing object fields. Default parameters and nullable types affect how objects are constructed, while value classes and sealed hierarchies have their own type semantics. A JSON library needs to understand Kotlin's type information and construction rules to handle these models correctly.
