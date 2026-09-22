@@ -8,7 +8,7 @@ tags: [fory, java, json, serialization, performance]
 
 **TL;DR**: Apache Fory JSON is a high-performance serialization framework that maps Java objects to and from standard JSON text and UTF-8 bytes. It supports common Java models and runs on JDK 8+, Android, and GraalVM Native Image. Fory JSON is the fastest Java JSON serialization framework in the published benchmarks: up to **10.91× the throughput of Jackson and 10.89× the throughput of Gson** with 1000 KB payloads, and up to **5.55× the throughput of Jackson and 10.00× the throughput of Gson** in the `jvm-serializers` MediaContent benchmark.
 
-- GitHub: [apache/fory](https://github.com/apache/fory)
+- GitHub: [apache/fory](https://github.com/apache/fory/tree/main/java/fory-json)
 - Documentation: [Fory JSON](/docs/json/)
 - Wider 1000 KB benchmark context: [java-json-benchmark](https://github.com/fabienrenaud/java-json-benchmark/pull/129)
 
@@ -287,6 +287,6 @@ To evaluate Fory JSON, replace one representative Jackson or Gson round trip, re
 - Run the [Getting Started example](/docs/json/getting-started).
 - Inspect the [complete `jvm-serializers` MediaContent benchmark](/docs/benchmarks/json/java/).
 - Review the [1000 KB benchmark and broader matrix](https://github.com/fabienrenaud/java-json-benchmark/pull/129).
-- Join development at [apache/fory](https://github.com/apache/fory).
+- Join development at [apache/fory](https://github.com/apache/fory/tree/main/java/fory-json).
 
 Fory JSON preserves standard JSON interoperability while providing a high-performance implementation for Java services.
