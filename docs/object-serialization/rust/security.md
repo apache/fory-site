@@ -44,8 +44,8 @@ Security-related configuration:
   positive byte gate for trusted workloads with different legitimate collection/map/struct sizes.
 - Keep `max_unbacked_container_items(...)` at `8192` unless trusted compact codecs require a
   larger root allowance. Zero rejects every unbacked item.
-- Keep the remote schema metadata limits at their defaults unless the data is not malicious and a
-  trusted peer sends larger metadata or many schema versions.
+- Keep remote metadata size limits at their defaults unless a trusted peer needs larger metadata.
+  Schema-version limits bound caching; additional valid schemas are decoded without caching.
 - Prefer concrete typed fields over `dyn Any` or broad trait-object fields for untrusted input.
 
 ## Verification

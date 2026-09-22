@@ -153,7 +153,7 @@ This limits the maximum depth for nested polymorphic object serialization (e.g.,
 
 ### max_schema_versions_per_type(uint32_t)
 
-Set the maximum accepted remote metadata versions for one logical type.
+Set the maximum cached remote metadata versions for one logical type.
 
 ```cpp
 auto fory = Fory::builder()
@@ -162,6 +162,11 @@ auto fory = Fory::builder()
 ```
 
 **Default:** `10`
+
+Schema-version limits bound cached metadata only. When a schema-version or
+logical-type cache limit is reached, valid data still deserializes after full
+metadata validation, without caching the new schema. Repeated reads of an
+uncached schema may cost more; existing cached schemas remain reusable.
 
 ### max_type_fields(uint32_t)
 
@@ -190,7 +195,7 @@ auto fory = Fory::builder()
 
 ### max_average_schema_versions_per_type(uint32_t)
 
-Set the average accepted remote metadata versions across accepted remote types.
+Set the average cached remote metadata versions across cached remote types.
 The effective global floor is `8192` schemas.
 
 ```cpp
@@ -236,19 +241,19 @@ auto fory = Fory::builder().build_thread_safe();  // Returns ThreadSafeFory
 
 ## Configuration Summary
 
-| Option                                           | Description                                       | Default   |
-| ------------------------------------------------ | ------------------------------------------------- | --------- |
-| `xlang(bool)`                                    | Use xlang mode                                    | `true`    |
-| `compatible(bool)`                               | Enable schema evolution                           | `true`    |
-| `track_ref(bool)`                                | Enable reference tracking                         | `true`    |
-| `max_graph_memory_bytes(int64_t)`                | Approximate graph-memory gate per root read       | `128 MiB` |
-| `max_unbacked_container_items(int64_t)`          | Unbacked collection/map work per root read        | `8192`    |
-| `max_dyn_depth(uint32_t)`                        | Maximum nesting depth for dynamic types           | `5`       |
-| `max_type_fields(uint32_t)`                      | Max fields in one received struct metadata body   | `512`     |
-| `max_type_meta_bytes(uint32_t)`                  | Max encoded bytes in one received metadata body   | `4096`    |
-| `max_schema_versions_per_type(uint32_t)`         | Max remote metadata versions for one logical type | `10`      |
-| `max_average_schema_versions_per_type(uint32_t)` | Average remote metadata versions across types     | `3`       |
-| `check_struct_version(bool)`                     | Enable struct version checking                    | `false`   |
+| Option                                           | Description                                              | Default   |
+| ------------------------------------------------ | -------------------------------------------------------- | --------- |
+| `xlang(bool)`                                    | Use xlang mode                                           | `true`    |
+| `compatible(bool)`                               | Enable schema evolution                                  | `true`    |
+| `track_ref(bool)`                                | Enable reference tracking                                | `true`    |
+| `max_graph_memory_bytes(int64_t)`                | Approximate graph-memory gate per root read              | `128 MiB` |
+| `max_unbacked_container_items(int64_t)`          | Unbacked collection/map work per root read               | `8192`    |
+| `max_dyn_depth(uint32_t)`                        | Maximum nesting depth for dynamic types                  | `5`       |
+| `max_type_fields(uint32_t)`                      | Max fields in one received struct metadata body          | `512`     |
+| `max_type_meta_bytes(uint32_t)`                  | Max encoded bytes in one received metadata body          | `4096`    |
+| `max_schema_versions_per_type(uint32_t)`         | Max cached remote metadata versions for one logical type | `10`      |
+| `max_average_schema_versions_per_type(uint32_t)` | Average cached remote metadata versions across types     | `3`       |
+| `check_struct_version(bool)`                     | Enable struct version checking                           | `false`   |
 
 ## Security
 

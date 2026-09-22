@@ -35,18 +35,18 @@ ThreadSafeFory threadSafe = Fory.Builder().BuildThreadSafe();
 
 `Fory.Builder().Build()` uses:
 
-| Option                            | Default     | Description                                       |
-| --------------------------------- | ----------- | ------------------------------------------------- |
-| `TrackRef`                        | `false`     | Reference tracking disabled                       |
-| `Compatible`                      | `true`      | Compatible schema-evolution metadata enabled      |
-| `CheckStructVersion`              | `false`     | Struct schema hash checks disabled                |
-| `MaxDepth`                        | `20`        | Max dynamic nesting depth                         |
-| `MaxGraphMemoryBytes`             | `134217728` | Approximate graph-memory gate per root read       |
-| `MaxUnbackedContainerItems`       | `8192`      | Unbacked collection/map work per root read        |
-| `MaxTypeFields`                   | `512`       | Max fields in one received struct metadata body   |
-| `MaxTypeMetaBytes`                | `4096`      | Max encoded bytes in one received metadata body   |
-| `MaxSchemaVersionsPerType`        | `10`        | Max remote metadata versions for one logical type |
-| `MaxAverageSchemaVersionsPerType` | `3`         | Average remote metadata versions across types     |
+| Option                            | Default     | Description                                              |
+| --------------------------------- | ----------- | -------------------------------------------------------- |
+| `TrackRef`                        | `false`     | Reference tracking disabled                              |
+| `Compatible`                      | `true`      | Compatible schema-evolution metadata enabled             |
+| `CheckStructVersion`              | `false`     | Struct schema hash checks disabled                       |
+| `MaxDepth`                        | `20`        | Max dynamic nesting depth                                |
+| `MaxGraphMemoryBytes`             | `134217728` | Approximate graph-memory gate per root read              |
+| `MaxUnbackedContainerItems`       | `8192`      | Unbacked collection/map work per root read               |
+| `MaxTypeFields`                   | `512`       | Max fields in one received struct metadata body          |
+| `MaxTypeMetaBytes`                | `4096`      | Max encoded bytes in one received metadata body          |
+| `MaxSchemaVersionsPerType`        | `10`        | Max cached remote metadata versions for one logical type |
+| `MaxAverageSchemaVersionsPerType` | `3`         | Average cached remote metadata versions across types     |
 
 ## Builder Options
 
@@ -151,7 +151,7 @@ Fory fory = Fory.Builder()
 
 ### `MaxSchemaVersionsPerType(int value)`
 
-Sets the maximum accepted remote metadata versions for one logical type.
+Sets the maximum cached remote metadata versions for one logical type.
 
 ```csharp
 Fory fory = Fory.Builder()
@@ -159,9 +159,14 @@ Fory fory = Fory.Builder()
     .Build();
 ```
 
+Schema-version limits bound cached metadata only. When a schema-version or
+logical-type cache limit is reached, valid data still deserializes after full
+metadata validation, without caching the new schema. Repeated reads of an
+uncached schema may cost more; existing cached schemas remain reusable.
+
 ### `MaxAverageSchemaVersionsPerType(int value)`
 
-Sets the average accepted remote metadata versions across accepted remote types.
+Sets the average cached remote metadata versions across cached remote types.
 The effective global floor is `8192` schemas.
 
 ```csharp

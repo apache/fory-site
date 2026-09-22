@@ -33,18 +33,18 @@ f := fory.New(fory.WithXlang(true))
 
 Default settings:
 
-| Option                          | Default   | Description                                       |
-| ------------------------------- | --------- | ------------------------------------------------- |
-| TrackRef                        | false     | Reference tracking disabled                       |
-| MaxDepth                        | 20        | Maximum nesting depth                             |
-| IsXlang                         | true      | Xlang mode enabled                                |
-| Compatible                      | true      | Compatible schema-evolution metadata enabled      |
-| MaxGraphMemoryBytes             | 134217728 | Approximate graph-memory gate per root read       |
-| MaxUnbackedContainerItems       | 8192      | Unbacked collection/map work per root read        |
-| MaxTypeFields                   | 512       | Max fields in one received struct metadata body   |
-| MaxTypeMetaBytes                | 4096      | Max encoded bytes in one received metadata body   |
-| MaxSchemaVersionsPerType        | 10        | Max remote metadata versions for one logical type |
-| MaxAverageSchemaVersionsPerType | 3         | Average remote metadata versions across types     |
+| Option                          | Default   | Description                                              |
+| ------------------------------- | --------- | -------------------------------------------------------- |
+| TrackRef                        | false     | Reference tracking disabled                              |
+| MaxDepth                        | 20        | Maximum nesting depth                                    |
+| IsXlang                         | true      | Xlang mode enabled                                       |
+| Compatible                      | true      | Compatible schema-evolution metadata enabled             |
+| MaxGraphMemoryBytes             | 134217728 | Approximate graph-memory gate per root read              |
+| MaxUnbackedContainerItems       | 8192      | Unbacked collection/map work per root read               |
+| MaxTypeFields                   | 512       | Max fields in one received struct metadata body          |
+| MaxTypeMetaBytes                | 4096      | Max encoded bytes in one received metadata body          |
+| MaxSchemaVersionsPerType        | 10        | Max cached remote metadata versions for one logical type |
+| MaxAverageSchemaVersionsPerType | 3         | Average cached remote metadata versions across types     |
 
 ### With Options
 
@@ -179,15 +179,20 @@ f := fory.New(fory.WithMaxTypeMetaBytes(4096))
 
 ### WithMaxSchemaVersionsPerType
 
-Set the maximum accepted remote metadata versions for one logical type:
+Set the maximum cached remote metadata versions for one logical type:
 
 ```go
 f := fory.New(fory.WithMaxSchemaVersionsPerType(10))
 ```
 
+Schema-version limits bound cached metadata only. When a schema-version or
+logical-type cache limit is reached, valid data still deserializes after full
+metadata validation, without caching the new schema. Repeated reads of an
+uncached schema may cost more; existing cached schemas remain reusable.
+
 ### WithMaxAverageSchemaVersionsPerType
 
-Set the average accepted remote metadata versions across accepted remote types.
+Set the average cached remote metadata versions across cached remote types.
 The effective global floor is `8192` schemas:
 
 ```go

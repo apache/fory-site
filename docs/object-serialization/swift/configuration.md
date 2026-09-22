@@ -117,9 +117,9 @@ Compatible-mode remote metadata is also limited:
 - `maxTypeFields` defaults to `512` and limits fields in one received struct metadata body.
 - `maxTypeMetaBytes` defaults to `4096` and limits encoded body bytes in one received TypeMeta body,
   excluding the 8-byte header and any extended-size varint.
-- `maxSchemaVersionsPerType` defaults to `10` and limits accepted remote metadata versions for one
+- `maxSchemaVersionsPerType` defaults to `10` and limits cached remote metadata versions for one
   logical type.
-- `maxAverageSchemaVersionsPerType` defaults to `3` and limits the average across accepted remote
+- `maxAverageSchemaVersionsPerType` defaults to `3` and limits the average across cached remote
   types. The effective global floor is `8192` schemas.
 
 ```swift
@@ -133,6 +133,11 @@ let fory = Fory(
   maxAverageSchemaVersionsPerType: 3
 )
 ```
+
+Schema-version limits bound cached metadata only. When a schema-version or
+logical-type cache limit is reached, valid data still deserializes after full
+metadata validation, without caching the new schema. Repeated reads of an
+uncached schema may cost more; existing cached schemas remain reusable.
 
 ## Recommended Presets
 

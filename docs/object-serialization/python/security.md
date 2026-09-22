@@ -80,8 +80,9 @@ Received remote metadata is also limited:
 
 - `max_type_fields` limits the number of fields accepted in one received struct metadata body.
 - `max_type_meta_bytes` limits the encoded body bytes accepted for one received TypeDef body.
-- `max_schema_versions_per_type` limits accepted remote metadata versions for one logical type.
-- `max_average_schema_versions_per_type` limits the average across accepted remote types.
+- `max_schema_versions_per_type` limits cached remote metadata versions for one logical type.
+- `max_average_schema_versions_per_type` limits the average across cached remote types.
+  Additional valid schemas are decoded without caching after either schema-version limit is reached.
 - `max_graph_memory_bytes` sets an approximate gate for materialized graph memory during one root
   deserialization. The estimate mainly covers lists, tuples, sets, dicts, object arrays, structs,
   and Python objects. It skips leaf values such as strings, binary data, primitive scalars, and

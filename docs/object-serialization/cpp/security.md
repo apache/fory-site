@@ -43,8 +43,8 @@ Security-related configuration:
   positive value for a trusted workload that needs a different collection/map/struct gate.
 - Keep `max_dyn_depth(...)` as low as your model permits to reject unexpectedly deep polymorphic
   graphs.
-- Keep the remote schema metadata limits at their defaults unless the data is not malicious and a
-  trusted peer sends larger metadata or many schema versions.
+- Keep remote metadata size limits at their defaults unless a trusted peer needs larger metadata.
+  Schema-version limits bound caching; additional valid schemas are decoded without caching.
 - Prefer concrete fields over broad polymorphic fields for untrusted input.
 
 ## Verification
