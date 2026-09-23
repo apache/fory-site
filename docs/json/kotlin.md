@@ -162,6 +162,14 @@ For this model:
 - a missing `id` uses `0`.
 - `{"id":1,"retries":null}` fails; null never asks Kotlin to use a default.
 
+Enable `ForyJsonKotlin.builder().failOnMissingRequiredProperties(true).build()` to require ordinary
+constructor properties without declared defaults, including nullable properties and numeric or
+Boolean properties. Compiler defaults still apply when declared. For example, a missing `id` in
+the model above is then an error, while missing `label` and `retries` still use their defaults.
+Nullability alone does not make a property optional in this mode: a nullable property without a
+default must appear, but its value may be explicit null. This option defaults to `false` and does
+not change writing, body-property behavior, or existing non-null constraints.
+
 Normal body `var` properties preserve their initializer when absent and are assigned after
 construction when present. A `lateinit` property is required. Automatic creator and deferred
 properties must be reconstructible in both read and write directions.

@@ -95,6 +95,12 @@ json.fromJson("""{"selected":null}""", classOf[Options]) // Options(None, None)
 json.fromJson("{}", classOf[Profile]) // Profile(0, false, List(), null)
 ```
 
+Use `ForyJsonScala.builder().failOnMissingRequiredProperties(true).build()` to reject missing ordinary
+constructor properties without a declared default. For example, `case class Request(id: Int)` then
+rejects `{}`, while `case class Request(id: Int = 7)` still reads it as `Request(7)`. Option,
+collection, map, and array properties retain their existing missing-value defaults. The option is
+disabled by default and does not change writing or explicit null handling.
+
 Explicit constructor defaults take precedence for omitted properties. An explicit JSON `null`
 decodes as `None` for `Option[A]`, even when its constructor default is `Some(...)`.
 
