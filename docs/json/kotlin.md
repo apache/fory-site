@@ -202,15 +202,21 @@ Explicit null remains distinct from a missing field and is rejected for a non-nu
 Choose an inclusion rule that retains values when exact round trips are required.
 
 `NON_DEFAULT` requires explicit field authorization with `@JsonProperty`, or class authorization
-with `@JsonInclude`. It is supported when **every parameter of the selected constructor has a
-language default**, or the model uses an ordinary no-argument constructor. Fory constructs one
+with `@JsonInclude`. Comparing against a reference object is supported when **every parameter of the
+selected constructor has a language default**, or the model uses an ordinary no-argument constructor. Fory constructs one
 reference object per initialized model metadata and captures authorized property values. This
 executes the complete constructor, all initializers, and `init` blocks. It is not repeated on each
 write, and models without authorization do not construct a reference. Dynamic and declared model
 occurrences can initialize separately.
 
-Models with required parameters are rejected, even if another constructor happens to have no
-arguments. Fory does not fabricate parameters, borrow them from the first object, change creator
+Both field-level and class-level authorization retain constructor properties without defaults and
+`lateinit` properties, including null, zero, false, and empty values. A defaulted property that needs
+a reference object is rejected when the selected constructor also has required parameters, even if
+another constructor has no arguments.
+For example, class-level `NON_DEFAULT` on `data class Key(val id: Int)` writes `{"id":0}` for `Key(0)`.
+For `data class Entry(val id: Int, val count: Int = 1)`, the same class policy cannot compare `count`
+without inventing `id`; give `count` an `ALWAYS` override to retain it.
+Fory does not fabricate parameters, borrow them from the first object, change creator
 selection, bypass a constructor, or analyze bytecode. Failed construction reports the model and
 property. Global `defaultPropertyInclusion(NON_DEFAULT)` is rejected.
 

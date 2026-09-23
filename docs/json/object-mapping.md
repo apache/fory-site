@@ -225,7 +225,8 @@ ForyJson json = ForyJson.builder().defaultPropertyInclusion(Include.NON_EMPTY).b
 The builder accepts `ALWAYS`, `NON_NULL`, and `NON_EMPTY`. It rejects `DEFAULT` and `NON_DEFAULT`.
 Default omission requires explicit `@JsonProperty(include = NON_DEFAULT)` or class-level
 `@JsonInclude(NON_DEFAULT)` authorization; see [Default omission](annotations.md#jsoninclude-and-default-omission)
-for supported sources, construction/evaluation effects, and errors. An explicit `JsonProperty.include`
+for supported sources, construction/evaluation effects, and errors. Both forms retain properties
+without defaults, including null and zero values. An explicit `JsonProperty.include`
 overrides `JsonInclude` on the class, which overrides the builder default. See
 [Property inclusion](annotations.md#jsonproperty) for the empty-value definitions and boundaries.
 

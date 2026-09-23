@@ -147,7 +147,7 @@ import org.apache.fory.json.scala.ForyJsonScala
 
 @JsonInclude(Include.NON_DEFAULT)
 case class Request(
-  @JsonProperty(include = Include.ALWAYS) id: Int,
+  id: Int,
   retries: Int = 3,
   tags: List[String] = Nil
 )
@@ -158,22 +158,24 @@ json.fromJson("""{"id":0}""", classOf[Request]) // Request(0, 3, Nil)
 json.toJson(Request(0, retries = 0)) // {"id":0,"retries":0}
 ```
 
-`id` is explicitly excluded because it has no declared default; otherwise class-level authorization
-would fail. A reader's implicit zero, empty collection, or `None` fallback is not a declared default.
+`id` has no declared default, so class-level authorization keeps it in the output, including when
+its value is zero. A reader's implicit zero, empty collection, or `None` fallback is not a declared
+default.
 Alternatively, omit the class annotation and place `@JsonProperty(include = Include.NON_DEFAULT)`
 only on selected defaulted properties. Mixins support both forms. Global `NON_DEFAULT` is rejected.
 
 Default expressions run during writing and must be deterministic and free of externally visible
 side effects. For `case class Limits(low: Int)(val high: Int = low + 1)`, the comparison for `high`
 uses the object's actual `low`. For `low=5, high=2`, high is retained because its default is 6.
-Missing default methods or unavailable write-schema dependencies cause a model-initialization error.
-`Unit` defaults whose JVM methods return `void` are not supported comparison sources; retain those
-properties with `ALWAYS` when authorizing the class.
+Unavailable dependencies of a selected default method cause a model-initialization error.
+Properties without a supported compiler default method are retained under both class-level and
+field-level `NON_DEFAULT`. This also applies to `Unit` defaults whose JVM methods return `void`,
+which are not supported comparison sources.
 Authorization confirms that missing input restores the same context; Fory does not prove this or
 expression purity. Use `ALWAYS` for time-, random-, or state-dependent defaults. Arrays compare by contents, and
 floating-point comparisons distinguish positive and negative zero. Class-body initializers are
-not inferred as Scala constructor defaults. Values differing from a default, including null and
-empty collections, remain written. Reading stays independent and creates fresh mutable defaults.
+not inferred as Scala constructor defaults and remain written. Values differing from a default,
+including null and empty collections, remain written. Reading stays independent and creates fresh mutable defaults.
 Class authorization covers future added fields too; see [Default omission](annotations.md#jsoninclude-and-default-omission).
 
 ## Supported Scala types

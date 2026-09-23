@@ -163,8 +163,9 @@ The supported inclusion values are:
   JDK `Optional`, `OptionalInt`, `OptionalLong`, and `OptionalDouble` values.
   With the Scala module, also omit `None` and supported empty strict Scala collections and maps.
 - `NON_DEFAULT`: explicitly authorize omission when the property equals a supported default.
-  Different values, including null or empty values, remain included. Unsupported default sources
-  cause an error when the model is initialized. See [Default omission](#jsoninclude-and-default-omission).
+  Different values, including null or empty values, remain included. Properties without defaults
+  remain included under both field-level and class-level authorization.
+  See [Default omission](#jsoninclude-and-default-omission).
 
 ```java
 public final class Response {
@@ -234,13 +235,21 @@ with `ALWAYS`. `defaultPropertyInclusion(NON_DEFAULT)` immediately throws a conf
 global authorization would silently apply this contract to unrelated models. `NON_EMPTY` does not
 grant default-evaluation authorization.
 
-| Model                                                                                                                     | Supported default source                                                                   |
-| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Scala constructor property                                                                                                | Declared compiler default method, evaluated on each write with actual preceding parameters |
-| Java ordinary no-argument model                                                                                           | One reference object constructed using the reader's no-argument constructor                |
-| Kotlin selected constructor with defaults for every parameter                                                             | One reference object constructed using those language defaults                             |
-| Ordinary Kotlin no-argument model                                                                                         | One reference object using that constructor                                                |
-| Java required constructor parameters, Kotlin constructor with any required parameter, or Scala missing default/dependency | Rejected for an authorized property                                                        |
+Both field-level and class-level `NON_DEFAULT` retain properties without defaults, including required
+constructor parameters and Kotlin `lateinit` properties. Their null, zero, false, and empty values are written;
+reader fallbacks do not make them defaulted properties. Java models without a no-argument
+construction path selected by the reader retain their authorized properties.
+Use `ALWAYS` to retain a property with an unstable or unsupported default. Mixins follow the same rules.
+
+| Model                                                                                | Supported default source                                                                   |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Scala constructor property                                                           | Declared compiler default method, evaluated on each write with actual preceding parameters |
+| Java ordinary no-argument model                                                      | One reference object constructed using the reader's no-argument constructor                |
+| Kotlin selected constructor with defaults for every parameter                        | One reference object constructed using those language defaults                             |
+| Ordinary Kotlin no-argument model                                                    | One reference object using that constructor                                                |
+| Required properties without defaults                                                 | Retained under both field-level and class-level authorization                              |
+| Kotlin defaulted property when the selected constructor also has required parameters | Rejected: no reference object can be constructed without inventing required arguments      |
+| Scala default method with unavailable dependencies                                   | Rejected                                                                                   |
 
 Reference construction happens once per initialized model metadata, not once per serialization.
 Distinct declared and dynamic model occurrences can initialize separately. Authorization permits
