@@ -2,6 +2,8 @@
 
 本测试使用同一个不可变 Scala MediaContent 模型和 Eishay JSON 文档，对比 fory-json-scala、jsoniter-scala 和 Jackson Scala。String 组不包含 UTF-8 转换；UTF-8 组中各库均使用直接操作字节数组的 API。
 
+独立的 Google Maps 工作负载见 [JVM JSON 格式化输出测量](../pretty-printing.md)。
+
 - 测试日期：`2026-08-14`
 - 源码提交：`588ad6ab355c4c23fa0a2e4f269a8c733cba7b01`
 - 平台：macOS-15.7.2-arm64-arm-64bit (arm64)

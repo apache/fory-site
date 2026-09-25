@@ -43,8 +43,8 @@ f := fory.New(fory.WithXlang(true))
 | MaxUnbackedContainerItems       | 8192      | 每次根读取中无输入支撑的集合/映射工作量 |
 | MaxTypeFields                   | 512       | 一个已接收结构体元数据主体的最大字段数  |
 | MaxTypeMetaBytes                | 4096      | 一个已接收元数据主体的最大编码字节数    |
-| MaxSchemaVersionsPerType        | 10        | 一个逻辑类型的最大远端元数据版本数      |
-| MaxAverageSchemaVersionsPerType | 3         | 各类型的平均远端元数据版本数            |
+| MaxSchemaVersionsPerType        | 10        | 一个逻辑类型的最大缓存远端元数据版本数      |
+| MaxAverageSchemaVersionsPerType | 3         | 各类型的平均缓存远端元数据版本数            |
 
 ### 使用选项
 
@@ -169,15 +169,18 @@ f := fory.New(fory.WithMaxTypeMetaBytes(4096))
 
 ### WithMaxSchemaVersionsPerType
 
-设置一个逻辑类型可接受的远端元数据版本上限：
+设置一个逻辑类型可缓存的远端元数据版本上限：
 
 ```go
 f := fory.New(fory.WithMaxSchemaVersionsPerType(10))
 ```
 
+Schema 版本限制仅约束缓存的元数据。达到 Schema 版本或逻辑类型缓存上限后，有效数据仍会在完整
+元数据验证后反序列化，但不会缓存新 Schema。重复读取未缓存的 Schema 可能增加开销；既有缓存仍可复用。
+
 ### WithMaxAverageSchemaVersionsPerType
 
-设置已接受远端类型的平均可接受远端元数据版本数。有效的全局下限为 `8192` 个 Schema：
+设置已缓存远端类型的平均可接受远端元数据版本数。有效的全局下限为 `8192` 个 Schema：
 
 ```go
 f := fory.New(fory.WithMaxAverageSchemaVersionsPerType(3))

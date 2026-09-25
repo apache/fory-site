@@ -42,8 +42,8 @@ license: |
 | `maxUnbackedContainerItems` | 单次根反序列化中，重复读取正文没有相应输入进度支撑的集合元素和映射条目的最大数量。零表示严格限制。 | `8192` |
 | `maxTypeFields` | 单个远程结构体元数据正文可接受的最大字段数。 | `512` |
 | `maxTypeMetaBytes` | 单个 TypeDef 或 TypeMeta 正文可接受的最大编码字节数，不含 8 字节头部和扩展长度 varint。 | `4096` |
-| `maxSchemaVersionsPerType` | 每个逻辑类型可接受的远程元数据版本上限。 | `10` |
-| `maxAverageSchemaVersionsPerType` | 所有已接受远程类型的平均远程元数据版本数。有效的全局下限为 `8192` 个元数据条目。 | `3` |
+| `maxSchemaVersionsPerType` | 每个逻辑类型可缓存的远程元数据版本上限。 | `10` |
+| `maxAverageSchemaVersionsPerType` | 所有已缓存远程类型的平均缓存远程元数据版本数。有效的全局下限为 `8192` 个元数据条目。 | `3` |
 | `suppressClassRegistrationWarnings` | 是否抑制类注册警告。这些警告可用于安全审计，但也可能造成干扰，因此默认启用抑制。 | `true` |
 | `metaShareEnabled` | 启用或禁用元数据共享模式。 | 兼容模式启用时为 `true`，否则为 false。 |
 | `scopedMetaShareEnabled` | 作用域元数据共享聚焦于单次序列化过程。该过程中创建或识别的元数据仅归其所有，不与其他序列化共享。 | 兼容模式启用时为 `true`，否则为 false。 |
@@ -53,6 +53,9 @@ license: |
 | `asyncCompilationEnabled` | 启用后，序列化先使用解释器模式，并在类的异步序列化器 JIT 完成后切换到 JIT 序列化。Android 和 GraalVM 原生镜像不支持运行时代码生成，因此会强制关闭此选项。 | `false` |
 | `copyRef` | 禁用后复制性能更好，但 Fory 深拷贝会忽略循环引用和共享引用。单次 `Fory#copy` 中，对象图里的同一引用会被复制为不同对象。 | `false` |
 | `serializeEnumByName` | 启用后，Fory 序列化枚举名称而非数字枚举 tag。未启用时，Fory 默认写入声明序号；如果枚举配置了 `@ForyEnumId`，则写入显式稳定 ID。 | `false` |
+
+Schema 版本限制仅约束缓存的元数据。达到 Schema 版本或逻辑类型缓存上限后，有效数据仍会在完整
+元数据验证后反序列化，但不会缓存新 Schema。重复读取未缓存的 Schema 可能增加开销；既有缓存仍可复用。
 
 ### 自定义元数据压缩器 {#custom-metadata-compressors}
 

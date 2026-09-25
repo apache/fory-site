@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.4")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.5")
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.4")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.5")
 }
 ```
 
@@ -77,10 +77,31 @@ val text = json.toJson(Account(7u, "Alice"), accountType)
 val decoded = json.fromJson(text, accountType)
 ```
 
+使用 `ForyJsonKotlin.builder().escapeNonAscii(true)` 可以在紧凑和格式化输出中转义非 ASCII 字符串内容与名称。
+该设置在实例构建后固定；原始 JSON 保持原样。见[非 ASCII 转义](object-mapping.md#non-ascii-escaping)。
+
 当有符号 `Long` 和无符号 `ULong` 值需要以带引号的十进制字符串输出时，请使用
 `ForyJsonKotlin.builder().writeLongAsString(true)`。该设置还适用于声明的 collection 和 Map 值、
 可空值、以这些类型为底层值的 Kotlin 值类、`ULongArray`，以及核心 JSON 运行时支持的 Java Long
 类包装器。Reader 同时接受带引号和不带引号的整数 token。
+
+`ByteArray` 默认使用 Base64 字符串。标准 builder 的 `byteArrayFormat` 也控制根数组，
+以及嵌套在属性、集合和 Map 中的数组：
+
+```kotlin
+import org.apache.fory.json.annotation.JsonByteArray
+import org.apache.fory.json.kotlin.ForyJsonKotlin
+import org.apache.fory.json.kotlin.jsonTypeRef
+
+val hexJson = ForyJsonKotlin.builder().byteArrayFormat(JsonByteArray.Format.BASE16).build()
+val bytesType = jsonTypeRef<ByteArray>()
+val text = hexJson.toJson(byteArrayOf(1, -2, 3), bytesType) // "\"01fe03\""
+val bytes = hexJson.fromJson(text, bytesType)
+```
+
+`@field:JsonByteArray` 或 `@get:JsonByteArray`（包括 Mixin 声明）可以覆盖该属性的默认格式。
+`UByteArray` 保留无符号数字数组表示。可接受的输入和 null 行为见
+[字节数组格式](object-mapping.md#builder-configuration)。
 
 `jsonTypeRef<T>()` 是类型令牌，不是编解码器查找操作。应创建一次并复用。Java `Class` 或普通 Java `TypeRef` 无法表达 `List<Account?>`、`UInt` 或降低为基本类型载体的逻辑值类等区别。
 
@@ -117,7 +138,7 @@ data class Request(
 
 - `{"id":1}` 会调用两个编译器默认值。
 - `{"id":1,"label":null}` 会传入显式 null，不调用 `label` 的默认值。
-- 缺少 `id` 会在调用构造函数前失败。
+- 缺少 `id` 使用 `0`。
 - `{"id":1,"retries":null}` 会失败；null 不会要求 Kotlin 使用默认值。
 
 普通类体 `var` 属性在成员缺失时保留初始化值，在成员存在时于构造后赋值。`lateinit` 属性是必需的。自动 creator 属性和延后赋值属性都必须能在读写两个方向重建。
@@ -126,7 +147,7 @@ data class Request(
 
 Kotlin 的构造函数参数和类体属性都遵循配置的[属性包含策略](annotations.md#jsonproperty)。
 默认的 `NON_NULL` 省略 null，`NON_EMPTY` 还会省略空字符串、数组、集合、Map 和不含值的 JDK Optional。
-属性上的 `@JsonProperty(include = ...)` 优先于 builder 默认值。使用 `ALWAYS` 或
+属性上的 `@JsonProperty(include = ...)` 优先于类上的 `@JsonInclude` 策略，后者优先于 builder 默认值。使用 `ALWAYS` 或
 `writeNullFields(true)` 可以保留 null。
 
 ```kotlin
@@ -144,10 +165,54 @@ val text = json.toJson(Response(1, items = emptyList())) // {"id":1}
 ```
 
 包含策略只影响写入。读取示例输出时，`items` 使用声明的默认值 null，因此不会保留原来的空列表。
-缺失的构造函数参数使用声明的默认值；如果没有默认值则读取失败。缺失的类体属性保留初始化值。
+缺失的构造函数参数优先使用声明的默认值；否则，非空数值和 Boolean 参数使用零和 `false`，
+可空参数使用 `null`，其他非空参数仍为必需参数。缺失的类体属性保留初始化值。
 显式 null 与字段缺失不同，非空属性仍会拒绝显式 null。如果需要精确往返，应选择能保留所需值的包含策略。
 
-序列化时不会比较 Kotlin 默认值，也不会执行初始化器。无论默认值为 null、`emptyList()` 还是非空列表，
+`NON_DEFAULT` 需要通过属性上的 `@JsonProperty` 或类上的 `@JsonInclude` 显式授权。
+只有**选定构造函数的每个参数都有语言默认值**，或模型使用普通无参构造函数时才支持。
+Fory 为每份已初始化的模型元数据构造一个参考对象并获取已授权属性的值，执行完整构造函数、
+所有初始化器和 `init` 块。此操作不会在每次写入时重复；未授权的模型不会构造参考对象。
+动态类型和声明类型的模型使用位置可能分别初始化。
+
+包含必需参数的模型会被拒绝，即使另一个构造函数恰好没有参数。Fory 不会伪造参数、
+借用第一个对象的参数、更改创建器选择、绕过构造函数或分析字节码。构造失败会报告模型和属性。
+全局 `defaultPropertyInclusion(NON_DEFAULT)` 会被拒绝。
+
+Kotlin 元数据只表明默认值是否存在，不揭示表达式或依赖关系。调用方必须确认默认值稳定、
+参考对象构造没有外部可见副作用，以及字段缺失时能恢复一致的值。
+固定参考对象无法表示依赖当前输入、时间、随机数或外部状态的默认值，应排除这些属性：
+
+```kotlin
+import org.apache.fory.json.annotation.JsonInclude
+import org.apache.fory.json.annotation.JsonProperty
+import org.apache.fory.json.annotation.JsonProperty.Include
+import org.apache.fory.json.kotlin.ForyJsonKotlin
+
+@JsonInclude(Include.NON_DEFAULT)
+data class Limits(
+  val low: Int = 1,
+  @param:JsonProperty(include = Include.ALWAYS) val high: Int = low + 1
+)
+
+val json = ForyJsonKotlin.builder().build()
+json.toJson(Limits()) // {"high":2}
+json.toJson(Limits(5, 2)) // {"low":5,"high":2}
+json.fromJson("""{"low":5}""", Limits::class.java) // Limits(5, 6)
+```
+
+当 `low=5` 时必须保留 `high=2`，否则会恢复为 `high=6`。参数依赖并非一概不安全，
+但固定参考对象无法提供其变化的上下文。若只授权个别属性，移除 `JsonInclude`，
+并在对应属性上添加 `@param:JsonProperty(include = Include.NON_DEFAULT)`。
+已注册的 Mixin 可以提供类或属性策略，无需修改模型。类级授权也覆盖未来新增的属性；
+维护者必须校验每个新增默认值，或通过 `ALWAYS` 排除。
+
+读取缺失字段时仍调用正常的 Kotlin 默认值。显式 null 不等于缺失。参考对象及其可变集合不会与
+解码对象共享。比较使用基本类型值、引用的 `equals` 契约及数组内容，见
+[默认值省略](annotations.md#jsoninclude-and-default-omission)。代码压缩时使用已有 JSON KSP 配置；
+默认值在运行时求值，不在 KSP 处理期间求值。
+
+无论默认值为 null、`emptyList()` 还是非空列表，
 `NON_EMPTY` 都会省略空列表。非空值类不会因为底层字符串或集合为空而被当作空属性。
 对于本身实现 `CharSequence`、`Collection` 或 `Map` 的未装箱值类，不支持显式的 `NON_EMPTY`；
 这类模型应使用包含它的对象的自定义编解码器。
@@ -159,7 +224,10 @@ Kotlin 类型使用位置的可空性在根值、属性、容器元素、Map 值
 | 声明 | 成员缺失 | 显式 JSON `null` |
 | --------------------------------- | --------------------- | ---------- |
 | `val value: String` | 失败 | 失败 |
-| `val value: String?` | 失败 | 传入 null |
+| `val value: String?` | 传入 null | 传入 null |
+| `val value: Int` | 使用 `0` | 失败 |
+| `val value: Boolean` | 使用 `false` | 失败 |
+| `val value: Int?` | 传入 null | 传入 null |
 | `val value: String = expression` | 求值默认值 | 失败 |
 | `val value: String? = expression` | 求值默认值 | 传入 null |
 

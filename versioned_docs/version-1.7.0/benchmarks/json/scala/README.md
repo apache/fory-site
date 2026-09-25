@@ -2,6 +2,8 @@
 
 The benchmark compares fory-json-scala, jsoniter-scala, and Jackson Scala on the same immutable Scala MediaContent model and Eishay JSON document. The String group excludes UTF-8 conversion; every library in the UTF-8 group uses its direct byte-array API.
 
+For the separate Google Maps workload, see [JVM JSON pretty-printing measurements](../pretty-printing.md).
+
 - Benchmark date: `2026-08-14`
 - Source commit: `588ad6ab355c4c23fa0a2e4f269a8c733cba7b01`
 - Platform: macOS-15.7.2-arm64-arm-64bit (arm64)

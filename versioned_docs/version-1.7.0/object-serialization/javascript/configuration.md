@@ -62,11 +62,16 @@ const fory = new Fory({
 | `maxUnbackedContainerItems`       | `8192`    | Unbacked collection elements and map entries allowed during one root deserialization  |
 | `maxTypeFields`                   | `512`     | Maximum fields accepted in one received remote struct metadata body                   |
 | `maxTypeMetaBytes`                | `4096`    | Maximum encoded body bytes accepted for one received TypeMeta body                    |
-| `maxSchemaVersionsPerType`        | `10`      | Maximum accepted remote metadata versions for one logical type                        |
-| `maxAverageSchemaVersionsPerType` | `3`       | Average accepted remote metadata versions across accepted remote types                |
+| `maxSchemaVersionsPerType`        | `10`      | Maximum cached remote metadata versions for one logical type                          |
+| `maxAverageSchemaVersionsPerType` | `3`       | Average cached remote metadata versions across cached remote types                    |
 | `useSliceString`                  | `false`   | Optional string-reading optimization for Node.js. Leave at default unless benchmarked |
 | `hps`                             | unset     | Optional fast string helper from `@apache-fory/hps` (Node.js 20+)                     |
 | `hooks.afterCodeGenerated`        | unset     | Callback to inspect the generated serializer code, useful for debugging               |
+
+Schema-version limits bound cached metadata only. When a schema-version or
+logical-type cache limit is reached, valid data still deserializes after full
+metadata validation, without caching the new schema. Repeated reads of an
+uncached schema may cost more; existing cached schemas remain reusable.
 
 ## Reference Tracking
 

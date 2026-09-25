@@ -42,8 +42,8 @@ Security-related configuration:
 - Set `maxDepth` to reject unexpectedly deep payload shapes.
 - Keep `maxGraphMemoryBytes` at the default for most inputs, or set an explicit positive byte gate
   for known trusted collection/map/struct-heavy payloads.
-- Keep the remote schema metadata limits at their defaults unless the data is not malicious and a
-  trusted peer sends larger metadata or many schema versions.
+- Keep remote metadata size limits at their defaults unless a trusted peer needs larger metadata.
+  Schema-version limits bound caching; additional valid schemas are decoded without caching.
 - Prefer generated schemas and explicit field metadata over broad dynamic fields for untrusted input.
 
 ## Verification

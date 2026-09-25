@@ -45,8 +45,8 @@ Security-related configuration:
 - Keep `maxTypeFields` and `maxTypeMetaBytes` at their defaults unless the data
   is not malicious and a trusted peer sends larger remote metadata.
 - Keep `maxSchemaVersionsPerType` and
-  `maxAverageSchemaVersionsPerType` at their defaults unless the data is not
-  malicious and a trusted peer sends many remote schema versions.
+  `maxAverageSchemaVersionsPerType` at their defaults to bound caching.
+  Additional valid schemas are decoded without caching.
 - Prefer explicit `Type.struct(...)` schemas over `Type.any()` for untrusted input.
 - Pass `hps` only from the official package version you deploy with Fory.
 

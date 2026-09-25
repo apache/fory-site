@@ -39,7 +39,8 @@ license: |
 - 对有意使用的相同 Schema 载荷，将 `checkStructVersion: true` 与 `compatible: false` 结合使用。
 - 设置 `maxDepth`，拒绝深度超出预期的载荷结构。
 - 对大多数输入保持 `maxGraphMemoryBytes` 默认值；对于已知可信且包含大量 collection/map/struct 的载荷，也可以设置显式正字节数限制。
-- 保持远程 Schema 元数据限制的默认值，除非数据可信且可信通信方会发送更大的元数据或大量 Schema 版本。
+- 保持远程元数据大小限制的默认值，除非可信通信方需要更大的元数据。
+  Schema 版本限制只约束缓存；更多有效 Schema 会在不缓存的情况下解码。
 - 对不可信输入，优先使用生成的 Schema 和显式字段元数据，而不是宽泛的动态字段。
 
 ## 验证

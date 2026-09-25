@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Fory JSON 在 `org.apache.fory.json.annotation` 中提供以下映射和验证注解：`JsonAnyGetter`、`JsonAnyProperty`、`JsonAnySetter`、`JsonByteArray`、`JsonCodec`、`JsonCreator`、`JsonFormat`、`JsonIgnore`、`JsonProperty`、`JsonPropertyOrder`、`JsonRawValue`、`JsonSubTypes`、`JsonUnwrapped`、`JsonValidator` 和 `JsonValue`。`JsonType` 是独立的构建期模型标记。这些属于 Fory JSON API，不是 Jackson、Gson 或 Fory 二进制协议兼容注解。
+Fory JSON 在 `org.apache.fory.json.annotation` 中提供以下映射和验证注解：`JsonAnyGetter`、`JsonAnyProperty`、`JsonAnySetter`、`JsonByteArray`、`JsonCodec`、`JsonCreator`、`JsonFormat`、`JsonIgnore`、`JsonInclude`、`JsonProperty`、`JsonPropertyOrder`、`JsonRawValue`、`JsonSubTypes`、`JsonUnwrapped`、`JsonValidator` 和 `JsonValue`。`JsonType` 是独立的构建期模型标记。这些属于 Fory JSON API，不是 Jackson、Gson 或 Fory 二进制协议兼容注解。
 
 `JsonType` 不会被继承，因此每个需要参与平台构建流程且符合要求的具体模型都必须单独标注。Java 源码需要使用 `fory-annotation-processor`。未标注的普通 Java 类仍可使用反射；在 Android 上，它们需要由应用编写精确 R8 规则。经过 Android 脱糖处理的 Record 必须直接声明 `JsonType`，或使用已编译的精确 `JsonMixin` 配对。在 Native Image 之外，直接标注的 Java 模型如果使用默认对象编解码器却未运行注解处理器，会在创建编解码器时失败。
 
@@ -96,7 +96,7 @@ Mixin 提供的 `JsonCodec` 会成为目标的有效注解。精确的 `register
 
 ## `JsonProperty`
 
-`JsonProperty` 配置一个完整逻辑属性的规范名称、序列化索引和 null 包含策略。字段、getter 或 setter
+`JsonProperty` 配置一个完整逻辑属性的规范名称、序列化索引和值包含策略。字段、getter 或 setter
 上的注解会应用于合并后的字段/getter/setter 属性组。
 
 ```java
@@ -124,12 +124,15 @@ public final class User {
 
 支持以下包含策略：
 
-- `DEFAULT`：使用 `ForyJsonBuilder.defaultPropertyInclusion`（初始值为 `NON_NULL`）。
+- `DEFAULT`：继承类上的 `JsonInclude`，再使用 `ForyJsonBuilder.defaultPropertyInclusion`（初始值为 `NON_NULL`）。
 - `ALWAYS`：即使选中的值为 null，也写入该属性。
 - `NON_NULL`：省略 null 值。
 - `NON_EMPTY`：省略 null、长度为零的 `CharSequence`（包括字符串）和 Java 数组、
   空的 `java.util.Collection` 和 `java.util.Map`，以及不含值的 JDK `Optional`、
   `OptionalInt`、`OptionalLong` 和 `OptionalDouble`。
+  安装 Scala 模块后，还会省略 `None` 以及受支持的空严格求值 Scala 集合和 Map。
+- `NON_DEFAULT`：显式授权在属性等于受支持的默认值时省略它。不同的值（包括 null 或空值）仍会保留。
+  不支持的默认值来源会在模型初始化时失败。见[默认值省略](#jsoninclude-and-default-omission)。
 
 ```java
 public final class Response {
@@ -138,9 +141,11 @@ public final class Response {
 }
 ```
 
-当 `items` 是空列表时，该对象会写为 `{}`。属性上显式指定的包含策略优先于 builder 默认值。
-空值检查针对属性的逻辑值，在调用选定的编解码器之前执行。自定义编解码器将普通对象写为 `""`
-或 `{}`，并不会使该对象被视为空。空 `byte[]` 无论使用 Base64 还是数字数组表示，都属于空值。
+当 `items` 是空列表时，该对象会写为 `{}`。属性上显式指定的包含策略优先于类和 builder 默认值。
+Java 空值检查直接执行，即使该值使用自定义编解码器也是如此。其他类型使用选定编解码器的
+`isEmpty(writer, value)`，其默认返回 `false`。自定义编解码器需要重写该方法才能定义空值；
+仅写出 `""` 或 `{}` 并不会使普通对象被视为空。空 `byte[]` 使用 Base64、Base16 或数字数组表示时
+都属于空值。见[自定义空值](custom-codecs.md#custom-empty-values)。
 
 过滤只检查当前属性值，不递归检查内部内容：`0`、`false`、含 null 的列表、含空列表的列表，
 以及包含空列表的非空 Optional 都会保留。属性包含策略不会过滤根值、集合元素、Map 条目或
@@ -148,7 +153,7 @@ Any 条目。原始 JSON String 属性按字符串检查，不会解析其中的
 
 Kotlin 属性遵循配置的包含策略，即使省略属性会因默认值而改变读取结果，或导致缺少必需属性的读取失败；
 请参阅 [Kotlin 包含策略](kotlin.md#immutable-classes-and-compiler-defaults)。
-Scala 仍遵循[必需构造函数参数规则](scala.md#case-classes-and-annotations)。
+Scala 的字段缺失行为见 [case class 与注解](scala.md#case-classes-and-annotations)。
 
 包含策略只影响写入。对于没有写入来源、仅供创建器使用的属性，非默认包含策略无效。可以重复相同声明；
 同一逻辑属性中相互冲突的显式名称、索引或非默认包含策略会被拒绝。规范化为同一最终 JSON 名称的两个
@@ -160,6 +165,83 @@ Scala 仍遵循[必需构造函数参数规则](scala.md#case-classes-and-annota
 
 不支持别名以及相互独立的读写名称。`JsonProperty` 不能与 Any 逻辑属性组合，
 也不能声明在 `JsonAnySetter` 上。
+
+## `JsonInclude` 与默认值省略 {#jsoninclude-and-default-omission}
+
+默认值可能依赖构造函数参数、时间、随机数或外部状态。能够求值并不意味着省略后能恢复相同的值。
+因此，`NON_DEFAULT` 需要逐属性显式授权，或通过类注解批量授权：
+
+```java
+import org.apache.fory.json.annotation.JsonInclude;
+import org.apache.fory.json.annotation.JsonProperty;
+import org.apache.fory.json.annotation.JsonProperty.Include;
+
+@JsonInclude(Include.NON_DEFAULT)
+public final class Options {
+  public int retries = 3;
+  public String label = "default";
+  @JsonProperty(include = Include.ALWAYS)
+  public long timestamp;
+}
+```
+
+未修改的 `Options` 写为 `{"timestamp":0}`。若只授权 `retries`，移除 `JsonInclude`，并在该字段上
+添加 `@JsonProperty(include = Include.NON_DEFAULT)`。属性策略优先于类策略，类策略优先于 builder 默认值。
+类注解不被子类继承；类上的 `DEFAULT` 使用 builder 设置。
+
+类级授权也覆盖**未来新增的属性**。维护者必须确认每个新属性的默认值稳定、求值安全，并能在字段缺失时
+恢复一致的值，或通过 `ALWAYS` 排除该属性。`defaultPropertyInclusion(NON_DEFAULT)` 会立即抛出配置错误，
+避免全局授权将此契约静默应用于无关模型。`NON_EMPTY` 不授予默认值求值权限。
+
+| 模型 | 支持的默认值来源 |
+| --- | --- |
+| Scala 构造函数属性 | 每次写入时，用实际的前置参数调用声明的编译器默认值方法 |
+| Java 普通无参模型 | 使用读取时选定的无参构造函数创建一个参考对象 |
+| 选定构造函数的所有参数都有默认值的 Kotlin 模型 | 使用这些语言默认值创建一个参考对象 |
+| Kotlin 普通无参模型 | 使用该构造函数创建一个参考对象 |
+| Java 必需构造函数参数、含必需参数的 Kotlin 构造函数，或缺少默认值/依赖的 Scala 属性 | 对已授权属性报错 |
+
+每份已初始化的模型元数据只构造一次参考对象，而非每次序列化都构造。声明类型与动态类型的模型使用位置
+可能分别初始化。授权允许执行**整个构造函数**、其他字段初始化器及 Kotlin `init` 块。
+没有 `NON_DEFAULT` 的模型不会创建参考对象。其他无参构造函数不能替换已选定的创建器。
+构造失败或访问已授权属性失败时会报告模型与属性，不会静默回退或绕过构造函数分配对象。
+
+调用方负责保证默认值稳定、比较求值没有外部可见副作用，以及字段缺失时能恢复相同的逻辑值。
+Fory 不证明纯度或分析默认值表达式。Scala 依赖式默认值方法在接收实际参数且读取能恢复同一上下文时可以安全使用。
+固定的 Java/Kotlin 参考对象无法表示随当前输入变化的默认值：对于 `low=1, high=low+1`，
+若在 `low=5` 的对象中省略 `high=2`，读取会得到 `high=6`。此时应通过 `ALWAYS` 保留 `high`。
+
+基本类型按值比较。浮点数区分正零和负零，非有限值保留并按常规方式输出。数组比较精确的数组类型与内容，
+嵌套数组递归比较；其他引用使用 `equals`。不支持循环结构的深度比较。
+读取行为独立：显式 null 不等于缺失，可变参考默认值不会与解码对象共享。
+
+可以通过已有 Mixin 机制授权默认值，而不修改模型：
+
+```java
+import org.apache.fory.json.ForyJson;
+import org.apache.fory.json.annotation.JsonMixin;
+import org.apache.fory.json.annotation.JsonProperty;
+import org.apache.fory.json.annotation.JsonProperty.Include;
+
+final class RetryPolicy {
+  public int retries = 3;
+  public long timestamp;
+}
+
+@JsonMixin(target = RetryPolicy.class)
+abstract class RetryPolicyMixin {
+  @JsonProperty(include = Include.NON_DEFAULT)
+  int retries;
+}
+
+// A class-level @JsonInclude on a Mixin can also supply the target's class policy.
+var json = ForyJson.builder().registerMixin(RetryPolicyMixin.class).build();
+json.toJson(new RetryPolicy()); // {"timestamp":0}
+```
+
+Android 和 Native Image 继续使用已有的 `@JsonType` 或 Mixin 构建配置。
+使用 R8/ProGuard 的 Kotlin 应用必须运行 JSON KSP。默认值在运行时求值，不在注解处理阶段求值。
+见 [Kotlin](kotlin.md)。
 
 ## `JsonPropertyOrder`
 
@@ -328,8 +410,8 @@ Map 值。它不能放在 setter、创建器参数或 Any 声明上，也不能�
 
 ## `JsonByteArray`
 
-未标注的 `byte[]` 值使用带引号的标准 Base64 JSON 字符串。`JsonByteArray` 为一个精确的 `byte[]`
-字段或 getter 选择 `BASE64` 或 `ARRAY` 表示，并同时作用于读写：
+`JsonByteArray` 为一个精确的 `byte[]` 字段或 getter 选择 `BASE64`、`BASE16` 或 `ARRAY` 表示，
+并同时作用于读写。它覆盖 builder 的 `byteArrayFormat`，后者默认为 `BASE64`：
 
 ```java
 import org.apache.fory.json.annotation.JsonByteArray;
@@ -340,22 +422,50 @@ public final class Attachment {
 
   @JsonByteArray(JsonByteArray.Format.BASE64)
   public byte[] content;
+
+  @JsonByteArray(JsonByteArray.Format.BASE16)
+  public byte[] hex;
 }
 ```
 
-对于字节 `{1, -2, 3}`，`numbers` 写为 `[1,-2,3]`，`content` 写为 `"Af4D"`。`ARRAY` 按有符号
+对于字节 `{1, -2, 3}`，`numbers` 写为 `[1,-2,3]`，`content` 写为 `"Af4D"`，`hex` 写为 `"01fe03"`。
+`BASE16` 写入不带前缀或分隔符的小写十六进制字符，读取接受大小写字符及 JSON 字符串转义，
+拒绝奇数长度或无效的十六进制字符串。`ARRAY` 按有符号
 字节范围 `[-128, 127]` 读取 JSON 数组；`BASE64` 读取标准 Base64 字符串，并在写入时保留填充符。
-两种表示都接受 JSON null，null 输出遵循属性的常规包含规则。默认 Base64 编解码器不接受数字数组
+三种表示都接受 JSON null，null 输出遵循属性的常规包含规则。默认 Base64 编解码器不接受数字数组
 输入；使用该格式的属性应选择 `ARRAY`。
 
 使用该注解时必须指定格式。它只作用于被标注的字节数组属性，不作用于容器元素或 Map 值。Mixin
 声明可以选择或移除该注解。它不能与 `JsonRawValue`、声明位置上的 `JsonCodec`、`JsonFormat` 或 Any
 声明共用于同一逻辑属性。同一属性的字段和 getter 选择冲突格式时会被拒绝。
 
-Base64 值是二进制叶值，不计入对象图内存配额；数字数组则会将其数组存储计入该配额。详见
+Base64 和 Base16 值是二进制叶值，不计入对象图内存配额；数字数组则会将其数组存储计入该配额。详见
 [安全](security.md#depth-and-graph-memory-limits)。
 
 ## `JsonFormat`
+
+在 Boolean 或数值属性上使用 `@JsonFormat(shape = JsonFormat.Shape.STRING)`，可将其 JSON token
+文本写入引号内，例如将 `false` 写为 `"false"`、`7` 写为 `"7"`。它也适用于匹配的创建器或 setter
+参数，包括 Scala 构造函数属性；还可通过 Mixin 配置而不修改模型：
+
+```java
+import org.apache.fory.json.annotation.JsonFormat;
+
+public class Metrics {
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  public boolean active;
+
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  public long count;
+}
+```
+
+读取同时接受带引号和原生 token，遵循声明标量类型的常规范围与 null 规则。
+null 引用仍为 JSON `null`，并遵循属性包含策略。支持 Boolean、基本/装箱数值类型、
+`BigInteger`、`BigDecimal`，以及 Scala 模块的 `BigInt`/`BigDecimal`。
+非有限浮点值保留原有字符串表示（`"NaN"`、`"Infinity"` 或 `"-Infinity"`）。
+字符串形态不能与 pattern、timezone 或自定义值表示组合。
+下方的直接包装规则也适用于标量字符串形态；它不会递归地将任意对象转为字符串，也不改变 Map 键。
 
 在日期/时间字段上使用 `JsonFormat`，可为读写两个方向选择 JSON 文本格式。格式采用
 `DateTimeFormatter` 语法和根语言环境：
@@ -403,7 +513,7 @@ public final class Schedule {
 如果必须在夏令时重叠期间保留精确时刻，请在格式中包含偏移量。省略 `timezone` 时保留上述默认行为。
 无效的时区标识符，以及在其他受支持日期/时间类型上使用非空 `timezone`，都会被拒绝。
 
-`JsonFormat` 是字段注解，而不是类型使用注解。Record 组件通过其生成字段生效。嵌套包装、Map 键、
+`JsonFormat` 通过字段、创建器参数或 setter 参数配置逻辑属性，而不是类型使用注解。支持 Record 组件。嵌套包装、Map 键、
 原始类型或通配符直接子元素、JSON Any 值以及展开值会被有意拒绝。不支持格式化语义模糊的类型，包括
 旧版和 SQL 日期类型、`Duration`、`Period`、`TimeZone`、`ZoneId` 和 `ZoneOffset`。具有完整注册表示、
 注解选择表示、多态表示或 `JsonValue` 表示的包装类型也会被拒绝，因为这些表示方式拥有整个包装对象。
@@ -448,8 +558,10 @@ Any 处理。
 
 Fory 会拒绝重复的最终名称、仅由展开属性构成的递归链、参数化子对象、JSON Any 子对象、多态或自定义
 编解码器子对象根，以及标量、数组、集合或 Map 子对象。若要展开 Map，请使用 `JsonAnyProperty`、
-`JsonAnyGetter` 或 `JsonAnySetter`。展开属性不能使用 `JsonProperty.value`、非默认的
-`JsonProperty.include`、`JsonCodec` 和 `JsonFormat`；普通子叶属性仍可使用这些配置。
+`JsonAnyGetter` 或 `JsonAnySetter`。展开组可以用 `NON_DEFAULT` 在匹配已授权默认值时省略整个组，
+或用 `ALWAYS` 排除类级默认值策略；各子属性仍按自身策略决定是否输出。
+展开属性不支持其他显式组包含策略、`JsonProperty.value`、`JsonCodec` 和 `JsonFormat`；
+普通子叶属性仍可使用这些配置。
 
 ## 动态对象成员
 

@@ -64,6 +64,42 @@ result = fory.deserialize(data)
 print(result)  # Person(name='Bob', age=25, ...)
 ```
 
+## 集合接口 {#collection-interfaces}
+
+Xlang 模式接受 `collections.abc.Mapping`、`Sequence` 和 `Set` 的实现，
+包括其可变变体和虚拟子类，例如 `collections.UserDict`、`collections.UserList`、`range`
+和 `frozenset`。它们使用标准 map、list、set 编码类型，并反序列化为内置 `dict`、`list` 和 `set`。
+具体 Python 类及额外属性不会保留，也无需注册这些集合类型。
+
+```python
+from collections import UserDict, UserList
+from dataclasses import dataclass
+from typing import Mapping, Sequence
+import pyfory
+
+@dataclass
+class Scores:
+    values: Mapping[str, Sequence[int]]
+
+fory = pyfory.Fory(xlang=True)
+fory.register(Scores, name="example.Scores")
+
+value = Scores(UserDict(alice=UserList([90, 95])))
+restored = fory.loads(fory.dumps(value))
+assert restored.values == {"alice": [90, 95]}
+assert type(restored.values) is dict
+assert type(restored.values["alice"]) is list
+```
+
+支持对应的 `typing.Mapping`、`MutableMapping`、`Sequence`、`MutableSequence`、
+`AbstractSet` 和 `MutableSet` 注解，包括嵌套类型和可空元素。没有泛型参数的注解使用动态元素类型。
+字符串和二进制值保留既有编码；任意迭代器和生成器不属于集合值。
+
+普通 `list`、`set` 和 `dict` 的行为足够时，应优先使用这些值和注解，Cython 运行时有对应的专用实现。
+仅限 Python 的应用如果需要保留具体容器子类和属性，见[容器子类](native.md#container-subclasses)。
+显式自定义序列化器优先于默认集合映射。若需为 xlang 集合指定自定义类型名或 ID，
+应提供自定义序列化器并在每个通信端注册匹配的扩展。
+
 ## 引用跟踪与循环引用
 
 载荷使用跨语言兼容类型时，可以安全处理重复引用：

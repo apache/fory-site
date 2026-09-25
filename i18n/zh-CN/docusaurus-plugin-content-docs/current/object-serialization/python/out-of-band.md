@@ -58,6 +58,10 @@ assert np.array_equal(array, deserialized_array)
 
 ## Pandas DataFrame 带外序列化
 
+原生模式支持包含日期时间列和 `DatetimeIndex` 的 DataFrame，保留日期时间单位与索引元数据。
+NumPy `datetime64` 和 `timedelta64` 数组也支持此缓冲区流程。
+C 连续存储可以共享而无需复制；非连续数组会被复制。
+
 ```python
 import pyfory
 import pandas as pd
@@ -65,12 +69,13 @@ import numpy as np
 
 fory = pyfory.Fory(xlang=False, ref=False, strict=False)
 
-# Create a DataFrame with numeric columns
+# Create a DataFrame with a datetime index and column
+index = pd.date_range("2026-01-01", periods=1000, freq="D", name="date")
 df = pd.DataFrame({
     'a': np.arange(1000, dtype=np.float64),
     'b': np.arange(1000, dtype=np.int64),
-    'c': ['text'] * 1000
-})
+    'created_at': index
+}, index=index)
 
 # Serialize with out-of-band buffers
 buffer_objects = []
@@ -80,7 +85,7 @@ buffers = [obj.getbuffer() for obj in buffer_objects]
 # Deserialize
 deserialized_df = fory.deserialize(serialized_data, buffers=buffers)
 
-assert df.equals(deserialized_df)
+pd.testing.assert_frame_equal(df, deserialized_df)
 ```
 
 ## 选择性带外序列化

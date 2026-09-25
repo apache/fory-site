@@ -70,6 +70,68 @@ print(fory.loads(data))  # Person(name='Bob', age=25)
 
 需要 pickle 风格 API 时使用 `dumps`/`loads`；在显式切换模式的代码中需要与跨语言 API 形式保持一致时，则使用 `serialize`/`deserialize`。
 
+## 具名元组 {#named-tuples}
+
+原生模式支持 `typing.NamedTuple` 和 `collections.namedtuple`，保留具体类及字段值。
+严格模式下，需要在每个通信端注册具名元组类型：
+
+```python
+from typing import NamedTuple
+import pyfory
+
+class Record(NamedTuple):
+    name: str
+    values: tuple
+    count: int
+
+fory = pyfory.Fory(xlang=False, strict=True)
+fory.register(Record)
+
+record = Record("sample", (1.0, 2.0, 3.0), 42)
+restored = fory.loads(fory.dumps(record))
+assert type(restored) is Record
+assert restored == record
+```
+
+写入端与读取端必须使用相同的具名元组定义，包括字段顺序。
+
+## 容器子类 {#container-subclasses}
+
+原生模式保留普通 `list`、`set` 和 `dict` 子类，包括内容、实例属性及继承的 `__slots__`。
+应在首次操作前，在两个通信端注册具体子类：
+
+```python
+import pyfory
+
+class LabeledDict(dict):
+    pass
+
+fory = pyfory.Fory(xlang=False, ref=True)
+fory.register(LabeledDict, type_id=100)
+
+value = LabeledDict(answer=42)
+value.label = "example"
+value["self"] = value
+restored = fory.loads(fory.dumps(value))
+
+assert type(restored) is LabeledDict
+assert restored.label == "example"
+assert restored["self"] is restored
+```
+
+普通子类路径不调用 `__init__`。通信两端必须使用相同的子类与 slot 定义。
+启用 `ref=True` 可保留容器内容与属性之间的共享对象和循环引用。
+
+即使重写迭代或修改方法，原生子类仍保留其基础容器存储。状态钩子在内容恢复后运行，
+因此 `__getstate__` 和 `__setstate__` 只需描述实例状态。显式自定义序列化器和自定义归约钩子优先。
+具有自定义 `__new__`、`__getnewargs__` 或 `__getnewargs_ex__` 的类需要自定义归约钩子
+或[自定义序列化器](custom-serializers.md)。`collections.abc` 接口不定义如何构造任意具体类；
+若普通对象状态或钩子无法描述完整值，应使用显式序列化器。
+
+声明为 `Mapping`、`Sequence` 或 `Set` 的字段使用集合值语义，返回内置 `dict`、`list` 或 `set`。
+需要保留 Python 类型身份与状态时，应声明已注册的具体子类或使用动态字段。
+Xlang 模式中的容器子类同样使用集合值语义，不保留 Python 专属实例状态。
+
 ## 安全与动态类型
 
 原生模式可以重建会在反序列化期间执行导入和构造逻辑的 Python 对象。应像对待不可信 pickle 字节一样对待不可信原生模式字节。

@@ -138,7 +138,7 @@ const runtimeExamples: RuntimeExample[] = [
     install: `<dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-core</artifactId>
-  <version>1.7.4</version>
+  <version>1.7.5</version>
 </dependency>`,
     codeLanguage: "java",
     guide: "/docs/object-serialization/java/",
@@ -160,7 +160,7 @@ Person out = (Person) fory.deserialize(bytes);`,
     id: "python",
     label: "Python",
     installLanguage: "bash",
-    install: `pip install pyfory==1.7.4`,
+    install: `pip install pyfory==1.7.5`,
     codeLanguage: "python",
     guide: "/docs/object-serialization/python/",
     summary:
@@ -183,7 +183,7 @@ out = fory.deserialize(data)`,
     id: "rust",
     label: "Rust",
     installLanguage: "bash",
-    install: `cargo add fory@1.7.4`,
+    install: `cargo add fory@1.7.5`,
     codeLanguage: "rust",
     guide: "/docs/object-serialization/rust/",
     summary:
@@ -209,7 +209,7 @@ fn main() -> Result<(), Error> {
     id: "go",
     label: "Go",
     installLanguage: "bash",
-    install: `go get github.com/apache/fory/go/fory@v1.7.4`,
+    install: `go get github.com/apache/fory/go/fory@v1.7.5`,
     codeLanguage: "go",
     guide: "/docs/object-serialization/go/",
     summary:
@@ -234,7 +234,7 @@ _ = f.Deserialize(payload, &out)`,
 FetchContent_Declare(
   fory
   GIT_REPOSITORY https://github.com/apache/fory.git
-  GIT_TAG v1.7.4
+  GIT_TAG v1.7.5
   SOURCE_SUBDIR cpp
 )
 FetchContent_MakeAvailable(fory)`,
@@ -262,7 +262,7 @@ auto out = fory.deserialize<Person>(bytes).value();`,
     id: "javascript",
     label: "JavaScript",
     installLanguage: "bash",
-    install: `npm install @apache-fory/core@1.7.4 @apache-fory/hps@1.7.4`,
+    install: `npm install @apache-fory/core@1.7.5 @apache-fory/hps@1.7.5`,
     codeLanguage: "typescript",
     guide: "/docs/object-serialization/javascript/",
     summary:
@@ -284,7 +284,7 @@ const out = deserialize(payload);`,
     id: "csharp",
     label: "C#",
     installLanguage: "bash",
-    install: `dotnet add package Apache.Fory --version 1.7.4`,
+    install: `dotnet add package Apache.Fory --version 1.7.5`,
     codeLanguage: "csharp",
     guide: "/docs/object-serialization/csharp/",
     summary:
@@ -308,7 +308,7 @@ Person out = fory.Deserialize<Person>(payload);`,
     id: "swift",
     label: "Swift",
     installLanguage: "swift",
-    install: `.package(url: "https://github.com/apache/fory.git", exact: "1.7.4")`,
+    install: `.package(url: "https://github.com/apache/fory.git", exact: "1.7.5")`,
     codeLanguage: "swift",
     guide: "/docs/object-serialization/swift/",
     summary:
@@ -332,7 +332,7 @@ let out: Person = try fory.deserialize(payload)`,
     label: "Dart",
     installLanguage: "yaml",
     install: `dependencies:
-  fory: ^1.7.4
+  fory: ^1.7.5
 
 dev_dependencies:
   build_runner: ^2.4.13`,
@@ -368,7 +368,7 @@ final out = fory.deserialize<Person>(payload);`,
     id: "scala",
     label: "Scala",
     installLanguage: "sbt",
-    install: `libraryDependencies += "org.apache.fory" %% "fory-scala" % "1.7.4"`,
+    install: `libraryDependencies += "org.apache.fory" %% "fory-scala" % "1.7.5"`,
     codeLanguage: "scala",
     guide: "/docs/object-serialization/scala/",
     summary:
@@ -389,8 +389,8 @@ val out = fory.deserialize(payload).asInstanceOf[Person]`,
     id: "kotlin",
     label: "Kotlin",
     installLanguage: "kotlin",
-    install: `implementation("org.apache.fory:fory-kotlin:1.7.4")
-ksp("org.apache.fory:fory-kotlin-ksp:1.7.4")`,
+    install: `implementation("org.apache.fory:fory-kotlin:1.7.5")
+ksp("org.apache.fory:fory-kotlin-ksp:1.7.5")`,
     codeLanguage: "kotlin",
     guide: "/docs/object-serialization/kotlin/",
     summary:

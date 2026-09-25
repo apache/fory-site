@@ -60,11 +60,14 @@ const fory = new Fory({
 | `maxUnbackedContainerItems`       | `8192`    | 单次根值反序列化允许的无输入支撑集合元素和 map 条目数           |
 | `maxTypeFields`                   | `512`     | 单个已接收远程 struct 元数据主体允许的最大字段数                |
 | `maxTypeMetaBytes`                | `4096`    | 单个已接收 TypeMeta 主体允许的最大编码主体字节数                |
-| `maxSchemaVersionsPerType`        | `10`      | 单个逻辑类型允许的最大远程元数据版本数                          |
-| `maxAverageSchemaVersionsPerType` | `3`       | 所有已接受远程类型允许的平均远程元数据版本数                    |
+| `maxSchemaVersionsPerType`        | `10`      | 单个逻辑类型可缓存的最大缓存远程元数据版本数                          |
+| `maxAverageSchemaVersionsPerType` | `3`       | 所有已缓存远程类型可缓存的平均缓存远程元数据版本数                    |
 | `useSliceString`                  | `false`   | 可选的 Node.js 字符串读取优化。除非已经基准测试，否则保留默认值 |
 | `hps`                             | 未设置    | 来自 `@apache-fory/hps` 的可选快速字符串辅助模块（Node.js 20+） |
 | `hooks.afterCodeGenerated`        | 未设置    | 检查生成的序列化器代码的回调，适用于调试                        |
+
+Schema 版本限制仅约束缓存的元数据。达到 Schema 版本或逻辑类型缓存上限后，有效数据仍会在完整
+元数据验证后反序列化，但不会缓存新 Schema。重复读取未缓存的 Schema 可能增加开销；既有缓存仍可复用。
 
 ## 引用跟踪
 

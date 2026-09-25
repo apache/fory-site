@@ -136,7 +136,7 @@ auto fory = Fory::builder()
 
 ### max_schema_versions_per_type(uint32_t)
 
-设置一个逻辑类型可接受的远端元数据版本上限。
+设置一个逻辑类型可缓存的远端元数据版本上限。
 
 ```cpp
 auto fory = Fory::builder()
@@ -145,6 +145,9 @@ auto fory = Fory::builder()
 ```
 
 **Default:** `10`
+
+Schema 版本限制仅约束缓存的元数据。达到 Schema 版本或逻辑类型缓存上限后，有效数据仍会在完整
+元数据验证后反序列化，但不会缓存新 Schema。重复读取未缓存的 Schema 可能增加开销；既有缓存仍可复用。
 
 ### max_type_fields(uint32_t)
 
@@ -172,7 +175,7 @@ auto fory = Fory::builder()
 
 ### max_average_schema_versions_per_type(uint32_t)
 
-设置已接受远端类型的平均可接受远端元数据版本数。有效的全局下限为 `8192` 个 Schema。
+设置已缓存远端类型的平均可接受远端元数据版本数。有效的全局下限为 `8192` 个 Schema。
 
 ```cpp
 auto fory = Fory::builder()
@@ -227,8 +230,8 @@ auto fory = Fory::builder().build_thread_safe();  // Returns ThreadSafeFory
 | `max_dyn_depth(uint32_t)`                        | 动态类型的最大嵌套深度                  | `5`       |
 | `max_type_fields(uint32_t)`                      | 一个已接收结构体元数据主体的最大字段数  | `512`     |
 | `max_type_meta_bytes(uint32_t)`                  | 一个已接收元数据主体的最大编码字节数    | `4096`    |
-| `max_schema_versions_per_type(uint32_t)`         | 一个逻辑类型的最大远端元数据版本数      | `10`      |
-| `max_average_schema_versions_per_type(uint32_t)` | 各类型的平均远端元数据版本数            | `3`       |
+| `max_schema_versions_per_type(uint32_t)`         | 一个逻辑类型的最大缓存远端元数据版本数  | `10`      |
+| `max_average_schema_versions_per_type(uint32_t)` | 各类型的平均缓存远端元数据版本数        | `3`       |
 | `check_struct_version(bool)`                     | 启用结构体版本检查                      | `false`   |
 
 ## 安全

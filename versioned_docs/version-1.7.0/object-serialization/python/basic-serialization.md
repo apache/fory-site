@@ -65,6 +65,50 @@ result = fory.deserialize(data)
 print(result)  # Person(name='Bob', age=25, ...)
 ```
 
+## Collection Interfaces
+
+Xlang mode accepts implementations of `collections.abc.Mapping`, `Sequence`,
+and `Set`, including their mutable variants and virtual subclasses. Examples
+include `collections.UserDict`, `collections.UserList`, `range`, and
+`frozenset`. They use the standard map, list, and set wire types and deserialize
+to built-in `dict`, `list`, and `set` values. Their concrete Python class and
+extra attributes are not preserved, and they do not need type registration.
+
+```python
+from collections import UserDict, UserList
+from dataclasses import dataclass
+from typing import Mapping, Sequence
+import pyfory
+
+@dataclass
+class Scores:
+    values: Mapping[str, Sequence[int]]
+
+fory = pyfory.Fory(xlang=True)
+fory.register(Scores, name="example.Scores")
+
+value = Scores(UserDict(alice=UserList([90, 95])))
+restored = fory.loads(fory.dumps(value))
+assert restored.values == {"alice": [90, 95]}
+assert type(restored.values) is dict
+assert type(restored.values["alice"]) is list
+```
+
+The corresponding `typing.Mapping`, `MutableMapping`, `Sequence`,
+`MutableSequence`, `AbstractSet`, and `MutableSet` annotations are supported,
+including nested types and optional elements. An annotation without generic
+arguments uses dynamic element types. Strings and binary values retain their
+existing encodings; arbitrary iterators and generators are not collection
+values.
+
+Use ordinary `list`, `set`, and `dict` values and annotations when their behavior
+is sufficient; the Cython runtime has specialized implementations for these
+built-ins. For Python-only applications that require concrete container
+subclasses and their attributes, see [Container Subclasses](native.md#container-subclasses).
+An explicit serializer takes precedence over the default collection mapping.
+To assign an xlang collection a custom type name or ID, supply a custom serializer
+and register the matching extension on every peer.
+
 ## Reference Tracking & Circular References
 
 Handle repeated references safely when the payload uses xlang-compatible types:

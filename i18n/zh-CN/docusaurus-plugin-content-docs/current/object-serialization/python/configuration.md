@@ -68,14 +68,17 @@ class ThreadSafeFory:
 | `max_depth`                            | `int`                           | `50`        | 安全用途的最大反序列化深度，用于防止栈溢出攻击。                                                                     |
 | `max_type_fields`                      | `int`                           | `512`       | 单个已接收远程结构体元数据正文可接受的最大字段数。                                                                   |
 | `max_type_meta_bytes`                  | `int`                           | `4096`      | 单个已接收 TypeDef 正文可接受的最大编码字节数，不含 8 字节头部和扩展长度 varint。                                    |
-| `max_schema_versions_per_type`         | `int`                           | `10`        | 每个逻辑类型可接受的远程元数据版本上限。                                                                             |
-| `max_average_schema_versions_per_type` | `int`                           | `3`         | 所有已接受远程类型的平均远程元数据版本数。有效的全局下限为 `8192` 个 Schema。                                        |
+| `max_schema_versions_per_type`         | `int`                           | `10`        | 每个逻辑类型可缓存的远程元数据版本上限。                                                                             |
+| `max_average_schema_versions_per_type` | `int`                           | `3`         | 所有已缓存远程类型的平均缓存远程元数据版本数。有效的全局下限为 `8192` 个 Schema。                                        |
 | `max_graph_memory_bytes`               | `int`                           | `134217728` | 单次根反序列化的近似对象图内存门限。显式非正值会被拒绝。                                                             |
 | `max_unbacked_container_items`         | `int`                           | `8192`      | 重复读取没有相应输入进度支撑的集合元素和映射条目的最大数量。零表示严格限制。                                         |
 | `policy`                               | `DeserializationPolicy \| None` | `None`      | 用于安全检查的反序列化策略。设置 `strict=False` 时强烈建议配置。                                                     |
 | `field_nullable`                       | `bool`                          | `False`     | 默认将 dataclass 字段视为可空。                                                                                      |
 | `meta_compressor`                      | `Any`                           | `None`      | 用于兼容模式元数据编码的可选元数据压缩器。                                                                           |
 | `fory_factory`                         | `Callable \| None`              | `None`      | `ThreadSafeFory` 工厂钩子。设置后，`ThreadSafeFory` 通过该回调创建实例；否则将 `**kwargs` 转发给 `Fory` 构造过程。   |
+
+Schema 版本限制仅约束缓存的元数据。达到 Schema 版本或逻辑类型缓存上限后，有效数据仍会在完整
+元数据验证后反序列化，但不会缓存新 Schema。重复读取未缓存的 Schema 可能增加开销；既有缓存仍可复用。
 
 ## 主要方法
 

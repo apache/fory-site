@@ -75,12 +75,13 @@ fory = pyfory.Fory(
 
 - `max_type_fields` 限制单个已接收结构体元数据正文可接受的字段数。
 - `max_type_meta_bytes` 限制单个已接收 TypeDef 正文可接受的编码正文字节数。
-- `max_schema_versions_per_type` 限制每个逻辑类型可接受的远程元数据版本。
-- `max_average_schema_versions_per_type` 限制所有已接受远程类型的平均值。
+- `max_schema_versions_per_type` 限制每个逻辑类型可缓存的远程元数据版本。
+- `max_average_schema_versions_per_type` 限制所有已缓存远程类型的平均值。
 - `max_graph_memory_bytes` 为单次根反序列化期间实例化的对象图内存设置近似门限。估算主要覆盖列表、元组、集合、字典、对象数组、结构体和 Python 对象。它会跳过字符串、二进制数据、原始标量和稠密原始类型数组等叶子值，因此实际进程内存可能高于该值。叶子值仍受字节可用性检查保护：如果未读取的输入没有足够字节，Fory 不会读取或创建该叶子值。所有根输入形式的默认值固定为 `128 MiB`。可信载荷确实需要更大或更小门限时，请设置正数字节值。
 - `max_unbacked_container_items` 限制单次根反序列化中重复读取正文没有消耗相应输入的集合元素和映射条目。默认值为 `8192`；零表示严格限制。
 
 这些限制不会改变 `strict`、`policy`、动态加载、未知类处理或 Schema 演进语义。
+达到缓存上限后，更多有效 Schema 仍会在不缓存的情况下解码。
 
 ### DeserializationPolicy
 

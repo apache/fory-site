@@ -222,24 +222,50 @@ ForyJson json = ForyJson.builder().defaultPropertyInclusion(Include.NON_EMPTY).b
 ```
 
 `defaultPropertyInclusion` and `writeNullFields` update the same setting; the last call wins.
-The builder accepts `ALWAYS`, `NON_NULL`, and `NON_EMPTY`; `DEFAULT` is only valid on a property.
-An explicit `JsonProperty.include` overrides the builder default. See
+The builder accepts `ALWAYS`, `NON_NULL`, and `NON_EMPTY`. It rejects `DEFAULT` and `NON_DEFAULT`.
+Default omission requires explicit `@JsonProperty(include = NON_DEFAULT)` or class-level
+`@JsonInclude(NON_DEFAULT)` authorization; see [Default omission](annotations.md#jsoninclude-and-default-omission)
+for supported sources, construction/evaluation effects, and errors. An explicit `JsonProperty.include`
+overrides `JsonInclude` on the class, which overrides the builder default. See
 [Property inclusion](annotations.md#jsonproperty) for the empty-value definitions and boundaries.
 
-| Builder method                         | Default                                   | User-visible effect                                        |
-| -------------------------------------- | ----------------------------------------- | ---------------------------------------------------------- |
-| `defaultPropertyInclusion(Include)`    | `NON_NULL`                                | Default inclusion of object properties                     |
-| `writeNullFields(boolean)`             | `false`                                   | Select `ALWAYS` when true or `NON_NULL` when false         |
-| `writeLongAsString(boolean)`           | `false`                                   | Write built-in 64-bit integer values as decimal strings    |
-| `withCodegen(boolean)`                 | `true`                                    | Enable generated object codecs                             |
-| `withAsyncCompilation(boolean)`        | `true`                                    | Compile generated codecs asynchronously                    |
-| `withFieldMode(boolean)`               | `false`                                   | When true, discover fields without getters/setters         |
-| `withPropertyNamingStrategy(strategy)` | `LOWER_CAMEL_CASE`                        | Name properties without an explicit `JsonProperty` name    |
-| `withMaxCachedFieldNames(int)`         | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | Field-name cache entries per reader; zero disables caching |
-| `withConcurrencyLevel(int)`            | `max(1, 2 * processors)`                  | Maximum concurrent root operations                         |
-| `withBufferSizeLimitBytes(int)`        | 2 MiB                                     | Maximum reusable capacity retained by each pooled writer   |
-| `registerCodec(type, codec)`           | None                                      | Replace an eligible exact class's complete JSON codec      |
-| `registerMixin(mixinType)`             | None                                      | Apply one annotation Mixin to its exact declared target    |
+| Builder method                          | Default                                   | User-visible effect                                             |
+| --------------------------------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| `defaultPropertyInclusion(Include)`     | `NON_NULL`                                | Default inclusion of object properties                          |
+| `writeNullFields(boolean)`              | `false`                                   | Select `ALWAYS` when true or `NON_NULL` when false              |
+| `writeLongAsString(boolean)`            | `false`                                   | Write built-in 64-bit integer values as decimal strings         |
+| `escapeNonAscii(boolean)`               | `false`                                   | Escape non-ASCII characters in generated JSON strings and names |
+| `byteArrayFormat(JsonByteArray.Format)` | `BASE64`                                  | Default byte-array representation for reading and writing       |
+| `withCodegen(boolean)`                  | `true`                                    | Enable generated object codecs                                  |
+| `withAsyncCompilation(boolean)`         | `true`                                    | Compile generated codecs asynchronously                         |
+| `withFieldMode(boolean)`                | `false`                                   | When true, discover fields without getters/setters              |
+| `withPropertyNamingStrategy(strategy)`  | `LOWER_CAMEL_CASE`                        | Name properties without an explicit `JsonProperty` name         |
+| `withMaxCachedFieldNames(int)`          | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | Field-name cache entries per reader; zero disables caching      |
+| `withConcurrencyLevel(int)`             | `max(1, 2 * processors)`                  | Maximum concurrent root operations                              |
+| `withBufferSizeLimitBytes(int)`         | 2 MiB                                     | Maximum retained output/string-decoding buffer capacity         |
+| `registerCodec(type, codec)`            | None                                      | Replace an eligible exact class's complete JSON codec           |
+| `registerMixin(mixinType)`              | None                                      | Apply one annotation Mixin to its exact declared target         |
+
+Use `byteArrayFormat` to choose one representation for ordinary `byte[]` roots, unannotated
+properties, and container values, including nested arrays, collections, maps, and optionals:
+
+```java
+import org.apache.fory.json.ForyJson;
+import org.apache.fory.json.annotation.JsonByteArray;
+
+ForyJson hexJson = ForyJson.builder().byteArrayFormat(JsonByteArray.Format.BASE16).build();
+String text = hexJson.toJson(new byte[] {1, -2, 3}); // "\"01fe03\""
+byte[] bytes = hexJson.fromJson(text, byte[].class);
+```
+
+`BASE64` is the default and writes padded standard Base64 strings. `BASE16` writes lowercase
+hexadecimal strings without prefixes or separators; reading accepts either case and JSON string
+escapes. Odd-length strings and non-hexadecimal characters are rejected. `ARRAY` uses signed
+numbers in `[-128, 127]`. Empty arrays become `""` for either string format or `[]` for `ARRAY`.
+All three formats accept JSON `null`. The reader uses the configured representation and does not
+guess another format. A [property's `JsonByteArray` annotation](annotations.md#jsonbytearray),
+including one supplied by a Mixin, overrides the global default. Custom occurrence codecs retain
+their complete representation; Kotlin unsigned semantic arrays remain numeric arrays.
 
 Enable `writeLongAsString(true)` when 64-bit integer values must pass through JavaScript without
 `Number` precision loss. The setting writes built-in `long`/`Long`, `AtomicLong`,
@@ -252,7 +278,8 @@ their own output shape.
 Concurrency-level and buffer-retention limits must be positive. The cached-field-name limit
 applies independently to each reader; zero disables this cache. It bounds only cached field names,
 not names accepted from the input. The buffer-retention setting does not limit JSON input or output
-size, only reusable writer storage retained after an operation.
+size. It limits the capacity of each reusable output or string-decoding buffer after an operation,
+not the total memory used by the instance.
 
 For class loading, type policy, nesting depth, graph-memory limits, and external input controls,
 see [Fory JSON Security](security.md).
@@ -264,3 +291,50 @@ image, runtime compilation is unavailable. Fory JSON generates codecs for reacha
 default configuration and each reachable `ForyJsonProvider` configuration. A model without a
 matching generated codec uses an interpreted codec. Every other builder option keeps the behavior
 described above.
+
+## Non-ASCII escaping
+
+Enable escaping when the receiver requires non-ASCII characters to be represented with JSON
+Unicode escapes:
+
+```java
+import org.apache.fory.json.ForyJson;
+
+ForyJson json = ForyJson.builder().escapeNonAscii(true).build();
+String text = json.toJson("汉é😀"); // "\u6c49\u00e9\ud83d\ude00"
+byte[] utf8 = json.toJsonBytes("汉é😀");
+```
+
+The option applies to string and character values, property names, map keys, enum names, and
+subtype names through all String, UTF-8, stream, and pretty write APIs. Characters above U+007F
+use lowercase hexadecimal escapes; supplementary characters use two UTF-16 surrogate escapes.
+JSON-required escaping is unchanged, and invalid surrogate sequences in strings still fail.
+ASCII characters such as `<`, `>`, and `&` are not additionally escaped.
+
+The setting defaults to `false` and is fixed for each built instance. Reuse two instances when
+alternating output policies. Pretty output remains a per-call choice, and reading is unaffected.
+Disabling the option preserves the existing output representation, including any escapes it
+already uses.
+
+Caller-supplied raw JSON, including `@JsonRawValue`, is preserved verbatim. A document containing
+raw JSON can therefore still contain non-ASCII characters. Custom codecs should use structured
+string-writing methods to honor the option; raw writes remain the codec author's responsibility.
+
+## Pretty printing
+
+Choose readable output for an individual serialization call:
+
+```java
+ForyJson json = ForyJson.builder().build();
+String text = json.toPrettyJson(value);
+byte[] utf8 = json.toPrettyJsonBytes(value);
+String compact = json.toJson(value);
+```
+
+The format matches Jackson's pretty printer configured with two-space indenters for both objects
+and arrays. Each container adds one indentation level, and colons have a space on each side.
+Empty objects and arrays are `{ }` and `[ ]`. Line breaks use `\n`, with no trailing line break.
+Both APIs preserve logical string values and honor `escapeNonAscii`. Raw JSON values remain verbatim, including their supplied
+whitespace. Reading accepts both compact and pretty JSON. Pretty output is selected per call;
+the same instance can alternate formats. Existing `toJson`, `toJsonBytes`, and `writeJsonTo`
+calls continue to produce compact output.

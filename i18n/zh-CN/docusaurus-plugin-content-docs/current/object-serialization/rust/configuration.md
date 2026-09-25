@@ -84,7 +84,7 @@ let fory = Fory::builder().max_dyn_depth(10).build(); // Allow up to 10 levels
 
 ### 远端 Schema 元数据限制
 
-兼容模式可以接收用于 Schema 演进的远端元数据。以下限制约束元数据大小和可接受的 Schema 版本：
+兼容模式可以接收用于 Schema 演进的远端元数据。以下限制约束元数据大小和可缓存的 Schema 版本：
 
 ```rust
 let fory = Fory::builder()
@@ -97,8 +97,11 @@ let fory = Fory::builder()
 
 - `max_type_fields` 默认为 `512`，限制一个已接收结构体元数据主体中的字段数。
 - `max_type_meta_bytes` 默认为 `4096`，限制一个已接收 TypeDef 或 TypeMeta 主体的编码字节数，不包括 8 字节头部和任何扩展大小变长整数。
-- `max_schema_versions_per_type` 默认为 `10`，限制一个逻辑类型可接受的远端元数据版本数。
-- `max_average_schema_versions_per_type` 默认为 `3`，限制已接受远端类型的平均版本数。有效全局下限为 `8192` 个 Schema。
+- `max_schema_versions_per_type` 默认为 `10`，限制一个逻辑类型可缓存的远端元数据版本数。
+- `max_average_schema_versions_per_type` 默认为 `3`，限制已缓存远端类型的平均版本数。有效全局下限为 `8192` 个 Schema。
+
+Schema 版本限制仅约束缓存的元数据。达到 Schema 版本或逻辑类型缓存上限后，有效数据仍会在完整
+元数据验证后反序列化，但不会缓存新 Schema。重复读取未缓存的 Schema 可能增加开销；既有缓存仍可复用。
 
 ### 对象图内存预算
 
@@ -170,8 +173,8 @@ let fory = Fory::builder()
 | `max_unbacked_container_items(usize)`         | 每次根值读取允许的无输入支撑 collection/map 工作量 | `8192`    |
 | `max_type_fields(usize)`                      | 单个已接收结构体元数据主体的最大字段数             | `512`     |
 | `max_type_meta_bytes(usize)`                  | 单个已接收元数据主体的最大编码字节数               | `4096`    |
-| `max_schema_versions_per_type(usize)`         | 单个逻辑类型的最大远程元数据版本数                 | `10`      |
-| `max_average_schema_versions_per_type(usize)` | 所有类型的平均远程元数据版本数                     | `3`       |
+| `max_schema_versions_per_type(usize)`         | 单个逻辑类型的最大缓存远程元数据版本数                 | `10`      |
+| `max_average_schema_versions_per_type(usize)` | 所有类型的平均缓存远程元数据版本数                     | `3`       |
 
 ## 兼容模式
 

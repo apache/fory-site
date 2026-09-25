@@ -101,7 +101,7 @@ is also charged once; a cached empty Optional singleton is not a new graph owner
 Dedicated leaf codecs are excluded from graph accounting: null, strings,
 characters, booleans, numeric values including arbitrary-precision numbers,
 enums, temporal and other scalar values, and binary values. A `byte[]` handled
-by a binary or Base64 codec remains a binary leaf; the same Java carrier read
+by a Base64 or Base16 codec remains a binary leaf; the same Java carrier read
 from a JSON numeric array is a primitive-array owner. Byte-availability and
 grammar checks still apply independently of graph accounting.
 
