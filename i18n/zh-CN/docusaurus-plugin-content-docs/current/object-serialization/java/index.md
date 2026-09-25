@@ -235,7 +235,7 @@ Fory JSON 具有独立的 [Android](../../json/android.md) 和 [GraalVM 原生�
 
 | 分组          | 页面                                                                                                                                                                                                                  |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 序列化模式    | [基础序列化](basic-serialization.md)、[原生序列化](native.md)                                                                                                                                                                    |
+| 序列化模式    | [基础序列化](basic-serialization.md)、[原生序列化](native.md)                                                                                                                                                         |
 | 通用          | [配置](configuration.md)、[类型注册](type-registration.md)、[Schema 演进](schema-evolution.md)、[Schema 元数据](schema-metadata.md)、[自定义序列化器](custom-serializers.md)                                          |
 | Java 专用功能 | [高级功能](advanced-features.md)、[压缩](compression.md)、[对象复制](object-copy.md)、[JDK 自定义序列化](jdk-serialization.md)、[静态生成的序列化器](static-generated-serializers.md)、[虚拟线程](virtual-threads.md) |
 | 平台与运维    | [Android](android.md)、[GraalVM 原生镜像](graalvm.md)、[故障排除](troubleshooting.md)                                                                                                                                 |

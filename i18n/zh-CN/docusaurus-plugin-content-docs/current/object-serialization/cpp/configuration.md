@@ -230,8 +230,8 @@ auto fory = Fory::builder().build_thread_safe();  // Returns ThreadSafeFory
 | `max_dyn_depth(uint32_t)`                        | 动态类型的最大嵌套深度                  | `5`       |
 | `max_type_fields(uint32_t)`                      | 一个已接收结构体元数据主体的最大字段数  | `512`     |
 | `max_type_meta_bytes(uint32_t)`                  | 一个已接收元数据主体的最大编码字节数    | `4096`    |
-| `max_schema_versions_per_type(uint32_t)`         | 一个逻辑类型的最大缓存远端元数据版本数      | `10`      |
-| `max_average_schema_versions_per_type(uint32_t)` | 各类型的平均缓存远端元数据版本数            | `3`       |
+| `max_schema_versions_per_type(uint32_t)`         | 一个逻辑类型的最大缓存远端元数据版本数  | `10`      |
+| `max_average_schema_versions_per_type(uint32_t)` | 各类型的平均缓存远端元数据版本数        | `3`       |
 | `check_struct_version(bool)`                     | 启用结构体版本检查                      | `false`   |
 
 ## 安全

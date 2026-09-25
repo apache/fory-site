@@ -132,7 +132,7 @@ dart run build_runner build
 | 主题                                    | 说明                                           |
 | --------------------------------------- | ---------------------------------------------- |
 | [配置](configuration.md)                | Fory 选项、兼容模式和安全限制                  |
-| [基本序列化](basic-serialization.md)               | `serialize`、`deserialize`、生成注册和根对象图 |
+| [基本序列化](basic-serialization.md)    | `serialize`、`deserialize`、生成注册和根对象图 |
 | [代码生成](code-generation.md)          | `@ForyStruct`、build runner 和生成模块         |
 | [Struct 继承](inheritance.md)           | 父类、mixin、私有字段和构造函数                |
 | [外部类型序列化](external-types.md)     | 为其他包拥有的类生成序列化器                   |

@@ -44,8 +44,8 @@ ThreadSafeFory threadSafe = Fory.Builder().BuildThreadSafe();
 | `MaxUnbackedContainerItems`       | `8192`      | 每次根值读取允许的无输入支撑 collection/map 工作量 |
 | `MaxTypeFields`                   | `512`       | 单个已接收结构体元数据主体的最大字段数             |
 | `MaxTypeMetaBytes`                | `4096`      | 单个已接收元数据主体的最大编码字节数               |
-| `MaxSchemaVersionsPerType`        | `10`        | 单个逻辑类型的最大缓存远程元数据版本数                 |
-| `MaxAverageSchemaVersionsPerType` | `3`         | 所有类型的平均缓存远程元数据版本数                     |
+| `MaxSchemaVersionsPerType`        | `10`        | 单个逻辑类型的最大缓存远程元数据版本数             |
+| `MaxAverageSchemaVersionsPerType` | `3`         | 所有类型的平均缓存远程元数据版本数                 |
 
 ## 构建器选项
 

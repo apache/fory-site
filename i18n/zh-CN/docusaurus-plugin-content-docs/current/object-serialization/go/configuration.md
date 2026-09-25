@@ -43,8 +43,8 @@ f := fory.New(fory.WithXlang(true))
 | MaxUnbackedContainerItems       | 8192      | 每次根读取中无输入支撑的集合/映射工作量 |
 | MaxTypeFields                   | 512       | 一个已接收结构体元数据主体的最大字段数  |
 | MaxTypeMetaBytes                | 4096      | 一个已接收元数据主体的最大编码字节数    |
-| MaxSchemaVersionsPerType        | 10        | 一个逻辑类型的最大缓存远端元数据版本数      |
-| MaxAverageSchemaVersionsPerType | 3         | 各类型的平均缓存远端元数据版本数            |
+| MaxSchemaVersionsPerType        | 10        | 一个逻辑类型的最大缓存远端元数据版本数  |
+| MaxAverageSchemaVersionsPerType | 3         | 各类型的平均缓存远端元数据版本数        |
 
 ### 使用选项
 

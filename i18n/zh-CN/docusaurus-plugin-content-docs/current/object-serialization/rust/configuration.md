@@ -173,8 +173,8 @@ let fory = Fory::builder()
 | `max_unbacked_container_items(usize)`         | 每次根值读取允许的无输入支撑 collection/map 工作量 | `8192`    |
 | `max_type_fields(usize)`                      | 单个已接收结构体元数据主体的最大字段数             | `512`     |
 | `max_type_meta_bytes(usize)`                  | 单个已接收元数据主体的最大编码字节数               | `4096`    |
-| `max_schema_versions_per_type(usize)`         | 单个逻辑类型的最大缓存远程元数据版本数                 | `10`      |
-| `max_average_schema_versions_per_type(usize)` | 所有类型的平均缓存远程元数据版本数                     | `3`       |
+| `max_schema_versions_per_type(usize)`         | 单个逻辑类型的最大缓存远程元数据版本数             | `10`      |
+| `max_average_schema_versions_per_type(usize)` | 所有类型的平均缓存远程元数据版本数                 | `3`       |
 
 ## 兼容模式
 
