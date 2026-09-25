@@ -116,6 +116,9 @@ license: |
   目标类型仍采用上表所示的 C# 映射；声明的归属方不会造成编码格式上的差异。
 - Python 的 `pyfory.Float16` 和 `pyfory.BFloat16` 是预留的注解标记；标量值反序列化为 Python 原生 `float`。
 - Python 的 `BoolArray`、`Int8Array`、`Int16Array`、`Int32Array`、`Int64Array`、`UInt8Array`、`UInt16Array`、`UInt32Array`、`UInt64Array`、`Float16Array`、`BFloat16Array`、`Float32Array` 和 `Float64Array` 是公开的稠密数组包装器，具有类似列表的序列行为。
+- Python 的 `collections.abc.Sequence`、`Set` 和 `Mapping` 实现及声明接口（包括可变变体）
+  映射为 `list`、`set` 和 `map`。Xlang 读取器创建内置 Python `list`、`set` 和 `dict`；
+  Python 子类身份及实例属性不属于这些编码类型。字符串与二进制类型保留其标量/叶值映射。
 - JavaScript 的 `BoolArray`、回退实现 `Float16Array` 和 `BFloat16Array` 是基于 `Uint8Array` 或 `Uint16Array` 的公开稠密数组包装器。`float16` 和 `bfloat16` 标量值使用 `number`。原生支持 `Float16Array` 的 JavaScript 环境可以为 `array<float16>` 返回该原生载体。
 - Java 的 `java.util.Date` 和 `java.sql.Date` 也映射到 `timestamp`，使用秒数和纳秒数。
   声明类型的字段保留其 Java 载体类型；动态时间戳使用 `Instant`。

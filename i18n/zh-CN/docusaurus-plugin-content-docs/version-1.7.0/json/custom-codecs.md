@@ -24,6 +24,10 @@ Fory 的 String 或 UTF-8 写入器，并直接从 Fory 的 Latin-1、UTF-16 或
 它不是 JSON 抽象语法树（AST）或 `JsonNode` 编解码器。它负责处理包含 JSON null 在内的完整值，
 但绝不处理 Map 键；JSON 对象成员名称仍由 `MapKeyCodec` 负责。
 
+使用 `writeString`、`writeChar`、`writeFieldName` 或 writer 的转义追加方法，
+以遵循实例的 `escapeNonAscii` 设置。直接写入原始内容会保留传入内容；
+输出原始 token 的自定义编解码器应自行负责转义。见[非 ASCII 转义](object-mapping.md#non-ascii-escaping)。
+
 如果应用编解码器在每种表示形式下都采用相同语义，请继承 `AbstractJsonValueCodec<T>`，
 只需实现一次 JSON 结构：
 
@@ -102,8 +106,8 @@ ForyJson json =
 仅当工厂在动态写入期间为值的实际类选择编解码器时，`runtimeType` 才为 `true`；声明的根类型和复合子类型收到的是 `false`。复合编解码器如果在构造后仍需此区分，必须保留该标志供后续 `resolveTypes` 调用使用，不能从 resolver 状态推断。
 
 外层属性仍控制其名称、忽略方向和包含策略。如果属性被 `NON_NULL` 或 `NON_EMPTY` 省略，
-就不会调用值编解码器。`NON_EMPTY` 检查属性的逻辑值，因此即使使用自定义 List 编解码器，
-空 List 仍被视为空。普通应用对象不会因为其编解码器输出的 JSON 内容而被视为空。
+就不会调用编解码器的写入操作。`NON_EMPTY` 直接检查 Java 空值类型，
+其他类型使用编解码器的 `isEmpty` 方法；见[自定义空值](#custom-empty-values)。
 如果属性会被输出，或者该值是数组元素、集合元素、Map 值、Optional 值或原子引用值，
 编解码器就会接收并负责处理 null。注册的实例会在并发操作之间共享，因此必须是线程安全的。
 
@@ -115,6 +119,29 @@ Fory JSON 不会使用目标类型的 `JsonValidator` 方法来包装完整的�
 
 为 `JsonSubTypes` 基类注册自定义编解码器，会取代该基类的子类型注解。对于列出的子类型，
 两种包装器包含方式支持注册自定义编解码器，但内联属性包含方式不支持。
+
+## 自定义空值 {#custom-empty-values}
+
+对于内置 Java 空值类型之外的非 null 值，`NON_EMPTY` 调用选定编解码器的
+`isEmpty(JsonWriter writer, T value)`。默认返回 `false`。如果类型有空状态，可重写它：
+
+```java
+// Inside MoneyCodec: treat a missing amount as an empty Money value.
+@Override
+public boolean isEmpty(JsonWriter writer, Money value) {
+  return value.amount == null;
+}
+```
+
+通过属性上的 `@JsonProperty(include = JsonProperty.Include.NON_EMPTY)`、
+类上的 `@JsonInclude(JsonProperty.Include.NON_EMPTY)` 或
+`defaultPropertyInclusion(JsonProperty.Include.NON_EMPTY)` 启用省略。
+该方法不能写入输出；writer 参数为动态编解码器提供当前操作的上下文。
+
+字符串和其他 Java `CharSequence`、数组、Java 集合/Map 及 JDK Optional 使用直接空值检查，
+不调用自定义 `isEmpty`。检查针对原始值，与编解码器的表示方式无关。
+对于其他类型（包括 Scala Option 和集合），替换内置编解码器也会替换其空值行为。
+根值、容器元素及非空包装器的内容不会被递归过滤。
 
 ## 使用 `JsonCodec` 选择编解码器
 

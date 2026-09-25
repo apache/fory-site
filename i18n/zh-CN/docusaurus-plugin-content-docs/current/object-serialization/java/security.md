@@ -52,7 +52,8 @@ Fory fory = Fory.builder()
 - `withMaxUnbackedContainerItems(...)` 限制由数量驱动、但重复读取正文没有消耗相应输入的集合和映射工作。默认值为 `8192`；零表示严格限制。
 - `withMaxTypeFields(...)` 和 `withMaxTypeMetaBytes(...)` 限制单个已接收远程元数据正文的字段数与编码正文大小。
 - `withMaxSchemaVersionsPerType(...)` 和
-  `withMaxAverageSchemaVersionsPerType(...)` 限制可接受的远程元数据版本，而不改变注册、动态加载或 Schema 演进语义。
+  `withMaxAverageSchemaVersionsPerType(...)` 限制可缓存的远程元数据版本，而不改变注册、动态加载或 Schema 演进语义。
+  达到缓存上限后，更多有效 Schema 仍会在不缓存的情况下解码。
 - `withDeserializeUnknownClass(false)` 避免根据元数据实例化未知类。
 - `checkJdkClassSerializable(true)` 保留对 `java.*` 类的 JDK 可序列化性检查。
 - 类注册警告可用于安全审计；需要暴露意外类型时，请使用 `suppressClassRegistrationWarnings(false)`。

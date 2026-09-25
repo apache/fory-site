@@ -44,8 +44,8 @@ Security-related configuration:
 - Set `maxGraphMemoryBytes` as an approximate gate for collection, map, array, struct, class, and
   object-heavy payloads. It is not an exact heap cap; leaf values are gated by remaining input
   bytes.
-- Keep the remote schema metadata limits at their defaults unless the data is not malicious and a
-  trusted peer sends larger metadata or many schema versions.
+- Keep remote metadata size limits at their defaults unless a trusted peer needs larger metadata.
+  Schema-version limits bound caching; additional valid schemas are decoded without caching.
 
 ## Verification
 

@@ -35,7 +35,7 @@ sbt --version
 
 ```sbt
 ThisBuild / scalaVersion := "3.3.1"
-libraryDependencies += "org.apache.fory" %% "fory-scala" % "1.7.4"
+libraryDependencies += "org.apache.fory" %% "fory-scala" % "1.7.5"
 ```
 
 创建 `src/main/scala/ScalaExample.scala`：

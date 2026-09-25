@@ -91,7 +91,7 @@ final fory = Fory(maxDepth: 128);
 ### Remote schema metadata limits
 
 Compatible mode can receive remote metadata for schema evolution. These limits
-bound metadata size and accepted schema versions:
+bound metadata size and cached schema versions:
 
 ```dart
 final fory = Fory(
@@ -105,9 +105,14 @@ final fory = Fory(
 - `maxTypeFields` limits fields in one received struct metadata body.
 - `maxTypeMetaBytes` limits encoded body bytes in one received TypeMeta body, excluding the 8-byte
   header and any extended-size varint.
-- `maxSchemaVersionsPerType` limits accepted remote metadata versions for one logical type.
-- `maxAverageSchemaVersionsPerType` limits the average across accepted remote types. The
+- `maxSchemaVersionsPerType` limits cached remote metadata versions for one logical type.
+- `maxAverageSchemaVersionsPerType` limits the average across cached remote types. The
   effective global floor is `8192` schemas.
+
+Schema-version limits bound cached metadata only. When a schema-version or
+logical-type cache limit is reached, valid data still deserializes after full
+metadata validation, without caching the new schema. Repeated reads of an
+uncached schema may cost more; existing cached schemas remain reusable.
 
 ### `maxGraphMemoryBytes`
 

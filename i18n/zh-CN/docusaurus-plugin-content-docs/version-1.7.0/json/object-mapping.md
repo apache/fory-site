@@ -130,17 +130,17 @@ Schema 仍应声明预期的 Java 类型。
 
 这些内置值使用以下常规 JSON 形式：
 
-| Java 类型 | JSON 表示形式 |
+| Java 类型                                                                 | JSON 表示形式                                                                                      |
 | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| 布尔和数值标量 | 写入原生 JSON 布尔或数字；声明类型的目标也可读取带引号的相同 token 文本 |
-| Enum | 常量名称字符串 |
-| `Date`、`Calendar`、`java.sql.Date`、`Time`、`Timestamp` | 表示 epoch 毫秒数的数值 |
-| `TimeZone` | 时区 ID 字符串 |
-| Java 时间类型以及受支持的 chronology 日期类型 | 对应的标准文本形式字符串 |
+| 布尔和数值标量                                                            | 写入原生 JSON 布尔或数字；声明类型的目标也可读取带引号的相同 token 文本                            |
+| Enum                                                                      | 常量名称字符串                                                                                     |
+| `Date`、`Calendar`、`java.sql.Date`、`Time`、`Timestamp`                  | 表示 epoch 毫秒数的数值                                                                            |
+| `TimeZone`                                                                | 时区 ID 字符串                                                                                     |
+| Java 时间类型以及受支持的 chronology 日期类型                             | 对应的标准文本形式字符串                                                                           |
 | `UUID`、`URI`、`File`、`Path`、`Locale`、`Charset`、`Currency`、`Pattern` | 对应类型的文本字符串；`File` 和 `Path` 使用路径文本，`Locale` 使用语言标签，`Pattern` 不保留 flags |
-| `BitSet` | 由有符号 `long` 字组成的数组，来源为 `BitSet.toLongArray()` |
-| `ByteBuffer` | 从 position 到 limit 的剩余范围所对应的有符号字节值数组 |
-| Optional 和原子包装类型 | 直接使用其中包含的标量、数组或值 |
+| `BitSet`                                                                  | 由有符号 `long` 字组成的数组，来源为 `BitSet.toLongArray()`                                        |
+| `ByteBuffer`                                                              | 从 position 到 limit 的剩余范围所对应的有符号字节值数组                                            |
+| Optional 和原子包装类型                                                   | 直接使用其中包含的标量、数组或值                                                                   |
 
 `Calendar` 会把 epoch 毫秒数读入新的 `GregorianCalendar`；不会保留原始日历子类型、时区和其他配置。
 null `Optional` 引用和空 `Optional` 都会写为 JSON null；将 JSON null 读取为声明的 Optional 类型时，
@@ -194,24 +194,47 @@ ForyJson json = ForyJson.builder().defaultPropertyInclusion(Include.NON_EMPTY).b
 ```
 
 `defaultPropertyInclusion` 和 `writeNullFields` 修改同一个设置，以最后一次调用为准。
-builder 接受 `ALWAYS`、`NON_NULL` 和 `NON_EMPTY`；`DEFAULT` 仅适用于属性注解。
-显式的 `JsonProperty.include` 优先于 builder 默认值。空值的定义与适用范围请参阅
+builder 接受 `ALWAYS`、`NON_NULL` 和 `NON_EMPTY`，拒绝 `DEFAULT` 和 `NON_DEFAULT`。
+省略默认值需要通过属性上的 `@JsonProperty(include = NON_DEFAULT)` 或类上的 `@JsonInclude(NON_DEFAULT)`
+显式授权；支持的默认值来源、构造与求值影响以及错误行为见[默认值省略](annotations.md#jsoninclude-and-default-omission)。
+属性上的 `JsonProperty.include` 优先于类上的 `JsonInclude`，后者优先于 builder 默认值。空值定义与适用范围见
 [属性包含策略](annotations.md#jsonproperty)。
 
-| Builder 方法 | 默认值 | 用户可见的效果 |
-| -------------------------------------- | ----------------------------------------- | ---------------------------------------------- |
-| `defaultPropertyInclusion(Include)` | `NON_NULL` | 对象属性的默认包含策略 |
-| `writeNullFields(boolean)` | `false` | 为 true 时选择 `ALWAYS`，为 false 时选择 `NON_NULL` |
-| `writeLongAsString(boolean)` | `false` | 将内置 64 位整数值写为十进制字符串 |
-| `withCodegen(boolean)` | `true` | 启用生成的对象编解码器 |
-| `withAsyncCompilation(boolean)` | `true` | 异步编译生成的编解码器 |
-| `withFieldMode(boolean)` | `false` | 为 true 时，仅发现字段而不使用 getter/setter |
-| `withPropertyNamingStrategy(strategy)` | `LOWER_CAMEL_CASE` | 为未显式指定 `JsonProperty` 名称的属性命名 |
-| `withMaxCachedFieldNames(int)` | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | 每个 reader 的字段名缓存条目数；零表示禁用缓存 |
-| `withConcurrencyLevel(int)` | `max(1, 2 * processors)` | 根操作的最大并发数 |
-| `withBufferSizeLimitBytes(int)` | 2 MiB | 每个池化 writer 可保留的最大复用容量 |
-| `registerCodec(type, codec)` | None | 替换允许注册的精确类的完整 JSON 编解码器 |
-| `registerMixin(mixinType)` | None | 将一个注解 Mixin 应用于其精确声明的目标 |
+| Builder 方法                            | 默认值                                    | 用户可见的效果                                      |
+| --------------------------------------- | ----------------------------------------- | --------------------------------------------------- |
+| `defaultPropertyInclusion(Include)`     | `NON_NULL`                                | 对象属性的默认包含策略                              |
+| `writeNullFields(boolean)`              | `false`                                   | 为 true 时选择 `ALWAYS`，为 false 时选择 `NON_NULL` |
+| `writeLongAsString(boolean)`            | `false`                                   | 将内置 64 位整数值写为十进制字符串                  |
+| `escapeNonAscii(boolean)`               | `false`                                   | 将生成的 JSON 字符串和名称中的非 ASCII 字符转义     |
+| `byteArrayFormat(JsonByteArray.Format)` | `BASE64`                                  | 字节数组读写的默认表示方式                          |
+| `withCodegen(boolean)`                  | `true`                                    | 启用生成的对象编解码器                              |
+| `withAsyncCompilation(boolean)`         | `true`                                    | 异步编译生成的编解码器                              |
+| `withFieldMode(boolean)`                | `false`                                   | 为 true 时，仅发现字段而不使用 getter/setter        |
+| `withPropertyNamingStrategy(strategy)`  | `LOWER_CAMEL_CASE`                        | 为未显式指定 `JsonProperty` 名称的属性命名          |
+| `withMaxCachedFieldNames(int)`          | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | 每个 reader 的字段名缓存条目数；零表示禁用缓存      |
+| `withConcurrencyLevel(int)`             | `max(1, 2 * processors)`                  | 根操作的最大并发数                                  |
+| `withBufferSizeLimitBytes(int)`         | 2 MiB                                     | 可保留的输出缓冲区或字符串解码缓冲区的最大容量      |
+| `registerCodec(type, codec)`            | None                                      | 替换允许注册的精确类的完整 JSON 编解码器            |
+| `registerMixin(mixinType)`              | None                                      | 将一个注解 Mixin 应用于其精确声明的目标             |
+
+使用 `byteArrayFormat` 为普通 `byte[]` 根值、未标注的属性及容器中的值选择统一表示，
+包括嵌套数组、集合、Map 和 Optional：
+
+```java
+import org.apache.fory.json.ForyJson;
+import org.apache.fory.json.annotation.JsonByteArray;
+
+ForyJson hexJson = ForyJson.builder().byteArrayFormat(JsonByteArray.Format.BASE16).build();
+String text = hexJson.toJson(new byte[] {1, -2, 3}); // "\"01fe03\""
+byte[] bytes = hexJson.fromJson(text, byte[].class);
+```
+
+默认的 `BASE64` 写入带填充符的标准 Base64 字符串。`BASE16` 写入不带前缀或分隔符的小写十六进制
+字符串，读取时接受大小写字母和 JSON 字符串转义，拒绝奇数长度和非十六进制字符。
+`ARRAY` 使用 `[-128, 127]` 范围内的有符号数字。空数组在字符串格式下写为 `""`，在 `ARRAY` 下写为 `[]`。
+三种格式都接受 JSON `null`。读取使用配置的表示方式，不猜测其他格式。
+[属性上的 `JsonByteArray` 注解](annotations.md#jsonbytearray)（包括 Mixin 提供的注解）覆盖全局默认值。
+声明位置上的自定义编解码器保留其完整表示；Kotlin 无符号语义数组仍使用数字数组。
 
 当 64 位整数必须经过 JavaScript 且不能损失 `Number` 精度时，请启用 `writeLongAsString(true)`。
 该设置会将内置 `long`/`Long`、`AtomicLong`、`AtomicLongArray` 和 `OptionalLong` 值写为带引号的
@@ -221,7 +244,7 @@ builder 接受 `ALWAYS`、`NON_NULL` 和 `NON_EMPTY`；`DEFAULT` 仅适用于属
 
 并发级别和缓冲区保留限制必须为正数。字段名缓存上限分别应用于每个 reader；零会禁用该缓存。该上限
 只限制缓存的字段名数量，不限制输入中可接受的名称。缓冲区保留设置不会限制 JSON 输入或输出大小，
-只限制一次操作结束后保留以供复用的 writer 存储空间。
+只限制一次操作后各个可复用输出缓冲区或字符串解码缓冲区的容量，不限制实例使用的总内存。
 
 有关类加载、类型策略、嵌套深度、对象图内存限制和外部输入控制，请参阅
 [Fory JSON 安全](security.md)。
@@ -229,3 +252,44 @@ builder 接受 `ALWAYS`、`NON_NULL` 和 `NON_EMPTY`；`DEFAULT` 仅适用于属
 调用 `build()` 之后再修改 builder，不会改变已有的 `ForyJson` 实例。
 
 在 Android 上禁用运行时代码生成和异步编译。GraalVM 原生镜像中无法进行运行时编译。Fory JSON 会为默认配置以及每个可达 `ForyJsonProvider` 配置下的可达模型生成编解码器。没有匹配生成编解码器的模型使用解释执行编解码器。其他 builder 选项保持上述行为。
+
+## 非 ASCII 转义 {#non-ascii-escaping}
+
+当接收方要求使用 JSON Unicode 转义表示非 ASCII 字符时，可以启用：
+
+```java
+import org.apache.fory.json.ForyJson;
+
+ForyJson json = ForyJson.builder().escapeNonAscii(true).build();
+String text = json.toJson("汉é"); // "\u6c49\u00e9"
+byte[] utf8 = json.toJsonBytes("汉é");
+```
+
+该选项适用于所有 String、UTF-8、流式和格式化写入 API 中的字符串和字符值、属性名、Map 键、
+枚举名和子类型名。U+007F 以上的字符使用小写十六进制转义，补充字符使用两个 UTF-16 代理项转义。
+JSON 必需的转义保持不变，字符串中的无效代理项序列仍会失败。
+`<`、`>` 和 `&` 等 ASCII 字符不会被额外转义。
+
+该设置默认为 `false`，实例构建后固定。需要交替使用不同输出策略时，应复用两个实例。
+格式化输出仍按次调用选择，读取行为不受影响。关闭此选项会保留既有输出表示，包括原有的转义。
+
+调用方提供的原始 JSON（包括 `@JsonRawValue`）会原样保留，因此包含原始 JSON 的文档仍可能含有
+非 ASCII 字符。自定义编解码器应使用结构化字符串写入方法以遵循该选项；直接写入原始内容的转义
+仍由编解码器作者负责。
+
+## 格式化输出 {#pretty-printing}
+
+可以为单次序列化调用选择便于阅读的输出：
+
+```java
+ForyJson json = ForyJson.builder().build();
+String text = json.toPrettyJson(value);
+byte[] utf8 = json.toPrettyJsonBytes(value);
+String compact = json.toJson(value);
+```
+
+格式与为对象和数组都配置两个空格缩进的 Jackson pretty printer 一致。每层容器增加一级缩进，
+冒号两侧各有一个空格。空对象和空数组分别为 `{ }` 和 `[ ]`，换行使用 `\n`，末尾没有换行。
+两个 API 均保留字符串的逻辑值，并遵循 `escapeNonAscii`。原始 JSON 值及其空白保持原样。
+读取同时接受紧凑和格式化 JSON。同一个实例可以按次切换输出格式；既有的
+`toJson`、`toJsonBytes` 和 `writeJsonTo` 继续输出紧凑 JSON。

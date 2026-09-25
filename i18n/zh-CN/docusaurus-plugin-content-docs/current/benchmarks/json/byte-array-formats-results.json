@@ -1,0 +1,625 @@
+{
+  "environment": {
+    "cpu": "Apple M4 Pro",
+    "logical_cpus": 12,
+    "os": "macOS 15.7.2 arm64",
+    "jdk": "OpenJDK 25.0.3",
+    "jmh": "1.37"
+  },
+  "source": {
+    "fory": "13739263ebf31af5fc962184aaccf2833f8ffc9a",
+    "fory_baseline": "e1d2f9d67800901392755b1133968d448ab076b8",
+    "jsoniter_scala_base": "84cb277f2c2a16b4018bc61fdeec3eed62252a1e",
+    "jsoniter_scala_adapters": "71b2ba16f1d5261e2be4e98d5dfe4be452d0e136",
+    "jsoniter_scala_version": "2.40.2-SNAPSHOT",
+    "benchmark_scala": "3.9.0",
+    "fory_scala": "3.3.8"
+  },
+  "settings": {
+    "threads": 1,
+    "forks_per_run": 1,
+    "warmup_iterations": 3,
+    "measurement_iterations": 5,
+    "iteration_seconds": 1,
+    "jvm_args": ["-Xms1g", "-Xmx1g", "-XX:+UseParallelGC"],
+    "profiler": "gc"
+  },
+  "results": [
+    {
+      "case": "ArrayOfBytesReading",
+      "size": 512,
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 718561.6343142863,
+            "iterations_ops_s": [
+              720966.2774700475, 722148.059950197, 723968.2127171038,
+              699675.4454108089, 726050.1760232744
+            ],
+            "allocation_bytes_op": 528.0081562652304,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 644154.4427726491,
+            "iterations_ops_s": [
+              642739.6225877892, 656549.9366009792, 647274.0194844017,
+              629323.8870815604, 644884.7481085152
+            ],
+            "allocation_bytes_op": 1128.0091134734967,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.1155114155874863
+        },
+        {
+          "pair": 2,
+          "order": ["fory", "jsoniter_scala"],
+          "fory": {
+            "throughput_ops_s": 712768.7484642493,
+            "iterations_ops_s": [
+              715809.6255148505, 712322.2180004838, 719427.3859759014,
+              706451.1582493099, 709833.3545807011
+            ],
+            "allocation_bytes_op": 528.0082231131366,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 646910.5376279108,
+            "iterations_ops_s": [
+              653642.6650007655, 648076.5626362266, 639063.9666087512,
+              648406.7871787745, 645362.7067150369
+            ],
+            "allocation_bytes_op": 1128.0090703040241,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.1018042016718836
+        },
+        {
+          "pair": 3,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 713855.8384418925,
+            "iterations_ops_s": [
+              713930.6941047948, 699719.8311706063, 713989.776513808,
+              721117.7876197997, 720521.1028004538
+            ],
+            "allocation_bytes_op": 528.0082200551103,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 648694.3313125791,
+            "iterations_ops_s": [
+              640046.1536157951, 651947.475615739, 650393.8228952556,
+              649302.6479094238, 651781.5565266822
+            ],
+            "allocation_bytes_op": 1128.0090437194845,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.100450249037115
+        }
+      ],
+      "median_fory_ops_s": 713855.8384418925,
+      "median_jsoniter_ops_s": 646910.5376279108,
+      "median_paired_ratio": 1.1018042016718836,
+      "minimum_paired_ratio": 1.100450249037115,
+      "maximum_paired_ratio": 1.1155114155874863,
+      "geometric_paired_ratio": 1.1059010882137206
+    },
+    {
+      "case": "ArrayOfBytesWriting",
+      "size": 512,
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 3350580.997475249,
+            "iterations_ops_s": [
+              3354256.676965812, 3350235.8910908336, 3370583.284923328,
+              3343149.3809342943, 3334679.7534619793
+            ],
+            "allocation_bytes_op": 1888.0017545395815,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 1534400.3964775414,
+            "iterations_ops_s": [
+              1555002.3973013056, 1551437.3792732242, 1483784.9963905278,
+              1539026.116856106, 1542751.092566543
+            ],
+            "allocation_bytes_op": 1888.003826423861,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 2.1836419002282828
+        },
+        {
+          "pair": 2,
+          "order": ["fory", "jsoniter_scala"],
+          "fory": {
+            "throughput_ops_s": 3355366.2425028966,
+            "iterations_ops_s": [
+              3371208.1427841824, 3370052.5561299818, 3367852.548591301,
+              3335320.999305273, 3332396.965703745
+            ],
+            "allocation_bytes_op": 1888.0017485208652,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 1539684.6759449516,
+            "iterations_ops_s": [
+              1530588.7989645593, 1536345.1128779924, 1550446.53671775,
+              1520990.2236222902, 1560052.7075421656
+            ],
+            "allocation_bytes_op": 1888.0038163834627,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 2.179255463748514
+        },
+        {
+          "pair": 3,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 3328563.302552803,
+            "iterations_ops_s": [
+              3320520.682048541, 3331924.359155337, 3319451.2998794424,
+              3332810.7688661655, 3338109.40281453
+            ],
+            "allocation_bytes_op": 1888.0017662799612,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 1540486.9964760381,
+            "iterations_ops_s": [
+              1537960.3534940826, 1560478.5204790654, 1537766.2635790894,
+              1527368.4693392226, 1538861.3754887313
+            ],
+            "allocation_bytes_op": 1888.0038109181107,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 2.1607214537786446
+        }
+      ],
+      "median_fory_ops_s": 3350580.997475249,
+      "median_jsoniter_ops_s": 1539684.6759449516,
+      "median_paired_ratio": 2.179255463748514,
+      "minimum_paired_ratio": 2.1607214537786446,
+      "maximum_paired_ratio": 2.1836419002282828,
+      "geometric_paired_ratio": 2.174516874590141
+    },
+    {
+      "case": "Base16Reading",
+      "size": 512,
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 3359808.747011424,
+            "iterations_ops_s": [
+              3170890.4021431804, 2835783.848635741, 3599267.745232154,
+              3600313.8419093373, 3592787.8971367073
+            ],
+            "allocation_bytes_op": 528.0017648087484,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 2914929.3631949537,
+            "iterations_ops_s": [
+              2894217.0461341827, 2909705.468348089, 2928398.5845325943,
+              2897313.7225826643, 2945011.9943772373
+            ],
+            "allocation_bytes_op": 528.0020149494615,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.1526209826672622
+        },
+        {
+          "pair": 2,
+          "order": ["fory", "jsoniter_scala"],
+          "fory": {
+            "throughput_ops_s": 3585325.1970511647,
+            "iterations_ops_s": [
+              3606779.6047478, 3620212.096465545, 3585192.9164911993,
+              3573313.8467803146, 3541127.5207709647
+            ],
+            "allocation_bytes_op": 528.0016362855811,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 2873552.418737786,
+            "iterations_ops_s": [
+              2761830.775159276, 2916270.0082977437, 2909785.4844934223,
+              2912280.347573207, 2867595.47816528
+            ],
+            "allocation_bytes_op": 528.0020441965414,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.2476978577707751
+        },
+        {
+          "pair": 3,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 3603439.30158346,
+            "iterations_ops_s": [
+              3626219.544144616, 3602839.8185009575, 3602282.722974174,
+              3598315.7871311214, 3587538.6351664294
+            ],
+            "allocation_bytes_op": 528.0016283749771,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 2949382.2375222584,
+            "iterations_ops_s": [
+              2947324.1011699555, 2941788.9030553037, 2943400.2053664513,
+              2947093.167103884, 2967304.8109156964
+            ],
+            "allocation_bytes_op": 528.001988912211,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.2217606981354399
+        }
+      ],
+      "median_fory_ops_s": 3585325.1970511647,
+      "median_jsoniter_ops_s": 2914929.3631949537,
+      "median_paired_ratio": 1.2217606981354399,
+      "minimum_paired_ratio": 1.1526209826672622,
+      "maximum_paired_ratio": 1.2476978577707751,
+      "geometric_paired_ratio": 1.2066853323390903
+    },
+    {
+      "case": "Base16Writing",
+      "size": 512,
+      "pairs": [
+        {
+          "pair": 1,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 9639285.749072284,
+            "iterations_ops_s": [
+              9720176.667163966, 9484401.322246242, 9672723.887067826,
+              9634169.371241517, 9684957.497641867
+            ],
+            "allocation_bytes_op": 1048.0006091523976,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 8472009.567249341,
+            "iterations_ops_s": [
+              8479680.230866075, 8457165.337729625, 8507324.055039847,
+              8446205.415500265, 8469672.797110893
+            ],
+            "allocation_bytes_op": 1048.0006932682013,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.137780319127039
+        },
+        {
+          "pair": 2,
+          "order": ["fory", "jsoniter_scala"],
+          "fory": {
+            "throughput_ops_s": 9790192.385472855,
+            "iterations_ops_s": [
+              9729910.203410858, 9798489.073830001, 9801086.328943448,
+              9821711.761606097, 9799764.559573878
+            ],
+            "allocation_bytes_op": 1048.0005986565332,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 8444372.230910677,
+            "iterations_ops_s": [
+              8454419.247091914, 8498853.198057437, 8439041.593527095,
+              8413092.78031926, 8416454.335557679
+            ],
+            "allocation_bytes_op": 1048.0006945067705,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.159374802266034
+        },
+        {
+          "pair": 3,
+          "order": ["jsoniter_scala", "fory"],
+          "fory": {
+            "throughput_ops_s": 9627140.75202604,
+            "iterations_ops_s": [
+              9571136.694928922, 9670291.685970405, 9650637.061303275,
+              9649359.818529114, 9594278.499398485
+            ],
+            "allocation_bytes_op": 1048.0006093169627,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "jsoniter_scala": {
+            "throughput_ops_s": 8299340.122327629,
+            "iterations_ops_s": [
+              8304739.0318363365, 8098181.555887745, 8329959.2642635,
+              8378818.139460061, 8385002.620190503
+            ],
+            "allocation_bytes_op": 1048.0007070897,
+            "artifact_sha256": {
+              "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+              "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+              "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+              "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+            }
+          },
+          "throughput_ratio": 1.1599886991167216
+        }
+      ],
+      "median_fory_ops_s": 9639285.749072284,
+      "median_jsoniter_ops_s": 8444372.230910677,
+      "median_paired_ratio": 1.159374802266034,
+      "minimum_paired_ratio": 1.137780319127039,
+      "maximum_paired_ratio": 1.1599886991167216,
+      "geometric_paired_ratio": 1.1523347999694993
+    }
+  ],
+  "numeric_read_development_pairs": [
+    {
+      "pair": 1,
+      "measurement_iterations": 3,
+      "baseline": {
+        "throughput_ops_s": 532673.8573387515,
+        "iterations_ops_s": [
+          525513.9417793049, 542316.8084152596, 530190.8218216901
+        ],
+        "allocation_bytes_op": 1656.0110539563302,
+        "artifact_sha256": {
+          "fory_json": "0b175646200572bd67817e5ff6350ca9b41ecf8d9c5fedb46ef90677fe335014",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      },
+      "fory": {
+        "throughput_ops_s": 688445.4281281951,
+        "iterations_ops_s": [
+          661077.1182975627, 700984.16167637, 703275.0044106527
+        ],
+        "allocation_bytes_op": 528.0085360717871,
+        "artifact_sha256": {
+          "fory_json": "3dc8c8cce674855b39faca03156bf57048bb28d1503513cd5d5a85c6935ea696",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      },
+      "jsoniter_scala": {
+        "throughput_ops_s": 633958.6015719158,
+        "iterations_ops_s": [
+          617689.5090250478, 649548.5363109286, 634637.7593797712
+        ],
+        "allocation_bytes_op": 1128.0092592375615,
+        "artifact_sha256": {
+          "fory_json": "0b175646200572bd67817e5ff6350ca9b41ecf8d9c5fedb46ef90677fe335014",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "measurement_iterations": 3,
+      "baseline": {
+        "throughput_ops_s": 540338.0918875013,
+        "iterations_ops_s": [
+          536275.7264876695, 526926.7419483826, 557811.8072264518
+        ],
+        "allocation_bytes_op": 1656.0108723773349,
+        "artifact_sha256": {
+          "fory_json": "0b175646200572bd67817e5ff6350ca9b41ecf8d9c5fedb46ef90677fe335014",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      },
+      "fory": {
+        "throughput_ops_s": 720624.0504748118,
+        "iterations_ops_s": [
+          725308.188246871, 717928.044117385, 718635.9190601795
+        ],
+        "allocation_bytes_op": 528.0081332921432,
+        "artifact_sha256": {
+          "fory_json": "3dc8c8cce674855b39faca03156bf57048bb28d1503513cd5d5a85c6935ea696",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      },
+      "jsoniter_scala": {
+        "throughput_ops_s": 637647.9827981751,
+        "iterations_ops_s": [
+          633147.7919315896, 637860.5415264402, 641935.6149364957
+        ],
+        "allocation_bytes_op": 1128.0092273109979,
+        "artifact_sha256": {
+          "fory_json": "0b175646200572bd67817e5ff6350ca9b41ecf8d9c5fedb46ef90677fe335014",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      }
+    }
+  ],
+  "integer_read_control": [
+    {
+      "pair": 1,
+      "baseline": {
+        "throughput_ops_s": 491577.15519360424,
+        "iterations_ops_s": [
+          493226.1424904787, 487426.7022866886, 491108.85466615774,
+          489525.76150114706, 496598.3150235495
+        ],
+        "allocation_bytes_op": 4176.011942924268,
+        "artifact_sha256": {
+          "fory_json": "0b175646200572bd67817e5ff6350ca9b41ecf8d9c5fedb46ef90677fe335014",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      },
+      "fory": {
+        "throughput_ops_s": 498496.5149580714,
+        "iterations_ops_s": [
+          500744.575380113, 500638.4030852225, 493489.2902459867,
+          498268.2111324434, 499342.09494659153
+        ],
+        "allocation_bytes_op": 4176.011777540917,
+        "artifact_sha256": {
+          "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "baseline": {
+        "throughput_ops_s": 487399.4866039612,
+        "iterations_ops_s": [
+          492882.917488924, 491449.6032085084, 492271.10849723214,
+          483111.02830760553, 477282.77551753627
+        ],
+        "allocation_bytes_op": 4176.012066509457,
+        "artifact_sha256": {
+          "fory_json": "0b175646200572bd67817e5ff6350ca9b41ecf8d9c5fedb46ef90677fe335014",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      },
+      "fory": {
+        "throughput_ops_s": 492338.3696801558,
+        "iterations_ops_s": [
+          482311.38343038387, 493766.54553907254, 493700.9130787423,
+          495583.89678214624, 496329.1095704343
+        ],
+        "allocation_bytes_op": 4176.01193743859,
+        "artifact_sha256": {
+          "fory_json": "a60312c784247481c49a6a7a2bf128979fdba070c305a0e1f95966673237883b",
+          "fory_scala": "69bce71e74891f86f0a2b1a607b2a86743955e5378386dbc3ab72e64c30f62cd",
+          "fory_core": "1d743236d0529f1e0c082bba9abc36bf502167add84905441ad917f7143b5b9a",
+          "benchmark": "606d03f7f6fb4bbf217b3e2d30ae82054d702aa937148328b1987191bd63e3b4"
+        }
+      }
+    }
+  ]
+}

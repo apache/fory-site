@@ -63,8 +63,9 @@ Security-related options:
 - `withMaxTypeFields(...)` and `withMaxTypeMetaBytes(...)` bound the field count
   and encoded body size of one received remote metadata body.
 - `withMaxSchemaVersionsPerType(...)` and
-  `withMaxAverageSchemaVersionsPerType(...)` bound accepted remote metadata versions without
+  `withMaxAverageSchemaVersionsPerType(...)` bound cached remote metadata versions without
   changing registration, dynamic loading, or schema-evolution semantics.
+  Additional valid schemas are decoded without caching after either limit is reached.
 - `withDeserializeUnknownClass(false)` avoids materializing unknown classes from metadata.
 - `checkJdkClassSerializable(true)` keeps the JDK serializability check for `java.*` classes.
 - Class registration warnings can be useful during security audits; use

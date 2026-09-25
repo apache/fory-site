@@ -111,8 +111,8 @@ array、dictionary、set、struct、class 和对象。字符串、二进制数�
 - `maxTypeFields` 默认为 `512`，限制单个接收的 struct 元数据主体中的字段数。
 - `maxTypeMetaBytes` 默认为 `4096`，限制单个接收的 TypeMeta 主体中的编码主体字节数，不包括
   8 字节头部和任何扩展大小 varint。
-- `maxSchemaVersionsPerType` 默认为 `10`，限制单个逻辑类型允许的远程元数据版本数。
-- `maxAverageSchemaVersionsPerType` 默认为 `3`，限制所有已接受远程类型的平均版本数。有效
+- `maxSchemaVersionsPerType` 默认为 `10`，限制单个逻辑类型可缓存的远程元数据版本数。
+- `maxAverageSchemaVersionsPerType` 默认为 `3`，限制所有已缓存远程类型的平均版本数。有效
   全局下限为 `8192` 个 Schema。
 
 ```swift
@@ -126,6 +126,9 @@ let fory = Fory(
   maxAverageSchemaVersionsPerType: 3
 )
 ```
+
+Schema 版本限制仅约束缓存的元数据。达到 Schema 版本或逻辑类型缓存上限后，有效数据仍会在完整
+元数据验证后反序列化，但不会缓存新 Schema。重复读取未缓存的 Schema 可能增加开销；既有缓存仍可复用。
 
 ## 推荐预设
 
