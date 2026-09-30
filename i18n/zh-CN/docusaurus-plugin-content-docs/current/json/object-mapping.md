@@ -89,6 +89,27 @@ Android 无法构造不具备可用无参构造函数的普通类。JDK 25 及�
 普通构造函数的副作用用作反序列化完成钩子：即使无参构造函数会运行，属性赋值也发生在其后；
 而绕过构造函数的路径根本不会运行它。
 
+## 必需的构造函数属性 {#required-constructor-properties}
+
+启用 `failOnMissingRequiredProperties(true)`，可以拒绝缺少未声明默认值的普通构造函数或工厂属性的输入：
+
+```java
+ForyJson json = ForyJson.builder()
+    .failOnMissingRequiredProperties(true)
+    .build();
+```
+
+此选项默认为 `false`，适用于 record、基于属性的 `JsonCreator` 模型、Scala case class 和 Kotlin
+构造函数模型，包括嵌套对象。声明的语言默认值及现有的 Optional、集合、Map 和数组默认值仍可使用。
+未声明默认值的普通属性必须出现在输入中，不再自动填充零、false 或 null。此选项不会引入新的容器默认值：
+没有默认值的 Kotlin 非空集合仍为必需属性，而 Scala 集合保留现有的空集合默认值。
+
+显式 JSON null 视为已提供的属性值，继续遵循属性的类型和可空性规则。被忽略的属性、普通无参 Java Bean
+以及构造后赋值的属性保持原有行为。完整的自定义对象编解码器自行负责缺失字段规则。
+
+此选项不改变写入。如果包含策略省略了必需属性，生成的 JSON 可能被严格读取器拒绝。应在输出中保留该属性，
+或使用未启用此选项的读取器。
+
 ## Kotlin 对象映射 {#kotlin-object-mapping}
 
 为 Kotlin/JVM 类安装 `fory-json-kotlin` 并使用 `ForyJsonKotlin.builder()`。Kotlin 普通类和 data class 使用选定的构造函数、精确属性类型、编译器默认值和声明的可空性，不使用 Java 绕过构造函数的回退路径。默认值仅在成员缺失时生效。显式 JSON null 仍是已提供的值，非空参数会拒绝它。
@@ -197,6 +218,7 @@ ForyJson json = ForyJson.builder().defaultPropertyInclusion(Include.NON_EMPTY).b
 builder 接受 `ALWAYS`、`NON_NULL` 和 `NON_EMPTY`，拒绝 `DEFAULT` 和 `NON_DEFAULT`。
 省略默认值需要通过属性上的 `@JsonProperty(include = NON_DEFAULT)` 或类上的 `@JsonInclude(NON_DEFAULT)`
 显式授权；支持的默认值来源、构造与求值影响以及错误行为见[默认值省略](annotations.md#jsoninclude-and-default-omission)。
+两种授权形式都会保留没有默认值的属性，包括其值为 null 或零时。
 属性上的 `JsonProperty.include` 优先于类上的 `JsonInclude`，后者优先于 builder 默认值。空值定义与适用范围见
 [属性包含策略](annotations.md#jsonproperty)。
 

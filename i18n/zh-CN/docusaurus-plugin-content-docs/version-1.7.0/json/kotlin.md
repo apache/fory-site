@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.5")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.6")
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.5")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.6")
 }
 ```
 
@@ -141,6 +141,12 @@ data class Request(
 - 缺少 `id` 使用 `0`。
 - `{"id":1,"retries":null}` 会失败；null 不会要求 Kotlin 使用默认值。
 
+启用 `ForyJsonKotlin.builder().failOnMissingRequiredProperties(true).build()` 后，未声明默认值的普通
+构造函数属性必须出现在输入中，包括可空属性、数值属性和 Boolean 属性。已声明的编译器默认值仍然生效。
+例如，上述模型缺少 `id` 时会报错，而缺少 `label` 和 `retries` 时仍使用它们的默认值。
+在此模式下，可空性本身不代表属性可以缺失：没有默认值的可空属性必须出现，但其值可以是显式 null。
+此选项默认为 `false`，不改变写入、类体属性行为或现有非空约束。
+
 普通类体 `var` 属性在成员缺失时保留初始化值，在成员存在时于构造后赋值。`lateinit` 属性是必需的。自动 creator 属性和延后赋值属性都必须能在读写两个方向重建。
 
 类体 `val`、计算属性、委托属性、仅 getter 的属性和委托 `var` 必须被忽略，或由精确的自定义编解码器处理。输入中存在的延后赋值 setter 在构造后按固定属性顺序执行，随后运行验证器；输入成员顺序不能决定应用调用顺序。Kotlin 类实例始终通过正常构造创建，因此不会绕过主构造函数初始化和验证。
@@ -170,12 +176,16 @@ val text = json.toJson(Response(1, items = emptyList())) // {"id":1}
 显式 null 与字段缺失不同，非空属性仍会拒绝显式 null。如果需要精确往返，应选择能保留所需值的包含策略。
 
 `NON_DEFAULT` 需要通过属性上的 `@JsonProperty` 或类上的 `@JsonInclude` 显式授权。
-只有**选定构造函数的每个参数都有语言默认值**，或模型使用普通无参构造函数时才支持。
+只有**选定构造函数的每个参数都有语言默认值**，或模型使用普通无参构造函数时，才支持与参考对象比较。
 Fory 为每份已初始化的模型元数据构造一个参考对象并获取已授权属性的值，执行完整构造函数、
 所有初始化器和 `init` 块。此操作不会在每次写入时重复；未授权的模型不会构造参考对象。
 动态类型和声明类型的模型使用位置可能分别初始化。
 
-包含必需参数的模型会被拒绝，即使另一个构造函数恰好没有参数。Fory 不会伪造参数、
+字段级和类级授权都会保留没有默认值的构造函数属性及 `lateinit` 属性，包括 null、零、false 和空值。
+如果某个有默认值的属性需要参考对象，而选定构造函数还含必需参数，则会拒绝该属性，即使另一个构造函数没有参数。
+例如，对 `data class Key(val id: Int)` 使用类级 `NON_DEFAULT` 时，`Key(0)` 写为 `{"id":0}`。
+对于 `data class Entry(val id: Int, val count: Int = 1)`，同样的类级策略无法在不伪造 `id` 的情况下比较 `count`；
+可为 `count` 指定 `ALWAYS` 覆盖策略以保留它。Fory 不会伪造参数、
 借用第一个对象的参数、更改创建器选择、绕过构造函数或分析字节码。构造失败会报告模型和属性。
 全局 `defaultPropertyInclusion(NON_DEFAULT)` 会被拒绝。
 

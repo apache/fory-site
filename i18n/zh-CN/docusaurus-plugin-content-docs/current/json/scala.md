@@ -24,7 +24,7 @@ Fory JSON 通过可选的 `fory-json-scala` 制品支持 Scala 2.13 和 Scala 3�
 ## 设置 {#setup}
 
 ```sbt
-libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.5"
+libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.6"
 ```
 
 `ForyJsonScala.builder()` 安装 Scala 模块并返回标准 Fory JSON builder：
@@ -88,6 +88,11 @@ json.fromJson("""{"selected":null}""", classOf[Options]) // Options(None, None)
 json.fromJson("{}", classOf[Profile]) // Profile(0, false, List(), null)
 ```
 
+使用 `ForyJsonScala.builder().failOnMissingRequiredProperties(true).build()`，可以拒绝缺少未声明默认值的
+普通构造函数属性的输入。例如，`case class Request(id: Int)` 此时拒绝 `{}`，而
+`case class Request(id: Int = 7)` 仍将它读取为 `Request(7)`。Option、集合、Map 和数组属性保留现有的
+缺失值默认规则。此选项默认关闭，不改变写入或显式 null 的处理。
+
 显式构造函数默认值优先用于缺失的属性。显式 JSON `null` 对 `Option[A]` 解码为 `None`，
 即使其构造函数默认值为 `Some(...)` 也是如此。
 
@@ -130,7 +135,7 @@ import org.apache.fory.json.scala.ForyJsonScala
 
 @JsonInclude(Include.NON_DEFAULT)
 case class Request(
-  @JsonProperty(include = Include.ALWAYS) id: Int,
+  id: Int,
   retries: Int = 3,
   tags: List[String] = Nil
 )
@@ -141,19 +146,19 @@ json.fromJson("""{"id":0}""", classOf[Request]) // Request(0, 3, Nil)
 json.toJson(Request(0, retries = 0)) // {"id":0,"retries":0}
 ```
 
-`id` 没有声明默认值，因此需要显式排除，否则类级授权会失败。读取时隐含的零、空集合或 `None`
+`id` 没有声明默认值，因此类级授权会将它保留在输出中，包括其值为零时。读取时隐含的零、空集合或 `None`
 不是声明的默认值。也可移除类注解，只在选定的默认值属性上添加
 `@JsonProperty(include = Include.NON_DEFAULT)`。Mixin 支持两种形式；全局 `NON_DEFAULT` 会被拒绝。
 
 默认值表达式在写入时执行，必须具有确定性且没有外部可见副作用。
 对于 `case class Limits(low: Int)(val high: Int = low + 1)`，比较 `high` 时使用对象实际的 `low`。
-当 `low=5, high=2` 时会保留 high，因为默认值为 6。缺少默认值方法或写入 Schema 依赖时，
-模型初始化会失败。JVM 方法返回 `void` 的 `Unit` 默认值不能用作比较来源；
-授权整个类时，应通过 `ALWAYS` 保留这些属性。
+当 `low=5, high=2` 时会保留 high，因为默认值为 6。选定默认值方法所需的依赖不可用时，模型初始化会失败。
+没有受支持的编译器默认值方法的属性，在类级和字段级 `NON_DEFAULT` 下都会保留。
+这也包括 JVM 方法返回 `void` 的 `Unit` 默认值，它们不是受支持的比较来源。
 
 授权表示调用方确认缺失输入可以恢复相同上下文；Fory 不证明这一点或表达式的纯度。
 对于依赖时间、随机数或状态的默认值，应使用 `ALWAYS`。数组按内容比较，浮点数区分正零与负零。
-Scala 类体初始化器不会被推断为构造函数默认值。不同于默认值的值（包括 null 和空集合）仍会写出。
+Scala 类体初始化器不会被推断为构造函数默认值，这些属性仍会写出。不同于默认值的值（包括 null 和空集合）仍会写出。
 读取行为独立，并创建新的可变默认值。类级授权也覆盖未来新增的字段，见
 [默认值省略](annotations.md#jsoninclude-and-default-omission)。
 
