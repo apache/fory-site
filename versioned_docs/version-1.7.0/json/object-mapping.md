@@ -100,6 +100,32 @@ use ordinary-constructor side effects as a deserialization completion hook: when
 constructor runs, property assignment happens afterward, and constructor-bypassing paths do not run
 it at all.
 
+## Required constructor properties
+
+Enable `failOnMissingRequiredProperties(true)` to reject missing ordinary constructor or factory
+properties that have no declared default:
+
+```java
+ForyJson json = ForyJson.builder()
+    .failOnMissingRequiredProperties(true)
+    .build();
+```
+
+The option defaults to `false` and applies to records, property-based `JsonCreator` models, Scala
+case classes, and Kotlin constructor models, including nested objects. Declared language defaults
+and existing optional, collection, map, and array defaults remain available. Ordinary properties
+without declared defaults must appear instead of receiving zero, false, or null. No new container
+defaults are introduced: a Kotlin non-null collection without a default remains required, while
+a Scala collection retains its empty default.
+
+An explicit JSON null counts as present and continues to follow the property's type and nullability
+rules. Ignored properties, ordinary no-argument beans, and properties assigned after construction
+keep their existing behavior. Complete custom object codecs own their own missing-field rules.
+
+This option does not change writing. If an inclusion policy omits a required property, the resulting
+JSON can be rejected by a strict reader. Preserve that property in the output or use a reader with
+the option disabled.
+
 ## Kotlin object mapping
 
 Install `fory-json-kotlin` and use `ForyJsonKotlin.builder()` for Kotlin/JVM classes. Kotlin
@@ -225,7 +251,8 @@ ForyJson json = ForyJson.builder().defaultPropertyInclusion(Include.NON_EMPTY).b
 The builder accepts `ALWAYS`, `NON_NULL`, and `NON_EMPTY`. It rejects `DEFAULT` and `NON_DEFAULT`.
 Default omission requires explicit `@JsonProperty(include = NON_DEFAULT)` or class-level
 `@JsonInclude(NON_DEFAULT)` authorization; see [Default omission](annotations.md#jsoninclude-and-default-omission)
-for supported sources, construction/evaluation effects, and errors. An explicit `JsonProperty.include`
+for supported sources, construction/evaluation effects, and errors. Both forms retain properties
+without defaults, including null and zero values. An explicit `JsonProperty.include`
 overrides `JsonInclude` on the class, which overrides the builder default. See
 [Property inclusion](annotations.md#jsonproperty) for the empty-value definitions and boundaries.
 
