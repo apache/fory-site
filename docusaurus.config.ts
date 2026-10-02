@@ -124,10 +124,10 @@ const config: Config = {
               : {}),
           },
           sidebarPath: './sidebars.ts',
-          editUrl: ({ locale, version, docPath }) => {
+          editUrl: ({ locale, version, versionDocsDirPath, docPath }) => {
             var editUrl = "";
             if (locale === "en-US") {
-              editUrl = `https://github.com/apache/fory-site/tree/main/docs/${docPath}`;
+              editUrl = `https://github.com/apache/fory-site/tree/main/${versionDocsDirPath}/${docPath}`;
             } else if (locale === "zh-CN") {
               version = version === "current" ? "current" : "version-" + version
               editUrl = `https://github.com/apache/fory-site/tree/main/i18n/${locale}/docusaurus-plugin-content-docs/${version}/${docPath}`;
