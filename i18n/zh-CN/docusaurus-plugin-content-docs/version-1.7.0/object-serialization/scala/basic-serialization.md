@@ -151,8 +151,8 @@ enum SearchTarget derives ForySerializer {
 名称，并使用限定名表示载荷类型。如果目标输出模式无法为冲突表达合法限定名，IDL
 编译器会在生成的 case 名称后追加 `Case`。
 
-Schema 定义的联合 case 使用非负 ID，类型化联合必须声明至少一个非 `Unknown` case。
-Scala 未知 case 载体由 `@ForyUnknownCase` 选择，而不是由 Schema case ID 选择。其载荷
+Schema 定义的联合 case 使用非负 ID，类型化联合必须声明至少一个 Schema 定义的 case。
+Scala 未知 case 载体由 `@ForyUnknownCase` 选择，与其名称无关，且没有 Schema case ID。其载荷
 存储原始 case ID 和反序列化后的值。当读取端遇到较新的 case ID 时，会返回
 `Unknown(UnknownCase)`，而不会仅仅因为本地不知道该 case ID 就失败。
 

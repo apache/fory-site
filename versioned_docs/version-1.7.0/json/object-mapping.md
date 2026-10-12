@@ -58,8 +58,14 @@ Static, transient, synthetic, and `Class<?>` fields are excluded. `getClass()` a
 value type is `Class<?>` are also excluded. An annotation placed on an ineligible member is rejected
 instead of being silently ignored.
 
-An ordinary final field can be written but is not used as a mutable read sink. Use a record,
-`JsonCreator`, or a custom codec for immutable construction.
+Eligible instance fields, including ordinary `final` fields, are restored when reading JSON.
+When a subclass hides a superclass field with the same name, the subclass field is the JSON
+property in both directions. Ignoring that field does not expose the hidden superclass field.
+
+An ordinary object property uses its declared type when reading. When writing a subclass instance
+through a concrete declared base type, Fory writes the subclass's mapped properties. Reading the
+same JSON through the base type creates a base instance and ignores subclass-only properties.
+Use `@JsonSubTypes` or a custom codec when the reader must restore the subtype.
 
 ### Field mode
 
@@ -118,8 +124,9 @@ without declared defaults must appear instead of receiving zero, false, or null.
 defaults are introduced: a Kotlin non-null collection without a default remains required, while
 a Scala collection retains its empty default.
 
-An explicit JSON null counts as present and continues to follow the property's type and nullability
-rules. Ignored properties, ordinary no-argument beans, and properties assigned after construction
+With the default `onNullRead(SET)`, an explicit JSON null counts as present and follows the property's
+type and nullability rules. With `SKIP`, that occurrence is omitted and cannot satisfy a required
+parameter. Ignored properties, ordinary no-argument beans, and properties assigned after construction
 keep their existing behavior. Complete custom object codecs own their own missing-field rules.
 
 This option does not change writing. If an inclusion policy omits a required property, the resulting
@@ -131,13 +138,34 @@ the option disabled.
 Install `fory-json-kotlin` and use `ForyJsonKotlin.builder()` for Kotlin/JVM classes. Kotlin
 ordinary and data classes use their selected constructor, exact property types, compiler defaults,
 and declared nullability; they do not use Java's constructor-bypassing fallback. A default applies
-only when the member is missing. An explicit JSON null remains a present value and is rejected for
-a non-null parameter.
+when the member is missing or its null occurrence is skipped. By default, explicit JSON null is a
+present value and is rejected for a non-null parameter.
 
 Use `jsonTypeRef<T>()` for generic, nullable, unsigned, and value-class roots. Standard arrays,
 collections, and maps continue to use their normal Fory JSON representation. The complete language
 type table, singleton/value-class behavior, and omission rules are in the
 [Kotlin guide](kotlin.md).
+
+## Read-side null handling
+
+Use independent builder settings to retain existing property values and omit null container items:
+
+```java
+import org.apache.fory.json.annotation.JsonProperty.NullHandling;
+
+ForyJson json = ForyJson.builder()
+    .onNullRead(NullHandling.SKIP)
+    .onContentNullRead(NullHandling.SKIP)
+    .build();
+```
+
+Both settings default to `SET`. `FAIL` rejects an explicit null; `SKIP` omits that input occurrence.
+The builder accepts concrete modes only, not `DEFAULT` or Java null. Each built instance retains
+its own configuration. Use `@JsonProperty(onNullRead = SET)` or `onContentNullRead = SET` to opt a
+property out of the matching global rule. Content settings cover immediate collection/array elements
+and map values, including root containers and dynamic JSON trees. Property settings apply to typed
+object properties, including nested objects, and do not alter a root `null` value.
+See [annotation semantics and examples](annotations.md#read-side-null-handling).
 
 ## Supported Java types
 
@@ -265,6 +293,8 @@ overrides `JsonInclude` on the class, which overrides the builder default. See
 | `byteArrayFormat(JsonByteArray.Format)` | `BASE64`                                  | Default byte-array representation for reading and writing       |
 | `withCodegen(boolean)`                  | `true`                                    | Enable generated object codecs                                  |
 | `withAsyncCompilation(boolean)`         | `true`                                    | Compile generated codecs asynchronously                         |
+| `onNullRead(NullHandling)`              | `SET`                                     | Handle explicit null property values                            |
+| `onContentNullRead(NullHandling)`       | `SET`                                     | Handle null array/collection elements and map values            |
 | `withFieldMode(boolean)`                | `false`                                   | When true, discover fields without getters/setters              |
 | `withPropertyNamingStrategy(strategy)`  | `LOWER_CAMEL_CASE`                        | Name properties without an explicit `JsonProperty` name         |
 | `withMaxCachedFieldNames(int)`          | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | Field-name cache entries per reader; zero disables caching      |

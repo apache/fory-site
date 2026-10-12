@@ -51,7 +51,8 @@ public sealed partial class Person
 `[ForyUnknownCase]` 标记。该标记只选择载体，不会向 Schema case 表添加条目。Schema
 定义的 case 使用非负 `[ForyCase]` ID。如果 case 需要非默认 Schema 编码，生成的
 `[ForyCase]` 会携带 `Type`。已知 case record 名称采用 PascalCase FDL case 名称；需要
-避免名称冲突时，载荷类型生成为限定引用。类型化联合必须至少包含一个非 `Unknown` case。
+避免名称冲突时，载荷类型生成为限定引用。类型化联合必须至少包含一个 Schema 定义的 case。
+名称冲突时，生成的载体名为 `Unknown_`；如果该名称也冲突，则会报错。Schema case 名称保持不变。
 
 ```csharp
 [ForyUnion]

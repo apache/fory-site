@@ -54,8 +54,12 @@ ForyJson json =
 static、transient、synthetic 和 `Class<?>` 字段会被排除。`getClass()` 以及值类型为 `Class<?>`
 的访问器也会被排除。在不符合条件的成员上放置注解会直接报错，而不是被静默忽略。
 
-普通 final 字段可以写出，但不会作为反序列化时的可变写入目标。不可变对象应使用 record、
-`JsonCreator` 或自定义编解码器来构造。
+读取 JSON 时会恢复符合条件的实例字段，包括普通 `final` 字段。子类字段隐藏父类同名字段时，
+读写两个方向均以子类字段作为 JSON 属性。忽略该字段不会暴露被隐藏的父类字段。
+
+普通对象属性在读取时使用声明类型。通过具体的声明基类类型写入子类实例时，Fory 会写出子类的
+映射属性。通过基类类型读取相同 JSON 时，会创建基类实例并忽略子类独有的属性。
+读取器需要恢复子类型时，应使用 `@JsonSubTypes` 或自定义编解码器。
 
 ### 字段模式
 
@@ -104,7 +108,8 @@ ForyJson json = ForyJson.builder()
 未声明默认值的普通属性必须出现在输入中，不再自动填充零、false 或 null。此选项不会引入新的容器默认值：
 没有默认值的 Kotlin 非空集合仍为必需属性，而 Scala 集合保留现有的空集合默认值。
 
-显式 JSON null 视为已提供的属性值，继续遵循属性的类型和可空性规则。被忽略的属性、普通无参 Java Bean
+使用默认的 `onNullRead(SET)` 时，显式 JSON null 视为已提供的属性值，并遵循属性的类型和可空性规则。
+使用 `SKIP` 时，该次输入被省略，不能满足必需参数要求。被忽略的属性、普通无参 Java Bean
 以及构造后赋值的属性保持原有行为。完整的自定义对象编解码器自行负责缺失字段规则。
 
 此选项不改变写入。如果包含策略省略了必需属性，生成的 JSON 可能被严格读取器拒绝。应在输出中保留该属性，
@@ -112,9 +117,29 @@ ForyJson json = ForyJson.builder()
 
 ## Kotlin 对象映射 {#kotlin-object-mapping}
 
-为 Kotlin/JVM 类安装 `fory-json-kotlin` 并使用 `ForyJsonKotlin.builder()`。Kotlin 普通类和 data class 使用选定的构造函数、精确属性类型、编译器默认值和声明的可空性，不使用 Java 绕过构造函数的回退路径。默认值仅在成员缺失时生效。显式 JSON null 仍是已提供的值，非空参数会拒绝它。
+为 Kotlin/JVM 类安装 `fory-json-kotlin` 并使用 `ForyJsonKotlin.builder()`。Kotlin 普通类和 data class 使用选定的构造函数、精确属性类型、编译器默认值和声明的可空性，不使用 Java 绕过构造函数的回退路径。成员缺失或其 null 输入被跳过时使用默认值。默认情况下，显式 JSON null 是已提供的值，非空参数会拒绝它。
 
 泛型、可空、无符号和值类根类型应使用 `jsonTypeRef<T>()`。标准数组、集合和 Map 继续使用常规 Fory JSON 表示。完整语言类型表、单例/值类行为和省略规则见 [Kotlin 指南](kotlin.md)。
+
+## 读取端 null 处理 {#read-side-null-handling}
+
+使用独立的 builder 设置可保留已有属性值，并省略 null 容器项：
+
+```java
+import org.apache.fory.json.annotation.JsonProperty.NullHandling;
+
+ForyJson json = ForyJson.builder()
+    .onNullRead(NullHandling.SKIP)
+    .onContentNullRead(NullHandling.SKIP)
+    .build();
+```
+
+两者均默认为 `SET`。`FAIL` 拒绝显式 null；`SKIP` 省略该次输入。
+builder 只接受具体模式，不接受 `DEFAULT` 或 Java null。每个构建的实例保留自己的配置。
+使用 `@JsonProperty(onNullRead = SET)` 或 `onContentNullRead = SET` 可让单个属性不受对应全局规则影响。
+内容设置覆盖直接的集合或数组元素以及 Map 值，包括根容器和动态 JSON 树。
+属性设置作用于带类型的对象属性，包括嵌套对象，但不改变根 `null` 值。
+见[注解语义与示例](annotations.md#read-side-null-handling)。
 
 ## 支持的 Java 类型 {#supported-java-types}
 
@@ -231,6 +256,8 @@ builder 接受 `ALWAYS`、`NON_NULL` 和 `NON_EMPTY`，拒绝 `DEFAULT` 和 `NON
 | `byteArrayFormat(JsonByteArray.Format)` | `BASE64`                                  | 字节数组读写的默认表示方式                          |
 | `withCodegen(boolean)`                  | `true`                                    | 启用生成的对象编解码器                              |
 | `withAsyncCompilation(boolean)`         | `true`                                    | 异步编译生成的编解码器                              |
+| `onNullRead(NullHandling)`              | `SET`                                     | 处理显式 null 属性值                                |
+| `onContentNullRead(NullHandling)`       | `SET`                                     | 处理数组或集合中的 null 元素以及 Map 中的 null 值   |
 | `withFieldMode(boolean)`                | `false`                                   | 为 true 时，仅发现字段而不使用 getter/setter        |
 | `withPropertyNamingStrategy(strategy)`  | `LOWER_CAMEL_CASE`                        | 为未显式指定 `JsonProperty` 名称的属性命名          |
 | `withMaxCachedFieldNames(int)`          | `DEFAULT_MAX_CACHED_FIELD_NAMES` (`8192`) | 每个 reader 的字段名缓存条目数；零表示禁用缓存      |

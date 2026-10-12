@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.6")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.7")
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.6")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.7")
 }
 ```
 
@@ -134,12 +134,18 @@ data class Request(
 
 主构造函数会被自动选择。公共次构造函数或目标类型自身的公共静态工厂，只有经 `JsonCreator` 显式选择后才会使用；伴生对象工厂必须通过外层类中实际存在的 `@JvmStatic` 桥接方法才符合条件。`@JvmOverloads` 生成的方法不是独立 creator 候选，选定的静态工厂也不能含编译器默认参数。私有/受保护、可变参数、方法泛型、上下文参数、局部类、匿名类、`inner` 类或合成构造路径需要精确的应用编解码器。
 
-对于这个模型：
+使用默认的 `onNullRead(SET)` 时，这个模型的行为如下：
 
 - `{"id":1}` 会调用两个编译器默认值。
 - `{"id":1,"label":null}` 会传入显式 null，不调用 `label` 的默认值。
 - 缺少 `id` 使用 `0`。
-- `{"id":1,"retries":null}` 会失败；null 不会要求 Kotlin 使用默认值。
+- `{"id":1,"retries":null}` 会失败。
+
+使用 `ForyJsonKotlin.builder().onNullRead(JsonProperty.NullHandling.SKIP)` 可将一次 null 输入视为缺失，
+保留构造函数默认值和类体属性初始化值。没有默认值的非空引用仍是必需属性。
+使用 `@get:JsonProperty(onNullRead = JsonProperty.NullHandling.SET)` 可让单个属性保留常规 null 解码。
+`onContentNullRead` 处理直接的集合或数组元素以及 Map 值，包括无符号数组。
+属性覆盖仅作用于一层，跳过 null 发生在元素可空性检查之前。见[读取端 null 处理](annotations.md#read-side-null-handling)。
 
 启用 `ForyJsonKotlin.builder().failOnMissingRequiredProperties(true).build()` 后，未声明默认值的普通
 构造函数属性必须出现在输入中，包括可空属性、数值属性和 Boolean 属性。已声明的编译器默认值仍然生效。

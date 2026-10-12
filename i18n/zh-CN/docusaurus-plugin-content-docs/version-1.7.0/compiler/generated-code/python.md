@@ -70,6 +70,14 @@ class Person:
     def from_bytes(cls, data: bytes) -> "Person": ...
 ```
 
+## 字段名称 {#field-names}
+
+生成的 Python 属性使用 `snake_case`，Python 关键字会增加尾部下划线。
+`field`、`pyfory`、`decimal`、`list` 和 `dict` 也会增加尾部下划线。
+由这五个名称之一加下划线组成的名称会再增加一个下划线，确保字段彼此不同：
+`field`、`field_` 和 `field__` 分别变为 `field_`、`field__` 和 `field___`。
+字段 tag ID 保持不变。
+
 ## 注册
 
 生成的注册函数：

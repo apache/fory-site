@@ -61,6 +61,8 @@ public data class Person(
 }
 ```
 
+空消息生成具有无参构造函数的普通类。
+
 参与编译器检测到的构造环的消息会生成普通可变类，使生成的序列化器能够在读取反向引用前
 发布实例：
 
@@ -82,7 +84,8 @@ public class Node() {
 枚举生成具有稳定 Fory 枚举 ID 的 Kotlin 枚举类。联合生成带 `@ForyUnion` 的密封类；Fory
 提供的 `Unknown(UnknownCase)` 载体使用 `@ForyUnknownCase` 标记。该标记只选择载体，不会
 向 Schema case 表添加条目。Schema 定义的 case 可以使用 case ID `0..N`，并保存一个
-`value` 属性。类型化联合必须至少包含一个非 `Unknown` case。
+`value` 属性。类型化联合必须至少包含一个 Schema 定义的 case。名称冲突时，生成的载体名为
+`Unknown_`；如果该名称也冲突，则会报错。Schema case 名称保持不变。
 
 ```kotlin
 package addressbook

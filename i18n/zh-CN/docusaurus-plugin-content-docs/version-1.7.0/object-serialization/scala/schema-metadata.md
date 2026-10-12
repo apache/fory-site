@@ -103,8 +103,8 @@ enum SearchTarget derives ForySerializer {
 }
 ```
 
-Schema 定义的联合 case 使用非负 ID，类型化联合必须声明至少一个非 `Unknown` case。
-未知 case 载体由 `@ForyUnknownCase` 选择，而不是由 Schema case ID 选择。当生成的 Scala
+Schema 定义的联合 case 使用非负 ID，类型化联合必须声明至少一个 Schema 定义的 case。
+未知 case 载体由 `@ForyUnknownCase` 选择，与其名称无关，且没有 Schema case ID。当生成的 Scala
 联合 case 名称与载荷类型的简单名称相同时，带软件包的输出会保留 case 名称，并使用
 限定名表示载荷类型。如果目标输出模式无法为冲突表达合法限定名，IDL 编译器会在生成的
 case 名称后追加 `Case`。

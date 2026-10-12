@@ -35,8 +35,9 @@ Rust 输出为每个 Schema 生成一个模块文件，例如：
 联合映射到带 `#[fory(id = ...)]` Schema case 属性的 Rust 枚举。
 `#[fory(unknown)] Unknown(::fory::UnknownCase)` 标记 Fory 提供的向前兼容载体。该标记
 只选择载体，不会向 Schema case 表添加条目；Schema case 仍使用完整的 `0..N` ID 范围。
-生成的类型化联合必须至少包含一个非 `Unknown` case。编译器将第一个声明的非 `Unknown`
-case 标记为 `#[fory(default)]`。当该 case 的载荷实现 Rust 标准 `Default` trait 时，编译器
+名称冲突时，生成的载体名为 `Unknown_`；如果该名称也冲突，则会报错。Schema case 名称保持不变。
+生成的类型化联合必须至少包含一个 Schema 定义的 case。编译器将第一个声明的 Schema case
+标记为 `#[fory(default)]`。当该 case 的载荷实现 Rust 标准 `Default` trait 时，编译器
 还会从该 case 生成标准 `Default` 实现：
 
 ```rust

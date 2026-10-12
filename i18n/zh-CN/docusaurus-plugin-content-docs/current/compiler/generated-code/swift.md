@@ -27,10 +27,10 @@ Swift 输出为每个 Schema 生成一个 `.swift` 文件，例如：
 
 ## 类型生成
 
-生成器使用拆分模型宏和稳定字段/case ID 创建 Swift 模型。类型化联合必须包含
-`@ForyUnknownCase case unknown(UnknownCase)` 和至少一个非 `unknown` case；
-`unknown(UnknownCase)` 只是 Fory 提供的向前兼容载体。该标记只选择载体，不会向 Schema
-case 表添加条目。
+生成器使用拆分模型宏和稳定字段/case ID 创建 Swift 模型。类型化联合必须包含一个带
+`@ForyUnknownCase` 标记的 case 和至少一个 Schema 定义的 case；`unknown(UnknownCase)`
+是 Fory 提供的向前兼容载体的默认名称。该标记只选择载体，不会向 Schema case 表添加条目。
+名称冲突时，生成的载体名为 `unknown_`；如果该名称也冲突，则会报错。Schema case 名称保持不变。
 
 当包/命名空间非空时，命名空间形状由 `swift_namespace_style` 控制：
 
