@@ -28,6 +28,13 @@ Fory IDL 生成的类型遵循宿主语言习惯，可以直接用作领域对�
 `ComplexPbForyModule` 等名称允许多个 IDL 文件指向同一个包或命名空间，而不会生成
 冲突的 `ForyModule` 类型。
 
+## 未知联合 case 的名称 {#unknown-union-case-names}
+
+C#、Kotlin、Scala 和 Rust 生成 `Unknown` case 来保留未知联合值；Swift 使用 `unknown`。
+Schema 定义的 case 保持各语言的常规名称形式。如果生成的载体名称冲突，编译器使用
+`Unknown_`，Swift 则使用 `unknown_`。如果备用名称也已被占用，生成会失败。
+未知 case 注解或属性用于标识载体，不要求载体必须名为 `Unknown` 或 `unknown`。
+
 ## 参考 Schema
 
 以下示例使用两个真实 Schema：

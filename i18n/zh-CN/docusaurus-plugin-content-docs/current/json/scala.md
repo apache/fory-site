@@ -24,7 +24,7 @@ Fory JSON 通过可选的 `fory-json-scala` 制品支持 Scala 2.13 和 Scala 3�
 ## 设置 {#setup}
 
 ```sbt
-libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.6"
+libraryDependencies += "org.apache.fory" %% "fory-json-scala" % "1.7.7"
 ```
 
 `ForyJsonScala.builder()` 安装 Scala 模块并返回标准 Fory JSON builder：
@@ -93,8 +93,13 @@ json.fromJson("{}", classOf[Profile]) // Profile(0, false, List(), null)
 `case class Request(id: Int = 7)` 仍将它读取为 `Request(7)`。Option、集合、Map 和数组属性保留现有的
 缺失值默认规则。此选项默认关闭，不改变写入或显式 null 的处理。
 
-显式构造函数默认值优先用于缺失的属性。显式 JSON `null` 对 `Option[A]` 解码为 `None`，
+显式构造函数默认值优先用于缺失的属性。使用默认的 `onNullRead(SET)` 时，JSON `null` 对 `Option[A]` 解码为 `None`，
 即使其构造函数默认值为 `Some(...)` 也是如此。
+
+使用 `ForyJsonScala.builder().onNullRead(JsonProperty.NullHandling.SKIP)` 可跳过 null 属性输入，
+保留构造函数默认值或类体属性初始化值。`onContentNullRead` 适用于受支持的严格求值 Scala 集合
+中的直接元素和 Map 值，包括基本类型集合。逐属性的 `JsonProperty` 设置覆盖对应的全局默认值，
+不会传播到嵌套容器。见[读取端 null 处理](annotations.md#read-side-null-handling)。
 
 case class 可以声明在顶层，也可以嵌套在任意层数的 `object` 内，但每一层外部作用域都必须是 `object`。如果外层是 `class`、trait 或方法，读写都会被拒绝，因为 Fory 无法访问重建值所需的外部实例或伴生对象。
 构造要求具有公共 JVM 构造函数以及匹配的公共伴生对象 `apply`；不支持的私有构造形式会被拒绝。
@@ -115,7 +120,7 @@ case class Media(
 `JsonIgnore` 适用于字段、属性方法、setter 参数和选定的构造函数参数。`JsonCodec` 子槽位绑定直接集合元素、`Option` 内容，以及 Map 键或值。其他 Fory JSON 注解保持[注解](annotations.md)中描述的行为。
 
 属性包含策略控制写出的值。省略的属性在读取时使用构造函数或类型默认值，因此省略空字符串可能恢复为 `null`。
-如果需要保留区别，使用 `ALWAYS`。显式 JSON `null` 保持声明类型的常规 null 行为，不会请求构造函数默认值。
+如果需要保留区别，使用 `ALWAYS`。在 `onNullRead(SET)` 下，JSON `null` 保持声明类型的常规 null 行为，不会请求构造函数默认值。
 
 `NON_EMPTY` 识别 `None` 和受支持的空严格求值 Scala 序列、集合、Map，包括可变集合和 range。
 过滤不递归：`Some("")`、`Some(Nil)`、`Some(null)` 和非空容器都会保留。

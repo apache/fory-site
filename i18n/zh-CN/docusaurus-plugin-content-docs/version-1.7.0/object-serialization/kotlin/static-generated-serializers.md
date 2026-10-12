@@ -198,7 +198,8 @@ KSP 会为带 `@ForyUnion` 注解的顶层密封类生成序列化器。每个 S
 `@ForyCase` 注解的嵌套类，并包含一个名为 `value` 的构造函数属性。
 `Unknown(UnknownCase)` 使用 `@ForyUnknownCase` 标记，作为 Fory 管理的向前兼容载体。
 它不会出现在 Schema case 表中，因为该标记只选择载体，不会添加 Schema 条目。类型化
-联合必须声明至少一个非 `Unknown` case：
+联合必须声明至少一个 Schema 定义的 case。恰好一个 case 必须带有 `@ForyUnknownCase`，
+其名称不受限制：
 
 ```kotlin
 package example

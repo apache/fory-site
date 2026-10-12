@@ -191,8 +191,8 @@ enum Event {
 case user(ThirdParty.User)
 ```
 
-每个 `@ForyUnion` 都必须声明 `@ForyUnknownCase case unknown(UnknownCase)`，并至少包含一个非
-`unknown` case。unknown case 只是 Fory 提供的前向兼容载体，不能作为默认值来源。它不会
+每个 `@ForyUnion` 都必须声明恰好一个带有 `@ForyUnknownCase` 且只有一个 `UnknownCase` 关联值的
+case，并至少包含一个 Schema 定义的 case。标记的 case 名称不受限制。未知 case 只是 Fory 提供的前向兼容载体，不能作为默认值来源。它不会
 出现在 Schema case 表中，因为该标记只选择载体，不会添加 Schema 条目。Schema case 使用
 非负 ID。
 

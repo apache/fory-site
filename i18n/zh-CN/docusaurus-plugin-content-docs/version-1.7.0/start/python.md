@@ -33,7 +33,7 @@ python -m pip --version
 安装已发布的软件包：
 
 ```bash
-python -m pip install pyfory==1.7.6
+python -m pip install pyfory==1.7.7
 ```
 
 运行 xlang 往返示例：

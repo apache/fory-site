@@ -105,7 +105,7 @@ Schema 描述符位于 `Apache.Fory.Schema.Types` 下，仅作为元数据使用
 
 ## `[ForyUnion]` 和 `[ForyCase]`
 
-生成的 union case 使用 `[ForyCase]` 同时指定稳定 case ID 和可选的 case 载荷 Schema 类型。不要在 union case 载荷成员上添加 `[ForyField]`。已知 case 的 record 名称使用 PascalCase FDL case 名称；需要避免名称冲突时，载荷类型使用限定引用。类型化 union 必须声明至少一个非 `Unknown` case；`Unknown(UnknownCase)` 只是 Fory 提供的向前兼容载体。该标记只选择载体，不会在 Schema case 表中增加条目。
+生成的 union case 使用 `[ForyCase]` 同时指定稳定 case ID 和可选的 case 载荷 Schema 类型。不要在 union case 载荷成员上添加 `[ForyField]`。已知 case 的 record 名称使用 PascalCase FDL case 名称；需要避免名称冲突时，载荷类型使用限定引用。类型化 union 必须声明至少一个 Schema 定义的 case，以及恰好一个暴露 `Value: UnknownCase` 的 `[ForyUnknownCase]` case。载体名称不受限制。该标记只选择载体，不会在 Schema case 表中增加条目。
 
 ```csharp
 using Apache.Fory;

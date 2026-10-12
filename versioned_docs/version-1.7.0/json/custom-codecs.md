@@ -109,6 +109,10 @@ ForyJson json =
         .build();
 ```
 
+Factories are also consulted for `Object` elements and values of declared arrays, collections,
+and maps. A factory that claims `Object` replaces the default natural JSON value mapping for those
+occurrences.
+
 A configurable factory must override `factoryKey()` with a deterministic value covering every
 option that can change the created codec class, object model, or generated operations. The default
 factory class name is sufficient only for a configuration-free factory.
@@ -123,8 +127,18 @@ property is omitted by `NON_NULL` or `NON_EMPTY`, the codec's write operation is
 `NON_EMPTY` checks Java empty-value types directly and otherwise uses the codec's `isEmpty` method;
 see [Custom empty values](#custom-empty-values). If the property is emitted, or the value
 is an array element, collection element, map value, Optional value, or atomic-reference value, the
-codec receives and owns null. The registered instance is shared across concurrent operations and
+codec receives and owns null during writing. During reading, the codec owns null when the
+applicable read setting is `SET`. Property `onNullRead`
+and Fory container `onContentNullRead` settings intercept literal null before invoking a selected
+child codec when configured as `SKIP` or `FAIL`. A codec returning Java null after consuming a
+non-null token is not filtered. The registered instance is shared across concurrent operations and
 must be thread-safe.
+
+A complete custom container codec owns its internal representation, so the global content setting
+does not alter it. For such a declared container property, explicit content `SET` delegates to the
+codec; explicit `SKIP` or `FAIL` is rejected. A complete custom object codec likewise owns the
+handling of its internal properties. Ordinary containing-property settings still apply before
+either complete codec is invoked.
 
 A custom codec that materializes composite graph owners must call `JsonReader.reserveGraphMemory`
 with its application-defined byte estimate before creating each owner. This applies to composite

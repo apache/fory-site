@@ -96,7 +96,7 @@ Mixin 提供的 `JsonCodec` 会成为目标的有效注解。精确的 `register
 
 ## `JsonProperty`
 
-`JsonProperty` 配置一个完整逻辑属性的规范名称、序列化索引和值包含策略。字段、getter 或 setter
+`JsonProperty` 配置一个完整逻辑属性的规范名称、序列化索引、写入包含策略和读取端 null 处理。字段、getter 或 setter
 上的注解会应用于合并后的字段/getter/setter 属性组。
 
 ```java
@@ -166,6 +166,51 @@ Scala 的字段缺失行为见 [case class 与注解](scala.md#case-classes-and-
 不支持别名以及相互独立的读写名称。`JsonProperty` 不能与 Any 逻辑属性组合，
 也不能声明在 `JsonAnySetter` 上。
 
+### 读取端 null 处理 {#read-side-null-handling}
+
+`onNullRead` 控制赋给属性的显式 JSON null。`onContentNullRead` 控制属性的数组或集合中的
+null 元素，以及 Map 中的 null 值。两者均使用 `JsonProperty.NullHandling`：
+
+| 值        | 行为                                                             |
+| --------- | ---------------------------------------------------------------- |
+| `DEFAULT` | 继承对应的 builder 设置。这是注解默认值。                        |
+| `SET`     | 按常规规则解码和赋值，包括声明的可空性规则。                     |
+| `SKIP`    | 消费 null，并省略此次赋值、元素或 Map 插入。                     |
+| `FAIL`    | 遇到显式 null 时抛出 `ForyJsonException`。此设置仍允许属性缺失。 |
+
+两个 builder 设置均默认为 `SET`。显式注解值仅覆盖对应的默认设置：
+
+```java
+import org.apache.fory.json.annotation.JsonProperty.NullHandling;
+
+public final class Response {
+  @JsonProperty(onNullRead = NullHandling.SKIP, onContentNullRead = NullHandling.SKIP)
+  public java.util.List<String> seats = java.util.List.of("default");
+}
+```
+
+读取 `{"seats":null}` 会保留初始化的列表。读取 `{"seats":[null,"a"]}` 会赋值为只含 `"a"` 的列表；
+`[null]` 会赋值为空列表。跳过属性不会调用其 setter。构造函数参数遵循原有的缺失属性默认值和
+必需属性校验。跳过重复成员不会清除较早的值：`{"seats":["a"],"seats":null}` 会保留 `"a"`。
+绕过构造函数创建的对象没有可保留的初始化值。
+
+`SET` 保留编解码器行为：null 可能变为 `Optional.empty()`，也可能因基本类型或 Kotlin 非空值而失败。
+`SKIP` 和 `FAIL` 在这种解码之前生效。仅处理字面量 JSON null；字符串 `"null"` 以及自定义编解码器
+处理其他 token 后返回的 Java null 不会被过滤。这些选项不影响写入，也不改变根值的 null 行为。
+
+内容覆盖仅作用于一层。对于 `List<List<String>>`，属性覆盖会跳过 null 内层列表；保留下来的列表内部
+元素遵循全局设置。Map 键不受影响，跳过重复键的 null 值会保留较早的条目。
+数字形式的字节数组支持内容处理，Base64 和 Base16 字符串不支持。在标量、声明为 `Object` 的值、
+透明包装或编码后的二进制字符串上显式指定内容设置是无效的。
+
+全局内容设置也适用于根容器、动态 JSON 数组或对象以及 Any 条目。不能在展开的父属性上显式指定
+null 设置；展开后的子属性保留各自的设置。仅遇到被跳过的子属性不会创建该组或将该组标记为已提供。
+
+匹配的字段、getter、setter 和创建器声明按每个设置独立合并。相互冲突的显式值会被拒绝，
+读取端设置要求属性可读或存在创建器参数。Mixin 替换和移除在合并之前执行。
+完整的自定义容器编解码器支持显式 `SET`；显式内容 `SKIP` 或 `FAIL` 要求容器表示由 Fory 负责。
+见[自定义编解码器](custom-codecs.md)。
+
 ## `JsonInclude` 与默认值省略 {#jsoninclude-and-default-omission}
 
 默认值可能依赖构造函数参数、时间、随机数或外部状态。能够求值并不意味着省略后能恢复相同的值。
@@ -220,7 +265,7 @@ Fory 不证明纯度或分析默认值表达式。Scala 依赖式默认值方法
 
 基本类型按值比较。浮点数区分正零和负零，非有限值保留并按常规方式输出。数组比较精确的数组类型与内容，
 嵌套数组递归比较；其他引用使用 `equals`。不支持循环结构的深度比较。
-读取行为独立：显式 null 不等于缺失，可变参考默认值不会与解码对象共享。
+读取行为独立：在 `onNullRead(SET)` 下，显式 null 不等于缺失，可变参考默认值不会与解码对象共享。
 
 可以通过已有 Mixin 机制授权默认值，而不修改模型：
 
@@ -551,7 +596,7 @@ public final class Name {
 会应用于每个子属性经 `JsonProperty` 和已配置命名策略处理后的最终 JSON 名称。嵌套展开属性会从内向外
 组合这些转换。
 
-null 子对象不会写入任何成员。读取时，Fory 只有在遇到至少一个展开成员后才会创建并赋值该子对象。
+null 子对象不会写入任何成员。读取时，Fory 只有在遇到至少一个值未被跳过的展开成员后才会创建并赋值该子对象。
 因此，完全缺失的属性组会保留可变父对象的初始化值；Record 或创建器参数则保持常规的缺失属性默认值。
 对于部分输入，子对象的其他属性使用普通默认值完成构造。
 
@@ -600,7 +645,7 @@ import org.apache.fory.json.annotation.JsonIgnore;
 public Map<String, Object> outputOnly;
 ```
 
-读取时会复用现有 Map。非 final 的 null 字段会在遇到第一个未知成员时初始化。普通可变对象上的可读 final
+读取时会复用现有 Map。非 final 的 null 字段会在遇到第一个值未被跳过的未知成员时初始化。普通可变对象上的可读 final
 字段必须已经包含可变 Map。Record 和属性列表形式的 `JsonCreator` 类型则通过构造参数接收累计得到的 Map。
 如果不存在未知成员，Fory 不会初始化 null 字段。
 
@@ -700,8 +745,8 @@ public static User create(
 
 创建器必须至少有一个参数，且不能使用可变参数或泛型。构造函数必须是 public。工厂方法必须是 public
 且 static，其精确返回类型必须声明为目标类，并返回非 null 值，且该值的运行时类必须恰好是目标类。
-缺失的引用参数使用 null，缺失的基本类型参数使用 Java 零值，重复成员采用最后一个值；基本类型参数若
-显式接收 null 则会被拒绝。Record 不能声明基于属性的 `JsonCreator`；带有 `JsonValue` 的 Record 可以在
+缺失的引用参数使用 null，缺失的基本类型参数使用 Java 零值。重复成员采用最后一个未被跳过的值；
+在 `onNullRead(SET)` 下，基本类型参数显式接收 null 会被拒绝。Record 不能声明基于属性的 `JsonCreator`；带有 `JsonValue` 的 Record 可以在
 其单 String 参数的规范构造函数上标注值形式。
 
 ## `JsonValidator`

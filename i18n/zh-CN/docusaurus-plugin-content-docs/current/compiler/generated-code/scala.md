@@ -96,7 +96,8 @@ enum PhoneType {
 联合生成 Scala 3 ADT 枚举。`Unknown(UnknownCase)` 是 Fory 提供的向前兼容载体，使用
 `@ForyUnknownCase` 标记。它不会出现在 Schema case 表中，因为该标记只选择载体，不会
 添加 Schema 条目。Schema 定义的 case 使用非负 `@ForyCase` ID。类型化联合必须至少
-包含一个非 `Unknown` case。
+包含一个 Schema 定义的 case。名称冲突时，生成的载体名为 `Unknown_`；如果该名称也冲突，
+则会报错。Schema case 名称保持不变。
 
 ```scala
 package addressbook
