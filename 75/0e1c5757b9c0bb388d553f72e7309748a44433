@@ -1,0 +1,14 @@
+.github/workflows/deploy.yml
+  h_e94f2b5704cbef 61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "750e1c5757b9c0bb388d553f72e7309748a44433",
+  "prompts": {},
+  "humans": {
+    "h_e94f2b5704cbef": {
+      "author": "chaokunyang <shawn.ck.yang@gmail.com>"
+    }
+  }
+}
