@@ -1,5 +1,5 @@
 ---
-title: Integration
+title: 框架集成
 sidebar_position: 13
 id: integration
 license: |
@@ -21,22 +21,21 @@ license: |
 
 ## Spring Fory
 
-[spring-fory](https://github.com/chaokunyang/spring-fory) provides Spring MVC message converters,
-Spring WebFlux codecs, and Spring Boot auto-configuration starters for Fory JSON. It supports
-ordinary JSON request and response bodies, with streaming JSON and NDJSON support in WebFlux.
+[spring-fory](https://github.com/chaokunyang/spring-fory) 为 Fory JSON 提供 Spring MVC 消息转换器、
+Spring WebFlux 编解码器以及 Spring Boot 自动配置 starter。它支持常规 JSON 请求和响应体，
+并在 WebFlux 中支持流式 JSON 和 NDJSON。
 
-See the project's [installation and usage guide](https://github.com/chaokunyang/spring-fory#installation)
-to select the adapter or starter matching your Spring version and configure your application.
+请参阅项目的[安装和使用指南](https://github.com/chaokunyang/spring-fory#installation)，
+选择与 Spring 版本匹配的适配器或 starter，并配置应用。
 
-## Kotlin integration
+## Kotlin 集成 {#kotlin-integration}
 
-Use `jsonTypeRef<Any?>(kType)` when a framework supplies a Kotlin `KType` at runtime and the
-callback cannot use a reified type argument. The supplied `KType` determines the complete JSON
-type, including nested generic arguments and nullability. `Any?` is only the callback's static
-view of the value; it does not replace the supplied type with a dynamic JSON schema.
+当框架在运行时提供 Kotlin `KType`，且回调无法使用 reified 类型参数时，请使用
+`jsonTypeRef<Any?>(kType)`。传入的 `KType` 决定完整 JSON 类型，包括嵌套泛型参数和可空性。
+`Any?` 只是回调中值的静态视图，不会将传入类型替换为动态 JSON Schema。
 
-Obtaining a `KType` from a Kotlin function or a Java `Method` requires the application's
-`kotlin-reflect` dependency. Match its version to the application's Kotlin version:
+从 Kotlin 函数或 Java `Method` 获取 `KType`，需要应用添加 `kotlin-reflect` 依赖。
+其版本应与应用的 Kotlin 版本保持一致：
 
 ```kotlin
 dependencies {
@@ -44,7 +43,7 @@ dependencies {
 }
 ```
 
-For example, discover and retain a controller method's response type:
+例如，发现并保留控制器方法的响应类型：
 
 ```kotlin
 import java.io.OutputStream
@@ -71,20 +70,51 @@ fun writeResponse(value: Any?, output: OutputStream) {
 fun readResponse(bytes: ByteArray): Any? = json.fromJson(bytes, responseType)
 ```
 
-Discover each declared type once and reuse its token. For request bodies, obtain the corresponding
-Kotlin value parameter's `KType`. A method with unresolved type parameters still needs its concrete
-type arguments before conversion; star projections and contravariant projections remain unsupported.
-If you select a static type more specific than `Any?`, the caller must ensure it matches the
-supplied `KType`.
+每个声明类型只需发现一次，并复用对应类型令牌。对于请求体，应获取对应 Kotlin 值参数的
+`KType`。如果方法仍有未解析的类型参数，转换前必须提供具体类型实参；星投影和逆变投影仍不受支持。
+若选择了比 `Any?` 更具体的静态类型，调用方必须保证它与传入的 `KType` 一致。
 
-For Spring MVC, retain the controller's Kotlin declaration when adapting the request or response
-to a converter. A `SmartHttpMessageConverter` can receive application-provided read/write hints
-containing that `KType` or its Fory type token. When an HTTP wrapper such as
-`ResponseEntity<Response<List<Employee>>>` is present, select the body type
-`Response<List<Employee>>` before constructing the token.
+在 Spring MVC 中，将请求或响应适配到转换器时，应保留控制器的 Kotlin 声明。
+`SmartHttpMessageConverter` 可以通过应用提供的读写 hints 接收该 `KType` 或 Fory 类型令牌。
+如果存在 `ResponseEntity<Response<List<Employee>>>` 等 HTTP 包装类型，
+应先选取消息体类型 `Response<List<Employee>>`，再构造令牌。
 
-An `AbstractHttpMessageConverter` callback that supplies only the runtime object loses generic
-arguments. `AbstractGenericHttpMessageConverter` preserves Java generics, but
-`TypeRef.of(javaType)` does not restore Kotlin nullability. Neither a Java `Type` nor the runtime
-value alone can recover the full Kotlin declaration. Use `jsonTypeRef(kType)` after obtaining that
-declaration; this API does not automatically install a Spring converter.
+只提供运行时对象的 `AbstractHttpMessageConverter` 回调会丢失泛型参数。
+`AbstractGenericHttpMessageConverter` 能保留 Java 泛型，但 `TypeRef.of(javaType)` 无法恢复 Kotlin
+可空性。单独使用 Java `Type` 或运行时值，都无法恢复完整 Kotlin 声明。
+应在获取该声明后使用 `jsonTypeRef(kType)`；此 API 不会自动安装 Spring 转换器。
+
+## 逐个读写 token {#token-level-reading-and-writing}
+
+自带序列化器的框架可以直接使用 Fory JSON 的 UTF-8 读取器和写入器。`readUtf8` 接受 `Function<Utf8JsonReader, R>` 并返回回调结果。`writeUtf8` 接受 `Consumer<Utf8JsonWriter>` 并返回写出的字节：
+
+```java
+ForyJson json = ForyJson.builder().build();
+
+byte[] bytes =
+    json.writeUtf8(
+        writer -> {
+          writer.writeObjectStart();
+          writer.writeFieldName("id");
+          writer.writeInt(7);
+          writer.writeObjectEnd();
+        });
+
+int id =
+    json.readUtf8(
+        bytes,
+        0,
+        bytes.length,
+        reader -> {
+          reader.expectNextToken('{');
+          String name = reader.readFieldName(); // "id"
+          reader.expect(':');
+          int value = reader.readInt();
+          reader.expectNextToken('}');
+          return value;
+        });
+```
+
+每次调用须同步读写一个完整 JSON 值，读取器和写入器仅在回调期间有效。回调返回后，若剩余输入包含非空白字符，`readUtf8` 会报错。
+
+`expectNextToken` 等方法不会自动记录嵌套深度或内存分配。处理不可信输入时，自定义反序列化器应在读每个对象或数组前后调用 `reader.enterDepth()` 和 `reader.exitDepth()`，并在分配容器前调用 `reader.reserveGraphMemory(bytes)`，以应用实例的 `maxDepth` 和对象图内存限制。详见[安全指南](security.md)。回调抛出的非受检异常会原样传播，受检异常需由集成代码包装，例如将 `IOException` 包装为 `UncheckedIOException`。同一个 `ForyJson` 实例上的这些根操作不可重入。

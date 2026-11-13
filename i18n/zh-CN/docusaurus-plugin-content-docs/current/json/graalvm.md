@@ -21,7 +21,7 @@ license: |
 
 ## 可达模型
 
-Fory JSON 使用一个 Native Image Feature。Java 模型通过可达注解发现，Feature 不使用 Java 注解处理器。请为原生可执行文件需要读写的每个可达具体 Java 对象模型添加 `@JsonType`：
+Fory JSON 使用一个 Native Image Feature，通过可达注解发现 Java 模型。该 Feature 无需 Java 注解处理器，并会忽略处理器生成的 JSON 制品，包括依赖中打包的制品。请为原生可执行文件需要读写的每个可达具体 Java 对象模型添加 `@JsonType`：
 
 ```java
 import org.apache.fory.json.ForyJson;

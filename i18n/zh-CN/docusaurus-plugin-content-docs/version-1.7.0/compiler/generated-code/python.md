@@ -72,7 +72,9 @@ class Person:
 
 ## 字段名称 {#field-names}
 
-生成的 Python 属性使用 `snake_case`，Python 关键字会增加尾部下划线。
+生成的 Python 属性使用 `snake_case`。关键字 `class` 会变为 `class_`，已经带后缀的 `class_` 和 `class__` 则保留原名。
+如果同一消息中的两个字段经转换和转义后属性名相同，编译会失败。例如，`class` 和 `class_` 都会生成 `class_`，而 `userName` 和 `user_name` 都会生成 `user_name`。请在 Schema 中重命名其中一个字段。
+
 `field`、`pyfory`、`decimal`、`list` 和 `dict` 也会增加尾部下划线。
 由这五个名称之一加下划线组成的名称会再增加一个下划线，确保字段彼此不同：
 `field`、`field_` 和 `field__` 分别变为 `field_`、`field__` 和 `field___`。

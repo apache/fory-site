@@ -93,6 +93,7 @@ fory.register::<Order>(100)?;
 - Fory 派生宏支持的枚举和类 union 模型。
 - `Vec`、map、set、tuple、array 和可选值。
 - `Box<T>`、`Rc<T>`、`Arc<T>`、`RcWeak<T>` 和 `ArcWeak<T>`。
+- 这些智能指针也可指向 `str` 或 `[T]`，支持共享引用和弱引用。
 - `RefCell<T>` 和 `Mutex<T>`。
 - `Box<dyn Trait>`、`Rc<dyn Trait>` 和 `Arc<dyn Trait>` 等特征对象。
 - 对已注册的非容器载荷，通过 `Box<dyn Any>`、`Rc<dyn Any>` 和

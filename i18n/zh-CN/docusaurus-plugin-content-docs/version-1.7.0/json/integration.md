@@ -83,3 +83,38 @@ fun readResponse(bytes: ByteArray): Any? = json.fromJson(bytes, responseType)
 `AbstractGenericHttpMessageConverter` 能保留 Java 泛型，但 `TypeRef.of(javaType)` 无法恢复 Kotlin
 可空性。单独使用 Java `Type` 或运行时值，都无法恢复完整 Kotlin 声明。
 应在获取该声明后使用 `jsonTypeRef(kType)`；此 API 不会自动安装 Spring 转换器。
+
+## 逐个读写 token {#token-level-reading-and-writing}
+
+自带序列化器的框架可以直接使用 Fory JSON 的 UTF-8 读取器和写入器。`readUtf8` 接受 `Function<Utf8JsonReader, R>` 并返回回调结果。`writeUtf8` 接受 `Consumer<Utf8JsonWriter>` 并返回写出的字节：
+
+```java
+ForyJson json = ForyJson.builder().build();
+
+byte[] bytes =
+    json.writeUtf8(
+        writer -> {
+          writer.writeObjectStart();
+          writer.writeFieldName("id");
+          writer.writeInt(7);
+          writer.writeObjectEnd();
+        });
+
+int id =
+    json.readUtf8(
+        bytes,
+        0,
+        bytes.length,
+        reader -> {
+          reader.expectNextToken('{');
+          String name = reader.readFieldName(); // "id"
+          reader.expect(':');
+          int value = reader.readInt();
+          reader.expectNextToken('}');
+          return value;
+        });
+```
+
+每次调用须同步读写一个完整 JSON 值，读取器和写入器仅在回调期间有效。回调返回后，若剩余输入包含非空白字符，`readUtf8` 会报错。
+
+`expectNextToken` 等方法不会自动记录嵌套深度或内存分配。处理不可信输入时，自定义反序列化器应在读每个对象或数组前后调用 `reader.enterDepth()` 和 `reader.exitDepth()`，并在分配容器前调用 `reader.reserveGraphMemory(bytes)`，以应用实例的 `maxDepth` 和对象图内存限制。详见[安全指南](security.md)。回调抛出的非受检异常会原样传播，受检异常需由集成代码包装，例如将 `IOException` 包装为 `UncheckedIOException`。同一个 `ForyJson` 实例上的这些根操作不可重入。

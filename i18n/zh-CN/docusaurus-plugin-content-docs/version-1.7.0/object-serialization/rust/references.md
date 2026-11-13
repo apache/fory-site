@@ -77,6 +77,25 @@ assert!(Arc::ptr_eq(&decoded[0], &decoded[1]));
 
 ## 使用弱指针的循环引用
 
+启用引用跟踪后，共享字符串和切片也会保留引用关系：
+
+```rust
+use fory::{ArcWeak, Fory};
+use std::sync::Arc;
+
+let fory = Fory::builder().track_ref(true).build();
+let text: Arc<str> = Arc::from("shared");
+let value = (ArcWeak::from(&text), text.clone(), text);
+let bytes = fory.serialize(&value)?;
+let decoded: (ArcWeak<str>, Arc<str>, Arc<str>) = fory.deserialize(&bytes)?;
+assert!(Arc::ptr_eq(&decoded.1, &decoded.2));
+assert!(Arc::ptr_eq(&decoded.0.upgrade().unwrap(), &decoded.1));
+```
+
+`Rc<str>`、`Rc<[T]>`、`Arc<[T]>` 及其 Fory 弱指针包装类型同样适用。`RcWeak::<str>::new()` 和 `ArcWeak::<[T]>::new()` 可创建空弱引用。已失效的弱引用反序列化为空。使用 Fory 的 `RcWeak` 或 `ArcWeak` 包装标准库弱指针以参与序列化。
+
+在同一对象图中，指向同一块内存的引用须使用相同的目标类型。例如，启用引用跟踪后可以共享 `Arc<[i32]>`，但不能将 `Arc<[i32; 2]>` 与转换得到的 `Arc<[i32]>` 视图混用。
+
 要序列化父子关系或双向链接结构等循环引用，请使用 `RcWeak<T>` 或 `ArcWeak<T>` 打破循环。
 
 **工作原理：**
