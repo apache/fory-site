@@ -1,0 +1,300 @@
+blog/2026-11-13-fory_1_7_8_released.md
+  h_e94f2b5704cbef 1-35
+docs/compiler/build-integration.md
+  h_e94f2b5704cbef 214
+docs/compiler/cli.md
+  h_e94f2b5704cbef 692
+docs/grpc/csharp.md
+  h_e94f2b5704cbef 42,51
+docs/grpc/dart.md
+  h_e94f2b5704cbef 41
+docs/grpc/rust.md
+  h_e94f2b5704cbef 40
+docs/json/getting-started.md
+  h_e94f2b5704cbef 46,60,69
+docs/json/kotlin.md
+  h_e94f2b5704cbef 44,57
+docs/json/scala.md
+  h_e94f2b5704cbef 28
+docs/object-serialization/cpp/index.md
+  h_e94f2b5704cbef 65,95,99,131
+docs/object-serialization/csharp/index.md
+  h_e94f2b5704cbef 49
+docs/object-serialization/dart/index.md
+  h_e94f2b5704cbef 50
+docs/object-serialization/java/index.md
+  h_e94f2b5704cbef 66,74
+docs/object-serialization/kotlin/index.md
+  h_e94f2b5704cbef 56,63
+docs/object-serialization/rust/basic-serialization.md
+  h_e94f2b5704cbef 185
+docs/object-serialization/rust/index.md
+  h_e94f2b5704cbef 40-42,55
+docs/object-serialization/scala/index.md
+  h_e94f2b5704cbef 52
+docs/row-format/java.md
+  h_e94f2b5704cbef 46,53
+docs/start/cpp.md
+  h_e94f2b5704cbef 48
+docs/start/csharp.md
+  h_e94f2b5704cbef 39
+docs/start/dart.md
+  h_e94f2b5704cbef 39
+docs/start/go.md
+  h_e94f2b5704cbef 41
+docs/start/java.md
+  h_e94f2b5704cbef 47,54,100
+docs/start/javascript.md
+  h_e94f2b5704cbef 39,75
+docs/start/kotlin.md
+  h_e94f2b5704cbef 47,91
+docs/start/python.md
+  h_e94f2b5704cbef 38
+docs/start/rust.md
+  h_e94f2b5704cbef 39
+docs/start/scala.md
+  h_e94f2b5704cbef 40
+docs/start/swift.md
+  h_e94f2b5704cbef 45
+i18n/zh-CN/docusaurus-plugin-content-blog/2026-11-13-fory_1_7_8_released.md
+  h_e94f2b5704cbef 1-35
+i18n/zh-CN/docusaurus-plugin-content-docs/current/compiler/build-integration.md
+  h_e94f2b5704cbef 214
+i18n/zh-CN/docusaurus-plugin-content-docs/current/compiler/cli.md
+  h_e94f2b5704cbef 662
+i18n/zh-CN/docusaurus-plugin-content-docs/current/compiler/generated-code/python.md
+  h_e94f2b5704cbef 75-77
+i18n/zh-CN/docusaurus-plugin-content-docs/current/grpc/csharp.md
+  h_e94f2b5704cbef 39,48
+i18n/zh-CN/docusaurus-plugin-content-docs/current/grpc/dart.md
+  h_e94f2b5704cbef 32
+i18n/zh-CN/docusaurus-plugin-content-docs/current/grpc/rust.md
+  h_e94f2b5704cbef 32
+i18n/zh-CN/docusaurus-plugin-content-docs/current/json/annotations.md
+  h_e94f2b5704cbef 22,298-314
+i18n/zh-CN/docusaurus-plugin-content-docs/current/json/getting-started.md
+  h_e94f2b5704cbef 44,58,67
+i18n/zh-CN/docusaurus-plugin-content-docs/current/json/graalvm.md
+  h_e94f2b5704cbef 24
+i18n/zh-CN/docusaurus-plugin-content-docs/current/json/integration.md
+  h_e94f2b5704cbef 2,24-26,28-29,31,33-35,37-38,46,73-120
+i18n/zh-CN/docusaurus-plugin-content-docs/current/json/kotlin.md
+  h_e94f2b5704cbef 41,53
+i18n/zh-CN/docusaurus-plugin-content-docs/current/json/object-mapping.md
+  h_e94f2b5704cbef 118-131
+i18n/zh-CN/docusaurus-plugin-content-docs/current/json/scala.md
+  h_e94f2b5704cbef 27
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/cpp/index.md
+  h_e94f2b5704cbef 63,93,97,128
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/csharp/index.md
+  h_e94f2b5704cbef 47
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/dart/index.md
+  h_e94f2b5704cbef 47
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/java/index.md
+  h_e94f2b5704cbef 54,62
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/kotlin/index.md
+  h_e94f2b5704cbef 56,63
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/rust/basic-serialization.md
+  h_e94f2b5704cbef 120-147,176
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/rust/external-types.md
+  h_e94f2b5704cbef 191-202
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/rust/index.md
+  h_e94f2b5704cbef 39-41,51
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/rust/native.md
+  h_e94f2b5704cbef 96
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/rust/references.md
+  h_e94f2b5704cbef 80-98
+i18n/zh-CN/docusaurus-plugin-content-docs/current/object-serialization/scala/index.md
+  h_e94f2b5704cbef 52
+i18n/zh-CN/docusaurus-plugin-content-docs/current/row-format/java.md
+  h_e94f2b5704cbef 44,51
+i18n/zh-CN/docusaurus-plugin-content-docs/current/specification/xlang_type_mapping.md
+  h_e94f2b5704cbef 118
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/cpp.md
+  h_e94f2b5704cbef 45
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/csharp.md
+  h_e94f2b5704cbef 37
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/dart.md
+  h_e94f2b5704cbef 37
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/go.md
+  h_e94f2b5704cbef 39
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/java.md
+  h_e94f2b5704cbef 42,49,88
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/javascript.md
+  h_e94f2b5704cbef 36,68
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/kotlin.md
+  h_e94f2b5704cbef 45,84
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/python.md
+  h_e94f2b5704cbef 36
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/rust.md
+  h_e94f2b5704cbef 37
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/scala.md
+  h_e94f2b5704cbef 38
+i18n/zh-CN/docusaurus-plugin-content-docs/current/start/swift.md
+  h_e94f2b5704cbef 42
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/compiler/build-integration.md
+  h_e94f2b5704cbef 214
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/compiler/cli.md
+  h_e94f2b5704cbef 662
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/compiler/generated-code/python.md
+  h_e94f2b5704cbef 75-77
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/grpc/csharp.md
+  h_e94f2b5704cbef 39,48
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/grpc/dart.md
+  h_e94f2b5704cbef 32
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/grpc/rust.md
+  h_e94f2b5704cbef 32
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/json/annotations.md
+  h_e94f2b5704cbef 22,298-314
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/json/getting-started.md
+  h_e94f2b5704cbef 44,58,67
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/json/graalvm.md
+  h_e94f2b5704cbef 24
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/json/integration.md
+  h_e94f2b5704cbef 86-120
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/json/kotlin.md
+  h_e94f2b5704cbef 41,53
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/json/object-mapping.md
+  h_e94f2b5704cbef 118-131
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/json/scala.md
+  h_e94f2b5704cbef 27
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/cpp/index.md
+  h_e94f2b5704cbef 63,93,97,128
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/csharp/index.md
+  h_e94f2b5704cbef 47
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/dart/index.md
+  h_e94f2b5704cbef 47
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/java/index.md
+  h_e94f2b5704cbef 54,62
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/kotlin/index.md
+  h_e94f2b5704cbef 56,63
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/rust/basic-serialization.md
+  h_e94f2b5704cbef 120-147,176
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/rust/external-types.md
+  h_e94f2b5704cbef 191-202
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/rust/index.md
+  h_e94f2b5704cbef 39-41,51
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/rust/native.md
+  h_e94f2b5704cbef 96
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/rust/references.md
+  h_e94f2b5704cbef 80-98
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/object-serialization/scala/index.md
+  h_e94f2b5704cbef 52
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/row-format/java.md
+  h_e94f2b5704cbef 44,51
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/specification/xlang_type_mapping.md
+  h_e94f2b5704cbef 118
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/cpp.md
+  h_e94f2b5704cbef 45
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/csharp.md
+  h_e94f2b5704cbef 37
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/dart.md
+  h_e94f2b5704cbef 37
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/go.md
+  h_e94f2b5704cbef 39
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/java.md
+  h_e94f2b5704cbef 42,49,88
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/javascript.md
+  h_e94f2b5704cbef 36,68
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/kotlin.md
+  h_e94f2b5704cbef 45,84
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/python.md
+  h_e94f2b5704cbef 36
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/rust.md
+  h_e94f2b5704cbef 37
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/scala.md
+  h_e94f2b5704cbef 38
+i18n/zh-CN/docusaurus-plugin-content-docs/version-1.7.0/start/swift.md
+  h_e94f2b5704cbef 42
+i18n/zh-CN/docusaurus-plugin-content-pages/download/index.md
+  h_e94f2b5704cbef 12,14-16,34,40,56,59,61-63
+src/components/home/HomepageLanding.tsx
+  h_e94f2b5704cbef 141,163,186,212,237,265,287,311,335,371,392-393
+src/pages/download/index.md
+  h_e94f2b5704cbef 12,14-16,34,40,57,60,62-64
+versioned_docs/version-1.7.0/compiler/build-integration.md
+  h_e94f2b5704cbef 214
+versioned_docs/version-1.7.0/compiler/cli.md
+  h_e94f2b5704cbef 692
+versioned_docs/version-1.7.0/compiler/generated-code/python.md
+  h_e94f2b5704cbef 76-88
+versioned_docs/version-1.7.0/grpc/csharp.md
+  h_e94f2b5704cbef 42,51
+versioned_docs/version-1.7.0/grpc/dart.md
+  h_e94f2b5704cbef 41
+versioned_docs/version-1.7.0/grpc/rust.md
+  h_e94f2b5704cbef 40
+versioned_docs/version-1.7.0/json/annotations.md
+  h_e94f2b5704cbef 24-25,353-376
+versioned_docs/version-1.7.0/json/getting-started.md
+  h_e94f2b5704cbef 46,60,69
+versioned_docs/version-1.7.0/json/graalvm.md
+  h_e94f2b5704cbef 25-26
+versioned_docs/version-1.7.0/json/integration.md
+  h_e94f2b5704cbef 91-137
+versioned_docs/version-1.7.0/json/kotlin.md
+  h_e94f2b5704cbef 44,57
+versioned_docs/version-1.7.0/json/object-mapping.md
+  h_e94f2b5704cbef 136-155
+versioned_docs/version-1.7.0/json/scala.md
+  h_e94f2b5704cbef 28
+versioned_docs/version-1.7.0/object-serialization/cpp/index.md
+  h_e94f2b5704cbef 65,95,99,131
+versioned_docs/version-1.7.0/object-serialization/csharp/index.md
+  h_e94f2b5704cbef 49
+versioned_docs/version-1.7.0/object-serialization/dart/index.md
+  h_e94f2b5704cbef 50
+versioned_docs/version-1.7.0/object-serialization/java/index.md
+  h_e94f2b5704cbef 66,74
+versioned_docs/version-1.7.0/object-serialization/kotlin/index.md
+  h_e94f2b5704cbef 56,63
+versioned_docs/version-1.7.0/object-serialization/rust/basic-serialization.md
+  h_e94f2b5704cbef 120-154,185
+versioned_docs/version-1.7.0/object-serialization/rust/external-types.md
+  h_e94f2b5704cbef 252-268
+versioned_docs/version-1.7.0/object-serialization/rust/index.md
+  h_e94f2b5704cbef 40-42,55
+versioned_docs/version-1.7.0/object-serialization/rust/native.md
+  h_e94f2b5704cbef 109
+versioned_docs/version-1.7.0/object-serialization/rust/references.md
+  h_e94f2b5704cbef 80-103
+versioned_docs/version-1.7.0/object-serialization/scala/index.md
+  h_e94f2b5704cbef 52
+versioned_docs/version-1.7.0/row-format/java.md
+  h_e94f2b5704cbef 46,53
+versioned_docs/version-1.7.0/specification/xlang_type_mapping.md
+  h_e94f2b5704cbef 122-125
+versioned_docs/version-1.7.0/start/cpp.md
+  h_e94f2b5704cbef 48
+versioned_docs/version-1.7.0/start/csharp.md
+  h_e94f2b5704cbef 39
+versioned_docs/version-1.7.0/start/dart.md
+  h_e94f2b5704cbef 39
+versioned_docs/version-1.7.0/start/go.md
+  h_e94f2b5704cbef 41
+versioned_docs/version-1.7.0/start/java.md
+  h_e94f2b5704cbef 47,54,100
+versioned_docs/version-1.7.0/start/javascript.md
+  h_e94f2b5704cbef 39,75
+versioned_docs/version-1.7.0/start/kotlin.md
+  h_e94f2b5704cbef 47,91
+versioned_docs/version-1.7.0/start/python.md
+  h_e94f2b5704cbef 38
+versioned_docs/version-1.7.0/start/rust.md
+  h_e94f2b5704cbef 39
+versioned_docs/version-1.7.0/start/scala.md
+  h_e94f2b5704cbef 40
+versioned_docs/version-1.7.0/start/swift.md
+  h_e94f2b5704cbef 45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9597ef23cd8f2958b8fc27f54ecf50d3a74f14bc",
+  "prompts": {},
+  "humans": {
+    "h_e94f2b5704cbef": {
+      "author": "chaokunyang <shawn.ck.yang@gmail.com>"
+    }
+  }
+}
