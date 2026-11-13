@@ -115,6 +115,20 @@ ForyJson json = ForyJson.builder()
 此选项不改变写入。如果包含策略省略了必需属性，生成的 JSON 可能被严格读取器拒绝。应在输出中保留该属性，
 或使用未启用此选项的读取器。
 
+## 重复属性 {#duplicate-properties}
+
+同一 JSON 对象中已知属性重复出现时，默认保留最后一个值。要拒绝这样的对象，可开启 `failOnDuplicateProperties(true)`：
+
+```java
+ForyJson json = ForyJson.builder()
+    .failOnDuplicateProperties(true)
+    .build();
+```
+
+此选项默认为 `false`，对 Fory 提供的对象编解码器生效，包括嵌套对象。已知属性包括允许读取的字段、setter、creator 参数，以及 `JsonUnwrapped` 展开的属性。显式 JSON null 也算一次，即使 `onNullRead(SKIP)` 会跳过该值。未知或被忽略的名称不参与检查，重复的 Any 成员沿用原有行为。重复的已知属性会触发 `ForyJsonException`，异常中包含该属性名。
+
+可通过 [`JsonDuplicateProperties`](annotations.md#jsonduplicateproperties) 单独设置某个类的行为。该选项仅影响读取。
+
 ## Kotlin 对象映射 {#kotlin-object-mapping}
 
 为 Kotlin/JVM 类安装 `fory-json-kotlin` 并使用 `ForyJsonKotlin.builder()`。Kotlin 普通类和 data class 使用选定的构造函数、精确属性类型、编译器默认值和声明的可空性，不使用 Java 绕过构造函数的回退路径。成员缺失或其 null 输入被跳过时使用默认值。默认情况下，显式 JSON null 是已提供的值，非空参数会拒绝它。

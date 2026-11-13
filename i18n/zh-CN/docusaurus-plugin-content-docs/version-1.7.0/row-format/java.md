@@ -41,14 +41,14 @@ Maven：
 <dependency>
   <groupId>org.apache.fory</groupId>
   <artifactId>fory-format</artifactId>
-  <version>1.7.7</version>
+  <version>1.7.8</version>
 </dependency>
 ```
 
 Gradle：
 
 ```kotlin
-implementation("org.apache.fory:fory-format:1.7.7")
+implementation("org.apache.fory:fory-format:1.7.8")
 ```
 
 ## 基本用法

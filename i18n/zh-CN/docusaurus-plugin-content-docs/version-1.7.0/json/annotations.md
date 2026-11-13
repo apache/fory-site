@@ -19,7 +19,7 @@ license: |
   limitations under the License.
 ---
 
-Fory JSON 在 `org.apache.fory.json.annotation` 中提供以下映射和验证注解：`JsonAnyGetter`、`JsonAnyProperty`、`JsonAnySetter`、`JsonByteArray`、`JsonCodec`、`JsonCreator`、`JsonFormat`、`JsonIgnore`、`JsonInclude`、`JsonProperty`、`JsonPropertyOrder`、`JsonRawValue`、`JsonSubTypes`、`JsonUnwrapped`、`JsonValidator` 和 `JsonValue`。`JsonType` 是独立的构建期模型标记。这些属于 Fory JSON API，不是 Jackson、Gson 或 Fory 二进制协议兼容注解。
+Fory JSON 在 `org.apache.fory.json.annotation` 中提供以下映射和验证注解：`JsonAnyGetter`、`JsonAnyProperty`、`JsonAnySetter`、`JsonByteArray`、`JsonCodec`、`JsonCreator`、`JsonDuplicateProperties`、`JsonFormat`、`JsonIgnore`、`JsonInclude`、`JsonProperty`、`JsonPropertyOrder`、`JsonRawValue`、`JsonSubTypes`、`JsonUnwrapped`、`JsonValidator` 和 `JsonValue`。`JsonType` 是独立的构建期模型标记。这些属于 Fory JSON API，不是 Jackson、Gson 或 Fory 二进制协议兼容注解。
 
 `JsonType` 不会被继承，因此每个需要参与平台构建流程且符合要求的具体模型都必须单独标注。Java 源码需要使用 `fory-annotation-processor`。未标注的普通 Java 类仍可使用反射；在 Android 上，它们需要由应用编写精确 R8 规则。经过 Android 脱糖处理的 Record 必须直接声明 `JsonType`，或使用已编译的精确 `JsonMixin` 配对。在 Native Image 之外，直接标注的 Java 模型如果使用默认对象编解码器却未运行注解处理器，会在创建编解码器时失败。
 
@@ -294,6 +294,23 @@ json.toJson(new RetryPolicy()); // {"timestamp":0}
 Android 和 Native Image 继续使用已有的 `@JsonType` 或 Mixin 构建配置。
 使用 R8/ProGuard 的 Kotlin 应用必须运行 JSON KSP。默认值在运行时求值，不在注解处理阶段求值。
 见 [Kotlin](kotlin.md)。
+
+## `JsonDuplicateProperties`
+
+`@JsonDuplicateProperties` 控制读取某个类时是否拒绝同一 JSON 对象中重复出现的已知属性，并覆盖构建器的 `failOnDuplicateProperties` 设置。详见[重复属性](object-mapping.md#duplicate-properties)。
+
+```java
+import org.apache.fory.json.annotation.JsonDuplicateProperties;
+
+@JsonDuplicateProperties(fail = true)
+public final class BidRequest {
+  public String id;
+  public long tmax;
+  public Source source;
+}
+```
+
+若输入为 `{"id":"r1","tmax":100,"tmax":200}`，读取会抛出指明 `tmax` 的 `ForyJsonException`。嵌套的 `source` 遵循 `Source` 类的设置。使用 `fail = false` 可以在构建器启用检查时为该类保留最后一个值。子类不继承此注解，明确指向该类的 Mixin 可以提供或替换此设置。该注解仅对将类作为 JSON 对象读取时生效。通过 `JsonValue`、`JsonCodec`、已注册的编解码器或枚举读取时，以及写入时，均不受影响。
 
 ## `JsonPropertyOrder`
 

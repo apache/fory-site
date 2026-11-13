@@ -9,11 +9,11 @@ Apache Fory™ 的官方发布以源码制品形式提供。
 
 ## 最新版本
 
-当前最新源码版本为 1.7.7：
+当前最新源码版本为 1.7.8：
 
-| 版本  | 日期       | 源码                                                                                                                                                                                                                                                                          | 发布说明                                                            |
-| ----- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| 1.7.7 | 2026-10-12 | [source](https://www.apache.org/dyn/closer.lua/fory/1.7.7/apache-fory-1.7.7-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/1.7.7/apache-fory-1.7.7-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/1.7.7/apache-fory-1.7.7-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v1.7.7) |
+| 版本  | 日期       | 源码                                                                                                                                                                                                                                                        | 发布说明                                        |
+| ----- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 1.7.8 | 2026-11-13 | [source](https://www.apache.org/dyn/closer.lua/fory/apache-fory-1.7.8-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.sha512) | [release notes](/zh-CN/blog/fory_1_7_8_release) |
 
 ## 所有归档版本
 
@@ -31,13 +31,13 @@ Fory 为下载站点上的所有文件提供 SHA 摘要和 PGP 签名文件。
 要验证 SHA 摘要，你需要 `.tar.gz` 文件及其对应的 `.tar.gz.sha512` 文件。示例命令如下：
 
 ```bash
-sha512sum --check apache-fory-1.7.7-src.tar.gz.sha512
+sha512sum --check apache-fory-1.7.8-src.tar.gz.sha512
 ```
 
 输出类似下面这样即表示校验通过：
 
 ```bash
-apache-fory-1.7.7-src.tar.gz: OK
+apache-fory-1.7.8-src.tar.gz: OK
 ```
 
 ### 校验签名
@@ -53,28 +53,12 @@ gpg --import KEYS
 之后可以校验签名：
 
 ```bash
-gpg --verify apache-fory-1.7.7-src.tar.gz.asc apache-fory-1.7.7-src.tar.gz
+gpg --verify apache-fory-1.7.8-src.tar.gz.asc apache-fory-1.7.8-src.tar.gz
 ```
 
-如果出现如下输出，即表示签名正确：
+核对 GPG 输出中的签名者及密钥指纹。1.7.8 源码包由 Apache Fory 自动发布密钥签名。
 
-```bash
-gpg: Signature made Sun Sep 27 01:30:42 2026 CST
-gpg:                using RSA key 1E2CDAE4C08AD7D694D1CB139D7BE8E45E580BA4
-gpg: Good signature from "chaokunyang (CODE SIGNING KEY) <chaokunyang@apache.org>" [unknown]
-```
-
-你还应通过如下命令进一步校验该密钥：
-
-```bash
-gpg --fingerprint 1E2CDAE4C08AD7D694D1CB139D7BE8E45E580BA4
-```
-
-输出应类似：
-
-```bash
-pub   rsa4096 2024-03-27 [SC]
-      1E2C DAE4 C08A D7D6 94D1  CB13 9D7B E8E4 5E58 0BA4
-uid           [ unknown] chaokunyang (CODE SIGNING KEY) <chaokunyang@apache.org>
-sub   rsa4096 2024-03-27 [E]
+```text
+gpg:                using RSA key C1FE86839CEDF2E023F4D9DF36A8FDFFA7A40EA5
+gpg: Good signature from "Apache Fory Automated Release Signing <private@fory.apache.org>" [unknown]
 ```

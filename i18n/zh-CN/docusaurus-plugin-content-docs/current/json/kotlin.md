@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-  implementation("org.apache.fory:fory-json-kotlin:1.7.7")
+  implementation("org.apache.fory:fory-json-kotlin:1.7.8")
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 }
 
 dependencies {
-  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.7")
+  ksp("org.apache.fory:fory-json-kotlin-ksp:1.7.8")
 }
 ```
 

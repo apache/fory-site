@@ -115,6 +115,7 @@ license: |
   `ForyEnum(Target = typeof(...))` 序列化器声明映射第三方 class/struct 或 enum。
   目标类型仍采用上表所示的 C# 映射；声明的归属方不会造成编码格式上的差异。
 - Python 的 `pyfory.Float16` 和 `pyfory.BFloat16` 是预留的注解标记；标量值反序列化为 Python 原生 `float`。
+- Rust 的 `Box<str>`、`Rc<str>` 和 `Arc<str>` 映射为 `string`。指向 `[T]` 的相应指针沿用 `Vec<T>` 的映射，包括 LIST、稠密数组和二进制的字段注解。`RcWeak` 和 `ArcWeak` 使用相同的目标映射，并具有可空引用语义。这些类型不引入新的编码类型 ID。
 - Python 的 `BoolArray`、`Int8Array`、`Int16Array`、`Int32Array`、`Int64Array`、`UInt8Array`、`UInt16Array`、`UInt32Array`、`UInt64Array`、`Float16Array`、`BFloat16Array`、`Float32Array` 和 `Float64Array` 是公开的稠密数组包装器，具有类似列表的序列行为。
 - Python 的 `collections.abc.Sequence`、`Set` 和 `Mapping` 实现及声明接口（包括可变变体）
   映射为 `list`、`set` 和 `map`。Xlang 读取器创建内置 Python `list`、`set` 和 `dict`；

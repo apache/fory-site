@@ -9,11 +9,11 @@ For binary install, please see the Apache Fory™ [getting started](/docs/start/
 
 ## The latest release
 
-The latest source release is 1.7.7:
+The latest source release is 1.7.8:
 
-| Version | Date       | Source                                                                                                                                                                                                                                                                        | Release Notes                                                       |
-| ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| 1.7.7   | 2026-10-12 | [source](https://www.apache.org/dyn/closer.lua/fory/1.7.7/apache-fory-1.7.7-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/1.7.7/apache-fory-1.7.7-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/1.7.7/apache-fory-1.7.7-src.tar.gz.sha512) | [release notes](https://github.com/apache/fory/releases/tag/v1.7.7) |
+| Version | Date       | Source                                                                                                                                                                                                                                                      | Release Notes                             |
+| ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| 1.7.8   | 2026-11-13 | [source](https://www.apache.org/dyn/closer.lua/fory/apache-fory-1.7.8-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.sha512) | [release notes](/blog/fory_1_7_8_release) |
 
 ## All archived releases
 
@@ -31,13 +31,13 @@ These files are named after the files they relate to but have `.sha512/.asc` ext
 To verify the SHA digests, you need the `.tar.gz` file and its associated `.tar.gz.sha512` file. An example command:
 
 ```bash
-sha512sum --check apache-fory-1.7.7-src.tar.gz.sha512
+sha512sum --check apache-fory-1.7.8-src.tar.gz.sha512
 ```
 
 It should output something like:
 
 ```bash
-apache-fory-1.7.7-src.tar.gz: OK
+apache-fory-1.7.8-src.tar.gz: OK
 ```
 
 ### Verifying Signatures
@@ -54,28 +54,12 @@ gpg --import KEYS
 Then you can verify signature:
 
 ```bash
-gpg --verify apache-fory-1.7.7-src.tar.gz.asc apache-fory-1.7.7-src.tar.gz
+gpg --verify apache-fory-1.7.8-src.tar.gz.asc apache-fory-1.7.8-src.tar.gz
 ```
 
-If something like the following appears, it means the signature is correct:
+Check the signer and fingerprint in the GPG output. The Apache Fory automated release key signed the 1.7.8 source archive.
 
-```bash
-gpg: Signature made Sun Sep 27 01:30:42 2026 CST
-gpg:                using RSA key 1E2CDAE4C08AD7D694D1CB139D7BE8E45E580BA4
-gpg: Good signature from "chaokunyang (CODE SIGNING KEY) <chaokunyang@apache.org>" [unknown]
-```
-
-You should also verify the key using a command like:
-
-```bash
-gpg --fingerprint 1E2CDAE4C08AD7D694D1CB139D7BE8E45E580BA4
-```
-
-It should output something like:
-
-```bash
-pub   rsa4096 2024-03-27 [SC]
-      1E2C DAE4 C08A D7D6 94D1  CB13 9D7B E8E4 5E58 0BA4
-uid           [ unknown] chaokunyang (CODE SIGNING KEY) <chaokunyang@apache.org>
-sub   rsa4096 2024-03-27 [E]
+```text
+gpg:                using RSA key C1FE86839CEDF2E023F4D9DF36A8FDFFA7A40EA5
+gpg: Good signature from "Apache Fory Automated Release Signing <private@fory.apache.org>" [unknown]
 ```

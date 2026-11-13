@@ -117,6 +117,34 @@ assert_eq!(person, decoded);
 | `RefCell<T>` | 内部可变性（运行时借用检查）           |
 | `Mutex<T>`   | 线程安全的内部可变性                   |
 
+`Box`、`Rc`、`Arc`、`RcWeak` 和 `ArcWeak` 也支持指向 `str` 或 `[T]`。例如，`Arc<str>` 表示共享字符串，`Box<[T]>` 持有切片。这些类型可用作根值、派生类型的字段或集合元素，原生模式和跨语言模式均支持。
+
+```rust
+use fory::{Fory, ForyStruct};
+use std::sync::Arc;
+
+#[derive(ForyStruct, Debug, PartialEq)]
+struct Message {
+    text: Arc<str>,
+    values: Arc<[i32]>,
+    #[fory(bytes)]
+    attachment: Box<[u8]>,
+}
+
+let mut fory = Fory::builder().build();
+fory.register::<Message>(100)?;
+let value = Message {
+    text: Arc::from("hello"),
+    values: vec![1, 2, 3].into(),
+    attachment: vec![0, 255].into(),
+};
+let bytes = fory.serialize(&value)?;
+let decoded: Message = fory.deserialize(&bytes)?;
+assert_eq!(value, decoded);
+```
+
+字符串指针采用 `String` 的编码格式，切片指针采用 `Vec<T>` 的编码格式。在根值处，根据元素选择列表、稠密数组或二进制格式；派生字段默认使用 LIST。对基本类型切片字段使用 `#[fory(array)]` 可指定稠密数组，使用 `#[fory(bytes)]` 可指定二进制，使用 `#[fory(list(...))]` 可配置列表元素。
+
 ### 日期和时间
 
 | Rust 类型   | 说明                                    |
@@ -145,7 +173,7 @@ Rust 启用 `chrono::NaiveDate`、`chrono::NaiveDateTime` 和 `chrono::Duration`
 
 ```toml
 [dependencies]
-fory = { version = "1.7.7", features = ["chrono"] }
+fory = { version = "1.7.8", features = ["chrono"] }
 ```
 
 ### 自定义类型

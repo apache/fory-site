@@ -188,6 +188,18 @@ struct Request {
 
 `with` 选择一个序列化器，其目标必须与声明的字段类型完全一致。对于 `Option`、`Box`、`Rc`、`Arc`、Fory 弱引用载体、`RefCell` 和 `Mutex`，请用对应的载体序列化器包装子序列化器。例如，使用 `OptionSerializer<UserSerializer>` 处理 `Option<third_party::User>`，使用 `ArcSerializer<UserSerializer>` 处理 `Arc<third_party::User>`。`RefCell` 和 `Mutex` 会保留子值的编码结构；序列化这些直接字段时只进行一次借用或加锁，反序列化则直接构造持有者，不会增加额外的堆所有者。嵌套在任何这些包装器之后的外部结构化序列化器仍然支持兼容 Schema 演进。
 
+对于外部类型的切片，可使用 `Box<[UserSerializer]>`、`Rc<[UserSerializer]>` 或 `Arc<[UserSerializer]>` 序列化相应的 `[third_party::User]` 指针。Fory 的 `RcWeak` 和 `ArcWeak` 也支持相同写法。在根值处使用 `serialize_with` 和 `deserialize_with` 选择序列化器，或在派生字段上指定：
+
+```rust
+#[derive(ForyStruct)]
+struct SharedUsers {
+    #[fory(with = std::sync::Arc<[UserSerializer]>)]
+    users: std::sync::Arc<[third_party::User]>,
+}
+```
+
+这些切片字段也支持 `#[fory(list(element(with = UserSerializer)))]`。请在首次根操作前注册 `UserSerializer`。
+
 在未跳过的派生字段中，应让每个载体构造器的规范名称保持可见，可以带上模块路径。这同时适用于字段的 Rust 类型和 `with` 序列化器树。例如，应直接写出 `Vec<third_party::User>` 和 `VecSerializer<UserSerializer>`，不要用类型别名或重命名导入隐藏任一载体树。叶子序列化器别名仍然有效。载体别名在根值处也仍然有效，因为 Rust 无需字段代码生成即可解析序列化器类型。跳过的字段也可以使用载体别名，因为它不产生字段 Schema 或主体字节，只使用所选序列化器的默认值。
 
 跳过的外部字段可以使用 `#[fory(skip, with = UserSerializer)]`。此时，序列化器只用于其可能失败的构造默认值；该字段不产生 Schema 或主体字节。如果这个跳过字段的默认值是序列化器的唯一用途，则无需注册。默认值会接收当前读取上下文，并且必须在任何自有内存分配之前预留对象图内存。跳过的 list/map/tuple 字段可以保留递归子序列化器注解，但空容器默认值不会调用其子序列化器。
