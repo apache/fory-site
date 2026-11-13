@@ -32,4 +32,4 @@ Rust 模型现可使用指向 `str` 和 `[T]` 的智能指针，例如用 `Arc<s
 - Java 复制 `java.sql.Timestamp` 时会保留不足一毫秒的精度。
 - [源码 SBOM](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.cdx.json) 列出了从源码包中的依赖清单和锁文件识别出的组件。
 
-[自 1.7.7 以来的完整变更](https://github.com/apache/fory/compare/v1.7.7...6f67e5b4978f909d614b990482063e332019f015)
+[GitHub 发布说明](https://github.com/apache/fory/releases/tag/v1.7.8) · [自 1.7.7 以来的完整变更](https://github.com/apache/fory/compare/v1.7.7...v1.7.8)

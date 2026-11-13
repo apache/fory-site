@@ -32,4 +32,4 @@ Rust models can now use smart pointers to `str` and `[T]`, including `Arc<str>` 
 - Java preserves sub-millisecond precision when copying `java.sql.Timestamp` values.
 - The [source SBOM](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.cdx.json) lists components identified in the manifests and lock files included in the source archive.
 
-[Full changelog since 1.7.7](https://github.com/apache/fory/compare/v1.7.7...6f67e5b4978f909d614b990482063e332019f015)
+[GitHub release notes](https://github.com/apache/fory/releases/tag/v1.7.8) · [Full changelog since 1.7.7](https://github.com/apache/fory/compare/v1.7.7...v1.7.8)
