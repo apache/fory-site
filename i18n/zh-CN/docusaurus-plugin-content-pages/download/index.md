@@ -11,9 +11,9 @@ Apache Fory™ 的官方发布以源码制品形式提供。
 
 当前最新源码版本为 1.7.8：
 
-| 版本  | 日期       | 源码                                                                                                                                                                                                                                                        | 发布说明                                        |
-| ----- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| 1.7.8 | 2026-11-13 | [source](https://www.apache.org/dyn/closer.lua/fory/apache-fory-1.7.8-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.sha512) | [release notes](/zh-CN/blog/fory_1_7_8_release) |
+| 版本  | 日期       | 源码                                                                                                                                                                                                                                                        | 发布说明                                                                                                           |
+| ----- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 1.7.8 | 2026-11-13 | [source](https://www.apache.org/dyn/closer.lua/fory/apache-fory-1.7.8-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.sha512) | [GitHub 发布说明](https://github.com/apache/fory/releases/tag/v1.7.8) · [版本亮点](/zh-CN/blog/fory_1_7_8_release) |
 
 ## 所有归档版本
 
