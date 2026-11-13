@@ -1,0 +1,16 @@
+blog/2026-11-13-fory_1_7_8_released.md
+  h_e94f2b5704cbef 35
+i18n/zh-CN/docusaurus-plugin-content-blog/2026-11-13-fory_1_7_8_released.md
+  h_e94f2b5704cbef 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7107dc63d132c702243d71d508dbc9fa51775e54",
+  "prompts": {},
+  "humans": {
+    "h_e94f2b5704cbef": {
+      "author": "chaokunyang <shawn.ck.yang@gmail.com>"
+    }
+  }
+}
