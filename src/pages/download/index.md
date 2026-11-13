@@ -11,9 +11,9 @@ For binary install, please see the Apache Fory™ [getting started](/docs/start/
 
 The latest source release is 1.7.8:
 
-| Version | Date       | Source                                                                                                                                                                                                                                                      | Release Notes                             |
-| ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| 1.7.8   | 2026-11-13 | [source](https://www.apache.org/dyn/closer.lua/fory/apache-fory-1.7.8-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.sha512) | [release notes](/blog/fory_1_7_8_release) |
+| Version | Date       | Source                                                                                                                                                                                                                                                      | Release Notes                                                                                                       |
+| ------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 1.7.8   | 2026-11-13 | [source](https://www.apache.org/dyn/closer.lua/fory/apache-fory-1.7.8-src.tar.gz?action=download) [asc](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.asc) [sha512](https://downloads.apache.org/fory/apache-fory-1.7.8-src.tar.gz.sha512) | [GitHub release notes](https://github.com/apache/fory/releases/tag/v1.7.8) · [Highlights](/blog/fory_1_7_8_release) |
 
 ## All archived releases
 
